@@ -1,16 +1,14 @@
-from datetime import datetime
+from datetime import date, time
 
 import pytest
-from resources.shared import AddressRoughDC
-from shipr.apc.available_services.avail_funcs import do_request, make_avail_serv_dict
-from shipr.apc.available_services.avail_request import GoodsInfo, Item, ServiceRequest, \
-    ShipmentDetails
-from shipr.apc.strs import SandboxEndPoints
+
+from shipr.apc.available_services.avail_request import Item, GoodsInfo, ShipmentDetails, Order, \
+    AddressRoughDC
 
 
 @pytest.fixture
-def avail_req_fxt():
-    dummy_item = Item(
+def dummy_item() -> Item:
+    return Item(
         type='ALL',
         weight=1,
         length=1,
@@ -18,15 +16,31 @@ def avail_req_fxt():
         height=1,
         value=1,
     )
-    dummy_goods_info = GoodsInfo(1, '.....', False)
-    dummy_shipment_details = ShipmentDetails(
+
+
+@pytest.fixture
+def dummy_goods_info() -> GoodsInfo:
+    return GoodsInfo(
+        goods_value=1,
+        goods_description='test description',
+        premium_insurance=False
+    )
+
+
+@pytest.fixture
+def dummy_shipment_details(dummy_item) -> ShipmentDetails:
+    return ShipmentDetails(
         number_of_pieces=1,
         items=[dummy_item]
     )
-    dummy_order = ServiceRequest(
-        collection_date=datetime(2024, 2, 1),
-        ready_at=datetime(2024, 2, 1, 9),
-        closed_at=datetime(2024, 2, 1, 18),
+
+
+@pytest.fixture
+def order_fxt(dummy_item, dummy_goods_info, dummy_shipment_details) -> Order:
+    dummy_request = Order(
+        collection_date=date(2024, 2, 5),
+        ready_at=time(9),
+        closed_at=time(18),
         collection=AddressRoughDC(
             postcode='NW6 4TE',
             country_code='GB'
@@ -38,11 +52,47 @@ def avail_req_fxt():
         goods_info=dummy_goods_info,
         shipment_details=dummy_shipment_details
     )
-    return dummy_order
+    return dummy_request
+
+
+@pytest.fixture
+def avail_req_fxt(dummy_item, dummy_goods_info, dummy_shipment_details) -> Order:
+    dummy_request = Order(
+        collection_date=date(2024, 2, 5),
+        ready_at=time(9),
+        closed_at=time(18),
+        collection=AddressRoughDC(
+            postcode='NW6 4TE',
+            country_code='GB'
+        ),
+        delivery=AddressRoughDC(
+            postcode='M17 1WA',
+            country_code='GB'
+        ),
+        goods_info=dummy_goods_info,
+        shipment_details=dummy_shipment_details
+    )
+    return dummy_request
+
+
+# @pytest.mark.asyncio
+# async def test_avail(order_fxt):
+#     req_dict = make_avail_serv_dict(order_fxt)
+#     response = await request_from_dict(SandboxEndPoints.SERVICE_AVAILABILITY, req_dict)
+#     assert response['ServiceAvailability']['Messages']['Code'] == 'SUCCESS'
+# 
+
+@pytest.mark.asyncio
+async def test_avail_v2(order_fxt):
+    print(order_fxt.get_dict)
 
 
 @pytest.mark.asyncio
-async def test_avail(avail_req_fxt):
-    req_dict = make_avail_serv_dict(avail_req_fxt)
-    response = await do_request(SandboxEndPoints.SERVICE_AVAILABILITY, req_dict)
-    assert response['ServiceAvailability']['Messages']['Code'] == 'SUCCESS'
+async def test_item(dummy_item):
+    print(dummy_item.get_dict)
+    ...
+
+@pytest.mark.asyncio
+async def test_order(order_fxt):
+    print(order_fxt.get_dict2)
+    ...

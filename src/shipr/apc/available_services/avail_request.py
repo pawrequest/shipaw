@@ -1,72 +1,45 @@
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional, Sequence, Literal
+from __future__ import annotations
+
+from datetime import date, time
+from typing import Literal, Sequence
 
 from dotenv import load_dotenv
 
-from resources.shared import AddressRoughDC
+from shipr.apc.available_services.apc_abc import BaseRequest
 
 load_dotenv()
 
 
-@dataclass
-class GoodsInfo:
+class GoodsInfo(BaseRequest):
     goods_value: int
     goods_description: str
     premium_insurance: bool
 
 
-@dataclass
-class Item:
-    type: Literal['ALL']
+class Item(BaseRequest):
     weight: int
     length: int
     width: int
     height: int
     value: int
-
-    def available_services_dict(self) -> dict:
-        return {
-            "Type": self.type,
-            "Weight": str(self.weight),
-            "Length": str(self.length),
-            "Width": str(self.width),
-            "Height": str(self.height),
-            "Value": str(self.value)
-        }
+    type: Literal['ALL'] = 'ALL'
 
 
-@dataclass
-class ShipmentDetails:
+class ShipmentDetails(BaseRequest):
     number_of_pieces: int
     items: Sequence[Item]
 
 
-@dataclass
-class ServiceRequest:
-    collection_date: datetime.date
-    ready_at: datetime.time
-    closed_at: datetime.time
+class Order(BaseRequest):
+    collection_date: date
+    ready_at: time
+    closed_at: time
     collection: AddressRoughDC
     delivery: AddressRoughDC
     goods_info: GoodsInfo
     shipment_details: ShipmentDetails
-    delivery_group: Optional[str] = None
 
 
-def get_item(item_obj: Item) -> dict:
-    return {
-        "Type": item_obj.type,
-        "Weight": str(item_obj.weight),
-        "Length": str(item_obj.length),
-        "Width": str(item_obj.width),
-        "Height": str(item_obj.height),
-        "Value": str(item_obj.value)
-    }
-
-
-def get_items_dict(items: Sequence[Item]) -> dict:
-    return {
-        "Item": _.available_services_dict()
-        for _ in items
-    }
+class AddressRoughDC(BaseRequest):
+    postcode: str
+    country_code: str

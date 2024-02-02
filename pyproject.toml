@@ -10,6 +10,8 @@ dependencies = [
     "pydantic",
     "aiohttp",
     "python-dotenv",
+    "pysimplegui",
+    "pawsupport[all] @ git+https://github.com/pawrequest/pawsupport",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
@@ -23,6 +25,7 @@ managed = true
 dev-dependencies = [
     "pytest",
     "pytest-asyncio",
+    "pyinstaller>=6.3.0",
 ]
 
 [tool.hatch.metadata]

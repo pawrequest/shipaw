@@ -4,8 +4,7 @@ import os
 
 from aiohttp import ClientSession
 
-from .avail_request import ServiceRequest, get_items_dict
-from ..strs import SandboxEndPoints
+from shipr.apc.available_services.avail_request_v2 import Item, Order
 
 
 def encode_b64(s: str) -> str:
@@ -31,7 +30,7 @@ def get_headers() -> dict:
     return res
 
 
-async def do_request(url, req_dict: dict, session=None) -> dict:
+async def request_from_dict(url, req_dict: dict, session=None) -> dict:
     session = session or ClientSession()
     req_json = json.dumps(req_dict)
 
@@ -46,7 +45,7 @@ async def do_request(url, req_dict: dict, session=None) -> dict:
             return response_json
 
 
-def make_avail_serv_dict(order_req: ServiceRequest) -> dict:
+def make_avail_serv_dict(order_req: Order) -> dict:
     return {
         "Orders": {
             "Order": {
@@ -69,7 +68,8 @@ def make_avail_serv_dict(order_req: ServiceRequest) -> dict:
                 },
                 "ShipmentDetails": {
                     "NumberofPieces": str(order_req.shipment_details.number_of_pieces),
-                    "Items": get_items_dict(order_req.shipment_details.items)
+                    **Item.items_dict_many(order_req.shipment_details.items)
+
                 }
             }
         }
