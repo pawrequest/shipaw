@@ -11,7 +11,7 @@ dependencies = [
     "aiohttp",
     "python-dotenv",
     "pysimplegui",
-    "pawsupport @ git+https://github.com/pawrequest/pawsupport",
+#    "pawsupport @ git+https://github.com/pawrequest/pawsupport",
     "zeep",
 ]
 readme = "README.md"
