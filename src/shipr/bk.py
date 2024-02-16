@@ -4,8 +4,6 @@ from typing import NamedTuple
 from dotenv import load_dotenv
 from zeep import Client, Settings, Transport
 
-from shipr.expresslink_specs import PFDicts
-
 ENV_FILE = r'C:\Users\giles\prdev\am_dev\amherst\.env'
 
 load_dotenv(ENV_FILE)
@@ -28,20 +26,25 @@ service = client.create_service(
 
 
 class PFAuth(NamedTuple):
-    user: str
-    pwd: str
+    UserName: str
+    Password: str
 
 
 postcode = 'NW6 4TE'
 
 Auth = PFAuth(username, password)
 
+postcode_only = {
+    "Postcode": postcode
+}
+
 response = service.Find(
     Authentication=dict(
-        UserName=Auth.user,
-        Password=Auth.pwd,
+        UserName=Auth.UserName,
+        Password=Auth.Password,
     ),
-    **PFDicts.paf(postcode)
+    # ConvenientCollect=postcode_only,
+    PAF=postcode_only
 )
 
 print(response)

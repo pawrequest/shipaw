@@ -5,11 +5,14 @@ from dotenv import load_dotenv
 from zeep.proxy import ServiceProxy
 
 import shipr.expresslink as pf
+import shipr.expresslink_specs as pf_specs
 
 ENV_FILE = r'C:\Users\giles\prdev\am_dev\amherst\.env'
 load_dotenv(ENV_FILE)
 
-
+@pytest.fixture
+def find_func():
+    return pf_specs.PFFunc.FIND
 @pytest.fixture
 def pf_auth():
     username = os.getenv('PF_EXPR_SAND_USR')
@@ -33,8 +36,8 @@ def test_client(pf_client):
     assert isinstance(pf_client, pf.PFExpressLink)
 
 
-def tst_get_service(pf_client):
-    serv = pf_client.get_service(pf.FIND)
+def test_get_service(pf_client):
+    serv = pf_client.get_service(pf_specs.PFEndPointSpec.find())
     assert isinstance(serv, ServiceProxy)
 
 
@@ -46,17 +49,13 @@ def test_get_find_service(pf_client):
 def test_find2(pf_client):
     find_serv = pf_client.find2()
 
-    # serv = pf_client.find_service()
-    # resp = getattr(serv, 'Find')(
-    #     Authentication={'UserName': AUTH.user, 'Password': AUTH.pwd},
-    #     PAF={'Postcode': 'NW6 4TE'}
-    # )
-    #
-    # au = pf.PFAuth.get_auth()
-    ...
+
+def test_sandbox_spec():
+    spec = pf_specs.PFEndPointSpec.sandbox(pf_specs.PFFunc.FIND)
+    assert spec.function == pf_specs.PFFunc.FIND
 
 
 def test_go_find(pf_client):
-    resp = pf_client.go_find('NW6 4TE')
+    resp = pf_client.addresses_from_postcode('NW6 4TE')
     assert resp
     ...
