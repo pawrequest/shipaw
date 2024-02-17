@@ -1,2 +1,3 @@
-def hello():
-    return "Hello from shipr!"
+from . import expresslink
+
+__all__ = ['expresslink']
