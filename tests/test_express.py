@@ -54,8 +54,7 @@ def test_from_zeep(pf_client):
     resp = pf_client.get_response(find_f, 'NW6 4TE')
 
     resp_type = FindReply
-    subtype = PAF
-    subres = resp[subtype.__name__]
     dct = serialize_object(resp, target_cls=dict)
     result = resp_type.model_validate(dct)
+    assert isinstance(result, resp_type)
     ...

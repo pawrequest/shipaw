@@ -35,6 +35,19 @@ class PFFunc(ABC):
         return self._pf_func.name
 
 
+class PFFunc2(ABC, BaseModel):
+    name: str
+    request_type: type[BaseModel]
+    response_type: type[BaseModel]
+
+    def get_pf_dict(self, data) -> dict:
+        raise NotImplementedError
+
+    # def do_func(self, client, data):
+    #     raise NotImplementedError
+
+
+
 @dataclass
 class PFDicts:
     @classmethod
