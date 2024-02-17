@@ -4,15 +4,19 @@ import pytest
 from dotenv import load_dotenv
 from zeep.proxy import ServiceProxy
 
-import shipr.expresslink as pf
-import shipr.expresslink_specs as pf_specs
+from shipr import expresslink as pf, expresslink_specs as pf_specs
 
-ENV_FILE = r'C:\Users\giles\prdev\am_dev\amherst\.env'
+# ENV_FILE = r'C:\Users\giles\prdev\am_dev\amherst\.env'
+# load_dotenv(ENV_FILE)
+ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)
+
 
 @pytest.fixture
 def find_func():
     return pf_specs.PFFunc.FIND
+
+
 @pytest.fixture
 def pf_auth():
     username = os.getenv('PF_EXPR_SAND_USR')

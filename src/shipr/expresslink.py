@@ -5,7 +5,7 @@ from typing import NamedTuple, Optional
 from zeep import Client, Settings, Transport
 from zeep.proxy import ServiceProxy
 
-from shipr.expresslink_specs import PFEndPointSpec
+from .expresslink_specs import PFEndPointSpec
 
 
 class PFAuth(NamedTuple):
