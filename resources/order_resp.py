@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Protocol, TypedDict
 
-from resources.shared import MessagesProtocol
+from shipr.resources.shared import MessagesProtocol
 
 
 ######################

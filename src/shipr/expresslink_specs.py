@@ -1,46 +1,84 @@
-from enum import StrEnum
+from __future__ import annotations
+
+from abc import ABC
+from dataclasses import dataclass
+from enum import StrEnum, auto
 from typing import NamedTuple
+
+from pydantic import BaseModel
 
 
 class PFExpressApiEndpoint(StrEnum):
     TEST = 'https://expresslink-test.parcelforce.net/ws/'
 
 
-class PFFunc(StrEnum):
-    FIND = 'Find'
-
-
 class PFBinding(StrEnum):
     SHIP = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
 
 
+class PFFuncName(StrEnum):
+    Find = auto()
+
+
+class PFFunc(ABC):
+    def __init__(self, pf_func: PFFuncName):
+        self._pf_func = pf_func
+
+    def get_pf_dict(self, data) -> dict:
+        raise NotImplementedError
+
+    # def do_func(self, client, data):
+    #     raise NotImplementedError
+
+    @property
+    def name(self):
+        return self._pf_func.name
+
+
+@dataclass
+class PFDicts:
+    @classmethod
+    def _postcode_only(cls, postcode):
+        return dict(
+            Postcode=postcode
+        )
+
+    @classmethod
+    def paf(cls, postcode):
+        return dict(
+            PAF=cls._postcode_only(postcode)
+        )
+
+
 class PFEndPointSpec(NamedTuple):
-    function: PFFunc
     binding: PFBinding
     api_address: PFExpressApiEndpoint
 
     @classmethod
-    def sandbox(cls, func: PFFunc):
+    def sandbox(cls):
         return cls(
-            function=func,
-            binding=PFBinding.SHIP,
-            api_address=PFExpressApiEndpoint.TEST
-        )
-
-    @classmethod
-    def find(cls):
-        return cls(
-            function=PFFunc.FIND,
             binding=PFBinding.SHIP,
             api_address=PFExpressApiEndpoint.TEST
         )
 
 
-class PFDicts:
-    @classmethod
-    def _postcode_only(cls, postcode):
-        return dict(Postcode=postcode)
+class PFAddress(BaseModel):
+    AddressLine1: str
+    AddressLine2: str
+    AddressLine3: str
+    Town: str
+    Postcode: str
+    Country: str
 
-    @classmethod
-    def paf(cls, postcode):
-        return dict(PAF=cls._postcode_only(postcode))
+
+class FindFunc(PFFunc):
+    def __init__(self):
+        super().__init__(pf_func=PFFuncName.Find)
+
+    def get_pf_dict(self, data):
+        return PFDicts.paf(data)
+
+    # def do_func(self, client, data):
+    #     data_d = self.get_pf_dict(data)
+    #     resp = client.get_response(self, data_d)
+    #     return resp

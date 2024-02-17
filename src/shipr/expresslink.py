@@ -5,7 +5,7 @@ from typing import NamedTuple, Optional
 from zeep import Client, Settings, Transport
 from zeep.proxy import ServiceProxy
 
-from .expresslink_specs import PFEndPointSpec
+from .expresslink_specs import PFFunc, PFEndPointSpec
 
 
 class PFAuth(NamedTuple):
@@ -40,35 +40,28 @@ class PFConfig:
 class PFExpressLink:
     def __init__(self, config: PFConfig):
         self.config = config
-        self.client = Client(wsdl=config.wsdl, settings=config.settings, transport=config.transport)
+        self.service = self.get_service(PFEndPointSpec.sandbox())
+
+    @property
+    def auth(self):
+        return self.config.auth.get_auth()
+
+    @property
+    def client(self):
+        return self.config.client
 
     @lru_cache
     def get_service(self, endpoint: PFEndPointSpec) -> ServiceProxy:
-        return self.client.create_service(
+        return self.config.client.create_service(
             binding_name=endpoint.binding,
             address=endpoint.api_address
         )
 
-    @lru_cache
-    def find_service(self) -> ServiceProxy:
-        spec = PFEndPointSpec.find()
-        return self.get_service(spec)
-
-    def find2(self):
-        find_serv = getattr(self.client.service, 'Find')
-        return find_serv
-
-    def get_response(self, service, spec: PFEndPointSpec, indict: dict):
-        resp = getattr(service, spec.function)(
-            Authentication=self.config.auth.get_auth(),
-            **indict
-        )
-        return resp
-
-    def addresses_from_postcode(self, postcode):
-        find_serv = self.find_service()
-        resp = getattr(find_serv, 'Find')(
-            Authentication=self.config.auth.get_auth(),
-            PAF={'Postcode': postcode}
+    def get_response(self, pf_func: PFFunc, data):
+        data_dict = pf_func.get_pf_dict(data)
+        fnc = getattr(self.service, pf_func.name)
+        resp = fnc(
+            Authentication=self.auth,
+            **data_dict
         )
         return resp

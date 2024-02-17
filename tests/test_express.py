@@ -1,26 +1,18 @@
+import json
 import os
 
 import pytest
 from dotenv import load_dotenv
 from zeep.proxy import ServiceProxy
+from zeep.helpers import serialize_object
 
-from shipr import expresslink as pf, expresslink_specs as pf_specs
+import shipr.expresslink_specs
+from shipr import expresslink as pf
+from shipr.expresslink_specs import FindFunc
+from shipr.models.generated import FindReply, PAF
 
 ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)
-
-
-@pytest.fixture
-def find_func():
-    return pf_specs.PFFunc.FIND
-
-
-@pytest.fixture
-def pf_auth():
-    username = os.getenv('PF_EXPR_SAND_USR')
-    password = os.getenv('PF_EXPR_SAND_PWD')
-    auth = pf.PFAuth(username, password)
-    return auth
 
 
 @pytest.fixture
@@ -39,25 +31,31 @@ def test_client(pf_client):
 
 
 def test_get_service(pf_client):
-    serv = pf_client.get_service(pf_specs.PFEndPointSpec.find())
+    serv = pf_client.get_service(shipr.expresslink_specs.PFEndPointSpec.sandbox())
     assert isinstance(serv, ServiceProxy)
 
 
-def test_get_find_service(pf_client):
-    serv = pf_client.find_service()
-    assert isinstance(serv, ServiceProxy)
+def test_get_response(pf_client):
+    find_f = FindFunc()
+    resp = pf_client.get_response(find_f, 'NW6 4TE')
+    ...
 
 
-def test_find2(pf_client):
-    find_serv = pf_client.find2()
+def test_models(pf_client):
+    find_f = FindFunc()
+    resp = pf_client.get_response(find_f, 'NW6 4TE')
+    # resp_dict = resp.__dict__['__values__']
+    res = PAF.model_validate(resp.PAF)
+    ...
 
 
-def test_sandbox_spec():
-    spec = pf_specs.PFEndPointSpec.sandbox(pf_specs.PFFunc.FIND)
-    assert spec.function == pf_specs.PFFunc.FIND
+def test_from_zeep(pf_client):
+    find_f = FindFunc()
+    resp = pf_client.get_response(find_f, 'NW6 4TE')
 
-
-def test_go_find(pf_client):
-    resp = pf_client.addresses_from_postcode('NW6 4TE')
-    assert resp
+    resp_type = FindReply
+    subtype = PAF
+    subres = resp[subtype.__name__]
+    dct = serialize_object(resp, target_cls=dict)
+    result = resp_type.model_validate(dct)
     ...
