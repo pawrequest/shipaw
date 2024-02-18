@@ -1,37 +1,19 @@
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import NamedTuple, Optional
+from typing import Optional
 
 from zeep import Client, Settings, Transport
 from zeep.proxy import ServiceProxy
 from zeep.helpers import serialize_object
-
-from .expresslink_specs import PFEndPointSpec, PFFunc, PFFunc2
+from .expresslink_specs import PFEndPointSpec, PFFunc2
 from .models.messages import PFFunc3
-from .models.remixed import Authentication
-
-
-class PFAuth(NamedTuple):
-    user: str
-    pwd: str
-
-    def get_auth(self):
-        return dict(
-            UserName=self.user,
-            Password=self.pwd
-        )
-
-    def get_auth2(self):
-        return Authentication(
-            UserName=self.user,
-            Password=self.pwd
-        )
+from .models.remixed import Authentication, BasePFType, FindRequest, BaseResponse
 
 
 @dataclass
 class PFConfig:
     wsdl: str
-    auth: PFAuth
+    auth: Authentication
     settings: Optional[Settings] = None
     transport: Optional[Transport] = None
     client: Optional[Client] = None
@@ -46,14 +28,14 @@ class PFConfig:
         )
 
 
-class PFConnector:
+class PFExpressLink:
     def __init__(self, config: PFConfig):
         self.config = config
         self.service = self.get_service(PFEndPointSpec.sandbox())
 
     @property
-    def auth(self) -> Authentication:
-        return self.config.auth.get_auth2()
+    def auth(self):
+        return self.config.auth
 
     @property
     def client(self):
@@ -66,17 +48,6 @@ class PFConnector:
             address=endpoint.api_address
         )
 
-
-class PFExpressLink(PFConnector):
-    def get_response(self, pf_func: PFFunc, data):
-        data_dict = pf_func.get_pf_dict(data)
-        fnc = getattr(self.service, pf_func.name)
-        resp = fnc(
-            Authentication=self.auth,
-            **data_dict
-        )
-        return resp
-
     def get_response2(self, pf_func: PFFunc2, data):
         data_dict = pf_func.get_pf_dict(data)
         fnc = getattr(self.service, pf_func.name)
@@ -86,17 +57,25 @@ class PFExpressLink(PFConnector):
         )
         return resp
 
-    def get_response3(self, pf_func: PFFunc3, data) -> dict:
-        request = pf_func.request_type(**data)
-        data_dict = serialize_object(request, target_cls=dict)
-        fnc = getattr(self.service, pf_func.name)
-        resp = fnc(
-            Authentication=self.auth,
-            **data_dict
-        )
-        return resp
+    # def process_request(self, pf_func: PFFunc2, data) -> dict:
+    #     request = pf_func.request_type(**data)
+    #     data_dict = serialize_object(request, target_cls=dict)
+    #     fnc = getattr(self.service, pf_func.name)
+    #     resp = fnc(
+    #         Authentication=self.auth,
+    #         **data_dict
+    #     )
+    #     return resp
 
-    def process_request(self, request) -> dict:
+    def process_request(self, request, pf_func:PFFunc3) -> BaseResponse:
         fnc = getattr(self.service, pf_func.name)
-        resp = fnc(**request)
-        return resp
+        data_dict = request.model_dump(by_alias=True)
+        resp = fnc(**data_dict)
+        ser = serialize_object(resp, target_cls=dict)
+        return pf_func.response_type.model_validate(ser)
+
+    def get_ath_request(self, pf_func: PFFunc3, *data: BasePFType):
+        res = pf_func.get_auth_request(self.auth, *data)
+        return res
+
+

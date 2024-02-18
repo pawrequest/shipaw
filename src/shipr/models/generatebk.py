@@ -4,17 +4,28 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from enum import Enum
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_snake, to_pascal
 
 
-class Notifications(BaseModel):
-    notification_type: List[str] = Field(..., alias='NotificationType', description='')
+class BasePFType(BaseModel):
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_pascal,
+        ),
+        use_enum_values=True
+    )
 
 
-class Address(BaseModel):
+class Notifications(BasePFType):
+    notification_type: List[str] = Field(..., description='')
+
+
+class Address(BasePFType):
     address_line1: str = Field(..., alias='AddressLine1')
     address_line2: Optional[str] = Field(None, alias='AddressLine2')
     address_line3: Optional[str] = Field(None, alias='AddressLine3')
@@ -23,27 +34,27 @@ class Address(BaseModel):
     country: str = Field(..., alias='Country')
 
 
-class Enhancement(BaseModel):
+class Enhancement(BasePFType):
     enhanced_compensation: Optional[str] = Field(None, alias='EnhancedCompensation')
     saturday_delivery_required: Optional[bool] = Field(
         None, alias='SaturdayDeliveryRequired'
     )
 
 
-class HazardousGood(BaseModel):
+class HazardousGood(BasePFType):
     lqdgun_code: Optional[str] = Field(None, alias='LQDGUNCode')
     lqdg_description: Optional[str] = Field(None, alias='LQDGDescription')
     lqdg_volume: Optional[float] = Field(None, alias='LQDGVolume')
     firearms: Optional[str] = Field(None, alias='Firearms')
 
 
-class Returns(BaseModel):
+class Returns(BasePFType):
     returns_email: Optional[str] = Field(None, alias='ReturnsEmail')
     email_message: Optional[str] = Field(None, alias='EmailMessage')
     email_label: bool = Field(..., alias='EmailLabel')
 
 
-class ContentDetail(BaseModel):
+class ContentDetail(BasePFType):
     country_of_manufacture: str = Field(..., alias='CountryOfManufacture')
     country_of_origin: Optional[str] = Field(None, alias='CountryOfOrigin')
     manufacturers_name: Optional[str] = Field(None, alias='ManufacturersName')
@@ -57,27 +68,27 @@ class ContentDetail(BaseModel):
     article_reference: Optional[str] = Field(None, alias='ArticleReference')
 
 
-class DateTimeRange(BaseModel):
+class DateTimeRange(BasePFType):
     from_: str = Field(..., alias='From')
     to: str = Field(..., alias='To')
 
 
-class ContentData(BaseModel):
+class ContentData(BasePFType):
     name: str = Field(..., alias='Name')
     data: str = Field(..., alias='Data')
 
 
-class LabelItem(BaseModel):
+class LabelItem(BasePFType):
     name: str = Field(..., alias='Name')
     data: str = Field(..., alias='Data')
 
 
-class Barcode(BaseModel):
+class Barcode(BasePFType):
     name: str = Field(..., alias='Name')
     data: str = Field(..., alias='Data')
 
 
-class Image(BaseModel):
+class Image(BasePFType):
     name: str = Field(..., alias='Name')
     data: str = Field(..., alias='Data')
 
@@ -87,16 +98,16 @@ class PrintType(Enum):
     single_parcel = 'SINGLE_PARCEL'
 
 
-class Document(BaseModel):
+class Document(BasePFType):
     data: str = Field(..., alias='Data')
 
 
-class ManifestShipment(BaseModel):
+class ManifestShipment(BasePFType):
     shipment_number: str = Field(..., alias='ShipmentNumber')
     service_code: str = Field(..., alias='ServiceCode')
 
 
-class CompletedShipment(BaseModel):
+class CompletedShipment(BasePFType):
     shipment_number: Optional[str] = Field(None, alias='ShipmentNumber')
     out_bound_shipment_number: Optional[str] = Field(
         None, alias='OutBoundShipmentNumber'
@@ -105,48 +116,48 @@ class CompletedShipment(BaseModel):
     partner_number: Optional[str] = Field(None, alias='PartnerNumber')
 
 
-class CompletedReturnInfo(BaseModel):
+class CompletedReturnInfo(BasePFType):
     status: str = Field(..., alias='Status')
     shipment_number: str = Field(..., alias='ShipmentNumber')
     collection_time: DateTimeRange = Field(..., alias='CollectionTime')
 
 
-class Authentication(BaseModel):
+class Authentication(BasePFType):
     user_name: str = Field(..., alias='UserName')
     password: str = Field(..., alias='Password')
 
 
-class CompletedCancelInfo(BaseModel):
+class CompletedCancelInfo(BasePFType):
     status: Optional[str] = Field(None, alias='Status')
     shipment_number: Optional[str] = Field(None, alias='ShipmentNumber')
 
 
-class SpecifiedNeighbour(BaseModel):
+class SpecifiedNeighbour(BasePFType):
     address: Optional[List[Address]] = Field(None, alias='Address', description='')
 
 
-class SafePlaceList(BaseModel):
+class SafePlaceList(BasePFType):
     safe_place: Optional[List[str]] = Field(None, alias='SafePlace', description='')
 
 
-class NominatedDeliveryDateList(BaseModel):
+class NominatedDeliveryDateList(BasePFType):
     nominated_delivery_date: Optional[List[str]] = Field(
         None, alias='NominatedDeliveryDate', description=''
     )
 
 
-class ServiceCodes(BaseModel):
+class ServiceCodes(BasePFType):
     service_code: Optional[List[str]] = Field(None, alias='ServiceCode', description='')
 
 
-class Hours(BaseModel):
+class Hours(BasePFType):
     open: Optional[str] = Field(None, alias='Open')
     close: Optional[str] = Field(None, alias='Close')
     close_lunch: Optional[str] = Field(None, alias='CloseLunch')
     after_lunch_opening: Optional[str] = Field(None, alias='AfterLunchOpening')
 
 
-class Position(BaseModel):
+class Position(BasePFType):
     longitude: Optional[float] = Field(None, alias='Longitude')
     latitude: Optional[float] = Field(None, alias='Latitude')
 
@@ -157,11 +168,11 @@ class AlertType(Enum):
     notification = 'NOTIFICATION'
 
 
-class BaseRequest(BaseModel):
+class BaseRequest(BasePFType):
     authentication: Authentication = Field(..., alias='Authentication')
 
 
-class Contact(BaseModel):
+class Contact(BasePFType):
     business_name: str = Field(..., alias='BusinessName')
     contact_name: Optional[str] = Field(None, alias='ContactName')
     email_address: Optional[str] = Field(None, alias='EmailAddress')
@@ -172,7 +183,7 @@ class Contact(BaseModel):
     notifications: Optional[Notifications] = Field(None, alias='Notifications')
 
 
-class InBoundDetails(BaseModel):
+class InBoundDetails(BasePFType):
     contract_number: str = Field(..., alias='ContractNumber')
     service_code: str = Field(..., alias='ServiceCode')
     total_shipment_weight: Optional[str] = Field(None, alias='TotalShipmentWeight')
@@ -188,73 +199,77 @@ class InBoundDetails(BaseModel):
     special_instructions4: Optional[str] = Field(None, alias='SpecialInstructions4')
 
 
-class HazardousGoods(BaseModel):
+class HazardousGoods(BasePFType):
     hazardous_good: List[HazardousGood] = Field(
         ..., alias='HazardousGood', description=''
     )
 
 
-class ContentDetails(BaseModel):
+class ContentDetails(BasePFType):
     content_detail: List[ContentDetail] = Field(
         ..., alias='ContentDetail', description=''
     )
 
 
-class CollectionInfo(BaseModel):
+class CollectionInfo(BasePFType):
     collection_contact: Contact = Field(..., alias='CollectionContact')
     collection_address: Address = Field(..., alias='CollectionAddress')
     collection_time: Optional[DateTimeRange] = Field(None, alias='CollectionTime')
 
 
-class ParcelContents(BaseModel):
+class ParcelContents(BasePFType):
     item: List[ContentData] = Field(..., alias='Item', description='')
 
 
-class LabelData(BaseModel):
+class LabelData(BasePFType):
     item: List[LabelItem] = Field(..., alias='Item', description='')
 
 
-class Barcodes(BaseModel):
+class Barcodes(BasePFType):
     barcode: List[Barcode] = Field(..., alias='Barcode', description='')
 
 
-class Images(BaseModel):
+class Images(BasePFType):
     image: List[Image] = Field(..., alias='Image', description='')
 
 
-class ManifestShipments(BaseModel):
+class ManifestShipments(BasePFType):
     manifest_shipment: List[ManifestShipment] = Field(
         ..., alias='ManifestShipment', description=''
     )
 
 
-class CompletedShipments(BaseModel):
+class CompletedShipments(BasePFType):
     completed_shipment: List[CompletedShipment] = Field(
         ..., alias='CompletedShipment', description=''
     )
 
 
-class Alert(BaseModel):
+class Alert(BasePFType):
     code: int = Field(..., alias='Code')
     message: str = Field(..., alias='Message')
     type: AlertType = Field(..., alias='Type')
 
 
-class CompletedCancel(BaseModel):
+class CompletedCancel(BasePFType):
     completed_cancel_info: Optional[CompletedCancelInfo] = Field(
         None, alias='CompletedCancelInfo'
     )
 
 
-class PAF(BaseModel):
+class PAF(BasePFType):
     postcode: Optional[str] = Field(None, alias='Postcode')
     count: Optional[int] = Field(None, alias='Count')
     specified_neighbour: Optional[List[SpecifiedNeighbour]] = Field(
         None, alias='SpecifiedNeighbour', description=''
     )
 
+    @classmethod
+    def from_postcode(cls, postcode: str) -> PAF:
+        return cls(postcode=postcode)
 
-class Department(BaseModel):
+
+class Department(BasePFType):
     department_id: Optional[List[int]] = Field(
         None, alias='DepartmentID', description=''
     )
@@ -266,35 +281,35 @@ class Department(BaseModel):
     )
 
 
-class Mon(BaseModel):
+class Mon(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class Tue(BaseModel):
+class Tue(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class Wed(BaseModel):
+class Wed(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class Thu(BaseModel):
+class Thu(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class Fri(BaseModel):
+class Fri(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class Sat(BaseModel):
+class Sat(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class Sun(BaseModel):
+class Sun(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
-class BankHol(BaseModel):
+class BankHol(BasePFType):
     hours: Optional[Hours] = Field(None, alias='Hours')
 
 
@@ -333,7 +348,7 @@ class CancelShipmentRequest(BaseRequest):
     shipment_number: str = Field(..., alias='ShipmentNumber')
 
 
-class Parcel(BaseModel):
+class Parcel(BasePFType):
     weight: Optional[float] = Field(None, alias='Weight')
     length: Optional[int] = Field(None, alias='Length')
     height: Optional[int] = Field(None, alias='Height')
@@ -346,7 +361,7 @@ class Parcel(BaseModel):
     shipping_cost: Optional[float] = Field(None, alias='ShippingCost')
 
 
-class ParcelLabelData(BaseModel):
+class ParcelLabelData(BasePFType):
     parcel_number: Optional[str] = Field(None, alias='ParcelNumber')
     shipment_number: Optional[str] = Field(None, alias='ShipmentNumber')
     journey_leg: Optional[str] = Field(None, alias='JourneyLeg')
@@ -358,7 +373,7 @@ class ParcelLabelData(BaseModel):
     )
 
 
-class CompletedManifestInfo(BaseModel):
+class CompletedManifestInfo(BasePFType):
     department_id: int = Field(..., alias='DepartmentId')
     manifest_number: str = Field(..., alias='ManifestNumber')
     manifest_type: str = Field(..., alias='ManifestType')
@@ -366,7 +381,7 @@ class CompletedManifestInfo(BaseModel):
     manifest_shipments: ManifestShipments = Field(..., alias='ManifestShipments')
 
 
-class CompletedShipmentInfoCreatePrint(BaseModel):
+class CompletedShipmentInfoCreatePrint(BasePFType):
     lead_shipment_number: Optional[str] = Field(None, alias='LeadShipmentNumber')
     shipment_number: Optional[str] = Field(None, alias='ShipmentNumber')
     delivery_date: Optional[str] = Field(None, alias='DeliveryDate')
@@ -374,17 +389,17 @@ class CompletedShipmentInfoCreatePrint(BaseModel):
     completed_shipments: CompletedShipments = Field(..., alias='CompletedShipments')
 
 
-class Alerts(BaseModel):
+class Alerts(BasePFType):
     alert: List[Alert] = Field(..., alias='Alert', description='')
 
 
-class Departments(BaseModel):
+class Departments(BasePFType):
     department: Optional[List[Department]] = Field(
         None, alias='Department', description=''
     )
 
 
-class OpeningHours(BaseModel):
+class OpeningHours(BasePFType):
     mon: Optional[Mon] = Field(None, alias='Mon')
     tue: Optional[Tue] = Field(None, alias='Tue')
     wed: Optional[Wed] = Field(None, alias='Wed')
@@ -395,76 +410,76 @@ class OpeningHours(BaseModel):
     bank_hol: Optional[BankHol] = Field(None, alias='BankHol')
 
 
-class CancelShipmentRequest1(BaseModel):
+class CancelShipmentRequest1(BasePFType):
     cancel_shipment_request: CancelShipmentRequest = Field(
         ..., alias='CancelShipmentRequest'
     )
 
 
-class CCReserveRequest1(BaseModel):
+class CCReserveRequest1(BasePFType):
     cc_reserve_request: CCReserveRequest = Field(..., alias='CCReserveRequest')
 
 
-class CreateManifestRequest1(BaseModel):
+class CreateManifestRequest1(BasePFType):
     create_manifest_request: CreateManifestRequest = Field(
         ..., alias='CreateManifestRequest'
     )
 
 
-class PrintDocumentRequest1(BaseModel):
+class PrintDocumentRequest1(BasePFType):
     print_document_request: PrintDocumentRequest = Field(
         ..., alias='PrintDocumentRequest'
     )
 
 
-class PrintLabelRequest1(BaseModel):
+class PrintLabelRequest1(BasePFType):
     print_label_request: PrintLabelRequest = Field(..., alias='PrintLabelRequest')
 
 
-class PrintManifestRequest1(BaseModel):
+class PrintManifestRequest1(BasePFType):
     print_manifest_request: PrintManifestRequest = Field(
         ..., alias='PrintManifestRequest'
     )
 
 
-class ReturnShipmentRequest1(BaseModel):
+class ReturnShipmentRequest1(BasePFType):
     return_shipment_request: ReturnShipmentRequest = Field(
         ..., alias='ReturnShipmentRequest'
     )
 
 
-class BaseReply(BaseModel):
+class BaseReply(BasePFType):
     alerts: Optional[Alerts] = Field(None, alias='Alerts')
 
 
-class Parcels(BaseModel):
+class Parcels(BasePFType):
     parcel: List[Parcel] = Field(..., alias='Parcel', description='')
 
 
-class ShipmentLabelData(BaseModel):
+class ShipmentLabelData(BasePFType):
     parcel_label_data: List[ParcelLabelData] = Field(
         ..., alias='ParcelLabelData', description=''
     )
 
 
-class CompletedManifests(BaseModel):
+class CompletedManifests(BasePFType):
     completed_manifest_info: List[CompletedManifestInfo] = Field(
         ..., alias='CompletedManifestInfo', description=''
     )
 
 
-class NominatedDeliveryDates(BaseModel):
+class NominatedDeliveryDates(BasePFType):
     service_code: Optional[str] = Field(None, alias='ServiceCode')
     departments: Optional[Departments] = Field(None, alias='Departments')
 
 
-class PostcodeExclusion(BaseModel):
+class PostcodeExclusion(BasePFType):
     delivery_postcode: Optional[str] = Field(None, alias='DeliveryPostcode')
     collection_postcode: Optional[str] = Field(None, alias='CollectionPostcode')
     departments: Optional[Departments] = Field(None, alias='Departments')
 
 
-class PostOffice(BaseModel):
+class PostOffice(BasePFType):
     post_office_id: Optional[str] = Field(None, alias='PostOfficeID')
     business: Optional[str] = Field(None, alias='Business')
     address: Optional[Address] = Field(None, alias='Address')
@@ -520,7 +535,7 @@ class CancelShipmentReply(BaseReply):
     completed_cancel: Optional[CompletedCancel] = Field(None, alias='CompletedCancel')
 
 
-class InternationalInfo(BaseModel):
+class InternationalInfo(BasePFType):
     parcels: Optional[Parcels] = Field(None, alias='Parcels')
     exporter_customs_reference: Optional[str] = Field(
         None, alias='ExporterCustomsReference'
@@ -543,7 +558,7 @@ class InternationalInfo(BaseModel):
     purchase_order_ref: Optional[str] = Field(None, alias='PurchaseOrderRef')
 
 
-class ConvenientCollect(BaseModel):
+class ConvenientCollect(BasePFType):
     postcode: Optional[str] = Field(None, alias='Postcode')
     post_office: Optional[List[PostOffice]] = Field(
         None, alias='PostOffice', description=''
@@ -552,7 +567,7 @@ class ConvenientCollect(BaseModel):
     post_office_id: Optional[str] = Field(None, alias='PostOfficeID')
 
 
-class SpecifiedPostOffice(BaseModel):
+class SpecifiedPostOffice(BasePFType):
     postcode: Optional[str] = Field(None, alias='Postcode')
     post_office: Optional[List[PostOffice]] = Field(
         None, alias='PostOffice', description=''
@@ -561,35 +576,35 @@ class SpecifiedPostOffice(BaseModel):
     post_office_id: Optional[str] = Field(None, alias='PostOfficeID')
 
 
-class CancelShipmentReply1(BaseModel):
+class CancelShipmentReply1(BasePFType):
     cancel_shipment_reply: CancelShipmentReply = Field(..., alias='CancelShipmentReply')
 
 
-class CCReserveReply1(BaseModel):
+class CCReserveReply1(BasePFType):
     cc_reserve_reply: CCReserveReply = Field(..., alias='CCReserveReply')
 
 
-class CreateManifestReply1(BaseModel):
+class CreateManifestReply1(BasePFType):
     create_manifest_reply: CreateManifestReply = Field(..., alias='CreateManifestReply')
 
 
-class CreatePrintReply1(BaseModel):
+class CreatePrintReply1(BasePFType):
     create_print_reply: CreatePrintReply = Field(..., alias='CreatePrintReply')
 
 
-class PrintDocumentReply1(BaseModel):
+class PrintDocumentReply1(BasePFType):
     print_document_reply: PrintDocumentReply = Field(..., alias='PrintDocumentReply')
 
 
-class PrintLabelReply1(BaseModel):
+class PrintLabelReply1(BasePFType):
     print_label_reply: PrintLabelReply = Field(..., alias='PrintLabelReply')
 
 
-class PrintManifestReply1(BaseModel):
+class PrintManifestReply1(BasePFType):
     print_manifest_reply: PrintManifestReply = Field(..., alias='PrintManifestReply')
 
 
-class ReturnShipmentReply1(BaseModel):
+class ReturnShipmentReply1(BasePFType):
     return_shipment_reply: ReturnShipmentReply = Field(..., alias='ReturnShipmentReply')
 
 
@@ -627,7 +642,7 @@ class FindReply(BaseReply):
     )
 
 
-class DeliveryOptions(BaseModel):
+class DeliveryOptions(BasePFType):
     convenient_collect: Optional[ConvenientCollect] = Field(
         None, alias='ConvenientCollect'
     )
@@ -645,15 +660,15 @@ class DeliveryOptions(BaseModel):
     personal_parcel: Optional[str] = Field(None, alias='PersonalParcel')
 
 
-class FindReply1(BaseModel):
+class FindReply1(BasePFType):
     find_reply: FindReply = Field(..., alias='FindReply')
 
 
-class FindRequest1(BaseModel):
+class FindRequest1(BasePFType):
     find_request: FindRequest = Field(..., alias='FindRequest')
 
 
-class RequestedShipment(BaseModel):
+class RequestedShipment(BasePFType):
     department_id: Optional[int] = Field(None, alias='DepartmentId')
     shipment_type: str = Field(..., alias='ShipmentType')
     contract_number: str = Field(..., alias='ContractNumber')
@@ -700,7 +715,7 @@ class RequestedShipment(BaseModel):
     consignment_handling: Optional[bool] = Field(None, alias='ConsignmentHandling')
 
 
-class CompletedShipmentInfo(BaseModel):
+class CompletedShipmentInfo(BasePFType):
     lead_shipment_number: Optional[str] = Field(None, alias='LeadShipmentNumber')
     delivery_date: Optional[str] = Field(None, alias='DeliveryDate')
     status: str = Field(..., alias='Status')
@@ -722,15 +737,15 @@ class CreatePrintRequest(BaseRequest):
     requested_shipment: RequestedShipment = Field(..., alias='RequestedShipment')
 
 
-class CreatePrintRequest1(BaseModel):
+class CreatePrintRequest1(BasePFType):
     create_print_request: CreatePrintRequest = Field(..., alias='CreatePrintRequest')
 
 
-class CreateShipmentReply1(BaseModel):
+class CreateShipmentReply1(BasePFType):
     create_shipment_reply: CreateShipmentReply = Field(..., alias='CreateShipmentReply')
 
 
-class CreateShipmentRequest1(BaseModel):
+class CreateShipmentRequest1(BasePFType):
     create_shipment_request: CreateShipmentRequest = Field(
         ..., alias='CreateShipmentRequest'
     )

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from enum import StrEnum, auto
 from typing import NamedTuple
 
+from enum import StrEnum, auto
 from pydantic import BaseModel
 
 
@@ -27,9 +27,6 @@ class PFFunc(ABC):
     def get_pf_dict(self, data) -> dict:
         raise NotImplementedError
 
-    # def do_func(self, client, data):
-    #     raise NotImplementedError
-
     @property
     def name(self):
         return self._pf_func.name
@@ -42,10 +39,6 @@ class PFFunc2(ABC, BaseModel):
 
     def get_pf_dict(self, data) -> dict:
         raise NotImplementedError
-
-    # def do_func(self, client, data):
-    #     raise NotImplementedError
-
 
 
 @dataclass
@@ -82,16 +75,3 @@ class PFAddress(BaseModel):
     Town: str
     Postcode: str
     Country: str
-
-
-class FindFunc(PFFunc):
-    def __init__(self):
-        super().__init__(pf_func=PFFuncName.Find)
-
-    def get_pf_dict(self, data):
-        return PFDicts.paf(data)
-
-    # def do_func(self, client, data):
-    #     data_d = self.get_pf_dict(data)
-    #     resp = client.get_response(self, data_d)
-    #     return resp

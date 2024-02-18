@@ -3,7 +3,7 @@ import shipr.models.pf_responses
 import shipr.models.pf_types
 import shipr.models.requests
 import shipr.models.simple
-from . import generated as pfgen
+from . import remixed as pfgen
 
 class PFType:
 
