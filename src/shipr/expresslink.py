@@ -7,9 +7,7 @@ from zeep.proxy import ServiceProxy
 from zeep.helpers import serialize_object
 
 from .expresslink_specs import PFEndPointSpec, PFFunc, PFFunc2
-from .models.expresslink_pydantic import Authentication
-from .models.messages import PFFunc
-
+from .models.express.expresslink_pydantic import Authentication
 
 
 @dataclass

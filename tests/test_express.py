@@ -6,7 +6,8 @@ from zeep.helpers import serialize_object
 import shipr.expresslink_specs
 from shipr import expresslink2 as pf
 from shipr.models.bases import obj_dict
-from shipr.models.expresslink_pydantic import FindResponse, PAF
+from shipr.models.expresslink_pydantic import PAF
+from shipr.models.express_com import FindResponse
 from shipr.models.messages import FindFunc
 
 ENV_FILE = r'../../amherst/.env'

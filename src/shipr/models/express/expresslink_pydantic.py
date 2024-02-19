@@ -4,37 +4,23 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from functools import partial
+from typing import List, Optional, Sequence
 from enum import Enum
 
-from pydantic import Field
+from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic.alias_generators import to_pascal
 
-from shipr.models.bases import BasePFType, BaseRequest, BaseResponse
 
-
-class FindMessage(BasePFType):
-    convenient_collect: Optional[ConvenientCollect] = Field(
-        None
+class BasePFType(BaseModel):
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            alias=to_pascal,
+        ),
+        use_enum_values=True,
+        populate_by_name=True,
+        extra='allow',
     )
-    specified_post_office: Optional[SpecifiedPostOffice] = Field(
-        None
-    )
-    paf: Optional[PAF] = Field(None, alias='PAF')
-    safe_places: Optional[bool] = Field(None)
-    nominated_delivery_dates: Optional[NominatedDeliveryDates] = Field(
-        None
-    )
-    postcode_exclusion: Optional[PostcodeExclusion] = Field(
-        None
-    )
-
-
-class FindRequest(FindMessage, BaseRequest):
-    ...
-
-
-class FindResponse(FindMessage, BaseResponse):
-    ...
 
 
 class PAF(BasePFType):
@@ -325,41 +311,6 @@ class BankHol(BasePFType):
     hours: Optional[Hours] = Field(None)
 
 
-class PrintLabelRequest(BaseRequest):
-    shipment_number: str = Field(...)
-    print_format: Optional[str] = Field(None)
-    barcode_format: Optional[str] = Field(None)
-    print_type: Optional[PrintType] = Field(None)
-
-
-class PrintDocumentRequest(BaseRequest):
-    shipment_number: str = Field(...)
-    document_type: int = Field(...)
-    print_format: Optional[str] = Field(None)
-
-
-class CreateManifestRequest(BaseRequest):
-    department_id: Optional[int] = Field(None)
-
-
-class PrintManifestRequest(BaseRequest):
-    manifest_number: str = Field(...)
-    print_format: Optional[str] = Field(None)
-
-
-class ReturnShipmentRequest(BaseRequest):
-    shipment_number: str = Field(...)
-    collection_time: DateTimeRange = Field(...)
-
-
-class CCReserveRequest(BaseRequest):
-    booking_reference: str = Field(...)
-
-
-class CancelShipmentRequest(BaseRequest):
-    shipment_number: str = Field(...)
-
-
 class Parcel(BasePFType):
     weight: Optional[float] = Field(None)
     length: Optional[int] = Field(None)
@@ -422,44 +373,6 @@ class OpeningHours(BasePFType):
     bank_hol: Optional[BankHol] = Field(None)
 
 
-class CancelShipmentRequest1(BasePFType):
-    cancel_shipment_request: CancelShipmentRequest = Field(
-        ...
-    )
-
-
-class CCReserveRequest1(BasePFType):
-    cc_reserve_request: CCReserveRequest = Field(...)
-
-
-class CreateManifestRequest1(BasePFType):
-    create_manifest_request: CreateManifestRequest = Field(
-        ...
-    )
-
-
-class PrintDocumentRequest1(BasePFType):
-    print_document_request: PrintDocumentRequest = Field(
-        ...
-    )
-
-
-class PrintLabelRequest1(BasePFType):
-    print_label_request: PrintLabelRequest = Field(...)
-
-
-class PrintManifestRequest1(BasePFType):
-    print_manifest_request: PrintManifestRequest = Field(
-        ...
-    )
-
-
-class ReturnShipmentRequest1(BasePFType):
-    return_shipment_request: ReturnShipmentRequest = Field(
-        ...
-    )
-
-
 class Parcels(BasePFType):
     parcel: List[Parcel] = Field(..., description='')
 
@@ -496,51 +409,6 @@ class PostOffice(BasePFType):
     availability: Optional[bool] = Field(None)
     position: Optional[Position] = Field(None)
     booking_reference: Optional[str] = Field(None)
-
-
-class CreatePrintResponse(BaseResponse):
-    completed_shipment_info_create_print: Optional[CompletedShipmentInfoCreatePrint] = (
-        Field(None)
-    )
-    label: Optional[Document] = Field(None)
-    label_data: Optional[ShipmentLabelData] = Field(None)
-    partner_code: Optional[str] = Field(None)
-
-
-class PrintLabelResponse(BaseResponse):
-    label: Optional[Document] = Field(None)
-    label_data: Optional[ShipmentLabelData] = Field(None)
-    partner_code: Optional[str] = Field(None)
-
-
-class PrintDocumentResponse(BaseResponse):
-    label: Optional[Document] = Field(None)
-    label_data: Optional[ShipmentLabelData] = Field(None)
-    document_type: Optional[Document] = Field(None)
-
-
-class CreateManifestResponse(BaseResponse):
-    completed_manifests: Optional[CompletedManifests] = Field(
-        None
-    )
-
-
-class PrintManifestResponse(BaseResponse):
-    manifest: Optional[Document] = Field(None)
-
-
-class ReturnShipmentResponse(BaseResponse):
-    completed_shipment_info: Optional[CompletedReturnInfo] = Field(
-        None
-    )
-
-
-class CCReserveResponse(BaseResponse):
-    post_office: Optional[PostOffice] = Field(None)
-
-
-class CancelShipmentResponse(BaseResponse):
-    completed_cancel: Optional[CompletedCancel] = Field(None)
 
 
 class InternationalInfo(BasePFType):
@@ -584,38 +452,6 @@ class SpecifiedPostOffice(BasePFType):
     post_office_id: Optional[str] = Field(None)
 
 
-class CancelShipmentResponse1(BasePFType):
-    cancel_shipment_reply: CancelShipmentResponse = Field(...)
-
-
-class CCReserveResponse1(BasePFType):
-    cc_reserve_reply: CCReserveResponse = Field(...)
-
-
-class CreateManifestResponse1(BasePFType):
-    create_manifest_reply: CreateManifestResponse = Field(...)
-
-
-class CreatePrintResponse1(BasePFType):
-    create_print_reply: CreatePrintResponse = Field(...)
-
-
-class PrintDocumentResponse1(BasePFType):
-    print_document_reply: PrintDocumentResponse = Field(...)
-
-
-class PrintLabelResponse1(BasePFType):
-    print_label_reply: PrintLabelResponse = Field(...)
-
-
-class PrintManifestResponse1(BasePFType):
-    print_manifest_reply: PrintManifestResponse = Field(...)
-
-
-class ReturnShipmentResponse1(BasePFType):
-    return_shipment_reply: ReturnShipmentResponse = Field(...)
-
-
 class DeliveryOptions(BasePFType):
     convenient_collect: Optional[ConvenientCollect] = Field(
         None
@@ -632,14 +468,6 @@ class DeliveryOptions(BasePFType):
     address_only: Optional[bool] = Field(None)
     nominated_delivery_date: Optional[str] = Field(None)
     personal_parcel: Optional[str] = Field(None)
-
-
-class FindResponse1(BasePFType):
-    find_reply: FindResponse = Field(...)
-
-
-class FindRequest1(BasePFType):
-    find_request: FindRequest = Field(...)
 
 
 class RequestedShipment(BasePFType):
@@ -697,29 +525,10 @@ class CompletedShipmentInfo(BasePFType):
     requested_shipment: RequestedShipment = Field(...)
 
 
-class CreateShipmentRequest(BaseRequest):
-    requested_shipment: RequestedShipment = Field(...)
+def obj_dict(objs: BasePFType | Sequence[BasePFType], **kwargs) -> dict:
+    if isinstance(objs, BasePFType):
+        objs = [objs]
+    return {obj.__class__.__name__: obj.model_dump(**kwargs) for obj in objs}
 
 
-class CreateShipmentResponse(BaseResponse):
-    completed_shipment_info: Optional[CompletedShipmentInfo] = Field(
-        None
-    )
-
-
-class CreatePrintRequest(BaseRequest):
-    requested_shipment: RequestedShipment = Field(...)
-
-
-class CreatePrintRequest1(BasePFType):
-    create_print_request: CreatePrintRequest = Field(...)
-
-
-class CreateShipmentResponse1(BasePFType):
-    create_shipment_reply: CreateShipmentResponse = Field(...)
-
-
-class CreateShipmentRequest1(BasePFType):
-    create_shipment_request: CreateShipmentRequest = Field(
-        ...
-    )
+alias_dict = partial(obj_dict, by_alias=True, exclude_none=True)

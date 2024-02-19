@@ -4,7 +4,7 @@ import pytest
 from dotenv import load_dotenv
 
 from shipr.el_combadge import ZeepConfig
-from shipr.models.expresslink_pydantic import Authentication
+from shipr.models.express.expresslink_pydantic import Authentication
 
 ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)

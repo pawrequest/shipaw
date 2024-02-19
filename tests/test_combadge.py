@@ -1,17 +1,9 @@
-import os
-
-import pytest
-from dotenv import load_dotenv
 from combadge.support.zeep.backends.sync import ZeepBackend
 
-from shipr.el_combadge import PFCom, ZeepConfig
+from shipr.el_combadge import PFCom
 from shipr.models.combadge_protocols import FindService
-from shipr.models.expresslink_pydantic import (Address, FindRequest, FindResponse, PAF)
-
-ENV_FILE = r'../../amherst/.env'
-load_dotenv(ENV_FILE)
-
-WSDL = os.environ.get('PF_WSDL')
+from shipr.models.express.expresslink_pydantic import Address, PAF
+from shipr.models.express.msg import FindRequest, FindResponse
 
 
 def test_find_paf(zconfig):
