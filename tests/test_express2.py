@@ -36,7 +36,7 @@ def test_go_find(pf_client):
 
 def test_go_find2(pf_client):
     try:
-        serv = pf_client._client._service
+        serv = pf_client._client.service
         fnc = getattr(serv, 'Find')
         resp = fnc(
             Authentication=pf_client.config.auth.get_auth(),

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from combadge.core.typevars import ServiceProtocolT
+from combadge.support.zeep.backends.sync import ZeepBackend
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
@@ -53,3 +55,29 @@ class PFCom:
             address=self.config.endpoint
         )
         return serv
+
+
+@dataclass
+class PFCom2:
+    config: ZeepConfig
+    service: ServiceProxy
+
+    @classmethod
+    def from_config(cls, config: ZeepConfig):
+        client = Client(wsdl=config.wsdl)
+        service = client.create_service(config.binding, config.endpoint)
+        return cls(
+            config=config,
+            service=service
+        )
+
+    def new_service(self) -> ServiceProxy:
+        client = Client(wsdl=self.config.wsdl)
+        serv = client.create_service(
+            binding_name=self.config.binding,
+            address=self.config.endpoint
+        )
+        return serv
+
+    def backend(self, service_prot: type[ServiceProtocolT]) -> ServiceProxy:
+        return ZeepBackend(self.service)[service_prot]

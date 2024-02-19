@@ -108,7 +108,7 @@ def results_frame(shipment_dict: ShipmentDict):
         ship_res = [
             sg.Text(shipment.shipment_request.client_reference, **params),
             sg.Text(shipment.shipment_return.recipient_address.recipient_address.street, **params),
-            sg.Text(keys_and_strings.SERVICE_STRING(num_boxes=num_boxes, service=shipment._service), **params),
+            sg.Text(keys_and_strings.SERVICE_STRING(num_boxes=num_boxes, service=shipment.service), **params),
         ]
 
         if shipment.is_printed:
@@ -150,7 +150,7 @@ def new_service_popup(menu_map: dict, location, default_service: Service) -> Ser
 
 def service_button(num_parcels, shipment):
     service_col = 'green' if shipment.default_service_matched else 'maroon4'
-    service_name_button = sg.Text(f'{shipment._service.name} \n£{(num_parcels * shipment._service.cost):.2f}',
+    service_name_button = sg.Text(f'{shipment.service.name} \n£{(num_parcels * shipment.service.cost):.2f}',
                                   background_color=service_col, enable_events=True,
                                   k=keys_and_strings.SERVICE_KEY(shipment), **shipment_params)
     return service_name_button

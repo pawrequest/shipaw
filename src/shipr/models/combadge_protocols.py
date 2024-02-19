@@ -9,7 +9,6 @@ from combadge.support.soap.markers import operation_name
 
 from .express import msg
 
-
 class FindService(SupportsService, Protocol):
     @operation_name("Find")
     def find(self, request: Annotated[msg.FindRequest, Payload(by_alias=True)]) -> msg.FindResponse:
@@ -89,6 +88,6 @@ class PrintLabelService(SupportsService, Protocol):
     @operation_name("PrintLabel")
     def printlabel(
             self,
-            request: Annotated[shipr.models.express.msg.PrintLabelRequest, Payload(by_alias=True)],
+            request: Annotated[msg.PrintLabelRequest, Payload(by_alias=True)],
     ) -> msg.PrintLabelResponse:
         ...
