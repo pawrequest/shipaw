@@ -2,7 +2,6 @@ import datetime
 import os
 
 import pytest
-from combadge.support.zeep.backends.sync import ZeepBackend
 from dotenv import load_dotenv
 
 from shipr.el_combadge import PFCom, ZeepConfig
@@ -49,10 +48,6 @@ def pf_com(zconfig):
 @pytest.fixture
 def service(pf_com):
     return pf_com.new_service()
-
-
-def combadge_service(service, service_prot):
-    return ZeepBackend(service)[service_prot]
 
 
 @pytest.fixture

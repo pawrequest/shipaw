@@ -9,7 +9,7 @@ import shipr.models.express.shared
 from . import expresslink_pydantic as elp, shipment
 
 
-class BaseRequest(elp.BasePFType, ABC):
+class BaseRequest(elp.BasePFType):
     authentication: Optional[elp.Authentication] = Field(None)
 
     def req_dict(self):

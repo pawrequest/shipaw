@@ -15,7 +15,6 @@ from shipr.models.express.msg import (
     FindRequest,
     FindResponse,
 )
-from .conftest import combadge_service, min_shipment_r
 
 ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)
@@ -44,7 +43,6 @@ def test_get_shipment(min_shipment_r, service, pf_auth):
 def test_new_service(zconfig):
     pfc = PFCom2.from_config(zconfig)
     back = pfc.backend(FindService)
-    ship = pfc.backend(CreateShipmentService)
     req = FindRequest(authentication=zconfig.auth, paf=PAF(postcode='NW6 4TE'))
     response = back.find(request=req)
     assert isinstance(response, FindResponse)
@@ -52,3 +50,5 @@ def test_new_service(zconfig):
     assert isinstance(response.paf.specified_neighbour[0].address[0], Address)
 
 
+def combadge_service(service, service_prot):
+    return ZeepBackend(service)[service_prot]
