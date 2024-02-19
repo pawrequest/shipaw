@@ -6,21 +6,68 @@ from __future__ import annotations
 
 from functools import partial
 from typing import List, Optional, Sequence
-from enum import Enum
+from enum import Enum, StrEnum
 
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
-from pydantic.alias_generators import to_pascal
+from pydantic import Field
+
+from shipr.models.express.address import Address, Contact
+from shipr.models.express.shared import BasePFType
 
 
-class BasePFType(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=AliasGenerator(
-            alias=to_pascal,
-        ),
-        use_enum_values=True,
-        populate_by_name=True,
-        extra='allow',
-    )
+class DeliveryTypeEnum(StrEnum):
+    DELIVERY = 'DELIVERY'
+
+
+class DepartmentEnum(Enum):
+    MAIN = 1
+
+
+class ServiceCode(StrEnum):
+    FLEX_DELIVERY_SERVICE_PRODUCT = "S09"
+    EXPRESS9 = "09"
+    EXPRESS9_SECURE = "SEN"
+    EXPRESS9_COURIER_PACK = "SC9"
+    EXPRESS10 = "S10"
+    EXPRESS10_SECURE = "SEE"
+    EXPRESS10_EXCHANGE = "SWN"
+    EXPRESS10_SECURE_EXCHANGE = "SSN"
+    EXPRESS10_COURIER_PACK = "SC0"
+    EXPRESSAM = "S12"
+    EXPRESSAM_LARGE = "SAML"
+    EXPRESSAM_SECURE = "SET"
+    EXPRESSAM_EXCHANGE = "SWT"
+    EXPRESSAM_SECURE_EXCHANGE = "SST"
+    EXPRESSAM_COURIER_PACK = "SC2"
+    EXPRESSAM_SUNDAY_B2B = "SC2P"
+    EXPRESSPM = "SPM"
+    EXPRESSPM_SECURE = "SEM"
+    EXPRESSPM_EXCHANGE = "SWP"
+    EXPRESSPM_SECURE_EXCHANGE = "SSP"
+    EXPRESS24 = "SND"
+    EXPRESS24_LARGE = "S24L"
+    EXPRESS24_SECURE = "SEF"
+    EXPRESS24_EXCHANGE = "SWR"
+    EXPRESS24_SECURE_EXCHANGE = "SSF"
+    EXPRESS24_COURIER_PACK = "SCD"
+    EXPRESS24_SUNDAY = "SCDP"
+    EXPRESS48 = "SUP"
+    EXPRESS48_LARGE = "SID"
+    PARCELRIDER_PLUS_NI_ONLY = "SPR"
+    EXPRESSCOLLECT = "SMS"
+    GLOBALBULK_DIRECT = "GBD"
+    GLOBALECONOMY = "IPE"
+    GLOBALEXPRESS = "GEX"
+    GLOBALEXPRESS_ENVELOPE_DELIVERY = "GXE"
+    GLOBALEXPRESS_PACK_DELIVERY = "GXP"
+    GLOBALPRIORITY = "GPR"
+    GLOBALPRIORITY_H_M_FORCES = "GPR"
+    GLOBALPRIORITY_RETURNS = "EPR"
+    GLOBALVALUE = "GVA"
+    EURO_ECONOMY = "EPH"
+    EURO_PRIORITY = "EPB"
+    EURO_PRIORITY_PACK = "EPK"
+    EUROPRIORITY_HOME_PO_BOXES = "EPP"
+    IRELANDEXPRESS = "I24"
 
 
 class PAF(BasePFType):
@@ -33,15 +80,6 @@ class PAF(BasePFType):
 
 class SpecifiedNeighbour(BasePFType):
     address: Optional[List[Address]] = Field(None, description='')
-
-
-class Address(BasePFType):
-    address_line1: str = Field(...)
-    address_line2: Optional[str] = Field(None)
-    address_line3: Optional[str] = Field(None)
-    town: Optional[str] = Field(None)
-    postcode: Optional[str] = Field(None)
-    country: str = Field(...)
 
 
 class Notifications(BasePFType):
@@ -176,17 +214,6 @@ class AlertType(Enum):
     error = 'ERROR'
     warning = 'WARNING'
     notification = 'NOTIFICATION'
-
-
-class Contact(BasePFType):
-    business_name: str = Field(...)
-    contact_name: Optional[str] = Field(None)
-    email_address: Optional[str] = Field(None)
-    telephone: Optional[str] = Field(None)
-    fax: Optional[str] = Field(None)
-    mobile_phone: Optional[str] = Field(None)
-    senders_name: Optional[str] = Field(None)
-    notifications: Optional[Notifications] = Field(None)
 
 
 class InBoundDetails(BasePFType):
@@ -450,79 +477,6 @@ class SpecifiedPostOffice(BasePFType):
     )
     count: Optional[int] = Field(None)
     post_office_id: Optional[str] = Field(None)
-
-
-class DeliveryOptions(BasePFType):
-    convenient_collect: Optional[ConvenientCollect] = Field(
-        None
-    )
-    irts: Optional[bool] = Field(None)
-    letterbox: Optional[bool] = Field(None)
-    specified_post_office: Optional[SpecifiedPostOffice] = Field(
-        None
-    )
-    specified_neighbour: Optional[str] = Field(None)
-    safe_place: Optional[str] = Field(None)
-    pin: Optional[int] = Field(None)
-    named_recipient: Optional[bool] = Field(None)
-    address_only: Optional[bool] = Field(None)
-    nominated_delivery_date: Optional[str] = Field(None)
-    personal_parcel: Optional[str] = Field(None)
-
-
-class RequestedShipment(BasePFType):
-    department_id: Optional[int] = Field(None)
-    shipment_type: str = Field(...)
-    contract_number: str = Field(...)
-    request_id: Optional[int] = Field(None)
-    service_code: str = Field(...)
-    pre_printed: Optional[bool] = Field(None)
-    shipping_date: Optional[str] = Field(None)
-    job_reference: Optional[str] = Field(None)
-    recipient_contact: Contact = Field(...)
-    recipient_address: Address = Field(...)
-    importer_contact: Optional[Contact] = Field(None)
-    importer_address: Optional[Address] = Field(None)
-    exporter_contact: Optional[Contact] = Field(None)
-    exporter_address: Optional[Address] = Field(None)
-    sender_contact: Optional[Contact] = Field(None)
-    sender_address: Optional[Address] = Field(None)
-    total_number_of_parcels: Optional[int] = Field(None)
-    total_shipment_weight: Optional[float] = Field(None)
-    enhancement: Optional[Enhancement] = Field(None)
-    delivery_options: Optional[DeliveryOptions] = Field(None)
-    hazardous_goods: Optional[HazardousGoods] = Field(None)
-    returns: Optional[Returns] = Field(None)
-    drop_off_ind: Optional[str] = Field(None)
-    print_own_label: Optional[bool] = Field(None)
-    collection_info: Optional[CollectionInfo] = Field(None)
-    international_info: Optional[InternationalInfo] = Field(
-        None
-    )
-    reference_number1: Optional[str] = Field(None)
-    reference_number2: Optional[str] = Field(None)
-    reference_number3: Optional[str] = Field(None)
-    reference_number4: Optional[str] = Field(None)
-    reference_number5: Optional[str] = Field(None)
-    special_instructions1: Optional[str] = Field(None)
-    special_instructions2: Optional[str] = Field(None)
-    special_instructions3: Optional[str] = Field(None)
-    special_instructions4: Optional[str] = Field(None)
-    in_bound_contact: Optional[Contact] = Field(None)
-    in_bound_address: Optional[Address] = Field(None)
-    in_bound_details: Optional[InBoundDetails] = Field(None)
-    exchange_instructions1: Optional[str] = Field(None)
-    exchange_instructions2: Optional[str] = Field(None)
-    exchange_instructions3: Optional[str] = Field(None)
-    consignment_handling: Optional[bool] = Field(None)
-
-
-class CompletedShipmentInfo(BasePFType):
-    lead_shipment_number: Optional[str] = Field(None)
-    delivery_date: Optional[str] = Field(None)
-    status: str = Field(...)
-    completed_shipments: CompletedShipments = Field(...)
-    requested_shipment: RequestedShipment = Field(...)
 
 
 def obj_dict(objs: BasePFType | Sequence[BasePFType], **kwargs) -> dict:

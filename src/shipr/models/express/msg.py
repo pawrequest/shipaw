@@ -5,7 +5,8 @@ from typing import Optional
 
 from pydantic import Field
 
-from . import expresslink_pydantic as elp
+import shipr.models.express.shared
+from . import expresslink_pydantic as elp, shipment
 
 
 class BaseRequest(elp.BasePFType, ABC):
@@ -28,11 +29,11 @@ class BaseRequest(elp.BasePFType, ABC):
         return self.alias_dict(all_obs)
 
 
-class BaseResponse(elp.BasePFType, ABC):
+class BaseResponse(shipr.models.express.shared.BasePFType, ABC):
     alerts: Optional[elp.Alerts] = Field(None)
 
 
-class FindMessage(elp.BasePFType):
+class FindMessage(shipr.models.express.shared.BasePFType):
     convenient_collect: Optional[elp.ConvenientCollect] = Field(
         None
     )
@@ -58,6 +59,20 @@ class FindResponse(FindMessage, BaseResponse):
 
 
 ################################################################
+
+class CreateShipmentRequest(BaseRequest):
+    requested_shipment: shipment.RequestedShipmentMinimum = Field(...)
+
+
+class CreateShipmentResponse(BaseResponse):
+    completed_shipment_info: Optional[shipment.CompletedShipmentInfo] = Field(
+        None
+    )
+
+
+################################################################
+
+
 class PrintDocumentRequest(BaseRequest):
     shipment_number: str = Field(...)
     document_type: int = Field(...)
@@ -130,7 +145,7 @@ class CancelShipmentResponse(BaseResponse):
 
 
 class CreatePrintRequest(BaseRequest):
-    requested_shipment: elp.RequestedShipment = Field(...)
+    requested_shipment: shipr.models.express.shipment.RequestedShipmentMinimum = Field(...)
 
 
 class CreatePrintResponse(BaseResponse):
@@ -156,15 +171,4 @@ class PrintLabelResponse(BaseResponse):
     label_data: Optional[elp.ShipmentLabelData] = Field(None)
     partner_code: Optional[str] = Field(None)
 
-
-################################################################
-
-class CreateShipmentRequest(BaseRequest):
-    requested_shipment: elp.RequestedShipment = Field(...)
-
-
-class CreateShipmentResponse(BaseResponse):
-    completed_shipment_info: Optional[elp.CompletedShipmentInfo] = Field(
-        None
-    )
 ################################################################

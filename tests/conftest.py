@@ -1,9 +1,10 @@
 import os
 
 import pytest
+from combadge.support.zeep.backends.sync import ZeepBackend
 from dotenv import load_dotenv
 
-from shipr.el_combadge import ZeepConfig
+from shipr.el_combadge import PFCom, ZeepConfig
 from shipr.models.express.expresslink_pydantic import Authentication
 
 ENV_FILE = r'../../amherst/.env'
@@ -30,3 +31,17 @@ def zconfig(pf_auth):
         auth=pf_auth,
         endpoint=ep
     )
+
+
+@pytest.fixture
+def pf_com(zconfig):
+    return PFCom.from_config(zconfig)
+
+
+@pytest.fixture
+def service(pf_com):
+    return pf_com.get_service()
+
+
+def combadge_service(service, service_prot):
+    return ZeepBackend(service)[service_prot]
