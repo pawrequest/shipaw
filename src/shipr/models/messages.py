@@ -5,147 +5,119 @@ from typing import ClassVar, Sequence
 
 from pydantic import BaseModel
 
-from shipr.models import remixed as gen
-from shipr.models.remixed import BaseResponse
+import shipr.models.bases
+from shipr.models import expresslink_pydantic as elp
+from shipr.models.bases import BaseReply
 
 
-class PFFunc3(ABC, BaseModel):
+class PFFunc(ABC, BaseModel):
     name: str
-    request_type: ClassVar[type[gen.BaseRequest]]
-    response_type: ClassVar[type[BaseResponse]]
+    request_type: ClassVar[type[shipr.models.bases.BaseRequest]]
+    response_type: ClassVar[type[BaseReply]]
 
     @classmethod
     def get_auth_request(
             cls,
-            auth: gen.Authentication,
-            *data: gen.BasePFType
-    ) -> gen.BaseRequest:
-        req_dict = {d.__class__.__name__: d for d in
-                    data}
-        return cls.request_type(authentication=auth.model_dump(), **req_dict)
+            auth: elp.Authentication,
+            params: Sequence[shipr.models.bases.BasePFType]
+    ) -> shipr.models.bases.BaseRequest:
+        ...
 
-    # @classmethod
-    # def get_auth_request(
-    #         cls,
-    #         auth: gen.Authentication,
-    #         data: Sequence[gen.BasePFType]
-    # ) -> gen.BaseRequest:
-    #     req_dict = cls.get_request_dict(data)
-    #     return cls.request_type(authentication=auth, **data)
-
-    # @classmethod
-    # def get_request(cls, data: Sequence[gen.BasePFType]) -> gen.BaseRequest:
-    #     return cls.request_type(**cls.get_request_dict(data))
-
-    @staticmethod
-    def get_request_dict(data: Sequence[gen.BasePFType]) -> dict:
-        unpacked = [_.model_dump() for _ in data]
-        # up2 = [**_ for _ in unpacked]
-        # unpacked2 = {k: v for _ in unpacked for k, v in _.items()}
-        res = {
-            name: value
-            for _ in data
-            for name, value in _.model_dump().items()
-        }
-        return res
+    def request(self, **params) -> shipr.models.bases.BaseRequest:
+        return self.request_type(**params)
 
 
-class FindFunc(PFFunc3):
+class FindFunc(PFFunc):
     name: str = 'Find'
-    request_type = gen.FindRequest
-    response_type = gen.FindReply
-
-    # @classmethod
-    # def get_request(cls, data: PAF) -> gen.FindRequest:
-    #     dt = [_.model_dump() for _ in data]
-    #     return cls.request_type()
+    request_type = elp.FindRequest
+    response_type = elp.FindReply
 
 
-class CCReserveFunc(PFFunc3):
+class CCReserveFunc(PFFunc):
     name: str = 'CCReserve'
-    request_type = gen.CCReserveRequest
-    response_type = gen.CCReserveReply
+    request_type = elp.CCReserveRequest
+    response_type = elp.CCReserveReply
 
 
-class CancelShipmentFunc(PFFunc3):
+class CancelShipmentFunc(PFFunc):
     name: str = 'CancelShipment'
-    request_type = gen.CancelShipmentRequest
-    response_type = gen.CancelShipmentReply
+    request_type = elp.CancelShipmentRequest
+    response_type = elp.CancelShipmentReply
 
 
-class PrintManifestFunc(PFFunc3):
+class PrintManifestFunc(PFFunc):
     name: str = 'PrintManifest'
-    request_type = gen.PrintManifestRequest
-    response_type = gen.PrintManifestReply
+    request_type = elp.PrintManifestRequest
+    response_type = elp.PrintManifestReply
 
 
-class CreateManifestFunc(PFFunc3):
+class CreateManifestFunc(PFFunc):
     name: str = 'CreateManifest'
-    request_type = gen.CreateManifestRequest
-    response_type = gen.CreateManifestReply
+    request_type = elp.CreateManifestRequest
+    response_type = elp.CreateManifestReply
 
 
-class CreateShipmentFunc(PFFunc3):
+class CreateShipmentFunc(PFFunc):
     name: str = 'CreateShipment'
-    request_type = gen.CreateShipmentRequest
-    response_type = gen.CreateShipmentReply
+    request_type = elp.CreateShipmentRequest
+    response_type = elp.CreateShipmentReply
 
 
-class PrintDocumentFunc(PFFunc3):
+class PrintDocumentFunc(PFFunc):
     name: str = 'PrintDocument'
-    request_type = gen.PrintDocumentRequest
-    response_type = gen.PrintDocumentReply
+    request_type = elp.PrintDocumentRequest
+    response_type = elp.PrintDocumentReply
 
 
-class ReturnShipmentFunc(PFFunc3):
+class ReturnShipmentFunc(PFFunc):
     name: str = 'ReturnShipment'
-    request_type = gen.ReturnShipmentRequest
-    response_type = gen.ReturnShipmentReply
+    request_type = elp.ReturnShipmentRequest
+    response_type = elp.ReturnShipmentReply
 
 
-class PrintLabelFunc(PFFunc3):
+class PrintLabelFunc(PFFunc):
     name: str = 'PrintLabel'
-    request_type = gen.PrintLabelRequest
-    response_type = gen.PrintLabelReply
+    request_type = elp.PrintLabelRequest
+    response_type = elp.PrintLabelReply
 
 
-class PrintLabel1Func(PFFunc3):
+class PrintLabel1Func(PFFunc):
     name: str = 'PrintLabel1'
-    request_type = gen.PrintLabelRequest1
-    response_type = gen.PrintLabelReply1
+    request_type = elp.PrintLabelRequest1
+    response_type = elp.PrintLabelReply1
 
 
-class PrintManifest1Func(PFFunc3):
+class PrintManifest1Func(PFFunc):
     name: str = 'PrintManifest1'
-    request_type = gen.PrintManifestRequest1
-    response_type = gen.PrintManifestReply1
+    request_type = elp.PrintManifestRequest1
+    response_type = elp.PrintManifestReply1
 
 
-class ReturnShipment1Func(PFFunc3):
+class ReturnShipment1Func(PFFunc):
     name: str = 'ReturnShipment1'
-    request_type = gen.ReturnShipmentRequest1
-    response_type = gen.ReturnShipmentReply1
+    request_type = elp.ReturnShipmentRequest1
+    response_type = elp.ReturnShipmentReply1
 
 
-class CCReserve1Func(PFFunc3):
+class CCReserve1Func(PFFunc):
     name: str = 'CCReserve1'
-    request_type = gen.CCReserveRequest1
-    response_type = gen.CCReserveReply1
+    request_type = elp.CCReserveRequest1
+    response_type = elp.CCReserveReply1
 
 
-class PrintDocument1Func(PFFunc3):
+class PrintDocument1Func(PFFunc):
     name: str = 'PrintDocument1'
-    request_type = gen.PrintDocumentRequest1
-    response_type = gen.PrintDocumentReply1
+    request_type = elp.PrintDocumentRequest1
+    response_type = elp.PrintDocumentReply1
 
 
-class CancelShipment1Func(PFFunc3):
+class CancelShipment1Func(PFFunc):
     name: str = 'CancelShipment1'
-    request_type = gen.CancelShipmentRequest1
-    response_type = gen.CancelShipmentReply1
+    request_type = elp.CancelShipmentRequest1
+    response_type = elp.CancelShipmentReply1
 
 
-class CreateManifest1Func(PFFunc3):
+class CreateManifest1Func(PFFunc):
     name: str = 'CreateManifest1'
-    request_type = gen.CreateManifestRequest1
-    response_type = gen.CreateManifestReply1
+    request_type = elp.CreateManifestRequest1
+    response_type = elp.CreateManifestReply1

@@ -5,19 +5,43 @@
 from __future__ import annotations
 
 from typing import List, Optional
-
 from enum import Enum
-from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
-from pydantic.alias_generators import to_pascal, to_snake
+
+from pydantic import Field
+
+from shipr.models.bases import BasePFType, BaseReply, BaseRequest
 
 
-class BasePFType(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=AliasGenerator(
-            validation_alias=to_snake,
-            serialization_alias=to_pascal,
-        ),
-        use_enum_values=True
+class FindMessage(BasePFType):
+    convenient_collect: Optional[ConvenientCollect] = Field(
+        None
+    )
+    specified_post_office: Optional[SpecifiedPostOffice] = Field(
+        None
+    )
+    paf: Optional[PAF] = Field(None, alias='PAF')
+    safe_places: Optional[bool] = Field(None)
+    nominated_delivery_dates: Optional[NominatedDeliveryDates] = Field(
+        None
+    )
+    postcode_exclusion: Optional[PostcodeExclusion] = Field(
+        None
+    )
+
+
+class FindRequest(FindMessage, BaseRequest):
+    ...
+
+
+class FindReply(FindMessage, BaseReply):
+    ...
+
+
+class PAF(BasePFType):
+    postcode: Optional[str] = Field(None)
+    count: Optional[int] = Field(None)
+    specified_neighbour: Optional[List[SpecifiedNeighbour]] = Field(
+        None, description=''
     )
 
 
@@ -168,14 +192,6 @@ class AlertType(Enum):
     notification = 'NOTIFICATION'
 
 
-class BaseRequest(BasePFType):
-    authentication: Authentication = Field(...)
-
-
-class BaseResponse(BasePFType):
-    pass
-
-
 class Contact(BasePFType):
     business_name: str = Field(...)
     contact_name: Optional[str] = Field(None)
@@ -263,26 +279,6 @@ class CompletedCancel(BasePFType):
 
 def snake_to_upper(s: str) -> str:
     return s.upper()
-
-
-class PAF(BasePFType):
-    # model_config = ConfigDict(
-    #     alias_generator=AliasGenerator(
-    #         validation_alias=to_snake,
-    #         serialization_alias=snake_to_upper,
-    #     ),
-    #     use_enum_values=True
-    # )
-
-    postcode: Optional[str] = Field(None)
-    count: Optional[int] = Field(None)
-    specified_neighbour: Optional[List[SpecifiedNeighbour]] = Field(
-        None, description=''
-    )
-
-    @classmethod
-    def from_postcode(cls, postcode: str) -> PAF:
-        return cls(postcode=postcode)
 
 
 class Department(BasePFType):
@@ -464,10 +460,6 @@ class ReturnShipmentRequest1(BasePFType):
     )
 
 
-class BaseReply(BasePFType):
-    alerts: Optional[Alerts] = Field(None)
-
-
 class Parcels(BasePFType):
     parcel: List[Parcel] = Field(..., description='')
 
@@ -622,40 +614,6 @@ class PrintManifestReply1(BasePFType):
 
 class ReturnShipmentReply1(BasePFType):
     return_shipment_reply: ReturnShipmentReply = Field(...)
-
-
-class FindRequest(BaseRequest):
-    convenient_collect: Optional[ConvenientCollect] = Field(
-        None
-    )
-    specified_post_office: Optional[SpecifiedPostOffice] = Field(
-        None
-    )
-    paf: Optional[PAF] = Field(None, alias='PAF')
-    safe_places: Optional[bool] = Field(None)
-    nominated_delivery_dates: Optional[NominatedDeliveryDates] = Field(
-        None
-    )
-    postcode_exclusion: Optional[PostcodeExclusion] = Field(
-        None
-    )
-
-
-class FindReply(BaseReply):
-    convenient_collect: Optional[ConvenientCollect] = Field(
-        None
-    )
-    specified_post_office: Optional[SpecifiedPostOffice] = Field(
-        None
-    )
-    paf: Optional[PAF] = Field(None)
-    safe_place_list: Optional[SafePlaceList] = Field(None)
-    nominated_delivery_dates: Optional[NominatedDeliveryDates] = Field(
-        None
-    )
-    postcode_exclusion: Optional[PostcodeExclusion] = Field(
-        None
-    )
 
 
 class DeliveryOptions(BasePFType):

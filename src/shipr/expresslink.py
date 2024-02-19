@@ -7,31 +7,15 @@ from zeep.proxy import ServiceProxy
 from zeep.helpers import serialize_object
 
 from .expresslink_specs import PFEndPointSpec, PFFunc, PFFunc2
-from .models.messages import PFFunc3
-from .models.remixed import Authentication
+from .models.expresslink_pydantic import Authentication
+from .models.messages import PFFunc
 
-
-class PFAuth(NamedTuple):
-    user: str
-    pwd: str
-
-    def get_auth(self):
-        return dict(
-            UserName=self.user,
-            Password=self.pwd
-        )
-
-    def get_auth2(self):
-        return Authentication(
-            UserName=self.user,
-            Password=self.pwd
-        )
 
 
 @dataclass
 class PFConfig:
     wsdl: str
-    auth: PFAuth
+    auth: Authentication
     settings: Optional[Settings] = None
     transport: Optional[Transport] = None
     client: Optional[Client] = None
@@ -86,7 +70,7 @@ class PFExpressLink(PFConnector):
         )
         return resp
 
-    def get_response3(self, pf_func: PFFunc3, data) -> dict:
+    def get_response3(self, pf_func: PFFunc, data) -> dict:
         request = pf_func.request_type(**data)
         data_dict = serialize_object(request, target_cls=dict)
         fnc = getattr(self.service, pf_func.name)

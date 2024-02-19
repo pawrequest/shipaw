@@ -4,11 +4,52 @@ from typing import Optional
 
 from zeep import Client, Settings, Transport
 from zeep.proxy import ServiceProxy
-from zeep.helpers import serialize_object
 
 from .expresslink_specs import PFEndPointSpec
-from .models.messages import PFFunc
-from .models.bases import BaseReply, BaseRequest, alias_dict
+from .models.remixed import Authentication
+
+
+@dataclass
+class ZeepConfig:
+    auth: Authentication
+    binding: str
+    wsdl: str
+    endpoint: str
+
+
+def get_service(client, binding, endpoint) -> ServiceProxy:
+    return client.create_service(
+        binding_name=binding,
+        address=endpoint
+    )
+
+@dataclass
+class PFCom:
+    config: ZeepConfig
+    client: Client
+    service: ServiceProxy = None
+
+    @classmethod
+    def from_config(cls, config: ZeepConfig):
+        client = Client(wsdl=config.wsdl)
+        service = get_service(
+            client,
+            config.binding,
+            config.endpoint
+        )
+        return cls(
+            config=config,
+            client=client,
+            service=service
+        )
+
+    @lru_cache(maxsize=1)
+    def get_service(self) -> ServiceProxy:
+        serv = self.client.create_service(
+            binding_name=self.config.binding,
+            address=self.config.endpoint
+        )
+        return serv
 
 
 @dataclass
@@ -29,7 +70,7 @@ class PFConfig:
         )
 
 
-class PFExpressLink:
+class PFCom2:
     def __init__(self, config: PFConfig):
         self.config = config
         self.service = self.get_service(PFEndPointSpec.sandbox())
@@ -42,25 +83,9 @@ class PFExpressLink:
     def client(self):
         return self.config.client
 
-    @lru_cache
+    @lru_cache(maxsize=1)
     def get_service(self, endpoint: PFEndPointSpec) -> ServiceProxy:
         return self.config.client.create_service(
             binding_name=endpoint.binding,
             address=endpoint.api_address
         )
-
-    def get_response(self, request: BaseRequest, pf_func: PFFunc) -> BaseReply:
-        fnc = getattr(self.service, pf_func.name)
-        if not request.authorised:
-            request.authorise(self.auth)
-        resp = fnc(**request.model_dump(by_alias=True, exclude_none=True))
-        return resp
-
-    def process_response(self, resp: BaseReply, pf_func: PFFunc) -> BaseReply:
-        ser = serialize_object(resp)
-        res = FindReply(**ser)
-        ret = pf_func.response_type.model_validate(res)
-        ret2 = pf_func.response_type.model_validate(ser)
-
-        return ret
-
