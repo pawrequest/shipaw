@@ -40,7 +40,7 @@ def pf_com(zconfig):
 
 @pytest.fixture
 def service(pf_com):
-    return pf_com.get_service()
+    return pf_com.new_service()
 
 
 def combadge_service(service, service_prot):

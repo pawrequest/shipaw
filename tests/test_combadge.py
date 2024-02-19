@@ -31,7 +31,7 @@ CONTRACT_NO = os.environ.get('PF_CONT_NUM_1')
 
 def test_find_paf(zconfig):
     pfc = PFCom.from_config(zconfig)
-    service = ZeepBackend(pfc.service)[FindService]
+    service = ZeepBackend(pfc._service)[FindService]
     paf = PAF(postcode='NW6 4TE')
     req = FindRequest(authentication=zconfig.auth, paf=paf)
     response = service.find(request=req)
