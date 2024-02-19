@@ -6,68 +6,13 @@ from __future__ import annotations
 
 from functools import partial
 from typing import List, Optional, Sequence
-from enum import Enum, StrEnum
+from enum import Enum
 
 from pydantic import Field
 
 from shipr.models.express.address import Address, Contact
+from shipr.models.express.enums import AlertType
 from shipr.models.express.shared import BasePFType
-
-
-class DeliveryTypeEnum(StrEnum):
-    DELIVERY = 'DELIVERY'
-
-
-class DepartmentEnum(Enum):
-    MAIN = 1
-
-
-class ServiceCode(StrEnum):
-    FLEX_DELIVERY_SERVICE_PRODUCT = "S09"
-    EXPRESS9 = "09"
-    EXPRESS9_SECURE = "SEN"
-    EXPRESS9_COURIER_PACK = "SC9"
-    EXPRESS10 = "S10"
-    EXPRESS10_SECURE = "SEE"
-    EXPRESS10_EXCHANGE = "SWN"
-    EXPRESS10_SECURE_EXCHANGE = "SSN"
-    EXPRESS10_COURIER_PACK = "SC0"
-    EXPRESSAM = "S12"
-    EXPRESSAM_LARGE = "SAML"
-    EXPRESSAM_SECURE = "SET"
-    EXPRESSAM_EXCHANGE = "SWT"
-    EXPRESSAM_SECURE_EXCHANGE = "SST"
-    EXPRESSAM_COURIER_PACK = "SC2"
-    EXPRESSAM_SUNDAY_B2B = "SC2P"
-    EXPRESSPM = "SPM"
-    EXPRESSPM_SECURE = "SEM"
-    EXPRESSPM_EXCHANGE = "SWP"
-    EXPRESSPM_SECURE_EXCHANGE = "SSP"
-    EXPRESS24 = "SND"
-    EXPRESS24_LARGE = "S24L"
-    EXPRESS24_SECURE = "SEF"
-    EXPRESS24_EXCHANGE = "SWR"
-    EXPRESS24_SECURE_EXCHANGE = "SSF"
-    EXPRESS24_COURIER_PACK = "SCD"
-    EXPRESS24_SUNDAY = "SCDP"
-    EXPRESS48 = "SUP"
-    EXPRESS48_LARGE = "SID"
-    PARCELRIDER_PLUS_NI_ONLY = "SPR"
-    EXPRESSCOLLECT = "SMS"
-    GLOBALBULK_DIRECT = "GBD"
-    GLOBALECONOMY = "IPE"
-    GLOBALEXPRESS = "GEX"
-    GLOBALEXPRESS_ENVELOPE_DELIVERY = "GXE"
-    GLOBALEXPRESS_PACK_DELIVERY = "GXP"
-    GLOBALPRIORITY = "GPR"
-    GLOBALPRIORITY_H_M_FORCES = "GPR"
-    GLOBALPRIORITY_RETURNS = "EPR"
-    GLOBALVALUE = "GVA"
-    EURO_ECONOMY = "EPH"
-    EURO_PRIORITY = "EPB"
-    EURO_PRIORITY_PACK = "EPK"
-    EUROPRIORITY_HOME_PO_BOXES = "EPP"
-    IRELANDEXPRESS = "I24"
 
 
 class PAF(BasePFType):
@@ -210,12 +155,6 @@ class Position(BasePFType):
     latitude: Optional[float] = Field(None)
 
 
-class AlertType(Enum):
-    error = 'ERROR'
-    warning = 'WARNING'
-    notification = 'NOTIFICATION'
-
-
 class InBoundDetails(BasePFType):
     contract_number: str = Field(...)
     service_code: str = Field(...)
@@ -288,10 +227,6 @@ class CompletedCancel(BasePFType):
     completed_cancel_info: Optional[CompletedCancelInfo] = Field(
         None
     )
-
-
-def snake_to_upper(s: str) -> str:
-    return s.upper()
 
 
 class Department(BasePFType):

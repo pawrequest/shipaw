@@ -14,8 +14,9 @@ from shipr.models.express.expresslink_pydantic import (
     InBoundDetails,
     InternationalInfo,
     Returns,
-    SpecifiedPostOffice, DeliveryTypeEnum, ServiceCode, DepartmentEnum,
+    SpecifiedPostOffice,
 )
+from shipr.models.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
 from shipr.models.express.shared import BasePFType
 from shipr.models.express.address import Address, Contact
 

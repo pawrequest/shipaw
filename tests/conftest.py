@@ -8,9 +8,8 @@ from shipr.el_combadge import PFCom, ZeepConfig
 from shipr.models.express.address import Address, Contact
 from shipr.models.express.expresslink_pydantic import (
     Authentication,
-    DepartmentEnum,
-    DeliveryTypeEnum, ServiceCode,
 )
+from shipr.models.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
 from shipr.models.express.shipment import RequestedShipmentMinimum
 
 ENV_FILE = r'../../amherst/.env'
