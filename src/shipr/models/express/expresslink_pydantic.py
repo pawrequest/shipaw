@@ -11,7 +11,7 @@ from enum import Enum
 
 from pydantic import Field
 
-from pawsupport.src.pawsupport.pdf_tools.array_pdf.src.array_pdf import convert_print_silent2
+from pawsupport import convert_print_silent2
 from shipr.models.express.address import Address, Contact
 from shipr.models.express.enums import AlertType
 from shipr.models.express.shared import BasePFType
