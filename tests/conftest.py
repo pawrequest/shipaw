@@ -3,6 +3,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
+from shipr.el_combadge import ZeepConfig
 from shipr.models.expresslink_pydantic import Authentication
 
 ENV_FILE = r'../../amherst/.env'
@@ -18,3 +19,14 @@ def pf_auth():
     return auth
 
 
+@pytest.fixture
+def zconfig(pf_auth):
+    wsdl = os.environ.get('PF_WSDL')
+    binding = os.environ.get('PF_BINDING')
+    ep = os.environ.get('PF_ENDPOINT_SAND')
+    return ZeepConfig(
+        binding=binding,
+        wsdl=wsdl,
+        auth=pf_auth,
+        endpoint=ep
+    )

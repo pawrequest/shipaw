@@ -23,11 +23,11 @@ alias_dict = partial(obj_dict, by_alias=True, exclude_none=True)
 class BasePFType(BaseModel):
     model_config = ConfigDict(
         alias_generator=AliasGenerator(
-            validation_alias=to_snake,
-            serialization_alias=to_pascal,
+            alias=to_pascal,
         ),
         use_enum_values=True,
         populate_by_name=True,
+        extra='allow',
     )
 
 
@@ -51,5 +51,5 @@ class BaseRequest(BasePFType, ABC):
         return self.alias_dict(all_obs)
 
 
-class BaseReply(BasePFType, ABC):
+class BaseResponse(BasePFType, ABC):
     alerts: Optional[Alerts] = Field(None)

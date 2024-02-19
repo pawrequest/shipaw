@@ -9,7 +9,7 @@ from enum import Enum
 
 from pydantic import Field
 
-from shipr.models.bases import BasePFType, BaseReply, BaseRequest
+from shipr.models.bases import BasePFType, BaseRequest, BaseResponse
 
 
 class FindMessage(BasePFType):
@@ -33,7 +33,7 @@ class FindRequest(FindMessage, BaseRequest):
     ...
 
 
-class FindReply(FindMessage, BaseReply):
+class FindResponse(FindMessage, BaseResponse):
     ...
 
 
@@ -45,8 +45,8 @@ class PAF(BasePFType):
     )
 
 
-class Notifications(BasePFType):
-    notification_type: List[str] = Field(..., description='')
+class SpecifiedNeighbour(BasePFType):
+    address: Optional[List[Address]] = Field(None, description='')
 
 
 class Address(BasePFType):
@@ -56,6 +56,10 @@ class Address(BasePFType):
     town: Optional[str] = Field(None)
     postcode: Optional[str] = Field(None)
     country: str = Field(...)
+
+
+class Notifications(BasePFType):
+    notification_type: List[str] = Field(..., description='')
 
 
 class Enhancement(BasePFType):
@@ -154,10 +158,6 @@ class Authentication(BasePFType):
 class CompletedCancelInfo(BasePFType):
     status: Optional[str] = Field(None)
     shipment_number: Optional[str] = Field(None)
-
-
-class SpecifiedNeighbour(BasePFType):
-    address: Optional[List[Address]] = Field(None, description='')
 
 
 class SafePlaceList(BasePFType):
@@ -498,7 +498,7 @@ class PostOffice(BasePFType):
     booking_reference: Optional[str] = Field(None)
 
 
-class CreatePrintReply(BaseReply):
+class CreatePrintResponse(BaseResponse):
     completed_shipment_info_create_print: Optional[CompletedShipmentInfoCreatePrint] = (
         Field(None)
     )
@@ -507,39 +507,39 @@ class CreatePrintReply(BaseReply):
     partner_code: Optional[str] = Field(None)
 
 
-class PrintLabelReply(BaseReply):
+class PrintLabelResponse(BaseResponse):
     label: Optional[Document] = Field(None)
     label_data: Optional[ShipmentLabelData] = Field(None)
     partner_code: Optional[str] = Field(None)
 
 
-class PrintDocumentReply(BaseReply):
+class PrintDocumentResponse(BaseResponse):
     label: Optional[Document] = Field(None)
     label_data: Optional[ShipmentLabelData] = Field(None)
     document_type: Optional[Document] = Field(None)
 
 
-class CreateManifestReply(BaseReply):
+class CreateManifestResponse(BaseResponse):
     completed_manifests: Optional[CompletedManifests] = Field(
         None
     )
 
 
-class PrintManifestReply(BaseReply):
+class PrintManifestResponse(BaseResponse):
     manifest: Optional[Document] = Field(None)
 
 
-class ReturnShipmentReply(BaseReply):
+class ReturnShipmentResponse(BaseResponse):
     completed_shipment_info: Optional[CompletedReturnInfo] = Field(
         None
     )
 
 
-class CCReserveReply(BaseReply):
+class CCReserveResponse(BaseResponse):
     post_office: Optional[PostOffice] = Field(None)
 
 
-class CancelShipmentReply(BaseReply):
+class CancelShipmentResponse(BaseResponse):
     completed_cancel: Optional[CompletedCancel] = Field(None)
 
 
@@ -584,36 +584,36 @@ class SpecifiedPostOffice(BasePFType):
     post_office_id: Optional[str] = Field(None)
 
 
-class CancelShipmentReply1(BasePFType):
-    cancel_shipment_reply: CancelShipmentReply = Field(...)
+class CancelShipmentResponse1(BasePFType):
+    cancel_shipment_reply: CancelShipmentResponse = Field(...)
 
 
-class CCReserveReply1(BasePFType):
-    cc_reserve_reply: CCReserveReply = Field(...)
+class CCReserveResponse1(BasePFType):
+    cc_reserve_reply: CCReserveResponse = Field(...)
 
 
-class CreateManifestReply1(BasePFType):
-    create_manifest_reply: CreateManifestReply = Field(...)
+class CreateManifestResponse1(BasePFType):
+    create_manifest_reply: CreateManifestResponse = Field(...)
 
 
-class CreatePrintReply1(BasePFType):
-    create_print_reply: CreatePrintReply = Field(...)
+class CreatePrintResponse1(BasePFType):
+    create_print_reply: CreatePrintResponse = Field(...)
 
 
-class PrintDocumentReply1(BasePFType):
-    print_document_reply: PrintDocumentReply = Field(...)
+class PrintDocumentResponse1(BasePFType):
+    print_document_reply: PrintDocumentResponse = Field(...)
 
 
-class PrintLabelReply1(BasePFType):
-    print_label_reply: PrintLabelReply = Field(...)
+class PrintLabelResponse1(BasePFType):
+    print_label_reply: PrintLabelResponse = Field(...)
 
 
-class PrintManifestReply1(BasePFType):
-    print_manifest_reply: PrintManifestReply = Field(...)
+class PrintManifestResponse1(BasePFType):
+    print_manifest_reply: PrintManifestResponse = Field(...)
 
 
-class ReturnShipmentReply1(BasePFType):
-    return_shipment_reply: ReturnShipmentReply = Field(...)
+class ReturnShipmentResponse1(BasePFType):
+    return_shipment_reply: ReturnShipmentResponse = Field(...)
 
 
 class DeliveryOptions(BasePFType):
@@ -634,8 +634,8 @@ class DeliveryOptions(BasePFType):
     personal_parcel: Optional[str] = Field(None)
 
 
-class FindReply1(BasePFType):
-    find_reply: FindReply = Field(...)
+class FindResponse1(BasePFType):
+    find_reply: FindResponse = Field(...)
 
 
 class FindRequest1(BasePFType):
@@ -701,7 +701,7 @@ class CreateShipmentRequest(BaseRequest):
     requested_shipment: RequestedShipment = Field(...)
 
 
-class CreateShipmentReply(BaseReply):
+class CreateShipmentResponse(BaseResponse):
     completed_shipment_info: Optional[CompletedShipmentInfo] = Field(
         None
     )
@@ -715,8 +715,8 @@ class CreatePrintRequest1(BasePFType):
     create_print_request: CreatePrintRequest = Field(...)
 
 
-class CreateShipmentReply1(BasePFType):
-    create_shipment_reply: CreateShipmentReply = Field(...)
+class CreateShipmentResponse1(BasePFType):
+    create_shipment_reply: CreateShipmentResponse = Field(...)
 
 
 class CreateShipmentRequest1(BasePFType):

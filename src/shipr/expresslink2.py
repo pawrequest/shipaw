@@ -8,7 +8,7 @@ from zeep.helpers import serialize_object
 
 from .expresslink_specs import PFEndPointSpec
 from .models.messages import PFFunc
-from .models.bases import BaseReply, BaseRequest, alias_dict
+from .models.bases import BaseResponse, BaseRequest, alias_dict
 
 
 @dataclass
@@ -49,16 +49,16 @@ class PFExpressLink:
             address=endpoint.api_address
         )
 
-    def get_response(self, request: BaseRequest, pf_func: PFFunc) -> BaseReply:
+    def get_response(self, request: BaseRequest, pf_func: PFFunc) -> BaseResponse:
         fnc = getattr(self.service, pf_func.name)
         if not request.authorised:
             request.authorise(self.auth)
         resp = fnc(**request.model_dump(by_alias=True, exclude_none=True))
         return resp
 
-    def process_response(self, resp: BaseReply, pf_func: PFFunc) -> BaseReply:
+    def process_response(self, resp: BaseResponse, pf_func: PFFunc) -> BaseResponse:
         ser = serialize_object(resp)
-        res = FindReply(**ser)
+        res = FindResponse(**ser)
         ret = pf_func.response_type.model_validate(res)
         ret2 = pf_func.response_type.model_validate(ser)
 

@@ -6,7 +6,7 @@ from zeep.helpers import serialize_object
 import shipr.expresslink_specs
 from shipr import expresslink2 as pf
 from shipr.models.bases import obj_dict
-from shipr.models.remixed import FindReply, PAF
+from shipr.models.expresslink_pydantic import FindResponse, PAF
 from shipr.models.messages import FindFunc
 
 ENV_FILE = r'../../amherst/.env'
@@ -37,7 +37,7 @@ def test_from_zeep(pf_client):
     find_f = FindFunc()
     resp = pf_client.get_response(find_f, 'NW6 4TE')
 
-    resp_type = FindReply
+    resp_type = FindResponse
     dct = serialize_object(resp, target_cls=dict)
     result = resp_type.model_validate(dct)
     assert isinstance(result, resp_type)
@@ -62,7 +62,7 @@ def test_process_request(pf_client):
 
 
     ser = serialize_object(resp)
-    res = FindReply(**ser)
+    res = FindResponse(**ser)
     ret = find_f.response_type.model_validate(res)
     ret2 = find_f.response_type.model_validate(ser)
 
@@ -77,6 +77,6 @@ def test_process_request(pf_client):
 
     # param = RequestParams(params=[paf])
     # ath2 = pf_client.get_request(find_f, paf)
-    # assert isinstance(resp, FindReply)
+    # assert isinstance(resp, FindResponse)
     # assert resp.paf.Postcode == 'NW6 4TE'
     ...

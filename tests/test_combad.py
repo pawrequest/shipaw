@@ -27,6 +27,7 @@ class BasePFType(BaseModel):
         ),
         use_enum_values=True,
         populate_by_name=True,
+        extra='allow',
     )
 
 
@@ -88,7 +89,8 @@ class FindRequest(BasePFType):
 
 
 class FindResponse(BasePFType):
-    paf: dict = Field(None, alias='PAF')
+
+    paf: PAF = Field(None, alias='PAF')
 
 
 class FindService(SupportsService, Protocol):

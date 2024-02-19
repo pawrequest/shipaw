@@ -15,7 +15,7 @@ class FindService(SupportsService, Protocol):
     def find(
             self,
             request: Annotated[elp.FindRequest, Payload(by_alias=True)],
-    ) -> elp.FindReply:
+    ) -> elp.FindResponse:
         ...
 
 
@@ -24,7 +24,7 @@ class CCReserveService(SupportsService, Protocol):
     def ccreserve(
             self,
             request: Annotated[elp.CCReserveRequest, Payload(by_alias=True)],
-    ) -> elp.CCReserveReply:
+    ) -> elp.CCReserveResponse:
         ...
 
 
@@ -33,7 +33,7 @@ class CancelShipmentService(SupportsService, Protocol):
     def cancelshipment(
             self,
             request: Annotated[elp.CancelShipmentRequest, Payload(by_alias=True)],
-    ) -> elp.CancelShipmentReply:
+    ) -> elp.CancelShipmentResponse:
         ...
 
 
@@ -42,7 +42,7 @@ class PrintManifestService(SupportsService, Protocol):
     def printmanifest(
             self,
             request: Annotated[elp.PrintManifestRequest, Payload(by_alias=True)],
-    ) -> elp.PrintManifestReply:
+    ) -> elp.PrintManifestResponse:
         ...
 
 
@@ -51,7 +51,7 @@ class CreateManifestService(SupportsService, Protocol):
     def createmanifest(
             self,
             request: Annotated[elp.CreateManifestRequest, Payload(by_alias=True)],
-    ) -> elp.CreateManifestReply:
+    ) -> elp.CreateManifestResponse:
         ...
 
 
@@ -60,7 +60,7 @@ class CreateShipmentService(SupportsService, Protocol):
     def createshipment(
             self,
             request: Annotated[elp.CreateShipmentRequest, Payload(by_alias=True)],
-    ) -> elp.CreateShipmentReply:
+    ) -> elp.CreateShipmentResponse:
         ...
 
 
@@ -69,7 +69,7 @@ class PrintDocumentService(SupportsService, Protocol):
     def printdocument(
             self,
             request: Annotated[elp.PrintDocumentRequest, Payload(by_alias=True)],
-    ) -> elp.PrintDocumentReply:
+    ) -> elp.PrintDocumentResponse:
         ...
 
 
@@ -78,7 +78,7 @@ class ReturnShipmentService(SupportsService, Protocol):
     def returnshipment(
             self,
             request: Annotated[elp.ReturnShipmentRequest, Payload(by_alias=True)],
-    ) -> elp.ReturnShipmentReply:
+    ) -> elp.ReturnShipmentResponse:
         ...
 
 
@@ -87,7 +87,7 @@ class PrintLabelService(SupportsService, Protocol):
     def printlabel(
             self,
             request: Annotated[elp.PrintLabelRequest, Payload(by_alias=True)],
-    ) -> elp.PrintLabelReply:
+    ) -> elp.PrintLabelResponse:
         ...
 
 
@@ -96,7 +96,7 @@ class PrintLabel1Service(SupportsService, Protocol):
     def printlabel1(
             self,
             request: Annotated[elp.PrintLabelRequest1, Payload(by_alias=True)],
-    ) -> elp.PrintLabelReply1:
+    ) -> elp.PrintLabelResponse1:
         ...
 
 
@@ -105,7 +105,7 @@ class PrintManifest1Service(SupportsService, Protocol):
     def printmanifest1(
             self,
             request: Annotated[elp.PrintManifestRequest1, Payload(by_alias=True)],
-    ) -> elp.PrintManifestReply1:
+    ) -> elp.PrintManifestResponse1:
         ...
 
 
@@ -114,7 +114,7 @@ class ReturnShipment1Service(SupportsService, Protocol):
     def returnshipment1(
             self,
             request: Annotated[elp.ReturnShipmentRequest1, Payload(by_alias=True)],
-    ) -> elp.ReturnShipmentReply1:
+    ) -> elp.ReturnShipmentResponse1:
         ...
 
 
@@ -123,7 +123,7 @@ class CCReserve1Service(SupportsService, Protocol):
     def ccreserve1(
             self,
             request: Annotated[elp.CCReserveRequest1, Payload(by_alias=True)],
-    ) -> elp.CCReserveReply1:
+    ) -> elp.CCReserveResponse1:
         ...
 
 
@@ -132,7 +132,7 @@ class PrintDocument1Service(SupportsService, Protocol):
     def printdocument1(
             self,
             request: Annotated[elp.PrintDocumentRequest1, Payload(by_alias=True)],
-    ) -> elp.PrintDocumentReply1:
+    ) -> elp.PrintDocumentResponse1:
         ...
 
 
@@ -141,7 +141,7 @@ class CancelShipment1Service(SupportsService, Protocol):
     def cancelshipment1(
             self,
             request: Annotated[elp.CancelShipmentRequest1, Payload(by_alias=True)],
-    ) -> elp.CancelShipmentReply1:
+    ) -> elp.CancelShipmentResponse1:
         ...
 
 
@@ -150,5 +150,5 @@ class CreateManifest1Service(SupportsService, Protocol):
     def createmanifest1(
             self,
             request: Annotated[elp.CreateManifestRequest1, Payload(by_alias=True)],
-    ) -> elp.CreateManifestReply1:
+    ) -> elp.CreateManifestResponse1:
         ...

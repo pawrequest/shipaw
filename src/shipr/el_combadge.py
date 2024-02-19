@@ -6,7 +6,7 @@ from zeep import Client, Settings, Transport
 from zeep.proxy import ServiceProxy
 
 from .expresslink_specs import PFEndPointSpec
-from .models.remixed import Authentication
+from .models.expresslink_pydantic import Authentication
 
 
 @dataclass
@@ -25,6 +25,34 @@ def get_service(client, binding, endpoint) -> ServiceProxy:
 
 @dataclass
 class PFCom:
+    config: ZeepConfig
+    client: Client
+    service: ServiceProxy = None
+
+    @classmethod
+    def from_config(cls, config: ZeepConfig):
+        client = Client(wsdl=config.wsdl)
+        service = get_service(
+            client,
+            config.binding,
+            config.endpoint
+        )
+        return cls(
+            config=config,
+            client=client,
+            service=service
+        )
+
+    def get_service(self) -> ServiceProxy:
+        serv = self.client.create_service(
+            binding_name=self.config.binding,
+            address=self.config.endpoint
+        )
+        return serv
+
+
+@dataclass
+class PFCom1:
     config: ZeepConfig
     client: Client
     service: ServiceProxy = None
