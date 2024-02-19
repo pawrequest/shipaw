@@ -1,22 +1,22 @@
 from __future__ import annotations
 
+import os
 from datetime import date
-from typing import Optional, Annotated
+from typing import Optional
 
 from pydantic import Field
 
 from shipr.models.express.expresslink_pydantic import (
     CollectionInfo,
     CompletedShipments,
-    ConvenientCollect,
     Enhancement,
     HazardousGoods,
     InBoundDetails,
     InternationalInfo,
     Returns,
-    SpecifiedPostOffice,
 )
 from shipr.models.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
+from shipr.models.express.options_enums import DeliveryOptions
 from shipr.models.express.shared import BasePFType
 from shipr.models.express.address import Address, Contact
 
@@ -29,6 +29,21 @@ class RequestedShipmentMinimum(BasePFType):
     recipient_contact: Contact = Field(...)
     recipient_address: Address = Field(...)
     total_number_of_parcels: int = Field(None)
+
+    @classmethod
+    def from_minimal(cls, ship_date: date, contact: Contact, address: Address, num_parcels: int = 1):
+        contract_no = os.environ.get('PF_CONT_NUM_1')
+
+        return cls(
+            department_id=DepartmentEnum.MAIN,
+            shipment_type=DeliveryTypeEnum.DELIVERY,
+            contract_number=contract_no,
+            service_code=ServiceCode.EXPRESS24,
+            shipping_date=ship_date,
+            recipient_contact=contact,
+            recipient_address=address,
+            total_number_of_parcels=num_parcels,
+        )
 
 
 class RequestedShipmentSimple(RequestedShipmentMinimum):
@@ -80,19 +95,3 @@ class CompletedShipmentInfo(BasePFType):
     requested_shipment: RequestedShipmentMinimum = Field(...)
 
 
-class DeliveryOptions(BasePFType):
-    convenient_collect: Optional[ConvenientCollect] = Field(
-        None
-    )
-    irts: Optional[bool] = Field(None)
-    letterbox: Optional[bool] = Field(None)
-    specified_post_office: Optional[SpecifiedPostOffice] = Field(
-        None
-    )
-    specified_neighbour: Optional[str] = Field(None)
-    safe_place: Optional[str] = Field(None)
-    pin: Optional[int] = Field(None)
-    named_recipient: Optional[bool] = Field(None)
-    address_only: Optional[bool] = Field(None)
-    nominated_delivery_date: Optional[str] = Field(None)
-    personal_parcel: Optional[str] = Field(None)

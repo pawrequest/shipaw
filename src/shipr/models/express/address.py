@@ -20,6 +20,7 @@ class Contact(BasePFType):
     # notifications: Optional[Notifications] = Field(None)
 
 
+
 class Address(BasePFType):
     address_line1: str = Field(...)
     town: str = Field(None)
@@ -28,3 +29,4 @@ class Address(BasePFType):
     address_line2: Optional[str] = Field(None)
     address_line3: Optional[str] = Field(None)
     country: str = Field('GB')
+

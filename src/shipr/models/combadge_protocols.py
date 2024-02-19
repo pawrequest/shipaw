@@ -45,7 +45,7 @@ class CancelShipmentService(SupportsService, Protocol):
 
 
 class PrintManifestService(SupportsService, Protocol):
-    @operation_name("PrintManifest")
+    @operation_name("printManifest")
     def printmanifest(
             self,
             request: Annotated[
@@ -55,7 +55,7 @@ class PrintManifestService(SupportsService, Protocol):
 
 
 class CreateManifestService(SupportsService, Protocol):
-    @operation_name("CreateManifest")
+    @operation_name("createManifest")
     def createmanifest(
             self,
             request: Annotated[
@@ -65,7 +65,7 @@ class CreateManifestService(SupportsService, Protocol):
 
 
 class PrintDocumentService(SupportsService, Protocol):
-    @operation_name("PrintDocument")
+    @operation_name("printDocument")
     def printdocument(
             self,
             request: Annotated[
@@ -75,7 +75,7 @@ class PrintDocumentService(SupportsService, Protocol):
 
 
 class ReturnShipmentService(SupportsService, Protocol):
-    @operation_name("ReturnShipment")
+    @operation_name("returnShipment")
     def returnshipment(
             self,
             request: Annotated[
@@ -85,7 +85,7 @@ class ReturnShipmentService(SupportsService, Protocol):
 
 
 class PrintLabelService(SupportsService, Protocol):
-    @operation_name("PrintLabel")
+    @operation_name("printLabel")
     def printlabel(
             self,
             request: Annotated[msg.PrintLabelRequest, Payload(by_alias=True)],

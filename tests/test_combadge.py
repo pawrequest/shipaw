@@ -40,9 +40,8 @@ def test_get_shipment(min_shipment_r, service, pf_auth):
     assert isinstance(shipment_.shipment_number, str)
 
 
-def test_new_service(zconfig):
-    pfc = PFCom2.from_config(zconfig)
-    back = pfc.backend(FindService)
+def test_pfc2(zconfig, pf_com2):
+    back = pf_com2.backend(FindService)
     req = FindRequest(authentication=zconfig.auth, paf=PAF(postcode='NW6 4TE'))
     response = back.find(request=req)
     assert isinstance(response, FindResponse)

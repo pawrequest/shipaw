@@ -4,7 +4,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from shipr.el_combadge import PFCom, ZeepConfig
+from shipr.el_combadge import PFCom, ZeepConfig, PFCom2
 from shipr.models.express.address import Address, Contact
 from shipr.models.express.expresslink_pydantic import (
     Authentication,
@@ -43,6 +43,9 @@ def zconfig(pf_auth):
 def pf_com(zconfig):
     return PFCom.from_config(zconfig)
 
+@pytest.fixture
+def pf_com2(zconfig):
+    return PFCom2.from_config(zconfig)
 
 @pytest.fixture
 def service(pf_com):

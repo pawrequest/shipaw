@@ -2,14 +2,14 @@ from dataclasses import dataclass
 
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
+from pydantic import BaseModel
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
 from .models.express.expresslink_pydantic import Authentication
 
 
-@dataclass
-class ZeepConfig:
+class ZeepConfig(BaseModel):
     auth: Authentication
     binding: str
     wsdl: str

@@ -5,14 +5,25 @@
 from __future__ import annotations
 
 from functools import partial
+from pathlib import Path
 from typing import List, Optional, Sequence
 from enum import Enum
 
 from pydantic import Field
 
+from pawsupport.src.pawsupport.pdf_tools.array_pdf.src.array_pdf import convert_print_silent2
 from shipr.models.express.address import Address, Contact
 from shipr.models.express.enums import AlertType
 from shipr.models.express.shared import BasePFType
+
+
+def obj_dict(objs: BasePFType | Sequence[BasePFType], **kwargs) -> dict:
+    if isinstance(objs, BasePFType):
+        objs = [objs]
+    return {obj.__class__.__name__: obj.model_dump(**kwargs) for obj in objs}
+
+
+alias_dict = partial(obj_dict, by_alias=True, exclude_none=True)
 
 
 class PAF(BasePFType):
@@ -96,7 +107,16 @@ class PrintType(Enum):
 
 
 class Document(BasePFType):
-    data: str = Field(...)
+    data: bytes = Field(...)
+
+    def download(self, outpath: Path = Path('label_out.pdf')):
+        with open(outpath, 'wb') as f:
+            f.write(self.data)
+        return outpath
+
+    def print_doc_arrayed(self):
+        output = self.download()
+        convert_print_silent2(output)
 
 
 class ManifestShipment(BasePFType):
@@ -412,12 +432,3 @@ class SpecifiedPostOffice(BasePFType):
     )
     count: Optional[int] = Field(None)
     post_office_id: Optional[str] = Field(None)
-
-
-def obj_dict(objs: BasePFType | Sequence[BasePFType], **kwargs) -> dict:
-    if isinstance(objs, BasePFType):
-        objs = [objs]
-    return {obj.__class__.__name__: obj.model_dump(**kwargs) for obj in objs}
-
-
-alias_dict = partial(obj_dict, by_alias=True, exclude_none=True)
