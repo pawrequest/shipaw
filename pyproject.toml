@@ -13,7 +13,9 @@ dependencies = [
     "zeep",
     'combadge[zeep]',
     "datamodel-code-generator",
-    'thefuzz'
+    'thefuzz',
+    'loguru',
+    'pydantic',
 ]
 
 readme = "README.md"

@@ -1,37 +1,3 @@
-from .express import (
-    AddressPF,
-    CompletedShipmentInfo,
-    CreateShipmentRequest,
-    DeliveryTypeEnum,
-    DepartmentEnum,
-    FindRequest,
-    FindResponse,
-    PrintLabelRequest,
-    PrintLabelResponse,
-    RequestedShipmentComplex,
-    RequestedShipmentMinimum,
-    RequestedShipmentSimple,
-    ServiceCode,
-    expresslink_types,
-)
-from .combadge_protocols import (
-    CCReserveService,
-    CancelShipmentService,
-    CreateManifestService,
-    CreateShipmentService,
-    FindService,
-    PrintDocumentService,
-    PrintLabelService,
-    PrintManifestService,
-    ReturnShipmentService,
-    SupportsService,
-)
+from . import express, combadge_protocols
 
-__all__ = [expresslink_types, AddressPF, CreateShipmentRequest, FindRequest, FindResponse,
-           PrintLabelRequest, PrintLabelResponse, FindResponse, DeliveryTypeEnum, DepartmentEnum,
-           ServiceCode, RequestedShipmentMinimum, RequestedShipmentSimple, RequestedShipmentComplex,
-           CompletedShipmentInfo, CreateShipmentService, FindService, PrintLabelService,
-           PrintDocumentService,
-           PrintManifestService, CreateManifestService, CancelShipmentService,
-           ReturnShipmentService,
-           CCReserveService, SupportsService]
+__all__ = [express, combadge_protocols]
