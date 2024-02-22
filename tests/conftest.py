@@ -4,11 +4,10 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from shipr.el_combadge import PFCom, ZeepConfig, PFCom2
-from shipr.models.express.address import Address, Contact
-from shipr.models.express.expresslink_pydantic import (
-    Authentication,
-)
+from shipr.el_combadge import PFCom, ZeepConfig
+from shipr import AddressPF
+from shipr.models.express.expresslink_types import ContactPF
+from shipr.models.express.expresslink_pydantic import Authentication
 from shipr.models.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
 from shipr.models.express.shipment import RequestedShipmentMinimum
 
@@ -17,35 +16,36 @@ load_dotenv(ENV_FILE)
 CONTRACT_NO = os.environ.get('PF_CONT_NUM_1')
 ...
 
+
 @pytest.fixture
 def pf_auth():
-    username = os.getenv('PF_EXPR_SAND_USR')
-    password = os.getenv('PF_EXPR_SAND_PWD')
-
-    auth = Authentication(user_name=username, password=password)
-    return auth
+    auth = {
+        'user_name': os.getenv('PF_EXPR_SAND_USR'),
+        'password': os.getenv('PF_EXPR_SAND_PWD')
+    }
+    pfauth = Authentication.model_validate(auth)
+    return pfauth
 
 
 @pytest.fixture
 def zconfig(pf_auth):
+    pf_auth = Authentication.model_validate(pf_auth)
     wsdl = os.environ.get('PF_WSDL')
     binding = os.environ.get('PF_BINDING')
     ep = os.environ.get('PF_ENDPOINT_SAND')
-    return ZeepConfig(
+    conf = ZeepConfig(
         binding=binding,
         wsdl=wsdl,
         auth=pf_auth,
         endpoint=ep
     )
+    return conf
 
 
 @pytest.fixture
 def pf_com(zconfig):
     return PFCom.from_config(zconfig)
 
-@pytest.fixture
-def pf_com2(zconfig):
-    return PFCom2.from_config(zconfig)
 
 @pytest.fixture
 def service(pf_com):
@@ -53,8 +53,8 @@ def service(pf_com):
 
 
 @pytest.fixture
-def address_r() -> Address:
-    return Address(
+def address_r() -> AddressPF:
+    return AddressPF(
         address_line1='30 Bennet Close',
         town='East Wickham',
         postcode='DA16 3HU',
@@ -62,8 +62,8 @@ def address_r() -> Address:
 
 
 @pytest.fixture
-def contact_r() -> Contact:
-    return Contact(
+def contact_r() -> ContactPF:
+    return ContactPF(
         business_name='Test Business',
         email_address='notreal@fake.com',
         mobile_phone='1234567890',

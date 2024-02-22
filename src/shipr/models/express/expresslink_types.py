@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import os
 from functools import partial
 from pathlib import Path
 from typing import List, Optional, Sequence
@@ -12,9 +13,8 @@ from enum import Enum
 from pydantic import Field
 
 from pawsupport import convert_print_silent2
-from shipr.models.express.address import Address, Contact
-from shipr.models.express.enums import AlertType
-from shipr.models.express.shared import BasePFType
+from .enums import AlertType
+from .shared import Notifications, BasePFType
 
 
 def obj_dict(objs: BasePFType | Sequence[BasePFType], **kwargs) -> dict:
@@ -35,11 +35,7 @@ class PAF(BasePFType):
 
 
 class SpecifiedNeighbour(BasePFType):
-    address: Optional[List[Address]] = Field(None, description='')
-
-
-class Notifications(BasePFType):
-    notification_type: List[str] = Field(..., description='')
+    address: Optional[List[AddressPF]] = Field(None, description='')
 
 
 class Enhancement(BasePFType):
@@ -109,7 +105,7 @@ class PrintType(Enum):
 class Document(BasePFType):
     data: bytes = Field(...)
 
-    def download(self, outpath: Path = Path('label_out.pdf')):
+    def download(self, outpath: Path = Path('label_out.pdf')) -> Path:
         with open(outpath, 'wb') as f:
             f.write(self.data)
         return outpath
@@ -140,8 +136,14 @@ class CompletedReturnInfo(BasePFType):
 
 
 class Authentication(BasePFType):
-    user_name: str = Field(...)
-    password: str = Field(...)
+    user_name: str
+    password: str
+
+    @classmethod
+    def from_env(cls):
+        username = os.getenv('PF_EXPR_SAND_USR')
+        password = os.getenv('PF_EXPR_SAND_PWD')
+        return cls(user_name=username, password=password)
 
 
 class CompletedCancelInfo(BasePFType):
@@ -204,8 +206,8 @@ class ContentDetails(BasePFType):
 
 
 class CollectionInfo(BasePFType):
-    collection_contact: Contact = Field(...)
-    collection_address: Address = Field(...)
+    collection_contact: ContactPF = Field(...)
+    collection_address: AddressPF = Field(...)
     collection_time: Optional[DateTimeRange] = Field(None)
 
 
@@ -385,7 +387,7 @@ class PostcodeExclusion(BasePFType):
 class PostOffice(BasePFType):
     post_office_id: Optional[str] = Field(None)
     business: Optional[str] = Field(None)
-    address: Optional[Address] = Field(None)
+    address: Optional[AddressPF] = Field(None)
     opening_hours: Optional[OpeningHours] = Field(None)
     distance: Optional[float] = Field(None)
     availability: Optional[bool] = Field(None)
@@ -432,3 +434,57 @@ class SpecifiedPostOffice(BasePFType):
     )
     count: Optional[int] = Field(None)
     post_office_id: Optional[str] = Field(None)
+
+
+class ContactPF(BasePFType):
+    business_name: str
+    email_address: str
+    mobile_phone: str
+
+    contact_name: Optional[str] = Field(None)
+    telephone: Optional[str] = Field(None)
+    fax: Optional[str] = Field(None)
+
+    senders_name: Optional[str] = Field(None)
+    notifications: Optional[Notifications] = Field(None)
+
+
+class AddressPF(BasePFType):
+    address_line1: str
+    address_line2: Optional[str] = Field(None)
+    address_line3: Optional[str] = Field(None)
+    town: str
+    postcode: str
+    country: str = Field('GB')
+
+    # @model_validator(mode='after')
+    # def town(self):
+    #     if not self.town:
+    #         addrs = [self.address_line1, self.address_line2, self.address_line3]
+    #         addrs = [a for a in addrs if a]
+    #         last_a = len(addrs)
+    #         if last_a == 1:
+    #             raise ValueError('Town is required')
+    #         self.town = addrs[-1]
+    #         setattr(self, f'address_line{last_a}', None)
+    #     return self
+    #
+    #
+
+
+class DeliveryOptions(BasePFType):
+    convenient_collect: Optional[ConvenientCollect] = Field(
+        None
+    )
+    irts: Optional[bool] = Field(None)
+    letterbox: Optional[bool] = Field(None)
+    specified_post_office: Optional[SpecifiedPostOffice] = Field(
+        None
+    )
+    specified_neighbour: Optional[str] = Field(None)
+    safe_place: Optional[str] = Field(None)
+    pin: Optional[int] = Field(None)
+    named_recipient: Optional[bool] = Field(None)
+    address_only: Optional[bool] = Field(None)
+    nominated_delivery_date: Optional[str] = Field(None)
+    personal_parcel: Optional[str] = Field(None)

@@ -3,12 +3,12 @@ import os
 from combadge.support.zeep.backends.sync import ZeepBackend
 from dotenv import load_dotenv
 
-from shipr.el_combadge import PFCom, PFCom2
+from shipr.el_combadge import PFCom, PFCom
 from shipr.models.combadge_protocols import CreateShipmentService, FindService
 from shipr.models.express.expresslink_pydantic import (
     PAF,
 )
-from shipr.models.express.address import Address
+from shipr import AddressPF
 from shipr.models.express.msg import (
     CreateShipmentRequest,
     CreateShipmentResponse,
@@ -29,7 +29,7 @@ def test_find_paf(zconfig):
     response = service.find(request=req)
     assert isinstance(response, FindResponse)
     assert isinstance(response.paf, PAF)
-    assert isinstance(response.paf.specified_neighbour[0].address[0], Address)
+    assert isinstance(response.paf.specified_neighbour[0].address[0], AddressPF)
 
 
 def test_get_shipment(min_shipment_r, service, pf_auth):
@@ -40,13 +40,13 @@ def test_get_shipment(min_shipment_r, service, pf_auth):
     assert isinstance(shipment_.shipment_number, str)
 
 
-def test_pfc2(zconfig, pf_com2):
-    back = pf_com2.backend(FindService)
+def test_pfc2(zconfig, pf_com):
+    back = pf_com.backend(FindService)
     req = FindRequest(authentication=zconfig.auth, paf=PAF(postcode='NW6 4TE'))
     response = back.find(request=req)
     assert isinstance(response, FindResponse)
     assert isinstance(response.paf, PAF)
-    assert isinstance(response.paf.specified_neighbour[0].address[0], Address)
+    assert isinstance(response.paf.specified_neighbour[0].address[0], AddressPF)
 
 
 def combadge_service(service, service_prot):

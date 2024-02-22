@@ -3,10 +3,12 @@ from __future__ import annotations
 from abc import ABC
 from typing import Optional
 
-from pydantic import Field
+from loguru import logger
+from pydantic import Field, field_validator
 
-import shipr.models.express.shared
-from . import expresslink_pydantic as elp, shipment
+from . import expresslink_types as elp
+from .shipment import RequestedShipmentMinimum, CompletedShipmentInfo
+from .shared import BasePFType
 
 
 class BaseRequest(elp.BasePFType):
@@ -29,11 +31,23 @@ class BaseRequest(elp.BasePFType):
         return self.alias_dict(all_obs)
 
 
-class BaseResponse(shipr.models.express.shared.BasePFType, ABC):
+class BaseResponse(BasePFType, ABC):
     alerts: Optional[elp.Alerts] = Field(None)
 
+    @field_validator('alerts')
+    def check_alerts(cls, v):
+        if v:
+            for alt in v.alert:
+                if alt.type == 'WARNING':
+                    logger.warning(f'ExpressLink Warning: {alt.message}')
+                elif alt.type == 'ERROR':
+                    logger.error(f'ExpressLink Error: {alt.message}')
+                else:
+                    logger.info(f'ExpressLink {alt.type}: {alt.message}')
+        return v
 
-class FindMessage(shipr.models.express.shared.BasePFType):
+
+class FindMessage(BasePFType):
     convenient_collect: Optional[elp.ConvenientCollect] = Field(
         None
     )
@@ -55,17 +69,18 @@ class FindRequest(FindMessage, BaseRequest):
 
 
 class FindResponse(FindMessage, BaseResponse):
+    safe_place_list: Optional[elp.SafePlaceList] = Field(None)
     ...
 
 
 ################################################################
 
 class CreateShipmentRequest(BaseRequest):
-    requested_shipment: shipment.RequestedShipmentMinimum = Field(...)
+    requested_shipment: RequestedShipmentMinimum = Field(...)
 
 
 class CreateShipmentResponse(BaseResponse):
-    completed_shipment_info: Optional[shipment.CompletedShipmentInfo] = Field(
+    completed_shipment_info: Optional[CompletedShipmentInfo] = Field(
         None
     )
 
@@ -145,7 +160,7 @@ class CancelShipmentResponse(BaseResponse):
 
 
 class CreatePrintRequest(BaseRequest):
-    requested_shipment: shipr.models.express.shipment.RequestedShipmentMinimum = Field(...)
+    requested_shipment: RequestedShipmentMinimum = Field(...)
 
 
 class CreatePrintResponse(BaseResponse):

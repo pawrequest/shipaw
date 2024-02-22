@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 
 from combadge.core.typevars import ServiceProtocolT
@@ -6,7 +7,7 @@ from pydantic import BaseModel
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
-from .models.express.expresslink_pydantic import Authentication
+from .models.express.expresslink_types import Authentication
 
 
 class ZeepConfig(BaseModel):
@@ -14,6 +15,15 @@ class ZeepConfig(BaseModel):
     binding: str
     wsdl: str
     endpoint: str
+
+    @classmethod
+    def from_env(cls):
+        return cls(
+            auth=Authentication.from_env(),
+            binding=os.environ.get('PF_BINDING'),
+            wsdl=os.environ.get('PF_WSDL'),
+            endpoint=os.environ.get('PF_ENDPOINT_SAND')
+        )
 
 
 def get_service(client, binding, endpoint) -> ServiceProxy:
@@ -26,40 +36,6 @@ def get_service(client, binding, endpoint) -> ServiceProxy:
 @dataclass
 class PFCom:
     config: ZeepConfig
-    client: Client
-    _service: ServiceProxy = None
-
-    @classmethod
-    def from_config(cls, config: ZeepConfig):
-        client = Client(wsdl=config.wsdl)
-        service = get_service(
-            client,
-            config.binding,
-            config.endpoint
-        )
-        return cls(
-            config=config,
-            client=client,
-            _service=service
-        )
-
-    @property
-    def service(self) -> ServiceProxy:
-        if self._service is None:
-            self._service = self.new_service()
-        return self._service
-
-    def new_service(self) -> ServiceProxy:
-        serv = self.client.create_service(
-            binding_name=self.config.binding,
-            address=self.config.endpoint
-        )
-        return serv
-
-
-@dataclass
-class PFCom2:
-    config: ZeepConfig
     service: ServiceProxy
 
     @classmethod
@@ -71,6 +47,10 @@ class PFCom2:
             service=service
         )
 
+    @classmethod
+    def from_env(cls):
+        return cls.from_config(ZeepConfig.from_env())
+
     def new_service(self) -> ServiceProxy:
         client = Client(wsdl=self.config.wsdl)
         serv = client.create_service(
@@ -81,3 +61,13 @@ class PFCom2:
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> ServiceProxy:
         return ZeepBackend(self.service)[service_prot]
+
+    def get_response(
+            self,
+            *items,
+            service_prot: type[ServiceProtocolT],
+            request: BaseModel
+    ) -> BaseModel:
+        backend = self.backend(service_prot)
+        return backend(*items, request=request)
+
