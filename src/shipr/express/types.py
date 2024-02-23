@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import List, Optional, Sequence
 from enum import Enum
 
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 from pawsupport import convert_print_silent2
-from .enums import AlertType
-from .shared import Notifications, BasePFType
+from shipr.express.enums import AlertType
+from shipr.express.shared import Notifications, BasePFType
 
 
 def obj_dict(objs: BasePFType | Sequence[BasePFType], **kwargs) -> dict:
@@ -488,3 +488,7 @@ class DeliveryOptions(BasePFType):
     address_only: Optional[bool] = Field(None)
     nominated_delivery_date: Optional[str] = Field(None)
     personal_parcel: Optional[str] = Field(None)
+
+
+class AddressCandidates(BaseModel):
+    candidates: list[AddressPF]

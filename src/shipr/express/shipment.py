@@ -5,7 +5,7 @@ from datetime import date
 from typing import Optional
 
 from pydantic import Field
-from . import expresslink_types as el
+from . import types as el
 from .enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
 from .shared import BasePFType
 

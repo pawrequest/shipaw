@@ -7,7 +7,7 @@ from zeep.proxy import ServiceProxy
 from zeep.helpers import serialize_object
 
 from .expresslink_specs import PFEndPointSpec
-from .models.express.msg import PFFunc
+from .express.msg import PFFunc
 from .models.bases import BaseResponse, BaseRequest, alias_dict
 
 

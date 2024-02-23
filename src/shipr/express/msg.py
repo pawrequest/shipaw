@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from loguru import logger
 from pydantic import Field, field_validator
 
-from . import expresslink_types as elp
-from .shipment import RequestedShipmentMinimum, CompletedShipmentInfo
-from .shared import BasePFType
+from shipr.express import types as elp
+from shipr.express.shipment import RequestedShipmentMinimum, CompletedShipmentInfo
+from shipr.express.shared import BasePFType
 
 
 class BaseRequest(elp.BasePFType):

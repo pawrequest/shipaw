@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 
 from shipr.el_combadge import PFCom, PFCom
 from shipr.models.combadge_protocols import CreateShipmentService, FindService
-from shipr.models.express.expresslink_pydantic import (
+from shipr.express.expresslink_pydantic import (
     PAF,
 )
 from shipr import AddressPF
-from shipr.models.express.msg import (
+from shipr.express.msg import (
     CreateShipmentRequest,
     CreateShipmentResponse,
     FindRequest,

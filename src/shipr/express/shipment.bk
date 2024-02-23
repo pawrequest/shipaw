@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional
 
 from pydantic import Field
-from shipr.models.express.expresslink_pydantic import (
+from shipr.express.expresslink_pydantic import (
     BasePFType,
     Contact,
     Address,

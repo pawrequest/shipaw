@@ -16,8 +16,8 @@
 #     def printmanifest1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.PrintManifestRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.PrintManifestResponse1:
+#                 shipr.express.with_1.PrintManifestRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.PrintManifestResponse1:
 #         ...
 #
 #
@@ -26,8 +26,8 @@
 #     def printlabel1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.PrintLabelRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.PrintLabelResponse1:
+#                 shipr.express.with_1.PrintLabelRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.PrintLabelResponse1:
 #         ...
 #
 # class ReturnShipment1Service(SupportsService, Protocol):
@@ -35,8 +35,8 @@
 #     def returnshipment1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.ReturnShipmentRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.ReturnShipmentResponse1:
+#                 shipr.express.with_1.ReturnShipmentRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.ReturnShipmentResponse1:
 #         ...
 #
 #
@@ -45,8 +45,8 @@
 #     def ccreserve1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.CCReserveRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.CCReserveResponse1:
+#                 shipr.express.with_1.CCReserveRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.CCReserveResponse1:
 #         ...
 #
 #
@@ -55,8 +55,8 @@
 #     def printdocument1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.PrintDocumentRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.PrintDocumentResponse1:
+#                 shipr.express.with_1.PrintDocumentRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.PrintDocumentResponse1:
 #         ...
 #
 #
@@ -65,8 +65,8 @@
 #     def cancelshipment1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.CancelShipmentRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.CancelShipmentResponse1:
+#                 shipr.express.with_1.CancelShipmentRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.CancelShipmentResponse1:
 #         ...
 #
 #
@@ -75,6 +75,6 @@
 #     def createmanifest1(
 #             self,
 #             request: Annotated[
-#                 shipr.models.express.with_1.CreateManifestRequest1, Payload(by_alias=True)],
-#     ) -> shipr.models.express.with_1.CreateManifestResponse1:
+#                 shipr.express.with_1.CreateManifestRequest1, Payload(by_alias=True)],
+#     ) -> shipr.express.with_1.CreateManifestResponse1:
 #         ...

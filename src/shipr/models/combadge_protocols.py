@@ -7,7 +7,7 @@ from combadge.core.interfaces import SupportsService
 from combadge.support.http.markers import Payload
 from combadge.support.soap.markers import operation_name
 
-from .express import msg
+from shipr.express import msg
 
 class FindService(SupportsService, Protocol):
     @operation_name("Find")

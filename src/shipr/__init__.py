@@ -1,5 +1,5 @@
 from . import models
-from .el_combadge import PFCom, ZeepConfig
+from .expresslink_client import PFCom, ZeepConfig
+from .express import types
 
-
-__all__ = [models, PFCom, ZeepConfig]
+__all__ = ['models', 'PFCom', 'ZeepConfig', 'types']

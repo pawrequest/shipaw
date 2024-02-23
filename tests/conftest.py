@@ -4,12 +4,10 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from shipr.el_combadge import PFCom, ZeepConfig
-from shipr import AddressPF
-from shipr.models.express.expresslink_types import ContactPF
-from shipr.models.express.expresslink_pydantic import Authentication
-from shipr.models.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
-from shipr.models.express.shipment import RequestedShipmentMinimum
+from shipr import ZeepConfig, PFCom
+from shipr.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
+from shipr.express.shipment import RequestedShipmentMinimum
+from shipr.express.types import Authentication, AddressPF, ContactPF
 
 ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)
