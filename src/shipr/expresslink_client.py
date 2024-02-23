@@ -6,17 +6,18 @@ from pathlib import Path
 
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from thefuzz import fuzz, process
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
-from shipr.express.types import AddressPF, Authentication
+from shipr import types as elt
 from shipr.models import combadge_protocols as cp
+from shipr import msg
 
 
 class ZeepConfig(BaseModel):
-    auth: Authentication
+    auth: elt.Authentication
     binding: str
     wsdl: str
     endpoint: str
@@ -24,7 +25,7 @@ class ZeepConfig(BaseModel):
     @classmethod
     def from_env(cls):
         return cls(
-            auth=Authentication.from_env(),
+            auth=elt.Authentication.from_env(),
             binding=os.environ.get('PF_BINDING'),
             wsdl=os.environ.get('PF_WSDL'),
             endpoint=os.environ.get('PF_ENDPOINT_SAND')
@@ -38,8 +39,10 @@ def get_service(client, binding, endpoint) -> ServiceProxy:
     )
 
 
-@dataclass
-class PFCom:
+class PFCom(BaseModel):
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True
+    )
     config: ZeepConfig
     service: ServiceProxy
 
@@ -89,9 +92,9 @@ class PFCom:
     #     return AddressCandidates(candidates=addresses)
 
     def get_candidates(self, postcode: str):
-        req = el.msg.FindRequest(
+        req = msg.FindRequest(
             authentication=self.config.auth,
-            paf=el.types.PAF(postcode=postcode)
+            paf=elt.PAF(postcode=postcode)
         )
         back = self.backend(cp.FindService)
         response = back.find(request=req)
@@ -112,13 +115,13 @@ class PFCom:
             ship_num: str - shipment number
         """
         back = self.backend(cp.PrintLabelService)
-        req = el.msg.PrintLabelRequest(authentication=self.config.auth, shipment_number=ship_num)
-        response: el.msg.PrintLabelResponse = back.printlabel(request=req)
+        req = msg.PrintLabelRequest(authentication=self.config.auth, shipment_number=ship_num)
+        response: msg.PrintLabelResponse = back.printlabel(request=req)
         outpath = response.label.download()
         os.startfile(outpath)
         return outpath
 
     def choose_one_str(self, address_str: str, candidates: list[str]) -> tuple[
-        el.types.AddressPF, int]:
+        elt.AddressPF, int]:
         address, score = process.extractOne(address_str, candidates, scorer=fuzz.token_sort_ratio)
         return address, score

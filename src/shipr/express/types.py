@@ -492,3 +492,8 @@ class DeliveryOptions(BasePFType):
 
 class AddressCandidates(BaseModel):
     candidates: list[AddressPF]
+
+
+class AddressChoice(BaseModel):
+    address: AddressPF
+    score: int
