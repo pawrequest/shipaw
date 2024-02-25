@@ -16,6 +16,7 @@ dependencies = [
     'thefuzz',
     'loguru',
     'pydantic',
+    'python-multipart',
 ]
 
 readme = "README.md"

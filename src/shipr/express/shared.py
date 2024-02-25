@@ -1,10 +1,14 @@
 from __future__ import annotations
 
-from typing import List
+import os
+from abc import ABC
+from typing import List, Optional
 
 from loguru import logger
-from pydantic import BaseModel, ConfigDict, AliasGenerator, model_validator, Field
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.alias_generators import to_pascal
+
+from .enums import AlertType
 
 
 class BasePFType(BaseModel):
@@ -29,3 +33,63 @@ class BasePFType(BaseModel):
 
 class Notifications(BasePFType):
     notification_type: List[str] = Field(..., description='')
+
+
+#
+
+
+class Authentication(BasePFType):
+    user_name: str
+    password: str
+
+    @classmethod
+    def from_env(cls):
+        username = os.getenv('PF_EXPR_SAND_USR')
+        password = os.getenv('PF_EXPR_SAND_PWD')
+        return cls(user_name=username, password=password)
+
+
+class Alert(BasePFType):
+    code: int = Field(...)
+    message: str = Field(...)
+    type: AlertType = Field(...)
+
+
+class Alerts(BasePFType):
+    alert: List[Alert] = Field(..., description='')
+
+
+class BaseRequest(BasePFType):
+    authentication: Optional[Authentication] = Field(None)
+
+    def req_dict(self):
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    @property
+    def authorised(self):
+        return self.authentication is not None
+
+    def authorise(self, auth: Authentication):
+        self.authentication = auth
+
+    def auth_request_dict(self) -> dict:
+        if not self.authorised:
+            raise ValueError('Authentication is required')
+        all_obs = [self.authentication, *self.objs]
+        return self.alias_dict(all_obs)
+
+
+class BaseResponse(BasePFType, ABC):
+    alerts: Optional[Alerts] = Field(None)
+
+    @field_validator('alerts')
+    def check_alerts(cls, v):
+        if v:
+            for alt in v.alert:
+                if alt.type == 'WARNING':
+                    logger.warning(f'ExpressLink Warning: {alt.message}')
+                elif alt.type == 'ERROR':
+                    logger.error(f'ExpressLink Error: {alt.message}')
+                else:
+                    logger.info(f'ExpressLink {alt.type}: {alt.message}')
+        return v

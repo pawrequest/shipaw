@@ -7,6 +7,7 @@ from core.entities import DateTimeMasks
 from shipper.shipment import ShipmentRequested
 
 import amherst.front.amui
+import amherst.front.fui_components
 
 
 def BOOK_KEY(shipment: ShipmentRequested):
@@ -70,7 +71,7 @@ def SERVICE_STRING(num_boxes: int, service: Service):
 
 
 def DATE_STRING(collection_date: CollectionDate):
-    return f'{datetime.strptime(amherst.front.amui.date, DateTimeMasks.DB.value):{DateTimeMasks.BUTTON.value}}'
+    return f'{datetime.strptime(amherst.front.fui_components.date_div, DateTimeMasks.DB.value):{DateTimeMasks.BUTTON.value}}'
 
 
 def ADDRESS_STRING(address: Address):
@@ -80,7 +81,8 @@ def ADDRESS_STRING(address: Address):
 def DATE_MENU(dates: list[CollectionDate]):
     menu_map = {}
     for potential_collection_date in dates:
-        real_date = datetime.strptime(amherst.front.amui.date, DateTimeMasks.DB.value).date_ui()
+        real_date = datetime.strptime(
+            amherst.front.fui_components.date_div, DateTimeMasks.DB.value).date_btn()
         display_date = real_date.strftime(DateTimeMasks.DISPLAY.value)
         menu_map.update({display_date: potential_collection_date})
     return menu_map

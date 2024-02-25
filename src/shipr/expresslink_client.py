@@ -11,13 +11,14 @@ from thefuzz import fuzz, process
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
+from shipr.express.shared import Authentication
 from shipr import types as elt
-from shipr.models import combadge_protocols as cp
+from shipr.models import service_protocols as cp
 from shipr import msg
 
 
 class ZeepConfig(BaseModel):
-    auth: elt.Authentication
+    auth: Authentication
     binding: str
     wsdl: str
     endpoint: str
@@ -25,7 +26,7 @@ class ZeepConfig(BaseModel):
     @classmethod
     def from_env(cls):
         return cls(
-            auth=elt.Authentication.from_env(),
+            auth=Authentication.from_env(),
             binding=os.environ.get('PF_BINDING'),
             wsdl=os.environ.get('PF_WSDL'),
             endpoint=os.environ.get('PF_ENDPOINT_SAND')
@@ -91,7 +92,7 @@ class PFCom(BaseModel):
     #         if response.paf.specified_neighbour else []
     #     return AddressCandidates(candidates=addresses)
 
-    def get_candidates(self, postcode: str):
+    def get_candidates(self, postcode: str) -> list[elt.AddressPF]:
         req = msg.FindRequest(
             authentication=self.config.auth,
             paf=elt.PAF(postcode=postcode)
@@ -105,6 +106,17 @@ class PFCom(BaseModel):
             for neighbour in response.paf.specified_neighbour
         ]
         return addresses
+
+    def get_town(self, postcode: str) -> str:
+        req = msg.FindRequest(
+            authentication=self.config.auth,
+            paf=elt.PAF(postcode=postcode)
+        )
+        back = self.backend(cp.FindService)
+        response = back.find(request=req)
+        if not response.paf.specified_neighbour:
+            return ''
+        return response.paf.specified_neighbour[0].address[0].town
 
     def get_label(self, ship_num) -> Path:
         """Get the label for a shipment number.
@@ -121,7 +133,7 @@ class PFCom(BaseModel):
         os.startfile(outpath)
         return outpath
 
-    def choose_one_str(self, address_str: str, candidates: list[str]) -> tuple[
+    def choose_one_str(self, address_str: str, candidates: list) -> tuple[
         elt.AddressPF, int]:
         address, score = process.extractOne(address_str, candidates, scorer=fuzz.token_sort_ratio)
         return address, score

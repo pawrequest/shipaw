@@ -36,6 +36,7 @@ class RequestedShipmentMinimum(BasePFType):
         )
 
 
+
 class RequestedShipmentSimple(RequestedShipmentMinimum):
     job_reference: Optional[str] = Field(None)
     # todo validate both or none for sender
