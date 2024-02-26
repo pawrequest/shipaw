@@ -404,9 +404,9 @@ class SpecifiedPostOffice(BasePFType):
 
 
 class ContactPF(BasePFType):
-    business_name: str
-    email_address: str
-    mobile_phone: str
+    business_name: str = Field(...)
+    email_address: str = Field(...)
+    mobile_phone: str = Field(...)
 
     contact_name: Optional[str] = Field(None)
     telephone: Optional[str] = Field(None)
@@ -443,6 +443,10 @@ class AddressPF(BasePFType):
     #     return self
     #
     #
+
+
+class AddressPFPartial(AddressPF):
+    town: Optional[str] = Field(None)
 
 
 class DeliveryOptions(BasePFType):

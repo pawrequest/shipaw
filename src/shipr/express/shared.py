@@ -18,23 +18,21 @@ class BasePFType(BaseModel):
         ),
         use_enum_values=True,
         populate_by_name=True,
-        extra='allow',
+        # extra='allow',
     )
 
-    @model_validator(mode='after')
-    def has_extra(self, v):
-        try:
-            if self.model_extra:
-                logger.warning(f'Extra fields found in {self.__class__.__name__}: {v}')
-        except Exception as e:
-            pass
-        return self
+    # @model_validator(mode='after')
+    # def has_extra(self, v):
+    #     try:
+    #         if self.model_extra:
+    #             logger.warning(f'Extra fields found in {self.__class__.__name__}: {v}')
+    #     except Exception as e:
+    #         pass
+    #     return self
 
 
 class Notifications(BasePFType):
-    notification_type: List[str] = Field(..., description='')
-
-
+    notification_type: List[str] = Field(default_factory=list)
 #
 
 
