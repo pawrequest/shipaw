@@ -404,9 +404,9 @@ class SpecifiedPostOffice(BasePFType):
 
 
 class ContactPF(BasePFType):
-    business_name: str = Field(...)
-    email_address: str = Field(...)
-    mobile_phone: str = Field(...)
+    business_name: str
+    email_address: str
+    mobile_phone: str
 
     contact_name: Optional[str] = Field(None)
     telephone: Optional[str] = Field(None)
@@ -418,8 +418,8 @@ class ContactPF(BasePFType):
 
 class AddressPF(BasePFType):
     address_line1: str
-    address_line2: Optional[str] = Field(None)
-    address_line3: Optional[str] = Field(None)
+    address_line2: Optional[str] = Field('')
+    address_line3: Optional[str] = Field('')
     town: str
     postcode: str
     country: str = Field('GB')
@@ -467,6 +467,6 @@ class DeliveryOptions(BasePFType):
     personal_parcel: Optional[str] = Field(None)
 
 
-class AddressChoice(BaseModel):
+class AddressChoice(BasePFType):
     address: AddressPF
     score: int

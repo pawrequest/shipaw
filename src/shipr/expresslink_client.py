@@ -11,8 +11,10 @@ from thefuzz import fuzz, process
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
+from amherst.shipping.utils import address_as_str
 from shipr.express.shared import Authentication
-from shipr import types as elt
+from shipr import types as elt, express as el
+from shipr.express.types import AddressPF
 from shipr.models import service_protocols as cp
 from shipr import msg
 
@@ -137,3 +139,19 @@ class PFCom(BaseModel):
         elt.AddressPF, int]:
         address, score = process.extractOne(address_str, candidates, scorer=fuzz.token_sort_ratio)
         return address, score
+
+    def get_shipment_resp(self, req: el.msg.CreateShipmentRequest) -> el.msg.CreateShipmentResponse:
+        back = self.backend(cp.CreateShipmentService)
+        resp = back.createshipment(request=req)
+        return resp
+
+    def guess_address(self, address: AddressPF) -> el.types.AddressChoice:
+        candidates_dict = {address_as_str(add): add for add in
+                           self.get_candidates(address.postcode)}
+        chosen, score = process.extractOne(
+            address_as_str(address),
+            list(candidates_dict.keys()),
+            scorer=fuzz.token_sort_ratio
+        )
+        add = candidates_dict[chosen]
+        return el.types.AddressChoice(address=add, score=score)
