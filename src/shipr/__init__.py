@@ -3,5 +3,6 @@ from .express import types
 from .express import shared, msg
 from .models import service_protocols
 from .expresslink_client import PFCom, ZeepConfig
+from .express import enums
 
-__all__ = ['models', 'PFCom', 'ZeepConfig', 'types', 'msg', 'service_protocols', 'shared']
+__all__ = ['models', 'PFCom', 'ZeepConfig', 'types', 'msg', 'service_protocols', 'shared', 'enums']

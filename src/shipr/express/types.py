@@ -445,8 +445,8 @@ class AddressPF(BasePFType):
     #
 
 
-class AddressPFPartial(AddressPF):
-    town: Optional[str] = Field(None)
+# class AddressPFPartial(AddressPF):
+#     town: Optional[str] = Field(None)
 
 
 class DeliveryOptions(BasePFType):
