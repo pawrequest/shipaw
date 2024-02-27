@@ -4,14 +4,38 @@
 
 from __future__ import annotations
 
+import os
+from abc import ABC
 from pathlib import Path
 from typing import List, Optional
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from loguru import logger
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field, field_validator
+from pydantic.alias_generators import to_pascal
 
 from pawsupport import convert_print_silent2
-from .shared import BasePFType, Notifications
+from .pf_enums import AlertType
+
+
+class BasePFType(BaseModel):
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            alias=to_pascal,
+        ),
+        use_enum_values=True,
+        populate_by_name=True,
+        # extra='allow',
+    )
+
+    # @model_validator(mode='after')
+    # def has_extra(self, v):
+    #     try:
+    #         if self.model_extra:
+    #             logger.warning(f'Extra fields found in {self.__class__.__name__}: {v}')
+    #     except Exception as e:
+    #         pass
+    #     return self
 
 
 class PAF(BasePFType):
@@ -417,36 +441,18 @@ class ContactPF(BasePFType):
 
 
 class AddressPF(BasePFType):
-    address_line1: str
+    address_line1: str = Field(...)
     address_line2: Optional[str] = Field('')
     address_line3: Optional[str] = Field('')
-    town: str
-    postcode: str
+    town: str = Field(...)
+    postcode: str = Field(...)
     country: str = Field('GB')
 
-    @property
-    def addr_lines_str(self) -> str:
-        lines = [self.address_line1, self.address_line2, self.address_line3]
-        ls = ' '.join(line for line in lines if line)
-        return ls
-
-    # @model_validator(mode='after')
-    # def town(self):
-    #     if not self.town:
-    #         addrs = [self.address_line1, self.address_line2, self.address_line3]
-    #         addrs = [a for a in addrs if a]
-    #         last_a = len(addrs)
-    #         if last_a == 1:
-    #             raise ValueError('Town is required')
-    #         self.town = addrs[-1]
-    #         setattr(self, f'address_line{last_a}', None)
-    #     return self
-    #
-    #
-
-
-# class AddressPFPartial(AddressPF):
-#     town: Optional[str] = Field(None)
+    @field_validator('address_line1', 'address_line2', 'address_line3', mode='after')
+    def address_lines(cls, v, info):
+        if v is None:
+            v = ' '
+        return v
 
 
 class DeliveryOptions(BasePFType):
@@ -470,3 +476,64 @@ class DeliveryOptions(BasePFType):
 class AddressChoice(BasePFType):
     address: AddressPF
     score: int
+
+
+class Notifications(BasePFType):
+    notification_type: List[str] = Field(default_factory=list)
+
+
+class Authentication(BasePFType):
+    user_name: str
+    password: str
+
+    @classmethod
+    def from_env(cls):
+        username = os.getenv('PF_EXPR_SAND_USR')
+        password = os.getenv('PF_EXPR_SAND_PWD')
+        return cls(user_name=username, password=password)
+
+
+class Alert(BasePFType):
+    code: int = Field(...)
+    message: str = Field(...)
+    type: AlertType = Field(...)
+
+
+class Alerts(BasePFType):
+    alert: List[Alert] = Field(..., description='')
+
+
+class BaseRequest(BasePFType):
+    authentication: Optional[Authentication] = Field(None)
+
+    def req_dict(self):
+        return self.model_dump(by_alias=True)
+
+    @property
+    def authorised(self):
+        return self.authentication is not None
+
+    def authorise(self, auth: Authentication):
+        self.authentication = auth
+
+    def auth_request_dict(self) -> dict:
+        if not self.authorised:
+            raise ValueError('Authentication is required')
+        all_obs = [self.authentication, *self.objs]
+        return self.alias_dict(all_obs)
+
+
+class BaseResponse(BasePFType, ABC):
+    alerts: Optional[Alerts] = Field(None)
+
+    @field_validator('alerts')
+    def check_alerts(cls, v):
+        if v:
+            for alt in v.alert:
+                if alt.type == 'WARNING':
+                    logger.warning(f'ExpressLink Warning: {alt.message}')
+                elif alt.type == 'ERROR':
+                    logger.error(f'ExpressLink Error: {alt.message}')
+                else:
+                    logger.info(f'ExpressLink {alt.type}: {alt.message}')
+        return v

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
 from pathlib import Path
 
 from combadge.core.typevars import ServiceProtocolT
@@ -11,16 +10,11 @@ from thefuzz import fuzz, process
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
-from amherst.shipping.utils import address_as_str
-from shipr.express.shared import Authentication
-from shipr import types as elt, express as el
-from shipr.express.types import AddressPF
-from shipr.models import service_protocols as cp
-from shipr import msg
+from shipr.models import pf_types as elt, pf_msg as msg, service_protocols as cp
 
 
 class ZeepConfig(BaseModel):
-    auth: Authentication
+    auth: elt.Authentication
     binding: str
     wsdl: str
     endpoint: str
@@ -28,7 +22,7 @@ class ZeepConfig(BaseModel):
     @classmethod
     def from_env(cls):
         return cls(
-            auth=Authentication.from_env(),
+            auth=elt.Authentication.from_env(),
             binding=os.environ.get('PF_BINDING'),
             wsdl=os.environ.get('PF_WSDL'),
             endpoint=os.environ.get('PF_ENDPOINT_SAND')
@@ -73,26 +67,10 @@ class PFCom(BaseModel):
     def backend(self, service_prot: type[ServiceProtocolT]) -> ServiceProxy:
         return ZeepBackend(self.service)[service_prot]
 
-    def get_response(
-            self,
-            *items,
-            service_prot: type[ServiceProtocolT],
-            request: BaseModel
-    ) -> BaseModel:
-        backend = self.backend(service_prot)
-        return backend(*items, request=request)
-
-    # def get_candidates2(self, postcode: str) -> AddressCandidates:
-    #     back = self.backend(cp.FindService)
-    #     req = el.msg.FindRequest(
-    #         authentication=self.config.auth,
-    #         paf=el.types.PAF(postcode=postcode)
-    #     )
-    #     response = back.find(request=req)
-    #     addresses = [neighbour.address[0] for neighbour in
-    #                  response.paf.specified_neighbour] \
-    #         if response.paf.specified_neighbour else []
-    #     return AddressCandidates(candidates=addresses)
+    def get_shipment_resp(self, req: el.msg.CreateShipmentRequest) -> el.msg.CreateShipmentResponse:
+        back = self.backend(cp.CreateShipmentService)
+        resp = back.createshipment(request=req.model_dump(by_alias=True))
+        return msg.CreateShipmentResponse.model_validate(resp)
 
     def get_candidates(self, postcode: str) -> list[elt.AddressPF]:
         req = msg.FindRequest(
@@ -100,7 +78,7 @@ class PFCom(BaseModel):
             paf=elt.PAF(postcode=postcode)
         )
         back = self.backend(cp.FindService)
-        response = back.find(request=req)
+        response = back.find(request=req.model_dump(by_alias=True))
         if not response.paf.specified_neighbour:
             return []
         addresses = [
@@ -109,23 +87,12 @@ class PFCom(BaseModel):
         ]
         return addresses
 
-    def get_town(self, postcode: str) -> str:
-        req = msg.FindRequest(
-            authentication=self.config.auth,
-            paf=elt.PAF(postcode=postcode)
-        )
-        back = self.backend(cp.FindService)
-        response = back.find(request=req)
-        if not response.paf.specified_neighbour:
-            return ''
-        return response.paf.specified_neighbour[0].address[0].town
-
     def get_label(self, ship_num) -> Path:
         """Get the label for a shipment number.
 
         args:
             pf_com2: PFCom - PFCom combadge client
-            pf_auth: Authentication - PFCom authentication
+            pf_auth: elt.Authentication - PFCom authentication
             ship_num: str - shipment number
         """
         back = self.backend(cp.PrintLabelService)
@@ -140,12 +107,7 @@ class PFCom(BaseModel):
         address, score = process.extractOne(address_str, candidates, scorer=fuzz.token_sort_ratio)
         return address, score
 
-    def get_shipment_resp(self, req: el.msg.CreateShipmentRequest) -> el.msg.CreateShipmentResponse:
-        back = self.backend(cp.CreateShipmentService)
-        resp = back.createshipment(request=req)
-        return resp
-
-    def guess_address(self, address: AddressPF) -> el.types.AddressChoice:
+    def guess_address(self, address: elt.AddressPF) -> elt.AddressChoice:
         candidates_dict = {address_as_str(add): add for add in
                            self.get_candidates(address.postcode)}
         chosen, score = process.extractOne(
@@ -154,4 +116,11 @@ class PFCom(BaseModel):
             scorer=fuzz.token_sort_ratio
         )
         add = candidates_dict[chosen]
-        return el.types.AddressChoice(address=add, score=score)
+        return elt.AddressChoice(address=add, score=score)
+
+
+def address_as_str(pf_address: elt.AddressPF) -> str:
+    lines = [pf_address.address_line1, pf_address.address_line2, pf_address.address_line3]
+    ls = ' '.join(line for line in lines if line)
+
+    return ls

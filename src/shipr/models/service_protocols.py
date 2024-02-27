@@ -6,8 +6,7 @@ from typing_extensions import Annotated
 from combadge.core.interfaces import SupportsService
 from combadge.support.http.markers import Payload
 from combadge.support.soap.markers import operation_name
-
-from shipr.express import msg
+from . import pf_msg as msg
 
 class FindService(SupportsService, Protocol):
     @operation_name("Find")

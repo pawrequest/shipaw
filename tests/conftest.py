@@ -5,10 +5,9 @@ import pytest
 from dotenv import load_dotenv
 
 from shipr import ZeepConfig, PFCom
-from shipr.express.enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
-from shipr.express.shipment import RequestedShipmentMinimum
-from shipr.express.types import AddressPF, ContactPF
-from shipr.express.shared import Authentication
+from shipr.models.pf_enums import DeliveryTypeEnum, DepartmentEnum, ServiceCode
+from shipr.express.pf_shipment import RequestedShipmentMinimum
+from shipr.express.pf_types import AddressPF, ContactPF, Authentication
 
 ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)

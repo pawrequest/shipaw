@@ -9,7 +9,7 @@ from shipr.express.expresslink_pydantic import (
     PAF,
 )
 from shipr import AddressPF
-from shipr.express.msg import (
+from shipr.express.pf_msg import (
     CreateShipmentRequest,
     CreateShipmentResponse,
     FindRequest,

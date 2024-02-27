@@ -4,9 +4,9 @@ from typing import Optional
 
 from pydantic import Field
 
-from shipr.express import types as elp
-from shipr.express.shipment import CompletedShipmentInfo, RequestedShipmentMinimum
-from shipr.express.shared import BasePFType, BaseRequest, BaseResponse
+from shipr.models import pf_types as elp
+from shipr.models.pf_shipment import CompletedShipmentInfo, RequestedShipmentMinimum
+from shipr.models.pf_types import BasePFType, BaseRequest, BaseResponse
 
 
 class FindMessage(BasePFType):
