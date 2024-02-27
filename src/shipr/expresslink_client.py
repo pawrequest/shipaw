@@ -10,7 +10,9 @@ from thefuzz import fuzz, process
 from zeep import Client
 from zeep.proxy import ServiceProxy
 
-from shipr.models import pf_types as elt, pf_msg as msg, service_protocols as cp
+from shipr.models import pf_msg as msg, pf_types as elt, service_protocols as cp
+
+SCORER = fuzz.token_sort_ratio
 
 
 class ZeepConfig(BaseModel):
@@ -67,7 +69,7 @@ class PFCom(BaseModel):
     def backend(self, service_prot: type[ServiceProtocolT]) -> ServiceProxy:
         return ZeepBackend(self.service)[service_prot]
 
-    def get_shipment_resp(self, req: el.msg.CreateShipmentRequest) -> el.msg.CreateShipmentResponse:
+    def get_shipment_resp(self, req: msg.CreateShipmentRequest) -> msg.CreateShipmentResponse:
         back = self.backend(cp.CreateShipmentService)
         resp = back.createshipment(request=req.model_dump(by_alias=True))
         return msg.CreateShipmentResponse.model_validate(resp)
@@ -98,29 +100,31 @@ class PFCom(BaseModel):
         back = self.backend(cp.PrintLabelService)
         req = msg.PrintLabelRequest(authentication=self.config.auth, shipment_number=ship_num)
         response: msg.PrintLabelResponse = back.printlabel(request=req)
-        outpath = response.label.download()
-        os.startfile(outpath)
-        return outpath
+        out_path = response.label.download()
+        os.startfile(out_path)
+        return out_path
 
-    def choose_one_str(self, address_str: str, candidates: list) -> tuple[
-        elt.AddressPF, int]:
-        address, score = process.extractOne(address_str, candidates, scorer=fuzz.token_sort_ratio)
-        return address, score
-
-    def guess_address(self, address: elt.AddressPF) -> elt.AddressChoice:
-        candidates_dict = {address_as_str(add): add for add in
-                           self.get_candidates(address.postcode)}
+    def address_choice_addr(self, address: elt.AddressPF) -> elt.AddressChoice:
+        candidates = self.candidates_dict(address.postcode)
         chosen, score = process.extractOne(
-            address_as_str(address),
-            list(candidates_dict.keys()),
+            address.address_lines_str,
+            list(candidates.keys()),
             scorer=fuzz.token_sort_ratio
+        )
+        add = candidates[chosen]
+        return elt.AddressChoice(address=add, score=score)
+
+    def candidates_dict(self, postcode):
+        candidates_dict = {add.address_lines_str: add for add in
+                           self.get_candidates(postcode)}
+        return candidates_dict
+
+    def address_choice_str(self, address_lines: str, postcode: str) -> elt.AddressChoice:
+        candidates_dict = self.candidates_dict(postcode)
+        chosen, score = process.extractOne(
+            address_lines,
+            list(candidates_dict.keys()),
+            scorer=SCORER
         )
         add = candidates_dict[chosen]
         return elt.AddressChoice(address=add, score=score)
-
-
-def address_as_str(pf_address: elt.AddressPF) -> str:
-    lines = [pf_address.address_line1, pf_address.address_line2, pf_address.address_line3]
-    ls = ' '.join(line for line in lines if line)
-
-    return ls
