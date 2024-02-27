@@ -451,9 +451,24 @@ class AddressPF(BasePFType):
     @field_validator('address_line1', 'address_line2', 'address_line3', mode='after')
     def address_lines(cls, v, info):
         if v is None:
-            v = ' '
+            v = ''
         return v
 
+    @property
+    def address_lines_list(self):
+        return [self.address_line1, self.address_line2, self.address_line3, self.town, self.postcode, self.country]
+
+    @property
+    def address_lines_str(self):
+        return '\n'.join(self.address_lines_list)
+
+    @property
+    def address_lines_dict(self):
+        return {
+            'address_line1': self.address_line1,
+            'address_line2': self.address_line2,
+            'address_line3': self.address_line3,
+        }
 
 class DeliveryOptions(BasePFType):
     convenient_collect: Optional[ConvenientCollect] = Field(
