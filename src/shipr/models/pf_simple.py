@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 from pawsupport import convert_print_silent2
-from shipr.models.shipr_shared import AlertType, BasePFType
+from shipr.models.pf_shared import AlertType, BasePFType
 
 
 class Enhancement(BasePFType):
@@ -81,13 +81,6 @@ class CompletedCancelInfo(BasePFType):
     shipment_number: Optional[str] = None
 
 
-class Hours(BasePFType):
-    open: Optional[str] = None
-    close: Optional[str] = None
-    close_lunch: Optional[str] = None
-    after_lunch_opening: Optional[str] = None
-
-
 class Position(BasePFType):
     longitude: Optional[float] = None
     latitude: Optional[float] = None
@@ -99,7 +92,7 @@ class Document(BasePFType):
     def download(self, outpath: Path = Path("label_out.pdf")) -> Path:
         with open(outpath, "wb") as f:
             f.write(self.data)
-        return outpath
+        return Path(outpath)
 
     def print_doc_arrayed(self):
         output = self.download()
@@ -125,7 +118,6 @@ __all__ = [
     "ManifestShipment",
     "CompletedShipment",
     "CompletedCancelInfo",
-    "Hours",
     "Position",
     "Document",
     "Alert",

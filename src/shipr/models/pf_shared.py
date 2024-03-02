@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import datetime
 import os
 from datetime import date, timedelta
 from enum import Enum
-from typing import Literal, Annotated, Optional
-
-import pydantic as pyd
+from typing import Annotated, Literal, Optional
 import typing as _ty
 
-from pydantic import BaseModel, ConfigDict, AliasGenerator, StringConstraints
+import pydantic as pyd
+from loguru import logger
+from pydantic import AliasGenerator, BaseModel, ConfigDict, StringConstraints
 from pydantic.alias_generators import to_pascal
+
+tod = date.today()
+date_range = [tod + datetime.timedelta(days=x) for x in range(7)]
+weekday_dates = [d for d in date_range if d.weekday() < 5]
 
 
 def valid_ship_date_type() -> type[date]:
@@ -17,7 +22,54 @@ def valid_ship_date_type() -> type[date]:
     return pyd.condate(ge=tod, le=tod + timedelta(days=7))
 
 
-ValidShipDate = valid_ship_date_type()
+ValidShipDateType = pyd.condate(ge=tod, le=tod + timedelta(days=7))
+
+
+def is_valid_date(v) -> bool | Literal['HIGH', 'LOW', 'WKEND']:
+    if v and isinstance(v, date):
+        if v < tod:
+            return "LOW"
+        if v > tod + timedelta(days=7):
+            return "HIGH"
+        if v.weekday() > 5:
+            return "WKEND"
+        return True
+    if isinstance(v, str):
+        try:
+            v = datetime.datetime.strptime(v, "%Y-%m-%d").date()
+            return is_valid_date(v)
+        except ValueError:
+            return False
+
+
+def latest_weekday() -> date:
+    return max(weekday_dates)
+
+
+def fix_date(v: date) -> date:
+    res = is_valid_date(v)
+    latest_wkd = max(weekday_dates)
+    match res:
+        case True:
+            return v
+        case "LOW":
+            logger.info(f"Date {v} is in the past - using today")
+            return tod
+        case "HIGH":
+            logger.info(f"Date {v} is too far in the future - using {latest_wkd}")
+            return latest_wkd
+        case "WKEND":
+            logger.info(f"Date {v} is a weekend - using {latest_wkd}")
+            return latest_wkd
+        case _:
+            raise ValueError(f"unable to fix date: {v}")
+
+
+# Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
+
+
+ValidatedShipDate = Annotated[ValidShipDateType, pyd.BeforeValidator(fix_date)]
+
 PrintType = _ty.Literal["ALL_PARCELS", "SINGLE_PARCEL"]
 AlertType = Literal["ERROR", "WARNING", "NOTIFICATION"]
 DeliveryKind = Literal['DELIVERY']
@@ -96,26 +148,24 @@ class Authentication(BasePFType):
 
 Max80 = Annotated[str, StringConstraints(max_length=80)]
 
-__all__ = [
-    "ValidShipDate",
-    "PrintType",
-    "AlertType",
-    "DeliveryKind",
-    "DropOffInd",
-    "DepartmentNum",
-    "ServiceCode",
-    "BasePFType",
-    "Authentication",
-    "Max80",
-]
+
+class DayHours(BasePFType):
+    hours: Hours | None = None
 
 
 class OpeningHours(BasePFType):
-    mon: Optional[Mon] = None
-    tue: Optional[Tue] = None
-    wed: Optional[Wed] = None
-    thu: Optional[Thu] = None
-    fri: Optional[Fri] = None
-    sat: Optional[Sat] = None
-    sun: Optional[Sun] = None
-    bank_hol: Optional[BankHol] = None
+    mon: DayHours | None = None
+    tue: DayHours | None = None
+    wed: DayHours | None = None
+    thu: DayHours | None = None
+    fri: DayHours | None = None
+    sat: DayHours | None = None
+    sun: DayHours | None = None
+    bank_hol: DayHours | None = None
+
+
+class Hours(BasePFType):
+    open: Optional[str] = None
+    close: Optional[str] = None
+    close_lunch: Optional[str] = None
+    after_lunch_opening: Optional[str] = None

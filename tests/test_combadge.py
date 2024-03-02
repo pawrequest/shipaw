@@ -4,7 +4,7 @@ from combadge.support.zeep.backends.sync import ZeepBackend
 from dotenv import load_dotenv
 
 from shipr.el_combadge import PFCom, PFCom
-from shipr.models.service_protocols import CreateShipmentService, FindService
+from shipr.models.pf_msg_protocols import CreateShipmentService, FindService
 from shipr.express.expresslink_pydantic import (
     PAF,
 )
