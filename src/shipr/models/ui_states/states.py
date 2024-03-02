@@ -59,3 +59,5 @@ def update_get_partial64(partial_class, **kwargs) -> str:
     state = partial_class.model_validate(kwargs)
     state_j = state.model_dump_json(exclude_none=True)
     return base64.urlsafe_b64encode(state_j.encode()).decode()
+
+
