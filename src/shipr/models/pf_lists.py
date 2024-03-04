@@ -1,73 +1,64 @@
-# from __future__ import annotations
-
-# if _ty.TYPE_CHECKING:
-#     pass
-
+import pydantic as _p
 import sqlmodel as sqm
-import pydantic as pyd
 
-from shipr.models import (
-    pf_ext,
-    pf_shared,
-    pf_simple,
-)
+from . import pf_ext, pf_shared
 
 
 class HazardousGoods(pf_shared.BasePFType):
-    hazardous_good: list[pf_simple.HazardousGood]
+    hazardous_good: list[pf_shared.HazardousGood]
 
 
 class ContentDetails(pf_shared.BasePFType):
-    content_detail: list[pf_simple.ContentDetail]
+    content_detail: list[pf_shared.ContentDetail]
 
 
 class ParcelContents(pf_shared.BasePFType):
-    item: list[pf_simple.ContentData]
+    item: list[pf_shared.ContentData]
 
 
 class LabelData(pf_shared.BasePFType):
-    item: list[pf_simple.LabelItem]
+    item: list[pf_shared.LabelItem]
 
 
 class Barcodes(pf_shared.BasePFType):
-    barcode: list[pf_simple.Barcode]
+    barcode: list[pf_shared.Barcode]
 
 
 class Images(pf_shared.BasePFType):
-    image: list[pf_simple.Image]
+    image: list[pf_shared.Image]
 
 
 class ManifestShipments(pf_shared.BasePFType):
-    manifest_shipment: list[pf_simple.ManifestShipment]
+    manifest_shipment: list[pf_shared.ManifestShipment]
 
 
 class CompletedShipments(pf_shared.BasePFType):
-    completed_shipment: list[pf_simple.CompletedShipment] = sqm.Field(default_factory=list)
+    completed_shipment: list[pf_shared.CompletedShipment] = sqm.Field(default_factory=list)
 
 
 class CompletedCancel(pf_shared.BasePFType):
-    completed_cancel_info: pf_simple.CompletedCancelInfo | None = None
+    completed_cancel_info: pf_shared.CompletedCancelInfo | None = None
 
 
 class Alerts(pf_shared.BasePFType):
-    alert: list[pf_simple.Alert]
+    alert: list[pf_shared.Alert]
 
 
 class Notifications(pf_shared.BasePFType):
-    notification_type: list[str] = pyd.Field(default_factory=list)
+    notification_type: list[str] = _p.Field(default_factory=list)
 
 
 class NominatedDeliveryDatelist(pf_shared.BasePFType):
-    nominated_delivery_date: list[str] = pyd.Field(default_factory=list)
+    nominated_delivery_date: list[str] = _p.Field(default_factory=list)
 
 
 class SafePlacelist(pf_shared.BasePFType):
-    safe_place: list[str] = pyd.Field(default_factory=list)
+    safe_place: list[str] = _p.Field(default_factory=list)
 
 
 class ServiceCodes(pf_shared.BasePFType):
-    service_code: list[str] = pyd.Field(default_factory=list)
+    service_code: list[str] = _p.Field(default_factory=list)
 
 
 class SpecifiedNeighbour(pf_shared.BasePFType):
-    address: list[pf_ext.AddressRecipient] = pyd.Field(default_factory=list)
+    address: list[pf_ext.AddressRecipient] = _p.Field(default_factory=list)

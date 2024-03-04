@@ -5,7 +5,8 @@ import pytest
 from dotenv import load_dotenv
 
 from shipr import ZeepConfig, ELClient
-from shipr.models.pf_shared import DeliveryKind, DepartmentNum, ServiceCode
+from shipr.models.pf_shared import ServiceCode
+from shipr.models.types import DeliveryKind, DepartmentNum
 from shipr.express.pf_shipment import RequestedShipmentMinimum
 from shipr.express.pf_types import AddressPF, ContactPF, Authentication
 

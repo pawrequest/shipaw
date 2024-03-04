@@ -4,8 +4,7 @@ import os
 import pydantic as pyd
 
 from pawsupport.pydantic import pyd_types
-from shipr.models import pf_lists, pf_shared, pf_simple
-from shipr.models.pf_ext import AddressRecipient, DeliveryOptions, InBoundDetails
+from . import pf_lists, pf_shared, pf_ext, types
 
 
 class Contact(pf_shared.BasePFType):
@@ -81,33 +80,33 @@ class CompletedShipmentInfo(pf_shared.BasePFType):
 
 class CollectionInfo(pf_shared.BasePFType):
     collection_contact: Contact
-    collection_address: AddressRecipient
-    collection_time: pf_simple.DateTimeRange | None = None
+    collection_address: pf_ext.AddressRecipient
+    collection_time: pf_shared.DateTimeRange | None = None
 
 
 class RequestedShipmentMinimum(pf_shared.BasePFType):
     recipient_contact: Contact
-    recipient_address: AddressRecipient
+    recipient_address: pf_ext.AddressRecipient
     contract_number: str
     total_number_of_parcels: int
     shipping_date: dt.date
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-    shipment_type: pf_shared.DeliveryKind = 'DELIVERY'
-    department_id: int = pf_shared.DepartmentNum
+    shipment_type: types.DeliveryKind = 'DELIVERY'
+    department_id: int = types.DepartmentNum
 
     @classmethod
     def from_minimal(
             cls,
             ship_date: dt.date,
             contact: Contact,
-            address: AddressRecipient,
+            address: pf_ext.AddressRecipient,
             num_parcels: int = 1,
     ):
         contract_no = os.environ.get("PF_CONT_NUM_1")
 
         return cls(
-            department_id=pf_shared.DepartmentNum.MAIN,
-            shipment_type=pf_shared.DeliveryKind.DELIVERY,
+            department_id=types.DepartmentNum.MAIN,
+            shipment_type=types.DeliveryKind.DELIVERY,
             contract_number=contract_no,
             service_code=pf_shared.ServiceCode.EXPRESS24,
             shipping_date=ship_date,
@@ -121,10 +120,10 @@ class RequestedShipmentSimple(RequestedShipmentMinimum):
     job_reference: str | None = None
     # todo validate both or none for sender
     sender_contact: Contact | None = None
-    sender_address: AddressRecipient | None = None
+    sender_address: pf_ext.AddressRecipient | None = None
     total_shipment_weight: float | None = None
-    enhancement: pf_simple.Enhancement | None = None
-    delivery_options: DeliveryOptions | None = None
+    enhancement: pf_shared.Enhancement | None = None
+    delivery_options: pf_ext.DeliveryOptions | None = None
     collection_info: CollectionInfo | None = None
 
 
@@ -173,17 +172,17 @@ class InternationalInfo(pf_shared.BasePFType):
 class RequestedShipmentComplex(RequestedShipmentSimple):
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
-    drop_off_ind: pf_shared.DropOffInd | None = None
+    drop_off_ind: types.DropOffInd | None = None
     exchange_instructions1: pyd.constr(max_length=25) | None = None
     exchange_instructions2: pyd.constr(max_length=25) | None = None
     exchange_instructions3: pyd.constr(max_length=25) | None = None
-    exporter_address: AddressRecipient | None = None
+    exporter_address: pf_ext.AddressRecipient | None = None
     exporter_contact: Contact | None = None
-    importer_address: AddressRecipient | None = None
+    importer_address: pf_ext.AddressRecipient | None = None
     importer_contact: Contact | None = None
-    in_bound_address: AddressRecipient | None = None
+    in_bound_address: pf_ext.AddressRecipient | None = None
     in_bound_contact: Contact | None = None
-    in_bound_details: InBoundDetails | None = None
+    in_bound_details: pf_ext.InBoundDetails | None = None
     international_info: InternationalInfo | None = None
     pre_printed: bool | None = None
     print_own_label: bool | None = None
@@ -193,7 +192,7 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     reference_number4: pyd.constr(max_length=24) | None = None
     reference_number5: pyd.constr(max_length=24) | None = None
     request_id: int | None = None
-    returns: pf_simple.Returns | None = None
+    returns: pf_shared.Returns | None = None
     special_instructions1: pyd.constr(max_length=25) | None = None
     special_instructions2: pyd.constr(max_length=25) | None = None
     special_instructions3: pyd.constr(max_length=25) | None = None

@@ -3,8 +3,8 @@
 import sqlmodel as sqm
 
 from pawsupport.pydantic import pyd_types
-from shipr.models import pf_shared, pf_simple
 
+from . import pf_shared
 
 # if _ty.TYPE_CHECKING:
 #     pass
@@ -13,13 +13,13 @@ from shipr.models import pf_shared, pf_simple
 def address_string_to_dict(address_str: str) -> dict[str, str]:
     addr_lines = address_str.splitlines()
     if len(addr_lines) < 3:
-        addr_lines.extend([""] * (3 - len(addr_lines)))
+        addr_lines.extend([''] * (3 - len(addr_lines)))
     elif len(addr_lines) > 3:
-        addr_lines[2] = ",".join(addr_lines[2:])
+        addr_lines[2] = ','.join(addr_lines[2:])
     return {
-        "address_line1": addr_lines[0],
-        "address_line2": addr_lines[1],
-        "address_line3": addr_lines[2],
+        'address_line1': addr_lines[0],
+        'address_line2': addr_lines[1],
+        'address_line3': addr_lines[2],
     }
 
 
@@ -35,7 +35,7 @@ class BaseAddress(pf_shared.BasePFType):
     # address_line3: str = ""
     town: str
     postcode: str
-    country: str = "GB"
+    country: str = 'GB'
 
     @property
     def lines_dict(self):
@@ -51,7 +51,7 @@ class BaseAddress(pf_shared.BasePFType):
 
     @property
     def lines_str(self):
-        return "\n".join(self.lines_dict.values())
+        return '\n'.join(self.lines_dict.values())
 
     # def address_lines_dict(self):
     #     return {
@@ -79,7 +79,7 @@ class PostOffice(pf_shared.BasePFType):
     opening_hours: pf_shared.OpeningHours | None = None
     distance: float | None = None
     availability: bool | None = None
-    position: pf_simple.Position | None = None
+    position: pf_shared.Position | None = None
     booking_reference: str | None = None
 
 
@@ -105,14 +105,14 @@ class SpecifiedPostOffice(pf_shared.BasePFType):
 class CompletedReturnInfo(pf_shared.BasePFType):
     status: str
     shipment_number: str
-    collection_time: pf_simple.DateTimeRange
+    collection_time: pf_shared.DateTimeRange
 
 
 class InBoundDetails(pf_shared.BasePFType):
     contract_number: str
     service_code: str
     total_shipment_weight: str | None = None
-    enhancement: pf_simple.Enhancement | None = None
+    enhancement: pf_shared.Enhancement | None = None
     reference_number1: str | None = None
     reference_number2: str | None = None
     reference_number3: str | None = None
@@ -136,5 +136,3 @@ class DeliveryOptions(pf_shared.BasePFType):
     address_only: bool | None = None
     nominated_delivery_date: str | None = None
     personal_parcel: str | None = None
-
-

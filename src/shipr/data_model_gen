@@ -1,4 +1,5 @@
 #
+NOTASCRIPT="This is not a script. It is a collection of commands to be run in the terminal."
 
 datamodel-codegen  --input C:\Users\RYZEN\prdev\workbench\shipr\resources\ShipServiceDefinitions-OpenApi31Json.json --input-file-type jsonschema --output model.py
 

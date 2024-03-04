@@ -3,10 +3,11 @@
 # if _ty.TYPE_CHECKING:
 #     pass
 
-from loguru import logger
 import pydantic as pyd
+from loguru import logger
 
-from shipr.models import (pf_ext, pf_lists, pf_shared, pf_simple, pf_top)
+from shipr.models import pf_ext, pf_lists, pf_shared, pf_top
+from shipr.models import types as shipr_types
 
 
 class BaseRequest(pf_shared.BasePFType):
@@ -24,7 +25,7 @@ class BaseRequest(pf_shared.BasePFType):
 
     def auth_request_dict(self) -> dict:
         if not self.authorised:
-            raise ValueError("Authentication is required")
+            raise ValueError('Authentication is required')
         all_obs = [self.authentication, *self.objs]
         return self.alias_dict(all_obs)
 
@@ -32,24 +33,24 @@ class BaseRequest(pf_shared.BasePFType):
 class BaseResponse(pf_shared.BasePFType):
     alerts: pf_lists.Alerts | None = pyd.Field(default_factory=list)
 
-    @pyd.field_validator("alerts")
+    @pyd.field_validator('alerts')
     def check_alerts(cls, v, info):
         if v:
             for alt in v.alert:
-                if alt.type == "WARNING":
-                    logger.warning(f"ExpressLink Warning: {alt.message} for {cls.__name__}")
-                elif alt.type == "ERROR":
-                    logger.error(f"ExpressLink Error: {alt.message} for {cls.__name__}")
-                    raise ValueError(f"ExpressLink Error: {alt.message} for {cls.__name__}")
+                if alt.type == 'WARNING':
+                    logger.warning(f'ExpressLink Warning: {alt.message} for {cls.__name__}')
+                elif alt.type == 'ERROR':
+                    logger.error(f'ExpressLink Error: {alt.message} for {cls.__name__}')
+                    raise ValueError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
                 else:
-                    logger.info(f"ExpressLink {alt.type}: {alt.message} for {cls.__name__}")
+                    logger.info(f'ExpressLink {alt.type}: {alt.message} for {cls.__name__}')
         return v
 
 
 class FindMessage(pf_shared.BasePFType):
     convenient_collect: pf_ext.ConvenientCollect | None = None
     specified_post_office: pf_ext.SpecifiedPostOffice | None = None
-    paf: pf_top.PAF | None = pyd.Field(None, alias="PAF")
+    paf: pf_top.PAF | None = pyd.Field(None, alias='PAF')
     safe_places: bool | None = None
     nominated_delivery_dates: pf_top.NominatedDeliveryDates | None = None
     postcode_exclusion: pf_top.PostcodeExclusion | None = None
@@ -89,11 +90,11 @@ class PrintLabelRequest(BaseRequest):
     shipment_number: str
     print_format: str | None = None
     barcode_format: str | None = None
-    print_type: pf_shared.PrintType = "ALL_PARCELS"
+    print_type: shipr_types.PrintType = 'ALL_PARCELS'
 
 
 class PrintLabelResponse(BaseResponse):
-    label: pf_simple.Document | None = None
+    label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
 
@@ -108,9 +109,9 @@ class PrintDocumentRequest(BaseRequest):
 
 
 class PrintDocumentResponse(BaseResponse):
-    label: pf_simple.Document | None = None
+    label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
-    document_type: pf_simple.Document | None = None
+    document_type: pf_shared.Document | None = None
 
 
 ################################################################
@@ -133,7 +134,7 @@ class PrintManifestRequest(BaseRequest):
 
 
 class PrintManifestResponse(BaseResponse):
-    manifest: pf_simple.Document | None = None
+    manifest: pf_shared.Document | None = None
 
 
 ################################################################
@@ -141,7 +142,7 @@ class PrintManifestResponse(BaseResponse):
 
 class ReturnShipmentRequest(BaseRequest):
     shipment_number: str
-    collection_time: pf_simple.DateTimeRange | None = None
+    collection_time: pf_shared.DateTimeRange | None = None
 
 
 class ReturnShipmentResponse(BaseResponse):
@@ -179,8 +180,9 @@ class CreatePrintRequest(BaseRequest):
 
 class CreatePrintResponse(BaseResponse):
     completed_shipment_info_create_print: pf_top.CompletedShipmentInfoCreatePrint | None = None
-    label: pf_simple.Document | None = None
+    label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
+
 
 ################################################################
