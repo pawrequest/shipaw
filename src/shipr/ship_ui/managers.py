@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sqlmodel as sqm
 
-from fastui.states import BaseUIState
+from fastuipr.states import BaseUIState
 from pawsupport.sqlmodel_ps import sqlpr
 
 

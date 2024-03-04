@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from fastui import AnyComponent
-from fastui import components as c
+from fastuipr import AnyComponent
+from fastuipr import components as c
 
 from .states import BaseUIState
 

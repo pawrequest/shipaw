@@ -9,7 +9,7 @@ import sqlmodel as sqm
 
 import shipr.models
 import shipr.models.types
-from fastui.states import BaseUIState
+from fastuipr.states import BaseUIState
 from pawsupport.sqlmodel_ps import sqlpr
 from shipr.models import pf_ext, pf_shared, pf_top
 
