@@ -6,6 +6,7 @@ authors = [
     { name = "Paul-Sees-Solutions", email = "79617825+Paul-Sees-Solutions@users.noreply.github.com" }
 ]
 dependencies = [
+    'sqlmodel',
     'fastuipr',
     "pydantic",
     "aiohttp",
