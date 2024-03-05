@@ -3,20 +3,19 @@ import os
 
 import pydantic as pyd
 
-from pawsupport.pydantic import pyd_types
 from . import pf_lists, pf_shared, pf_ext, types
 
 
 class Contact(pf_shared.BasePFType):
-    business_name: pyd_types.TruncatedSafeStr(40)
-    email_address: pyd_types.TruncatedSafeStr(50)
+    business_name: types.TruncatedSafeStr(40)
+    email_address: types.TruncatedSafeStr(50)
     mobile_phone: str
 
-    contact_name: pyd_types.TruncatedSafeMaybeStr(30)
+    contact_name: types.TruncatedSafeMaybeStr(30)
     telephone: str | None = None
     fax: str | None = None
 
-    senders_name: pyd_types.TruncatedSafeMaybeStr(25)
+    senders_name: types.TruncatedSafeMaybeStr(25)
     notifications: pf_lists.Notifications | None = None
 
 

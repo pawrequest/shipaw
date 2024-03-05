@@ -2,7 +2,7 @@
 
 import sqlmodel as sqm
 
-from pawsupport.pydantic import pyd_types
+from . import types
 
 from . import pf_shared
 
@@ -27,9 +27,9 @@ addr_lines_set = sorted({'address_line1', 'address_line2', 'address_line3'})
 
 
 class BaseAddress(pf_shared.BasePFType):
-    address_line1: pyd_types.TruncatedSafeStr(24)
-    address_line2: pyd_types.TruncatedSafeMaybeStr(24)
-    address_line3: pyd_types.TruncatedSafeMaybeStr(24)
+    address_line1: types.TruncatedSafeStr(24)
+    address_line2: types.TruncatedSafeMaybeStr(24)
+    address_line3: types.TruncatedSafeMaybeStr(24)
     # address_line1: str
     # address_line2: str = ""
     # address_line3: str = ""
@@ -66,10 +66,10 @@ class AddressSender(BaseAddress):
 
 
 class AddressRecipient(BaseAddress):
-    address_line1: pyd_types.TruncatedSafeStr(40)
-    address_line2: pyd_types.TruncatedSafeMaybeStr(50)
-    address_line3: pyd_types.TruncatedSafeMaybeStr(60)
-    town: pyd_types.TruncatedSafeStr(30)
+    address_line1: types.TruncatedSafeStr(40)
+    address_line2: types.TruncatedSafeMaybeStr(50)
+    address_line3: types.TruncatedSafeMaybeStr(60)
+    town: types.TruncatedSafeStr(30)
 
 
 class PostOffice(pf_shared.BasePFType):

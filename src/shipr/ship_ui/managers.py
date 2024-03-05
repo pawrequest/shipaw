@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import sqlmodel as sqm
 
+import shipr.models.types
 from fastuipr.states import BaseUIState
-from pawsupport.sqlmodel_ps import sqlpr
 
 
 class BaseManager(sqm.SQLModel):
-    state: BaseUIState = sqm.Field(sa_column=sqm.Column(sqlpr.GenericJSONType(BaseUIState)))
+    state: BaseUIState = sqm.Field(sa_column=sqm.Column(
+        shipr.models.types.GenericJSONType(BaseUIState)))
 
 
 class BaseManagerDB(BaseManager):

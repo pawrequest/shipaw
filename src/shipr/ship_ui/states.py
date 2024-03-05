@@ -7,19 +7,19 @@ import typing as _t
 import pydantic as pyd
 import sqlmodel as sqm
 
-import shipr.models
 import shipr.models.types
 from fastuipr.states import BaseUIState
-from pawsupport.sqlmodel_ps import sqlpr
-from shipr.models import pf_ext, pf_shared, pf_top
+from shipr.models import pf_ext, pf_shared, pf_top, types
 
 from .. import msgs
 
 BookingReqSQM = _t.Annotated[
-    msgs.CreateShipmentRequest, sqm.Field(sa_column=sqm.Column(sqlpr.GenericJSONType(msgs.CreateShipmentRequest)))
+    msgs.CreateShipmentRequest, sqm.Field(sa_column=sqm.Column(
+        shipr.models.types.GenericJSONType(msgs.CreateShipmentRequest)))
 ]
 BookingRespSQM = _t.Annotated[
-    msgs.CreateShipmentResponse, sqm.Field(sa_column=sqm.Column(sqlpr.GenericJSONType(msgs.CreateShipmentResponse)))
+    msgs.CreateShipmentResponse, sqm.Field(sa_column=sqm.Column(
+        shipr.models.types.GenericJSONType(msgs.CreateShipmentResponse)))
 ]
 
 
@@ -59,4 +59,4 @@ class ShipState(ShipStatePartial):
     ship_service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
-    ship_date: shipr.models.types.ValidatedShipDate
+    ship_date: types.ValidatedShipDate

@@ -8,8 +8,8 @@ from pathlib import Path
 import pydantic as _p
 from pydantic.alias_generators import to_pascal
 
-from pawsupport import convert_print_silent2
 from shipr.models import types
+
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
 
@@ -186,10 +186,6 @@ class Document(BasePFType):
         with open(outpath, 'wb') as f:
             f.write(self.data)
         return Path(outpath)
-
-    def print_doc_arrayed(self):
-        output = self.download()
-        convert_print_silent2(output)
 
 
 class Enhancement(BasePFType):
