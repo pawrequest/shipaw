@@ -8,7 +8,7 @@ import pydantic as pyd
 import sqlmodel as sqm
 
 import shipr.models.types
-from fastuipr.states import BaseUIState
+import fastuipr.states
 from shipr.models import pf_ext, pf_shared, pf_top, types
 
 from .. import msgs
@@ -23,7 +23,7 @@ BookingRespSQM = _t.Annotated[
 ]
 
 
-class BookingState(BaseUIState):
+class BookingState(fastuipr.states.BaseUIState):
     request: BookingReqSQM
     response: BookingRespSQM
     label_path: pathlib.Path | None = None
@@ -44,7 +44,7 @@ class BookingState(BaseUIState):
         return self.response.completed_shipment_info is not None
 
 
-class ShipStatePartial(BaseUIState):
+class ShipStatePartial(fastuipr.states.BaseUIState):
     booking_state: BookingState | None = None
     boxes: int | None = None
     ship_date: dt.date | None = None
