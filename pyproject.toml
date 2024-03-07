@@ -6,17 +6,17 @@ authors = [
     { name = "Paul-Sees-Solutions", email = "79617825+Paul-Sees-Solutions@users.noreply.github.com" }
 ]
 dependencies = [
-    'sqlmodel',
+    "pawsupport[fast] @git+https://github.com/pawrequest/pawsupport",
     'fastuipr',
-    "pydantic",
+    'pydantic',
+    'fastapi',
+    'sqlmodel',
     "aiohttp",
     "python-dotenv",
     "zeep",
     'combadge[zeep]',
-    "datamodel-code-generator",
     'thefuzz',
     'loguru',
-    'pydantic',
     'python-multipart',
 ]
 
@@ -30,6 +30,7 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = [
+    "datamodel-code-generator",
     "pytest",
     "pytest-asyncio",
     "pyinstaller",
