@@ -7,8 +7,6 @@ authors = [
 ]
 dependencies = [
     "pawsupport[fast] @git+https://github.com/pawrequest/pawsupport",
-    'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
-    'fastuipr',
     'pydantic',
     'fastapi',
     'sqlmodel',
