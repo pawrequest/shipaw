@@ -127,3 +127,6 @@ class GenericJSONType(sqa.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         return self.model_class.model_validate_json(value) if value else None
+
+
+ShipperScope = _t.Literal['SAND', 'LIVE']

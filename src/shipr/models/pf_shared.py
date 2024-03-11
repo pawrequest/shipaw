@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import typing as _t
+
+from src.shipr.models.types import ShipperScope
 from enum import Enum
 from pathlib import Path
 
@@ -76,7 +78,7 @@ class Authentication(BasePFType):
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
 
     @classmethod
-    def from_env(cls, scope: _t.Literal['SAND', 'LIVE'] = 'SAND'):
+    def from_env(cls, scope: ShipperScope = 'SAND'):
         username = os.getenv(f'PF_EXPR_{scope}_USR')
         password = os.getenv(f'PF_EXPR_{scope}_PWD')
         return cls(user_name=username, password=password)

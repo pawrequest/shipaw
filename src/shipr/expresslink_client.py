@@ -12,6 +12,7 @@ from thefuzz import fuzz, process
 
 from . import models, msgs, ship_ui
 from .models import types
+from .models.types import ShipperScope
 
 SCORER = fuzz.token_sort_ratio
 
@@ -23,9 +24,9 @@ class ZeepConfig(pydantic.BaseModel):
     endpoint: str
 
     @classmethod
-    def from_env(cls):
+    def from_env(cls, scope: ShipperScope = 'SAND'):
         return cls(
-            auth=models.Authentication.from_env(),
+            auth=models.Authentication.from_env(scope=scope),
             binding=os.environ.get("PF_BINDING"),
             wsdl=os.environ.get("PF_WSDL"),
             endpoint=os.environ.get("PF_ENDPOINT_SAND"),
@@ -45,8 +46,8 @@ class ELClient(pydantic.BaseModel):
 
     @classmethod
     # @lru_cache(maxsize=1)
-    def from_env(cls):
-        return cls.from_config(ZeepConfig.from_env())
+    def from_env(cls, scope: ShipperScope = 'SAND'):
+        return cls.from_config(ZeepConfig.from_env(scope))
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.config.wsdl)
