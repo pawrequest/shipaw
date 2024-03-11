@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pydantic as _p
 from pydantic.alias_generators import to_pascal
-
 from shipr.models import types
 
 
@@ -77,9 +76,9 @@ class Authentication(BasePFType):
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
 
     @classmethod
-    def from_env(cls):
-        username = os.getenv('PF_EXPR_SAND_USR')
-        password = os.getenv('PF_EXPR_SAND_PWD')
+    def from_env(cls, scope: _t.Literal['SAND', 'LIVE'] = 'SAND'):
+        username = os.getenv(f'PF_EXPR_{scope}_USR')
+        password = os.getenv(f'PF_EXPR_{scope}_PWD')
         return cls(user_name=username, password=password)
 
 
