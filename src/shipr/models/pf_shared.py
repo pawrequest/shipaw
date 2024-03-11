@@ -3,13 +3,12 @@ from __future__ import annotations
 import os
 import typing as _t
 
-from src.shipr.models.types import ShipperScope
+from . import types
 from enum import Enum
 from pathlib import Path
 
 import pydantic as _p
 from pydantic.alias_generators import to_pascal
-from shipr.models import types
 
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
@@ -78,7 +77,7 @@ class Authentication(BasePFType):
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
 
     @classmethod
-    def from_env(cls, scope: ShipperScope = 'SAND'):
+    def from_env(cls, scope: types.ShipperScope = 'SAND'):
         username = os.getenv(f'PF_EXPR_{scope}_USR')
         password = os.getenv(f'PF_EXPR_{scope}_PWD')
         return cls(user_name=username, password=password)
