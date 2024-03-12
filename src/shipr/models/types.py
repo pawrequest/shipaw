@@ -130,3 +130,7 @@ class GenericJSONType(sqa.TypeDecorator):
 
 
 ShipperScope = _t.Literal['SAND', 'LIVE']
+
+
+class ExpressLinkError(Exception):
+    ...
