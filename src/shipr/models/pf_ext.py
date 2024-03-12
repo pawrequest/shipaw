@@ -2,9 +2,8 @@
 
 import sqlmodel as sqm
 
-from . import types
+from . import types, pf_shared
 
-from . import pf_shared
 
 # if _ty.TYPE_CHECKING:
 #     pass

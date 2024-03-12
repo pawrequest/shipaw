@@ -3,7 +3,7 @@ import os
 
 import pydantic as pyd
 
-from . import pf_lists, pf_shared, pf_ext, types
+from . import pf_shared, pf_ext, types, pf_lists
 
 
 class Contact(pf_shared.BasePFType):

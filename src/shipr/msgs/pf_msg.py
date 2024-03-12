@@ -6,8 +6,7 @@
 import pydantic as pyd
 from loguru import logger
 
-from shipr.models import pf_ext, pf_lists, pf_shared, pf_top
-from shipr.models import types as shipr_types
+from ..models import pf_ext, pf_lists, pf_shared, pf_top, types as shipr_types
 
 
 class BaseRequest(pf_shared.BasePFType):

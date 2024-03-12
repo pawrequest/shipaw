@@ -9,7 +9,8 @@ import sqlmodel as sqm
 
 import shipr.models.types
 import fastuipr.states
-from shipr.models import pf_ext, pf_shared, pf_top, types
+from shipr.models import types
+from shipr.models import pf_ext, pf_shared, pf_top
 
 from .. import msgs
 
