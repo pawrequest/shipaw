@@ -79,8 +79,8 @@ class Authentication(BasePFType):
 
     @classmethod
     def from_env(cls):
-        live = os.environ.get('SHIP_LIVE', False)
-        scope = 'LIVE' if live else 'SAND'
+        live = os.environ.get('SHIP_LIVE', 'false')
+        scope = 'LIVE' if live == 'true' else 'SAND'
         logger.info(f'Getting auth for {scope}')
         username = os.getenv(f'PF_EXPR_{scope}_USR')
         password = os.getenv(f'PF_EXPR_{scope}_PWD')
