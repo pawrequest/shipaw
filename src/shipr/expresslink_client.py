@@ -81,7 +81,7 @@ class ELClient(pydantic.BaseModel):
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.config.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
-        out_path = response.label.download(Path(r'c:/temp/temp_label.pdf'))
+        out_path = response.label.download(Path('temp_label.pdf'))
         return out_path
 
     def choose_address(

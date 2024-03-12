@@ -182,7 +182,7 @@ class Position(BasePFType):
 class Document(BasePFType):
     data: bytes
 
-    def download(self, outpath: Path = Path('label_out.pdf')) -> Path:
+    def download(self, outpath: Path) -> Path:
         with open(outpath, 'wb') as f:
             f.write(self.data)
         return Path(outpath)
