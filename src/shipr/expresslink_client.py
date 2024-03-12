@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pydantic
 import zeep
-from loguru import logger
 from zeep.proxy import ServiceProxy
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
