@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pydantic
 import zeep
+from loguru import logger
 from zeep.proxy import ServiceProxy
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
@@ -12,7 +13,6 @@ from thefuzz import fuzz, process
 
 from . import models, msgs, ship_ui
 from .models import types
-from .models.types import ShipperScope
 
 SCORER = fuzz.token_sort_ratio
 
@@ -24,9 +24,10 @@ class ZeepConfig(pydantic.BaseModel):
     endpoint: str
 
     @classmethod
-    def from_env(cls, scope: ShipperScope = 'SAND'):
+    def from_env(cls, live: bool = False):
+        logger.info(f'Getting config for scope:{live=}')
         return cls(
-            auth=models.Authentication.from_env(scope=scope),
+            auth=models.Authentication.from_env(live=live),
             binding=os.environ.get("PF_BINDING"),
             wsdl=os.environ.get("PF_WSDL"),
             endpoint=os.environ.get("PF_ENDPOINT_SAND"),
@@ -46,8 +47,9 @@ class ELClient(pydantic.BaseModel):
 
     @classmethod
     # @lru_cache(maxsize=1)
-    def from_env(cls, scope: ShipperScope = 'SAND'):
-        return cls.from_config(ZeepConfig.from_env(scope))
+    def from_env(cls, live: bool = False):
+        logger.info(f'Getting client, scope{live=}')
+        return cls.from_config(ZeepConfig.from_env(live=live))
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.config.wsdl)

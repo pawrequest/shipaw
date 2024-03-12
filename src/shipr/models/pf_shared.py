@@ -6,6 +6,7 @@ from enum import Enum, StrEnum
 from pathlib import Path
 
 import pydantic as _p
+from loguru import logger
 from pydantic.alias_generators import to_pascal
 
 from . import types
@@ -77,7 +78,9 @@ class Authentication(BasePFType):
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
 
     @classmethod
-    def from_env(cls, scope: types.ShipperScope = 'SAND'):
+    def from_env(cls, live: bool = False):
+        scope = 'LIVE' if live else 'SAND'
+        logger.info(f'Getting auth for {scope}')
         username = os.getenv(f'PF_EXPR_{scope}_USR')
         password = os.getenv(f'PF_EXPR_{scope}_PWD')
         return cls(user_name=username, password=password)
