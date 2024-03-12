@@ -24,10 +24,9 @@ class ZeepConfig(pydantic.BaseModel):
     endpoint: str
 
     @classmethod
-    def from_env(cls, live: bool = False):
-        logger.info(f'Getting config for scope:{live=}')
+    def from_env(cls):
         return cls(
-            auth=models.Authentication.from_env(live=live),
+            auth=models.Authentication.from_env(),
             binding=os.environ.get("PF_BINDING"),
             wsdl=os.environ.get("PF_WSDL"),
             endpoint=os.environ.get("PF_ENDPOINT_SAND"),
@@ -47,9 +46,8 @@ class ELClient(pydantic.BaseModel):
 
     @classmethod
     # @lru_cache(maxsize=1)
-    def from_env(cls, live: bool = False):
-        logger.info(f'Getting client, scope{live=}')
-        return cls.from_config(ZeepConfig.from_env(live=live))
+    def from_env(cls):
+        return cls.from_config(ZeepConfig.from_env())
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.config.wsdl)

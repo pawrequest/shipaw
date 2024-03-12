@@ -78,7 +78,8 @@ class Authentication(BasePFType):
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
 
     @classmethod
-    def from_env(cls, live: bool = False):
+    def from_env(cls):
+        live = os.environ.get('LIVE', False)
         scope = 'LIVE' if live else 'SAND'
         logger.info(f'Getting auth for {scope}')
         username = os.getenv(f'PF_EXPR_{scope}_USR')
