@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import os
 import typing as _t
-
-from . import types
-from enum import Enum
+from enum import Enum, StrEnum
 from pathlib import Path
 
 import pydantic as _p
 from pydantic.alias_generators import to_pascal
+
+from . import types
 
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
@@ -197,3 +197,16 @@ class Alert(BasePFType):
     code: int
     message: str
     type: types.AlertType
+
+
+class NotificationType(StrEnum):
+    EMAIL_NOTIFICATION = "EMAIL"
+    EMAIL_DOD_INT = "EMAILDODINT"
+    EMAIL_ATTEMPT_DELIVERY = "EMAILATTEMPTDELIVERY"
+    EMAIL_COLL_RECEIVED = "EMAILCOLLRECEIVED"
+    EMAIL_START_OF_DELIVERY = "EMAILSTARTOFDELIVERY"
+    DELIVERY_NOTIFICATION = "DELIVERYNOTIFICATION"
+    SMS_DAY_OF_DESPATCH = "SMSDAYOFDESPATCH"
+    SMS_START_OF_DELIVERY = "SMSSTARTOFDELIVERY"
+    SMS_ATTEMPT_DELIVERY = "SMSATTEMPTDELIVERY"
+    SMS_COLL_RECEIVED = "SMSCOLLRECEIVED"
