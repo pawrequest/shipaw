@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import typing as _t
-from enum import Enum, StrEnum
+from enum import Enum
 from pathlib import Path
 
 import pydantic as _p
@@ -10,6 +10,13 @@ from loguru import logger
 from pydantic.alias_generators import to_pascal
 
 from . import types
+
+
+def scope_from_env_live() -> types.ShipperScope:
+    live = os.environ.get('SHIP_LIVE', 'false')
+    scope: types.ShipperScope = 'LIVE' if live == 'true' else 'SAND'
+    logger.info(f'Using scope: {scope}')
+    return scope
 
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
@@ -79,8 +86,7 @@ class Authentication(BasePFType):
 
     @classmethod
     def from_env(cls):
-        live = os.environ.get('SHIP_LIVE', 'false')
-        scope = 'LIVE' if live == 'true' else 'SAND'
+        scope = scope_from_env_live()
         logger.info(f'Getting auth for {scope}')
         username = os.getenv(f'PF_EXPR_{scope}_USR')
         password = os.getenv(f'PF_EXPR_{scope}_PWD')
