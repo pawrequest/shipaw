@@ -128,3 +128,4 @@ def booking_state_to_shipment(state: ship_ui.ShipState) -> models.RequestedShipm
         recipient_address=state.address,
         total_number_of_parcels=state.boxes,
     )
+
