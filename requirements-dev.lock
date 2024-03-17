@@ -34,7 +34,7 @@ loguru==0.7.2
 markupsafe==2.1.5
 multidict==6.0.4
 packaging==23.2
-pawsupport @ git+https://github.com/pawrequest/pawsupport
+suppawt @ git+https://github.com/pawrequest/suppawt
 pefile==2023.2.7
 pluggy==1.4.0
 pycommence @ git+https://github.com/pawrequest/pycommence

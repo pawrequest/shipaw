@@ -32,7 +32,7 @@ loguru==0.7.2
 markupsafe==2.1.5
 multidict==6.0.4
 packaging==23.2
-pawsupport @ git+https://github.com/pawrequest/pawsupport
+suppawt @ git+https://github.com/pawrequest/suppawt
 pydantic==2.6.0
 pydantic-core==2.16.1
 pygments==2.17.2
