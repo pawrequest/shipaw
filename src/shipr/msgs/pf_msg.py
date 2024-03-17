@@ -6,7 +6,7 @@
 import pydantic as pyd
 from loguru import logger
 
-from ..models import pf_ext, pf_lists, pf_shared, pf_top, types as shipr_types
+from ..models import pf_ext, pf_lists, pf_shared, pf_top, types as shipr_types, types
 
 
 class BaseRequest(pf_shared.BasePFType):
@@ -37,12 +37,12 @@ class BaseResponse(pf_shared.BasePFType):
         if v:
             for alt in v.alert:
                 if alt.type == 'WARNING':
-                    logger.warning(f'ExpressLink Warning: {alt.message} for {cls.__name__}')
+                    logger.warning(f'ExpressLink Warning: {alt.message} in {cls.__name__}')
                 elif alt.type == 'ERROR':
-                    logger.error(f'ExpressLink Error: {alt.message} for {cls.__name__}')
-                    raise ValueError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
+                    logger.error(f'ExpressLink Error: {alt.message} in {cls.__name__}')
+                    raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
                 else:
-                    logger.info(f'ExpressLink {alt.type}: {alt.message} for {cls.__name__}')
+                    logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
         return v
 
 

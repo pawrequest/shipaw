@@ -119,7 +119,7 @@ class RequestedShipmentSimple(RequestedShipmentMinimum):
     job_reference: str | None = None
     # todo validate both or none for sender
     sender_contact: Contact | None = None
-    sender_address: pf_ext.AddressRecipient | None = None
+    sender_address: pf_ext.AddressSender | None = None
     total_shipment_weight: float | None = None
     enhancement: pf_shared.Enhancement | None = None
     delivery_options: pf_ext.DeliveryOptions | None = None

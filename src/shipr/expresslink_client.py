@@ -11,8 +11,7 @@ from combadge.support.zeep.backends.sync import ZeepBackend
 from thefuzz import fuzz, process
 
 from . import models, msgs, ship_ui
-from .models import types
-from .models.types import ShipperScope
+from .models import pf_shared, types
 
 SCORER = fuzz.token_sort_ratio
 
@@ -24,12 +23,13 @@ class ZeepConfig(pydantic.BaseModel):
     endpoint: str
 
     @classmethod
-    def from_env(cls, scope: ShipperScope = 'SAND'):
+    def from_env(cls):
+        scope: types.ShipperScope = pf_shared.scope_from_env_live()
         return cls(
-            auth=models.Authentication.from_env(scope=scope),
+            auth=models.Authentication.from_env(),
             binding=os.environ.get("PF_BINDING"),
             wsdl=os.environ.get("PF_WSDL"),
-            endpoint=os.environ.get("PF_ENDPOINT_SAND"),
+            endpoint=os.environ.get(f"PF_ENDPOINT_{scope}"),
         )
 
 
@@ -46,8 +46,8 @@ class ELClient(pydantic.BaseModel):
 
     @classmethod
     # @lru_cache(maxsize=1)
-    def from_env(cls, scope: ShipperScope = 'SAND'):
-        return cls.from_config(ZeepConfig.from_env(scope))
+    def from_env(cls):
+        return cls.from_config(ZeepConfig.from_env())
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.config.wsdl)
@@ -128,3 +128,4 @@ def booking_state_to_shipment(state: ship_ui.ShipState) -> models.RequestedShipm
         recipient_address=state.address,
         total_number_of_parcels=state.boxes,
     )
+
