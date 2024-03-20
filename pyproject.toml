@@ -8,18 +8,19 @@ authors = [
 readme = "README.md"
 requires-python = ">= 3.10"
 dependencies = [
+    'flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui',
     "suppawt",
     'pydantic',
     'fastapi',
     'sqlmodel',
     "aiohttp",
-    "python-dotenv",
-    "zeep",
+#    "python-dotenv",
+#    "zeep",
     'combadge[zeep]',
     'thefuzz',
     'loguru',
     'python-multipart',
-    "pypdf",
+#    "pypdf",
 ]
 [project.optional-dependencies]
 dev = [

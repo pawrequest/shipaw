@@ -40,7 +40,7 @@ class BaseResponse(pf_shared.BasePFType):
                     logger.warning(f'ExpressLink Warning: {alt.message} in {cls.__name__}')
                 elif alt.type == 'ERROR':
                     logger.error(f'ExpressLink Error: {alt.message} in {cls.__name__}')
-                    raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
+                    # raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
                 else:
                     logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
         return v

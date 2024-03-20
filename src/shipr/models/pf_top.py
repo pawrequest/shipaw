@@ -3,31 +3,32 @@ import os
 
 import pydantic as pyd
 
-from . import pf_shared, pf_ext, types, pf_lists
+from pawdantic import paw_types
+from . import pf_ext, pf_lists, pf_shared, types
 
 
 class Contact(pf_shared.BasePFType):
-    business_name: types.TruncatedSafeStr(40)
-    email_address: types.TruncatedSafeStr(50)
+    business_name: paw_types.truncated_printable_str_type(40)
+    email_address: paw_types.truncated_printable_str_type(50)
     mobile_phone: str
 
-    contact_name: types.TruncatedSafeMaybeStr(30)
+    contact_name: paw_types.optional_truncated_printable_str_type(30)
     telephone: str | None = None
     fax: str | None = None
 
-    senders_name: types.TruncatedSafeMaybeStr(25)
+    senders_name: paw_types.optional_truncated_printable_str_type(25)
     notifications: pf_lists.Notifications | None = None
 
 
 class PAF(pf_shared.BasePFType):
     postcode: str | None = None
     count: int | None = pyd.Field(None)
-    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = pyd.Field(None, description="")
+    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = pyd.Field(None, description='')
 
 
 class Department(pf_shared.BasePFType):
-    department_id: list[int | None] = pyd.Field(None, description="")
-    service_codes: list[pf_lists.ServiceCodes | None] = pyd.Field(None, description="")
+    department_id: list[int | None] = pyd.Field(None, description='')
+    service_codes: list[pf_lists.ServiceCodes | None] = pyd.Field(None, description='')
     nominated_delivery_date_list: pf_lists.NominatedDeliveryDatelist | None = None
 
 
@@ -51,7 +52,7 @@ class ParcelLabelData(pf_shared.BasePFType):
     label_data: pf_lists.LabelData | None = None
     barcodes: pf_lists.Barcodes | None = None
     images: pf_lists.Images | None = None
-    parcel_contents: list[pf_lists.ParcelContents | None] = pyd.Field(None, description="")
+    parcel_contents: list[pf_lists.ParcelContents | None] = pyd.Field(None, description='')
 
 
 class CompletedManifestInfo(pf_shared.BasePFType):
@@ -101,7 +102,7 @@ class RequestedShipmentMinimum(pf_shared.BasePFType):
             address: pf_ext.AddressRecipient,
             num_parcels: int = 1,
     ):
-        contract_no = os.environ.get("PF_CONT_NUM_1")
+        contract_no = os.environ.get('PF_CONT_NUM_1')
 
         return cls(
             department_id=types.DepartmentNum.MAIN,
