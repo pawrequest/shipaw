@@ -78,6 +78,10 @@ class CreateShipmentRequest(BaseRequest):
     requested_shipment: pf_top.RequestedShipmentMinimum
 
 
+class CreateCollectionRequest(CreateShipmentRequest):
+    requested_shipment: pf_top.CollectionMinimum
+
+
 class CreateShipmentResponse(BaseResponse):
     completed_shipment_info: pf_top.CompletedShipmentInfo | None = None
 
@@ -182,6 +186,5 @@ class CreatePrintResponse(BaseResponse):
     label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
-
 
 ################################################################

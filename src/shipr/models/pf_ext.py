@@ -2,8 +2,8 @@
 
 import sqlmodel as sqm
 
-from . import pf_shared
 from pawdantic import paw_types as types
+from . import pf_shared
 
 
 # if _ty.TYPE_CHECKING:
@@ -37,6 +37,16 @@ class BaseAddress(pf_shared.BasePFType):
     postcode: str
     country: str = 'GB'
 
+    def to_collection(self):
+        return AddressCollection(
+            address_line1=self.address_line1,
+            address_line2=self.address_line2,
+            address_line3=self.address_line3,
+            town=self.town,
+            postcode=self.postcode,
+            country=self.country,
+        )
+
     @property
     def lines_dict(self):
         return {_: getattr(self, _) for _ in addr_lines_set}
@@ -69,6 +79,13 @@ class AddressRecipient(BaseAddress):
     address_line1: types.truncated_printable_str_type(40)
     address_line2: types.optional_truncated_printable_str_type(50)
     address_line3: types.optional_truncated_printable_str_type(60)
+    town: types.truncated_printable_str_type(30)
+
+
+class AddressCollection(BaseAddress):
+    address_line1: types.truncated_printable_str_type(40)
+    address_line2: types.optional_truncated_printable_str_type(40)
+    address_line3: types.optional_truncated_printable_str_type(40)
     town: types.truncated_printable_str_type(30)
 
 

@@ -5,11 +5,12 @@ from pathlib import Path
 
 import pydantic
 import zeep
-from zeep.proxy import ServiceProxy
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
 from thefuzz import fuzz, process
+from zeep.proxy import ServiceProxy
 
+# from amherst.shipper import shipstate_to_collection
 from . import models, msgs, ship_ui
 from .models import pf_shared, types
 
@@ -27,9 +28,9 @@ class ZeepConfig(pydantic.BaseModel):
         scope: types.ShipperScope = pf_shared.scope_from_env_live()
         return cls(
             auth=models.Authentication.from_env(),
-            binding=os.environ.get("PF_BINDING"),
-            wsdl=os.environ.get("PF_WSDL"),
-            endpoint=os.environ.get(f"PF_ENDPOINT_{scope}"),
+            binding=os.environ.get('PF_BINDING'),
+            wsdl=os.environ.get('PF_WSDL'),
+            endpoint=os.environ.get(f'PF_ENDPOINT_{scope}'),
         )
 
 
@@ -97,14 +98,14 @@ class ELClient(pydantic.BaseModel):
             add = candidates[chosen]
             return add
         else:
-            raise ValueError(f"No candidates found for {address.postcode}")
+            raise ValueError(f'No candidates found for {address.postcode}')
 
     def candidates_dict(self, postcode):
         return {add.lines_str: add
                 for add in self.get_candidates(postcode)}
 
     def state_to_shipment_request(self, state: ship_ui.ShipState):
-        ship_req = booking_state_to_shipment(state)
+        ship_req = shipstate_to_shipment(state)
         req = msgs.CreateShipmentRequest(
             authentication=self.config.auth,
             requested_shipment=ship_req
@@ -116,16 +117,15 @@ class ELClient(pydantic.BaseModel):
         return self.get_shipment_resp(req)
 
 
-def booking_state_to_shipment(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
+def shipstate_to_shipment(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
     # add = elt.AddressRecipientPF.model_validate(state.address)
     return models.RequestedShipmentMinimum(
-        department_id=types.DepartmentNum,
-        shipment_type='DELIVERY',
-        contract_number=os.environ["PF_CONT_NUM_1"],
-        service_code=state.ship_service,
+        contract_number=os.environ['PF_CONT_NUM_1'],
+        service_code=pf_shared.ServiceCode.EXPRESS24,
         shipping_date=state.ship_date,
         recipient_contact=state.contact,
         recipient_address=state.address,
         total_number_of_parcels=state.boxes,
     )
+
 

@@ -14,23 +14,23 @@ class BaseItem(pf_shared.BasePFType, abc.ABC):
     contact: pf_top.Contact | None = None
 
 
-    # # @pyd.computed_field
+    # # @_p.computed_field
     # @property
     # def boxes(self) -> int:
     #     return 1
     #
-    # # @pyd.computed_field
+    # # @_p.computed_field
     # @property
     # def ship_date(self) -> dt.date:
     #     """uses cmc cannonical format yyyymmdd"""
     #     return dt.date.today()
     #
-    # # @pyd.computed_field
+    # # @_p.computed_field
     # @property
     # def name(self) -> str:
     #     return 'name'
     #
-    # # @pyd.computed_field
+    # # @_p.computed_field
     # @property
     # def input_address(self) -> pf_ext.AddressRecipient:
     #     return pf_ext.AddressRecipient(
@@ -40,7 +40,7 @@ class BaseItem(pf_shared.BasePFType, abc.ABC):
     #         postcode='postcode',
     #     )
     #
-    # # @pyd.computed_field
+    # # @_p.computed_field
     # @property
     # def contact(self) -> pf_top.Contact:
     #     return pf_top.Contact(

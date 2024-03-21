@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 import os
 import typing as _t
 from enum import Enum
@@ -143,8 +144,21 @@ class ContentDetail(BasePFType):
 
 
 class DateTimeRange(BasePFType):
-    from_: str
+    from_: str = _p.Field(alias='From')
     to: str
+
+    @classmethod
+    def from_datetimes(cls, from_dt: dt.datetime, to_dt: dt.datetime):
+        now = dt.datetime.now()
+        if to_dt < now:
+            logger.warning(f'To date {to_dt} is in the past, using next day')
+            from_dt = from_dt + dt.timedelta(days=1)
+            to_dt = to_dt + dt.timedelta(days=1)
+
+        return cls(
+            from_=from_dt.isoformat(timespec='seconds'),
+            to=to_dt.isoformat(timespec='seconds')
+        )
 
 
 class ContentData(BasePFType):
@@ -210,13 +224,13 @@ class Alert(BasePFType):
 
 
 class NotificationType(str, Enum):
-    EMAIL = "EMAIL"
-    EMAIL_DOD_INT = "EMAILDODINT"
-    EMAIL_ATTEMPT = "EMAILATTEMPTDELIVERY"
-    EMAIL_COLL_REC = "EMAILCOLLRECEIVED"
-    EMAIL_START_DEL = "EMAILSTARTOFDELIVERY"
-    DELIVERY = "DELIVERYNOTIFICATION"
-    SMS_DOD = "SMSDAYOFDESPATCH"
-    SMS_START_DEL = "SMSSTARTOFDELIVERY"
-    SMS_ATTEMPT_DEL = "SMSATTEMPTDELIVERY"
-    SMS_COLL_REC = "SMSCOLLRECEIVED"
+    EMAIL = 'EMAIL'
+    EMAIL_DOD_INT = 'EMAILDODINT'
+    EMAIL_ATTEMPT = 'EMAILATTEMPTDELIVERY'
+    EMAIL_COLL_REC = 'EMAILCOLLRECEIVED'
+    EMAIL_START_DEL = 'EMAILSTARTOFDELIVERY'
+    DELIVERY = 'DELIVERYNOTIFICATION'
+    SMS_DOD = 'SMSDAYOFDESPATCH'
+    SMS_START_DEL = 'SMSSTARTOFDELIVERY'
+    SMS_ATTEMPT_DEL = 'SMSATTEMPTDELIVERY'
+    SMS_COLL_REC = 'SMSCOLLRECEIVED'

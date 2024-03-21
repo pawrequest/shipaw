@@ -1,7 +1,9 @@
 import datetime as dt
 import os
+import typing as _t
 
-import pydantic as pyd
+import pydantic as _p
+from loguru import logger
 
 from pawdantic import paw_types
 from . import pf_ext, pf_lists, pf_shared, types
@@ -9,8 +11,10 @@ from . import pf_ext, pf_lists, pf_shared, types
 
 class Contact(pf_shared.BasePFType):
     business_name: paw_types.truncated_printable_str_type(40)
-    email_address: paw_types.truncated_printable_str_type(50)
     mobile_phone: str
+    # todo hit pycharm with a brick until no more false positives
+    # email_address: paw_types.truncated_printable_str_type(50)
+    email_address: _t.Annotated[str, _p.StringConstraints(max_length=50)]
 
     contact_name: paw_types.optional_truncated_printable_str_type(30)
     telephone: str | None = None
@@ -20,15 +24,30 @@ class Contact(pf_shared.BasePFType):
     notifications: pf_lists.Notifications | None = None
 
 
+def telephone_from_mobile(v):
+    logger.warning('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+    if v.get('mobile_phone') and not v.get('telephone'):
+        v['telephone'] = v['mobile_phone']
+    return v
+
+
+class CollectionContact(Contact):
+    @_p.field_validator('telephone', mode='after')
+    def tel_is_none(cls, v, values):
+        if not v:
+            v = values.data.get('mobile_phone')
+        return v
+
+
 class PAF(pf_shared.BasePFType):
     postcode: str | None = None
-    count: int | None = pyd.Field(None)
-    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = pyd.Field(None, description='')
+    count: int | None = _p.Field(None)
+    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description='')
 
 
 class Department(pf_shared.BasePFType):
-    department_id: list[int | None] = pyd.Field(None, description='')
-    service_codes: list[pf_lists.ServiceCodes | None] = pyd.Field(None, description='')
+    department_id: list[int | None] = _p.Field(None, description='')
+    service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description='')
     nominated_delivery_date_list: pf_lists.NominatedDeliveryDatelist | None = None
 
 
@@ -52,7 +71,7 @@ class ParcelLabelData(pf_shared.BasePFType):
     label_data: pf_lists.LabelData | None = None
     barcodes: pf_lists.Barcodes | None = None
     images: pf_lists.Images | None = None
-    parcel_contents: list[pf_lists.ParcelContents | None] = pyd.Field(None, description='')
+    parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description='')
 
 
 class CompletedManifestInfo(pf_shared.BasePFType):
@@ -81,18 +100,50 @@ class CompletedShipmentInfo(pf_shared.BasePFType):
 class CollectionInfo(pf_shared.BasePFType):
     collection_contact: Contact
     collection_address: pf_ext.AddressRecipient
-    collection_time: pf_shared.DateTimeRange | None = None
+    collection_time: pf_shared.DateTimeRange
+
+
+class CollectionStateProtocol(_t.Protocol):
+    contact: Contact
+    address: pf_ext.AddressRecipient
+    ship_date: dt.date
+
+
+def collection_info_from_state(state: CollectionStateProtocol):
+    col_contact = CollectionContact.model_validate(state.contact, from_attributes=True)
+    info = CollectionInfo(
+        collection_contact=col_contact,
+        collection_address=state.address,
+        collection_time=pf_shared.DateTimeRange.from_datetimes(
+            dt.datetime.combine(state.ship_date, dt.time(9, 0)),
+            dt.datetime.combine(
+                state.ship_date, dt.time(17, 0)
+            )
+        )
+    )
+    return info.model_validate(info)
 
 
 class RequestedShipmentMinimum(pf_shared.BasePFType):
+    shipment_type: types.DeliveryKind = 'DELIVERY'
+    department_id: int = types.DepartmentNum
+    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+
     recipient_contact: Contact
     recipient_address: pf_ext.AddressRecipient
     contract_number: str
     total_number_of_parcels: int
     shipping_date: dt.date
-    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-    shipment_type: types.DeliveryKind = 'DELIVERY'
-    department_id: int = types.DepartmentNum
+
+    reference_number1: paw_types.optional_truncated_printable_str_type(
+        35
+    )  # first 14 visible on label
+
+    @_p.field_validator('reference_number1', mode='after')
+    def ref_num_validator(cls, v, values):
+        if v is None:
+            v = values['recipient_contact'].business_name
+        return v
 
     @classmethod
     def from_minimal(
@@ -114,6 +165,40 @@ class RequestedShipmentMinimum(pf_shared.BasePFType):
             recipient_address=address,
             total_number_of_parcels=num_parcels,
         )
+
+
+class CollectionMinimum(RequestedShipmentMinimum):
+    # 'requested shipment'
+    department_id: int = types.DepartmentNum
+    shipment_type: types.DeliveryKind = 'COLLECTION'
+    contract_number: str = os.environ.get('PF_CONT_NUM_1')
+    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24.value
+    shipping_date: dt.date
+
+    #
+    recipient_contact: Contact
+    recipient_address: pf_ext.AddressRecipient
+    total_number_of_parcels: int
+    print_own_label: bool = True
+
+    collection_info: CollectionInfo
+    # collection_contact: Contact
+    # collection_address: pf_ext.AddressCollection
+
+    # from_dt: dt.datetime | None = None
+    # to_dt: dt.datetime | None = None
+
+    # @_p.field_validator('from_dt', mode='after')
+    # def validate_from_dt(cls, v, values):
+    #     if values.get('shipping_date') and v is None:
+    #         v = dt.datetime.combine(values['shipping_date'], dt.time(9, 0))
+    #     return v
+    # 
+    # @_p.field_validator('to_dt', mode='after')
+    # def validate_to_dt(cls, v, values):
+    #     if values.get('shipping_date') and v is None:
+    #         v = dt.datetime.combine(values['shipping_date'], dt.time(17, 0))
+    #     return v
 
 
 class RequestedShipmentSimple(RequestedShipmentMinimum):
@@ -140,7 +225,7 @@ class CompletedManifests(pf_shared.BasePFType):
 
 
 class Departments(pf_shared.BasePFType):
-    department: list[Department] = pyd.Field(default_factory=list)
+    department: list[Department] = _p.Field(default_factory=list)
 
 
 class NominatedDeliveryDates(pf_shared.BasePFType):
@@ -173,9 +258,9 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
     drop_off_ind: types.DropOffInd | None = None
-    exchange_instructions1: pyd.constr(max_length=25) | None = None
-    exchange_instructions2: pyd.constr(max_length=25) | None = None
-    exchange_instructions3: pyd.constr(max_length=25) | None = None
+    exchange_instructions1: _p.constr(max_length=25) | None = None
+    exchange_instructions2: _p.constr(max_length=25) | None = None
+    exchange_instructions3: _p.constr(max_length=25) | None = None
     exporter_address: pf_ext.AddressRecipient | None = None
     exporter_contact: Contact | None = None
     importer_address: pf_ext.AddressRecipient | None = None
@@ -186,14 +271,14 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     international_info: InternationalInfo | None = None
     pre_printed: bool | None = None
     print_own_label: bool | None = None
-    reference_number1: pyd.constr(max_length=24) | None = None
-    reference_number2: pyd.constr(max_length=24) | None = None
-    reference_number3: pyd.constr(max_length=24) | None = None
-    reference_number4: pyd.constr(max_length=24) | None = None
-    reference_number5: pyd.constr(max_length=24) | None = None
+    reference_number1: _p.constr(max_length=24) | None = None
+    reference_number2: _p.constr(max_length=24) | None = None
+    reference_number3: _p.constr(max_length=24) | None = None
+    reference_number4: _p.constr(max_length=24) | None = None
+    reference_number5: _p.constr(max_length=24) | None = None
     request_id: int | None = None
     returns: pf_shared.Returns | None = None
-    special_instructions1: pyd.constr(max_length=25) | None = None
-    special_instructions2: pyd.constr(max_length=25) | None = None
-    special_instructions3: pyd.constr(max_length=25) | None = None
-    special_instructions4: pyd.constr(max_length=25) | None = None
+    special_instructions1: _p.constr(max_length=25) | None = None
+    special_instructions2: _p.constr(max_length=25) | None = None
+    special_instructions3: _p.constr(max_length=25) | None = None
+    special_instructions4: _p.constr(max_length=25) | None = None

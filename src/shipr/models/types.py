@@ -58,7 +58,7 @@ TOD = date.today()
 ValidShipDateType = _p.condate(ge=TOD, le=TOD + timedelta(days=7))
 PrintType = _t.Literal['ALL_PARCELS', 'SINGLE_PARCEL']
 AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
-DeliveryKind = _t.Literal['DELIVERY']
+DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 FixedDate = _t.Annotated[ValidShipDateType, _p.BeforeValidator(fix_date)]
