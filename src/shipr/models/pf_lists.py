@@ -44,8 +44,36 @@ class Alerts(pf_shared.BasePFType):
     alert: list[pf_shared.Alert]
 
 
-class Notifications(pf_shared.BasePFType):
-    notification_type: list[str] = _p.Field(default_factory=list)
+class CollectionNotifications(pf_shared.BasePFType):
+    notification_type: list[pf_shared.CollectionNotificationType] = _p.Field(
+        default_factory=list
+    )
+
+    @classmethod
+    def standard_coll(cls):
+        return cls(
+            notification_type=[
+                pf_shared.CollectionNotificationType.EMAIL,
+                # pf_shared.CollectionNotificationType.SMS_RECIEVED,
+                # pf_shared.CollectionNotificationType.EMAIL_RECIEVED,
+            ]
+        )
+
+
+class RecipientNotifications(pf_shared.BasePFType):
+    notification_type: list[pf_shared.NotificationType] = _p.Field(
+        default_factory=list
+    )
+
+    @classmethod
+    def standard_recip(cls):
+        return cls(
+            notification_type=[
+                pf_shared.NotificationType.EMAIL,
+                pf_shared.NotificationType.SMS_DOD,
+                pf_shared.NotificationType.DELIVERY,
+            ]
+        )
 
 
 class NominatedDeliveryDatelist(pf_shared.BasePFType):

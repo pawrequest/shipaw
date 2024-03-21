@@ -1513,7 +1513,7 @@ components:
           allOf:
           - $ref: '#/components/schemas/Notifications'
           - xml:
-              name: Notifications
+              name: RecipientNotifications
               namespace: http://www.parcelforce.net/ws/ship/v14
               prefix: tns
               attribute: false
@@ -1526,7 +1526,7 @@ components:
         attribute: false
         wrapped: false
     Notifications:
-      title: Notifications
+      title: RecipientNotifications
       required:
       - NotificationType
       type: object
@@ -1547,7 +1547,7 @@ components:
             wrapped: false
       description: ''
       xml:
-        name: Notifications
+        name: RecipientNotifications
         namespace: http://www.parcelforce.net/ws/ship/v14
         prefix: tns
         attribute: false

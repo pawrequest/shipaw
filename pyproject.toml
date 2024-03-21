@@ -20,6 +20,7 @@ dependencies = [
     'thefuzz',
     'loguru',
     'python-multipart',
+    'pydantic-extra-types',
 #    "pypdf",
 ]
 [project.optional-dependencies]

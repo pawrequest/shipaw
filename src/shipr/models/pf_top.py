@@ -3,7 +3,6 @@ import os
 import typing as _t
 
 import pydantic as _p
-from loguru import logger
 
 from pawdantic import paw_types
 from . import pf_ext, pf_lists, pf_shared, types
@@ -21,17 +20,12 @@ class Contact(pf_shared.BasePFType):
     fax: str | None = None
 
     senders_name: paw_types.optional_truncated_printable_str_type(25)
-    notifications: pf_lists.Notifications | None = None
-
-
-def telephone_from_mobile(v):
-    logger.warning('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-    if v.get('mobile_phone') and not v.get('telephone'):
-        v['telephone'] = v['mobile_phone']
-    return v
+    notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
 
 
 class CollectionContact(Contact):
+    notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
+
     @_p.field_validator('telephone', mode='after')
     def tel_is_none(cls, v, values):
         if not v:
@@ -110,7 +104,8 @@ class CollectionStateProtocol(_t.Protocol):
 
 
 def collection_info_from_state(state: CollectionStateProtocol):
-    col_contact = CollectionContact.model_validate(state.contact, from_attributes=True)
+    col_contact_ = CollectionContact(**state.contact.model_dump(exclude={'notifications'}))
+    col_contact = col_contact_.model_validate(col_contact_)
     info = CollectionInfo(
         collection_contact=col_contact,
         collection_address=state.address,
