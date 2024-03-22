@@ -148,5 +148,5 @@ VALID_PC = _t.Annotated[
     str,
     _p.StringConstraints(pattern=POSTCODE_PATTERN),
     _p.BeforeValidator(lambda s: s.strip().upper()),
-    _p.Field(..., description='A valid UK postcode'),
+    _p.Field(description='A valid UK postcode'),
 ]

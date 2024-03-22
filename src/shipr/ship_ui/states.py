@@ -9,18 +9,22 @@ import sqlmodel as sqm
 
 import shipr.models.types
 from pawdantic.pawui import states as ui_states
-from shipr.models import types
-from shipr.models import pf_ext, pf_shared, pf_top
-
+from shipr.models import pf_ext, pf_shared, pf_top, types
 from .. import msgs
 
 BookingReqSQM = _t.Annotated[
-    msgs.CreateShipmentRequest, sqm.Field(sa_column=sqm.Column(
-        shipr.models.types.GenericJSONType(msgs.CreateShipmentRequest)))
+    msgs.CreateShipmentRequest, sqm.Field(
+        sa_column=sqm.Column(
+            shipr.models.types.GenericJSONType(msgs.CreateShipmentRequest)
+        )
+    )
 ]
 BookingRespSQM = _t.Annotated[
-    msgs.CreateShipmentResponse, sqm.Field(sa_column=sqm.Column(
-        shipr.models.types.GenericJSONType(msgs.CreateShipmentResponse)))
+    msgs.CreateShipmentResponse, sqm.Field(
+        sa_column=sqm.Column(
+            shipr.models.types.GenericJSONType(msgs.CreateShipmentResponse)
+        )
+    )
 ]
 
 
@@ -32,13 +36,17 @@ class BookingState(ui_states.BaseUIState):
 
     def shipment_num(self):
         return (
-            self.response.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
+            self.response.completed_shipment_info.completed_shipments.completed_shipment[
+                0].shipment_number
             if self.booked
             else None
         )
 
-    def alerts(self):
-        return self.state.response.alerts.alert
+    # def state_alerts(self) -> list:
+    #     return self.response.alerts.alert if self.response.alerts else []
+    # 
+    # def alert_dict(self) -> dict[str, shipr.types.AlertType]:
+    #     return {a.message: a.type for a in self.state_alerts()}
 
     @property
     def booked(self):
@@ -61,3 +69,11 @@ class ShipState(ShipStatePartial):
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
     ship_date: types.fixed_date_type(7)
+
+
+def response_alert_dict(response):
+    return {a.message: a.type for a in response.alerts.alert} if response.alerts else {}
+
+
+def state_alert_dict(state: BookingState):
+    return response_alert_dict(state.response)

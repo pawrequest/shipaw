@@ -1,6 +1,7 @@
 from . import models
 from .expresslink_client import ELClient, ZeepConfig
 from .models import types
+from .models.types import ExpressLinkError
 from .ship_ui import (
     # BookingManager,
     # BookingManagerDB,
@@ -20,4 +21,5 @@ __all__ = models.__all__ + [
     'ShipState',
     'BookingState',
     'types',
+    'ExpressLinkError',
 ]

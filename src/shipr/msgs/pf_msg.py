@@ -12,8 +12,8 @@ from ..models import pf_ext, pf_lists, pf_shared, pf_top, types as shipr_types, 
 class BaseRequest(pf_shared.BasePFType):
     authentication: pf_shared.Authentication
 
-    def req_dict(self):
-        return self.model_dump(by_alias=True)
+    # def req_dict(self):
+    #     return self.model_dump(by_alias=True)
 
     @property
     def authorised(self):
@@ -22,11 +22,11 @@ class BaseRequest(pf_shared.BasePFType):
     def authorise(self, auth: pf_shared.Authentication):
         self.authentication = auth
 
-    def auth_request_dict(self) -> dict:
-        if not self.authorised:
-            raise ValueError('Authentication is required')
-        all_obs = [self.authentication, *self.objs]
-        return self.alias_dict(all_obs)
+    # def auth_request_dict(self) -> dict:
+    #     if not self.authorised:
+    #         raise ValueError('Authentication is required')
+    #     all_obs = [self.authentication, *self.objs]
+    #     return self.alias_dict(all_obs)
 
 
 class BaseResponse(pf_shared.BasePFType):
