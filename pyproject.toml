@@ -9,21 +9,18 @@ readme = "README.md"
 requires-python = ">= 3.10"
 dependencies = [
     'flaskwebgui',
-    #    'flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui',
     "suppawt",
     'pawdantic',
     'fastapi',
     'sqlmodel',
     "aiohttp",
-    #    "python-dotenv",
-    #    "zeep",
     'combadge[zeep]',
     'thefuzz',
     'loguru',
     'python-multipart',
     'pydantic-extra-types',
-    #    "pypdf",
 ]
+
 [project.optional-dependencies]
 dev = [
     "datamodel-code-generator",
