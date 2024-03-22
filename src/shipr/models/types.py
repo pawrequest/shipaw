@@ -131,14 +131,14 @@ class ExpressLinkError(Exception):
 
 
 class PostcodeSelect(_p.BaseModel):
-    postcode_to_fetch_addresses_from: VALID_PC
+    fetch_address_from_postcode: VALID_PC
 
     @classmethod
     def with_default(cls, postcode: str):
         dflt2 = paw_types.default_gen(VALID_PC, default=postcode)
 
         class _PostcodeSelect(cls):
-            postcode_to_fetch_addresses_from: dflt2
+            fetch_address_from_postcode: dflt2
 
         return _PostcodeSelect
 
