@@ -170,6 +170,13 @@ class CollectionMinimum(RequestedShipmentMinimum):
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24.value
     shipping_date: dt.date
 
+    # @_p.field_validator('shipping_date', mode='after')
+    # def validate_shipping_date(cls, v, values):
+    #     tod = dt.date.today()
+    #     if v <= tod:
+    #         v = tod + dt.timedelta(days=1)
+    #     return v
+
     #
     recipient_contact: Contact
     recipient_address: pf_ext.AddressRecipient
