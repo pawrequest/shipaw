@@ -9,20 +9,20 @@ readme = "README.md"
 requires-python = ">= 3.10"
 dependencies = [
     'flaskwebgui',
-#    'flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui',
+    #    'flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui',
     "suppawt",
-    'pydantic',
+    'pawdantic',
     'fastapi',
     'sqlmodel',
     "aiohttp",
-#    "python-dotenv",
-#    "zeep",
+    #    "python-dotenv",
+    #    "zeep",
     'combadge[zeep]',
     'thefuzz',
     'loguru',
     'python-multipart',
     'pydantic-extra-types',
-#    "pypdf",
+    #    "pypdf",
 ]
 [project.optional-dependencies]
 dev = [
@@ -30,6 +30,11 @@ dev = [
     "pytest",
     "pytest-asyncio",
     "pyinstaller",
+]
+paw-git = [
+    'flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+    'suppawt @ git+https://github.com/pawrequest/suppawt',
 ]
 
 
