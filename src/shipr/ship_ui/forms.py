@@ -50,3 +50,9 @@ class ContactAndAddressForm(_p.BaseModel):
     town: paw_types.truncated_printable_str_type(30)
     postcode: str
     country: str = 'GB'
+
+
+def get_full_form(state: s_mod.ShipStatePartial):
+
+    class _FullForm(ContactAndAddressForm):
+        ...

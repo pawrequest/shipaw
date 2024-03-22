@@ -60,10 +60,10 @@ class ShipStatePartial(ui_states.BaseUIState):
     ship_service: str | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
+    candidates: list[pf_ext.AddressRecipient] | None = None
 
 
 class ShipState(ShipStatePartial):
-    booking_state: BookingState | None = None
     boxes: pyd.PositiveInt = 1
     ship_service: pf_shared.ServiceCode
     contact: pf_top.Contact

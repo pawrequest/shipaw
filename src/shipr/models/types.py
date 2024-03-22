@@ -11,7 +11,6 @@ import pydantic as _p
 import sqlalchemy as sqa
 from loguru import logger
 
-import shipr
 from pawdantic import paw_types
 
 
@@ -150,3 +149,5 @@ VALID_PC = _t.Annotated[
     _p.BeforeValidator(lambda s: s.strip().upper()),
     _p.Field(description='A valid UK postcode'),
 ]
+
+
