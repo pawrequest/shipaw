@@ -61,6 +61,7 @@ class ShipStatePartial(ui_states.BaseUIState):
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
+    direction: _t.Literal['INBOUND', 'OUTBOUND'] | None = None
 
 
 class ShipState(ShipStatePartial):
@@ -69,6 +70,7 @@ class ShipState(ShipStatePartial):
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
     ship_date: types.fixed_date_type(7)
+    direction: _t.Literal['INBOUND', 'OUTBOUND'] = 'OUTBOUND'
 
 
 def response_alert_dict(response):
