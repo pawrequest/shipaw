@@ -10,7 +10,7 @@ import pydantic as _p
 from loguru import logger
 from pydantic.alias_generators import to_pascal
 
-from . import types
+from .. import types
 
 
 def scope_from_env_live() -> types.ShipperScope:
@@ -22,8 +22,16 @@ def scope_from_env_live() -> types.ShipperScope:
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
 
-
 class ServiceCode(str, Enum):
+    EXPRESS24 = 'SND'
+    EXPRESS9 = '09'
+    EXPRESS10 = 'S10'
+    EXPRESSAM = 'S12'
+    EXPRESSPM = 'SPM'
+    EXPRESS48 = 'SUP'
+
+
+class ServiceCodeFull(str, Enum):
     FLEX_DELIVERY_SERVICE_PRODUCT = 'S09'
     EXPRESS9 = '09'
     EXPRESS9_SECURE = 'SEN'

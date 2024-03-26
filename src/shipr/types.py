@@ -150,4 +150,4 @@ VALID_PC = _t.Annotated[
     _p.Field(description='A valid UK postcode'),
 ]
 
-
+ShipDirection = _t.Literal['in', 'out']

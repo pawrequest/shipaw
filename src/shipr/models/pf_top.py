@@ -5,7 +5,8 @@ import typing as _t
 import pydantic as _p
 
 from pawdantic import paw_types
-from . import pf_ext, pf_lists, pf_shared, types
+from . import pf_ext, pf_lists, pf_shared
+from .. import types
 
 
 class Contact(pf_shared.BasePFType):

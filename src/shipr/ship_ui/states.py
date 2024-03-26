@@ -4,25 +4,27 @@ import datetime as dt
 import pathlib
 import typing as _t
 
+
 import pydantic as pyd
 import sqlmodel as sqm
 
-import shipr.models.types
+import shipr.types
 from pawdantic.pawui import states as ui_states
-from shipr.models import pf_ext, pf_shared, pf_top, types
-from .. import msgs
+from shipr.models import pf_ext, pf_shared, pf_top
+from .. import msgs, types
+from shipr.types import ShipDirection
 
 BookingReqSQM = _t.Annotated[
     msgs.CreateShipmentRequest, sqm.Field(
         sa_column=sqm.Column(
-            shipr.models.types.GenericJSONType(msgs.CreateShipmentRequest)
+            shipr.types.GenericJSONType(msgs.CreateShipmentRequest)
         )
     )
 ]
 BookingRespSQM = _t.Annotated[
     msgs.CreateShipmentResponse, sqm.Field(
         sa_column=sqm.Column(
-            shipr.models.types.GenericJSONType(msgs.CreateShipmentResponse)
+            shipr.types.GenericJSONType(msgs.CreateShipmentResponse)
         )
     )
 ]
@@ -57,20 +59,20 @@ class ShipStatePartial(ui_states.BaseUIState):
     booking_state: BookingState | None = None
     boxes: int | None = None
     ship_date: dt.date | None = None
-    ship_service: str | None = None
+    service: str | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
-    direction: _t.Literal['INBOUND', 'OUTBOUND'] | None = None
+    direction: ShipDirection | None = None
 
 
 class ShipState(ShipStatePartial):
     boxes: pyd.PositiveInt = 1
-    ship_service: pf_shared.ServiceCode
+    service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
     ship_date: types.fixed_date_type(7)
-    direction: _t.Literal['INBOUND', 'OUTBOUND'] = 'OUTBOUND'
+    direction: types.ShipDirection = 'out'
 
 
 def response_alert_dict(response):

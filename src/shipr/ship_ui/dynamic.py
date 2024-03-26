@@ -6,19 +6,44 @@ from datetime import date, timedelta
 from enum import Enum, auto
 
 import pydantic as _p
-from fastui import class_name as _class_name
-from fastui import components as c
+from fastui import class_name as _class_name, components as c, forms as fastui_forms
 from pydantic import BaseModel
 
 from pawdantic.paw_strings import date_string
 from pawdantic.pawui import styles
 from shipr.models import pf_ext, pf_shared
+import pawdantic.paw_strings
+
+
+def get_dates() -> list[fastui_forms.SelectOption]:
+    return [
+        fastui_forms.SelectOption(
+            value=str(d.isoformat()),
+            label=pawdantic.paw_strings.date_string(d),
+        )
+        for d in DATE_RANGE_LIST
+    ]
+
+
+def get_addresses(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_forms.SelectOption]:
+    return [
+        fastui_forms.SelectOption(
+            value=cand.model_dump_json(),
+            label=cand.address_line1,
+        )
+        for cand in candidates
+    ]
+
+
+DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(7) if
+                   (date.today() + timedelta(days=i)).weekday() < 5]
+DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in DATE_RANGE_LIST}
 
 
 def date_range_enum():
     return Enum(
         'DateRange',
-        {str(d): date_string(d) for d in [date.today() + timedelta(days=i) for i in range(7)]}
+        DATE_RANGE_DICT
     )
 
 
@@ -33,7 +58,7 @@ class BookingForm(BaseModel, ABC):
     boxes: BoxesEnum = _p.Field(description='Number of boxes')
     address: Enum
     ship_date: date_range_enum()
-    ship_service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+    service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     direction: _t.Literal['in', 'out'] = 'out'
 
 

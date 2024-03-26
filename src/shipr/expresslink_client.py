@@ -11,8 +11,8 @@ from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
 # from amherst.shipper import shipstate_to_collection
-from . import models, msgs, ship_ui
-from .models import pf_shared, types
+from . import models, msgs, ship_ui, types
+from .models import pf_shared
 
 SCORER = fuzz.token_sort_ratio
 

@@ -1,7 +1,6 @@
-from . import models
+from . import models, types
 from .expresslink_client import ELClient, ZeepConfig
-from .models import types
-from .models.types import ExpressLinkError
+from shipr.types import ExpressLinkError
 from .ship_ui import (
     # BookingManager,
     # BookingManagerDB,
