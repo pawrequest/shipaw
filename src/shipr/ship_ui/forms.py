@@ -7,7 +7,8 @@ from pawdantic import paw_types
 from shipr import models as s_mod
 from shipr.models import pf_shared
 from shipr.ship_ui import states
-from shipr.ship_ui.dynamic import get_addresses, get_dates
+from shipr.ship_ui.dynamic import get_addresses, get_dates, BookingForm, BoxesModelForm  # noqa F401
+from shipr.types import VALID_PC
 
 
 class ContactForm(_p.BaseModel):
@@ -152,3 +153,16 @@ async def big_form_fields(state: states.ShipState):
             initial=state.service.value,
         ),
     ]
+
+
+class PostcodeSelect(_p.BaseModel):
+    fetch_address_from_postcode: VALID_PC
+
+    @classmethod
+    def with_default(cls, postcode: str):
+        dflt2 = paw_types.default_gen(VALID_PC, default=postcode)
+
+        class _PostcodeSelect(cls):
+            fetch_address_from_postcode: dflt2
+
+        return _PostcodeSelect

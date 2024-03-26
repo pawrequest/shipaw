@@ -2,12 +2,12 @@ from .base_item import BaseItem
 from .pf_ext import AddressChoice, AddressRecipient, AddressSender
 from .pf_shared import Authentication
 from .pf_top import (
-    Contact,
     PAF,
+    CollectionMinimum,
+    Contact,
     RequestedShipmentComplex,
     RequestedShipmentMinimum,
     RequestedShipmentSimple,
-    CollectionMinimum,
 )
 
 __all__ = [

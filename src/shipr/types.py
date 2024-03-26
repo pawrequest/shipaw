@@ -11,8 +11,6 @@ import pydantic as _p
 import sqlalchemy as sqa
 from loguru import logger
 
-from pawdantic import paw_types
-
 
 def shipable_date(v: date, delta_days=7) -> _t.Literal['TRUE', 'HIGH', 'LOW', 'WK_END']:
     if v:
@@ -127,19 +125,6 @@ ShipperScope = _t.Literal['SAND', 'LIVE']
 
 class ExpressLinkError(Exception):
     ...
-
-
-class PostcodeSelect(_p.BaseModel):
-    fetch_address_from_postcode: VALID_PC
-
-    @classmethod
-    def with_default(cls, postcode: str):
-        dflt2 = paw_types.default_gen(VALID_PC, default=postcode)
-
-        class _PostcodeSelect(cls):
-            fetch_address_from_postcode: dflt2
-
-        return _PostcodeSelect
 
 
 POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
