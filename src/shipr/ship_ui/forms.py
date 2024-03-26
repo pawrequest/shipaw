@@ -7,7 +7,7 @@ from pawdantic import paw_types
 from shipr import models as s_mod
 from shipr.models import pf_shared
 from shipr.ship_ui import states
-from shipr.ship_ui.dynamic import get_addresses, get_dates, BookingForm, BoxesModelForm  # noqa F401
+from shipr.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # noqa F401
 from shipr.types import VALID_PC
 
 
@@ -88,6 +88,68 @@ def get_services():
     ]
 
 
+async def contact_fields(state):
+    return [
+        c.FormFieldInput(
+            name='business_name',
+            title='Business Name',
+            initial=state.contact.business_name,
+        ),
+
+        c.FormFieldInput(
+            name='email',
+            title='Delivery Email',
+            initial=state.contact.email_address,
+        ),
+
+        c.FormFieldInput(
+            name='phone',
+            title='Delivery Mobile Phone',
+            initial=state.contact.mobile_phone,
+        )
+    ]
+
+
+async def address_fields(state):
+    return [
+        c.FormFieldInput(
+            name='address_line1',
+            title='Address Line 1',
+            initial=state.address.address_line1,
+        ),
+
+        c.FormFieldInput(
+            name='address_line2',
+            title='Address Line 2',
+            initial=state.address.address_line2,
+        ),
+
+        c.FormFieldInput(
+            name='address_line3',
+            title='Address Line 3',
+            initial=state.address.address_line3,
+        ),
+
+        c.FormFieldInput(
+            name='town',
+            title='Town',
+            initial=state.address.town,
+        ),
+
+        c.FormFieldInput(
+            name='postcode',
+            title='Postcode',
+            initial=state.address.postcode,
+        ),
+
+        # c.FormFieldInput(
+        #     name='country',
+        #     title='Country',
+        #     initial=state.address.country,
+        # )
+    ]
+
+
 async def big_form_fields(state: states.ShipState):
     return [
         c.FormFieldSelect(
@@ -121,48 +183,26 @@ async def big_form_fields(state: states.ShipState):
             # class_name='col-2',
             # display_mode='inline',
         ),
-        c.FormFieldSelect(
-            name='address',
-            options=get_addresses(state.candidates),
-            title='Address From Postcode',
-            initial=state.address.model_dump_json(),
-            class_name='row'
-        ),
-
-        c.FormFieldInput(
-            name='business_name',
-            title='Business Name',
-            initial=state.contact.business_name,
-        ),
-
-        c.FormFieldInput(
-            name='email',
-            title='Delivery Email',
-            initial=state.contact.email_address,
-        ),
-
-        c.FormFieldInput(
-            name='phone',
-            title='Delivery Mobile Phone',
-            initial=state.contact.mobile_phone,
-        ),
+        *await contact_fields(state),
         c.FormFieldSelect(
             name='service',
             options=get_services(),
             title='Service',
             initial=state.service.value,
         ),
+        *await address_fields(state),
     ]
+
+
+async def address_f_postcode_select_field(state):
+    return c.FormFieldSelect(
+        name='address',
+        options=get_addresses(state.candidates),
+        title='Address From Postcode',
+        initial=state.address.model_dump_json(),
+        class_name='row'
+    )
 
 
 class PostcodeSelect(_p.BaseModel):
     fetch_address_from_postcode: VALID_PC
-
-    @classmethod
-    def with_default(cls, postcode: str):
-        dflt2 = paw_types.default_gen(VALID_PC, default=postcode)
-
-        class _PostcodeSelect(cls):
-            fetch_address_from_postcode: dflt2
-
-        return _PostcodeSelect
