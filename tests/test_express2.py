@@ -3,7 +3,7 @@ import os
 import pytest
 
 import shipr.expresslink_specs
-import shipr.types
+import shipr.shipr_types
 from shipr import expresslink2 as pf, expresslink_specs2 as pf_specs
 
 

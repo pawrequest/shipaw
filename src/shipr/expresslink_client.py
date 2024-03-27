@@ -11,7 +11,7 @@ from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
 # from amherst.shipper import shipstate_to_collection
-from . import models, msgs, ship_ui, types
+from . import models, msgs, ship_ui, shipr_types
 from .models import pf_shared
 
 SCORER = fuzz.token_sort_ratio
@@ -25,7 +25,7 @@ class ZeepConfig(pydantic.BaseModel):
 
     @classmethod
     def from_env(cls):
-        scope: types.ShipperScope = pf_shared.scope_from_env_live()
+        scope: shipr_types.ShipperScope = pf_shared.scope_from_env_live()
         return cls(
             auth=models.Authentication.from_env(),
             binding=os.environ.get('PF_BINDING'),

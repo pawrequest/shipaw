@@ -4,27 +4,26 @@ import datetime as dt
 import pathlib
 import typing as _t
 
-
 import pydantic as pyd
 import sqlmodel as sqm
 
-import shipr.types
 from pawdantic.pawui import states as ui_states
 from shipr.models import pf_ext, pf_shared, pf_top
-from .. import msgs, types
-from shipr.types import ShipDirection
+from shipr.shipr_types import ShipDirection
+
+from .. import msgs, shipr_types
 
 BookingReqSQM = _t.Annotated[
     msgs.CreateShipmentRequest, sqm.Field(
         sa_column=sqm.Column(
-            shipr.types.GenericJSONType(msgs.CreateShipmentRequest)
+            shipr_types.GenericJSONType(msgs.CreateShipmentRequest)
         )
     )
 ]
 BookingRespSQM = _t.Annotated[
     msgs.CreateShipmentResponse, sqm.Field(
         sa_column=sqm.Column(
-            shipr.types.GenericJSONType(msgs.CreateShipmentResponse)
+            shipr_types.GenericJSONType(msgs.CreateShipmentResponse)
         )
     )
 ]
@@ -71,8 +70,8 @@ class ShipState(ShipStatePartial):
     service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
-    ship_date: types.fixed_date_type(7)
-    direction: types.ShipDirection = 'out'
+    ship_date: shipr_types.fixed_date_type(7)
+    direction: shipr_types.ShipDirection = 'out'
 
 
 def response_alert_dict(response):

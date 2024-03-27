@@ -1,13 +1,8 @@
-# from __future__ import annotations
-
-# if _ty.TYPE_CHECKING:
-#     pass
-
 import pydantic as pyd
 from loguru import logger
 
+from .. import shipr_types
 from ..models import pf_ext, pf_lists, pf_shared, pf_top
-from .. import types
 
 
 class BaseRequest(pf_shared.BasePFType):
@@ -94,7 +89,7 @@ class PrintLabelRequest(BaseRequest):
     shipment_number: str
     print_format: str | None = None
     barcode_format: str | None = None
-    print_type: types.PrintType = 'ALL_PARCELS'
+    print_type: shipr_types.PrintType = 'ALL_PARCELS'
 
 
 class PrintLabelResponse(BaseResponse):

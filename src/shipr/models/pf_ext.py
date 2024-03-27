@@ -2,9 +2,9 @@
 
 import sqlmodel as sqm
 
-from pawdantic import paw_types as types
-from . import pf_shared
+from pawdantic import paw_types
 
+from . import pf_shared
 
 # if _ty.TYPE_CHECKING:
 #     pass
@@ -27,9 +27,9 @@ addr_lines_set = sorted({'address_line1', 'address_line2', 'address_line3'})
 
 
 class BaseAddress(pf_shared.BasePFType):
-    address_line1: types.truncated_printable_str_type(24)
-    address_line2: types.optional_truncated_printable_str_type(24)
-    address_line3: types.optional_truncated_printable_str_type(24)
+    address_line1: paw_types.truncated_printable_str_type(24)
+    address_line2: paw_types.optional_truncated_printable_str_type(24)
+    address_line3: paw_types.optional_truncated_printable_str_type(24)
     # address_line1: str
     # address_line2: str = ""
     # address_line3: str = ""
@@ -76,17 +76,17 @@ class AddressSender(BaseAddress):
 
 
 class AddressRecipient(BaseAddress):
-    address_line1: types.truncated_printable_str_type(40)
-    address_line2: types.optional_truncated_printable_str_type(50)
-    address_line3: types.optional_truncated_printable_str_type(60)
-    town: types.truncated_printable_str_type(30)
+    address_line1: paw_types.truncated_printable_str_type(40)
+    address_line2: paw_types.optional_truncated_printable_str_type(50)
+    address_line3: paw_types.optional_truncated_printable_str_type(60)
+    town: paw_types.truncated_printable_str_type(30)
 
 
 class AddressCollection(BaseAddress):
-    address_line1: types.truncated_printable_str_type(40)
-    address_line2: types.optional_truncated_printable_str_type(40)
-    address_line3: types.optional_truncated_printable_str_type(40)
-    town: types.truncated_printable_str_type(30)
+    address_line1: paw_types.truncated_printable_str_type(40)
+    address_line2: paw_types.optional_truncated_printable_str_type(40)
+    address_line3: paw_types.optional_truncated_printable_str_type(40)
+    town: paw_types.truncated_printable_str_type(30)
 
 
 class PostOffice(pf_shared.BasePFType):

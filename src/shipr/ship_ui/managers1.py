@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sqlmodel as sqm
 
-import shipr.types
+import shipr.shipr_types
 from pawdantic.pawui import states
 
 class BaseManager(sqm.SQLModel):

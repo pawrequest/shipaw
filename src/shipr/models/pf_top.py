@@ -5,8 +5,9 @@ import typing as _t
 import pydantic as _p
 
 from pawdantic import paw_types
+
+from .. import shipr_types
 from . import pf_ext, pf_lists, pf_shared
-from .. import types
 
 
 class Contact(pf_shared.BasePFType):
@@ -121,8 +122,8 @@ def collection_info_from_state(state: CollectionStateProtocol):
 
 
 class RequestedShipmentMinimum(pf_shared.BasePFType):
-    shipment_type: types.DeliveryKind = 'DELIVERY'
-    department_id: int = types.DepartmentNum
+    shipment_type: shipr_types.DeliveryKind = 'DELIVERY'
+    department_id: int = shipr_types.DepartmentNum
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
 
     recipient_contact: Contact
@@ -152,8 +153,8 @@ class RequestedShipmentMinimum(pf_shared.BasePFType):
         contract_no = os.environ.get('PF_CONT_NUM_1')
 
         return cls(
-            department_id=types.DepartmentNum.MAIN,
-            shipment_type=types.DeliveryKind.DELIVERY,
+            department_id=shipr_types.DepartmentNum.MAIN,
+            shipment_type=shipr_types.DeliveryKind.DELIVERY,
             contract_number=contract_no,
             service_code=pf_shared.ServiceCode.EXPRESS24,
             shipping_date=ship_date,
@@ -165,8 +166,8 @@ class RequestedShipmentMinimum(pf_shared.BasePFType):
 
 class CollectionMinimum(RequestedShipmentMinimum):
     # 'requested shipment'
-    department_id: int = types.DepartmentNum
-    shipment_type: types.DeliveryKind = 'COLLECTION'
+    department_id: int = shipr_types.DepartmentNum
+    shipment_type: shipr_types.DeliveryKind = 'COLLECTION'
     contract_number: str = os.environ.get('PF_CONT_NUM_1')
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24.value
     shipping_date: dt.date
@@ -260,7 +261,7 @@ class InternationalInfo(pf_shared.BasePFType):
 class RequestedShipmentComplex(RequestedShipmentSimple):
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
-    drop_off_ind: types.DropOffInd | None = None
+    drop_off_ind: shipr_types.DropOffInd | None = None
     exchange_instructions1: _p.constr(max_length=25) | None = None
     exchange_instructions2: _p.constr(max_length=25) | None = None
     exchange_instructions3: _p.constr(max_length=25) | None = None
