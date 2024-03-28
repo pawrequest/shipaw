@@ -90,6 +90,13 @@ def get_services():
     ]
 
 
+# def get_services():
+#     return [
+#         {'value': service.value, 'label': service.display_label}
+#         for service in pf_shared.ServiceCode
+#     ]
+
+
 async def contact_fields(state):
     return [
         c.FormFieldInput(
@@ -102,6 +109,7 @@ async def contact_fields(state):
             name='email',
             title='Delivery Email',
             initial=state.contact.email_address,
+            html_type='email',
         ),
 
         c.FormFieldInput(
@@ -118,6 +126,7 @@ async def address_fields(state):
             name='address_line1',
             title='Address Line 1',
             initial=state.address.address_line1,
+            required=True,
         ),
 
         c.FormFieldInput(
@@ -185,13 +194,15 @@ async def big_form_fields(state: states.ShipState):
             # class_name='col-2',
             # display_mode='inline',
         ),
-        *await contact_fields(state),
         c.FormFieldSelect(
             name='service',
             options=get_services(),
             title='Service',
-            initial=state.service.value,
+            # initial=state.service.value,
+            initial=state.service,
         ),
+        *await contact_fields(state),
+        await address_f_postcode_select_field(state),
         *await address_fields(state),
     ]
 
@@ -201,7 +212,7 @@ async def address_f_postcode_select_field(state):
         name='address',
         options=get_addresses(state.candidates),
         title='Address From Postcode',
-        initial=state.address.model_dump_json(),
+        # initial=state.address.model_dump_json(),
         class_name='row'
     )
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import enum
 import os
 import typing as _t
 from enum import Enum
@@ -22,7 +23,17 @@ def scope_from_env_live() -> shipr_types.ShipperScope:
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
 
-class ServiceCode(str, Enum):
+
+# class ServiceCode(StrEnum):
+#     EXPRESS24 = 'SND'
+#     EXPRESS9 = '09'
+#     EXPRESS10 = 'S10'
+#     EXPRESSAM = 'S12'
+#     EXPRESSPM = 'SPM'
+#     EXPRESS48 = 'SUP'
+
+
+class ServiceCode(enum.StrEnum):
     EXPRESS24 = 'SND'
     EXPRESS9 = '09'
     EXPRESS10 = 'S10'
@@ -31,7 +42,7 @@ class ServiceCode(str, Enum):
     EXPRESS48 = 'SUP'
 
 
-class ServiceCodeFull(str, Enum):
+class ServiceCodeFull(str, enum.Enum):
     FLEX_DELIVERY_SERVICE_PRODUCT = 'S09'
     EXPRESS9 = '09'
     EXPRESS9_SECURE = 'SEN'

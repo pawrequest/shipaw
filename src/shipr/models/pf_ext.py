@@ -3,8 +3,8 @@
 import sqlmodel as sqm
 
 from pawdantic import paw_types
-
 from . import pf_shared
+
 
 # if _ty.TYPE_CHECKING:
 #     pass
@@ -23,7 +23,7 @@ def address_string_to_dict(address_str: str) -> dict[str, str]:
     }
 
 
-addr_lines_set = sorted({'address_line1', 'address_line2', 'address_line3'})
+addr_lines_fields_set = sorted({'address_line1', 'address_line2', 'address_line3'})
 
 
 class BaseAddress(pf_shared.BasePFType):
@@ -49,15 +49,19 @@ class BaseAddress(pf_shared.BasePFType):
 
     @property
     def lines_dict(self):
-        return {_: getattr(self, _) for _ in addr_lines_set}
+        return {line_field: getattr(self, line_field) for line_field in self.lines_fields_set}
 
     @property
     def lines_list(self):
         return list(self.lines_dict.values())
 
     @property
-    def lines_set(self):
-        return {getattr(self, _) for _ in addr_lines_set}
+    def lines_set_vals(self):
+        return {getattr(self, _) for _ in self.lines_fields_set}
+
+    @property
+    def lines_fields_set(self):
+        return {_ for _ in addr_lines_fields_set if getattr(self, _)}
 
     @property
     def lines_str(self):

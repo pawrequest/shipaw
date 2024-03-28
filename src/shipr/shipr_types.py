@@ -27,7 +27,7 @@ def shipable_date(v: date, delta_days=7) -> _t.Literal['TRUE', 'HIGH', 'LOW', 'W
             return 'TRUE'
 
 
-def fix_date(v: date, delta_days=7) -> date:
+def limit_daterange_no_weekends(v: date, delta_days=7) -> date:
     date_range = [TOD + datetime.timedelta(days=x) for x in range(7)]
     weekday_dates = [d for d in date_range if d.weekday() < 5]
     latest_wkd = max(weekday_dates)
@@ -58,11 +58,11 @@ AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
 DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
-FixedDate = _t.Annotated[ValidShipDateType, _p.BeforeValidator(fix_date)]
+FixedDate = _t.Annotated[ValidShipDateType, _p.BeforeValidator(limit_daterange_no_weekends)]
 
 
 def fixed_date_type(days_delta: int = 7):
-    fix_date_validator = functools.partial(fix_date, delta_days=days_delta)
+    fix_date_validator = functools.partial(limit_daterange_no_weekends, delta_days=days_delta)
     return _t.Annotated[_p.condate(ge=TOD, le=TOD + timedelta(days=days_delta)), _p.BeforeValidator(
         fix_date_validator
     )]

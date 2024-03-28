@@ -12,7 +12,7 @@ from zeep.proxy import ServiceProxy
 
 # from amherst.shipper import shipstate_to_collection
 from . import models, msgs, ship_ui, shipr_types
-from .models import pf_shared
+from .models import pf_shared, pf_ext
 
 SCORER = fuzz.token_sort_ratio
 

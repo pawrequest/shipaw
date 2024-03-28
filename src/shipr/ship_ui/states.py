@@ -56,9 +56,9 @@ class BookingState(ui_states.BaseUIState):
 
 class ShipStatePartial(ui_states.BaseUIState):
     booking_state: BookingState | None = None
-    boxes: int | None = None
-    ship_date: dt.date | None = None
-    service: str | None = None
+    boxes: pyd.PositiveInt | None = None
+    service: pf_shared.ServiceCode | None = None
+    ship_date: shipr_types.fixed_date_type(7) | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
