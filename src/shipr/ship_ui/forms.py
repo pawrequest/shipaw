@@ -6,7 +6,7 @@ import pydantic as _p
 from fastui import components as c, forms as fastui_forms
 
 from pawdantic import paw_types
-from shipr import models as s_mod, shipr_types
+from shipr import shipr_types
 from shipr.models import pf_shared
 from shipr.ship_ui import states
 from shipr.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # noqa F401
@@ -18,22 +18,6 @@ class ContactForm(_p.BaseModel):
     email_address: paw_types.truncated_printable_str_type(50)
     mobile_phone: str
     contact_name: paw_types.optional_truncated_printable_str_type(30)
-
-    @classmethod
-    def with_default(cls, contact: s_mod.Contact):
-        class _ContactSelect(cls):
-            business_name: paw_types.default_gen(
-                paw_types.truncated_printable_str_type(40), default=contact.business_name
-            )
-            email_address: paw_types.default_gen(
-                paw_types.truncated_printable_str_type(50), default=contact.email_address
-            )
-            mobile_phone: paw_types.default_gen(str, default=contact.mobile_phone)
-            contact_name: paw_types.default_gen(
-                paw_types.optional_truncated_printable_str_type(30), default=contact.contact_name
-            )
-
-        return _ContactSelect
 
 
 class AddressForm(_p.BaseModel):
@@ -161,7 +145,7 @@ async def address_fields(state):
     ]
 
 
-async def big_form_fields(state: states.ShipState):
+async def ship_fields(state: states.ShipState, manual=False):
     return [
         c.FormFieldSelect(
             name='date',
@@ -202,17 +186,51 @@ async def big_form_fields(state: states.ShipState):
             initial=state.service,
         ),
         *await contact_fields(state),
-        await address_f_postcode_select_field(state),
+    ]
+
+
+async def ship_fields_select(state: states.ShipState):
+    return [
+        *await ship_fields(state),
+        await address_select(state),
+    ]
+
+
+async def ship_fields_manual(state: states.ShipState):
+    return [
+        *await ship_fields(state),
         *await address_fields(state),
     ]
 
 
-async def address_f_postcode_select_field(state):
+async def address_select(state):
     return c.FormFieldSelect(
         name='address',
         options=get_addresses(state.candidates),
         title='Address From Postcode',
+        # initial='',
+        # initial=state.address.model_dump(),
+        initial=state.address.model_dump_json(),
+        # placeholder=state.address.address_line1,
+
+        class_name='row'
+    )
+
+
+async def address_select2(state):
+    return c.FormFieldSelect(
+        name='address',
+        options=[
+            {'value': 'val1', 'label': 'label1'},
+            {'value': 'val2', 'label': 'label2'},
+            {'value': 'val3', 'label': 'label3'},
+        ],
+        title='Address From Postcode',
+        initial='val1',
+        # initial=state.address.model_dump(),
         # initial=state.address.model_dump_json(),
+        # placeholder=state.address.address_line1,
+
         class_name='row'
     )
 

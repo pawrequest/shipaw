@@ -7,6 +7,7 @@ import pydantic
 import zeep
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
+from loguru import logger
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
@@ -61,6 +62,8 @@ class ELClient(pydantic.BaseModel):
     def get_shipment_resp(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
         back = self.backend(msgs.CreateShipmentService)
         resp = back.createshipment(request=req.model_dump(by_alias=True))
+        logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
+
         return msgs.CreateShipmentResponse.model_validate(resp)
 
     def get_candidates(self, postcode: str) -> list[models.AddressRecipient]:
@@ -88,7 +91,7 @@ class ELClient(pydantic.BaseModel):
     def choose_address(
             self,
             address: models.AddressRecipient
-    ) -> models.AddressRecipient | None:
+    ) -> models.AddressRecipient:
         if candidates := self.candidates_dict(address.postcode):
             chosen, score = process.extractOne(
                 address.lines_str,
