@@ -153,7 +153,7 @@ async def ship_fields(state: states.ShipState, manual=False):
             initial=str(state.ship_date.isoformat()),
             title='date',
             # class_name='col-3',
-            display_mode='inline',
+            # display_mode='inline',
         ),
         c.FormFieldSelect(
             name='boxes',
