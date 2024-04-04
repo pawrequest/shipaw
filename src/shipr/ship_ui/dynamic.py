@@ -29,13 +29,13 @@ def get_addresses(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_form
     return [
         fastui_forms.SelectOption(
             value=cand.model_dump_json(),
-            label=cand.address_line1,
+            label=cand.lines_str_oneline,
         )
         for cand in candidates
     ]
 
 
-DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(7) if
+DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(14) if
                    (date.today() + timedelta(days=i)).weekday() < 5]
 DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in DATE_RANGE_LIST}
 

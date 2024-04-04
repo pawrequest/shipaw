@@ -90,6 +90,12 @@ async def contact_fields(state):
         ),
 
         c.FormFieldInput(
+            name='contact_name',
+            title='Contact Name',
+            initial=state.contact.contact_name,
+        ),
+
+        c.FormFieldInput(
             name='email',
             title='Delivery Email',
             initial=state.contact.email_address,
@@ -208,6 +214,7 @@ async def address_select(state):
         name='address',
         options=get_addresses(state.candidates),
         title='Address From Postcode',
+        required=True,
         # initial='',
         # initial=state.address.model_dump(),
         initial=state.address.model_dump_json(),

@@ -74,7 +74,7 @@ class ELClient(pydantic.BaseModel):
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
-    def get_label(self, ship_num) -> Path:
+    def get_label(self, ship_num, dl_path=None) -> Path:
         """Get the label for a shipment number.
 
         args:
@@ -82,10 +82,11 @@ class ELClient(pydantic.BaseModel):
             pf_auth: elt.Authentication - PFCom authentication
             ship_num: str - shipment number
         """
+        dl_path = dl_path or 'temp_label.pdf'
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.config.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
-        out_path = response.label.download(Path('temp_label.pdf'))
+        out_path = response.label.download(Path(dl_path))
         return out_path
 
     def choose_address(
@@ -107,7 +108,7 @@ class ELClient(pydantic.BaseModel):
         return {add.lines_str: add
                 for add in self.get_candidates(postcode)}
 
-    def state_to_shipment_request(self, state: ship_ui.ShipState):
+    def state_to_outbound_request(self, state: ship_ui.ShipState):
         ship_req = shipstate_to_shipment(state)
         req = msgs.CreateShipmentRequest(
             authentication=self.config.auth,
@@ -116,7 +117,7 @@ class ELClient(pydantic.BaseModel):
         return req
 
     def state_to_response(self, state: ship_ui.ShipState) -> msgs.CreateShipmentResponse:
-        req = self.state_to_shipment_request(state)
+        req = self.state_to_outbound_request(state)
         return self.get_shipment_resp(req)
 
 

@@ -49,7 +49,7 @@ class BaseAddress(pf_shared.BasePFType):
 
     @property
     def lines_dict(self):
-        return {line_field: getattr(self, line_field) for line_field in self.lines_fields_set}
+        return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
 
     @property
     def lines_list(self):
@@ -66,6 +66,10 @@ class BaseAddress(pf_shared.BasePFType):
     @property
     def lines_str(self):
         return '\n'.join(self.lines_dict.values())
+
+    @property
+    def lines_str_oneline(self):
+        return ', '.join(self.lines_dict.values())
 
     # def address_lines_dict(self):
     #     return {
