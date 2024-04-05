@@ -33,6 +33,15 @@ def scope_from_env_live() -> shipr_types.ShipperScope:
 #     EXPRESS48 = 'SUP'
 
 
+class ServiceCode2(str, Enum):
+    EXPRESS24 = 'SND'
+    EXPRESS9 = '09'
+    EXPRESS10 = 'S10'
+    EXPRESSAM = 'S12'
+    EXPRESSPM = 'SPM'
+    EXPRESS48 = 'SUP'
+
+
 class ServiceCode(enum.StrEnum):
     EXPRESS24 = 'SND'
     EXPRESS9 = '09'

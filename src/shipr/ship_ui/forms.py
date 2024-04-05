@@ -28,6 +28,7 @@ class AddressForm(_p.BaseModel):
     postcode: str
     country: str = 'GB'
 
+#
 
 class ContactAndAddressForm(_p.BaseModel):
     business_name: paw_types.truncated_printable_str_type(40)
@@ -190,6 +191,16 @@ async def ship_fields(state: states.ShipState, manual=False):
             title='Service',
             # initial=state.service.value,
             initial=state.service,
+        ),
+        c.FormFieldInput(
+            name='reference',
+            title='Reference on Label',
+            initial=state.reference,
+        ),
+        c.FormFieldInput(
+            name='special_instructions',
+            title='Special Delivery/Colelction Instructions',
+            initial=state.special_instructions,
         ),
         *await contact_fields(state),
     ]

@@ -115,7 +115,7 @@ class AddressChoice(pf_shared.BasePFType):
 
 class ConvenientCollect(pf_shared.BasePFType):
     postcode: str | None = None
-    post_office: list[PostOffice | None]
+    post_office: list[PostOffice] | None = None
     count: int | None = None
     post_office_id: str | None = None
 

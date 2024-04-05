@@ -108,20 +108,20 @@ class ELClient(pydantic.BaseModel):
         return {add.lines_str: add
                 for add in self.get_candidates(postcode)}
 
-    def state_to_outbound_request(self, state: ship_ui.ShipState):
-        ship_req = shipstate_to_shipment(state)
+    def create_outbound_request(self, state: ship_ui.ShipState):
+        ship_req = shipstate_to_outbound(state)
         req = msgs.CreateShipmentRequest(
             authentication=self.config.auth,
             requested_shipment=ship_req
         )
         return req
 
-    def state_to_response(self, state: ship_ui.ShipState) -> msgs.CreateShipmentResponse:
-        req = self.state_to_outbound_request(state)
-        return self.get_shipment_resp(req)
+    # def state_to_response(self, state: ship_ui.ShipState) -> msgs.CreateShipmentResponse:
+    #     req = self.create_outbound_request(state)
+    #     return self.get_shipment_resp(req)
 
 
-def shipstate_to_shipment(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
+def shipstate_to_outbound(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
     # add = elt.AddressRecipientPF.model_validate(state.address)
     return models.RequestedShipmentMinimum(
         contract_number=os.environ['PF_CONT_NUM_1'],
@@ -130,6 +130,7 @@ def shipstate_to_shipment(state: ship_ui.ShipState) -> models.RequestedShipmentM
         recipient_contact=state.contact,
         recipient_address=state.address,
         total_number_of_parcels=state.boxes,
+        reference_number1=state.reference,
     )
 
 

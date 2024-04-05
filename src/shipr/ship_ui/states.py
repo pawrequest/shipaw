@@ -64,6 +64,8 @@ class ShipStatePartial(ui_states.BaseUIState):
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
     direction: ShipDirection | None = None
+    reference: str | None = None
+    special_instructions: str | None = None
 
     @property
     def pf_label_name(self):

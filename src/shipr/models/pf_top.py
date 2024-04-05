@@ -1,13 +1,29 @@
 import datetime as dt
-import os
 import typing as _t
 
 import pydantic as _p
 
 from pawdantic import paw_types
-
 from .. import shipr_types
 from . import pf_ext, pf_lists, pf_shared
+
+
+
+
+class ContactMinimum(pf_shared.BasePFType):
+    business_name: paw_types.truncated_printable_str_type(40)
+    mobile_phone: str
+    # todo hit pycharm with a brick until no more false positives
+    # email_address: paw_types.truncated_printable_str_type(50)
+    email_address: _t.Annotated[str, _p.StringConstraints(max_length=50)]
+
+    contact_name: paw_types.optional_truncated_printable_str_type(30)
+    telephone: str | None = None
+    fax: str | None = None
+
+    senders_name: paw_types.optional_truncated_printable_str_type(25)
+    notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
+
 
 
 class Contact(pf_shared.BasePFType):
@@ -121,99 +137,44 @@ def collection_info_from_state(state: CollectionStateProtocol):
     return info.model_validate(info)
 
 
-class RequestedShipmentMinimum(pf_shared.BasePFType):
-    shipment_type: shipr_types.DeliveryKind = 'DELIVERY'
-    department_id: int = shipr_types.DepartmentNum
-    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-
+class RequestedShipmentZero(pf_shared.BasePFType):
     recipient_contact: Contact
     recipient_address: pf_ext.AddressRecipient
-    contract_number: str
     total_number_of_parcels: int
     shipping_date: dt.date
 
+
+class RequestedShipmentMinimum(RequestedShipmentZero):
+    contract_number: str
+    department_id: int = shipr_types.DepartmentNum
+
+    shipment_type: shipr_types.DeliveryKind = 'DELIVERY'
+    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     reference_number1: paw_types.optional_truncated_printable_str_type(
-        35
+        24
     )  # first 14 visible on label
 
     @_p.field_validator('reference_number1', mode='after')
     def ref_num_validator(cls, v, values):
-        if v is None:
+        if not v:
             v = values['recipient_contact'].business_name
         return v
 
-    @classmethod
-    def from_minimal(
-            cls,
-            ship_date: dt.date,
-            contact: Contact,
-            address: pf_ext.AddressRecipient,
-            num_parcels: int = 1,
-    ):
-        contract_no = os.environ.get('PF_CONT_NUM_1')
-
-        return cls(
-            department_id=shipr_types.DepartmentNum.MAIN,
-            shipment_type=shipr_types.DeliveryKind.DELIVERY,
-            contract_number=contract_no,
-            service_code=pf_shared.ServiceCode.EXPRESS24,
-            shipping_date=ship_date,
-            recipient_contact=contact,
-            recipient_address=address,
-            total_number_of_parcels=num_parcels,
-        )
-
 
 class CollectionMinimum(RequestedShipmentMinimum):
-    # 'requested shipment'
-    department_id: int = shipr_types.DepartmentNum
     shipment_type: shipr_types.DeliveryKind = 'COLLECTION'
-    contract_number: str = os.environ.get('PF_CONT_NUM_1')
-    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24.value
-    shipping_date: dt.date
-
-    # @_p.field_validator('shipping_date', mode='after')
-    # def validate_shipping_date(cls, v, values):
-    #     tod = dt.date.today()
-    #     if v <= tod:
-    #         v = tod + dt.timedelta(days=1)
-    #     return v
-
-    #
-    recipient_contact: Contact
-    recipient_address: pf_ext.AddressRecipient
-    total_number_of_parcels: int
     print_own_label: bool = True
-
     collection_info: CollectionInfo
-    # collection_contact: Contact
-    # collection_address: pf_ext.AddressCollection
 
-    # from_dt: dt.datetime | None = None
-    # to_dt: dt.datetime | None = None
 
-    # @_p.field_validator('from_dt', mode='after')
-    # def validate_from_dt(cls, v, values):
-    #     if values.get('shipping_date') and v is None:
-    #         v = dt.datetime.combine(values['shipping_date'], dt.time(9, 0))
-    #     return v
-    # 
-    # @_p.field_validator('to_dt', mode='after')
-    # def validate_to_dt(cls, v, values):
-    #     if values.get('shipping_date') and v is None:
-    #         v = dt.datetime.combine(values['shipping_date'], dt.time(17, 0))
-    #     return v
+class CollectionSimple(CollectionMinimum):
+    special_instructions1: _p.constr(max_length=25) | None = None
+    special_instructions2: _p.constr(max_length=25) | None = None
 
 
 class RequestedShipmentSimple(RequestedShipmentMinimum):
-    job_reference: str | None = None
-    # todo validate both or none for sender
-    sender_contact: Contact | None = None
-    sender_address: pf_ext.AddressSender | None = None
-    total_shipment_weight: float | None = None
     enhancement: pf_shared.Enhancement | None = None
     delivery_options: pf_ext.DeliveryOptions | None = None
-    collection_info: CollectionInfo | None = None
 
 
 class Parcels(pf_shared.BasePFType):
@@ -286,3 +247,10 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     special_instructions2: _p.constr(max_length=25) | None = None
     special_instructions3: _p.constr(max_length=25) | None = None
     special_instructions4: _p.constr(max_length=25) | None = None
+
+    # job_reference: str | None = None  # not required for domestic
+    # sender_contact: Contact | None = None
+    # sender_address: pf_ext.AddressSender | None = None
+    # total_shipment_weight: float | None = None
+    # enhancement: pf_shared.Enhancement | None = None
+    # delivery_options: pf_ext.DeliveryOptions | None = None
