@@ -9,33 +9,24 @@ from . import pf_ext, pf_lists, pf_shared
 
 
 
+class ContactMininmum(pf_shared.BasePFType):
+    business_name: paw_types.truncated_printable_str_type(40) = _p.Field(
+        ...,
+        title='Business Name'
+    )
+    mobile_phone: str = _p.Field(..., description='Mobile phone number')
+    email_address: _p.EmailStr = _p.Field(
+        title='Email Address',
+    )
 
-class ContactMinimum(pf_shared.BasePFType):
-    business_name: paw_types.truncated_printable_str_type(40)
-    mobile_phone: str
-    # todo hit pycharm with a brick until no more false positives
-    # email_address: paw_types.truncated_printable_str_type(50)
-    email_address: _t.Annotated[str, _p.StringConstraints(max_length=50)]
 
-    contact_name: paw_types.optional_truncated_printable_str_type(30)
+class Contact(ContactMininmum):
+    contact_name: paw_types.optional_truncated_printable_str_type(30) = _p.Field(
+        None,
+        title='Contact Name'
+    )
     telephone: str | None = None
-    fax: str | None = None
-
-    senders_name: paw_types.optional_truncated_printable_str_type(25)
-    notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
-
-
-
-class Contact(pf_shared.BasePFType):
-    business_name: paw_types.truncated_printable_str_type(40)
-    mobile_phone: str
-    # todo hit pycharm with a brick until no more false positives
-    # email_address: paw_types.truncated_printable_str_type(50)
-    email_address: _t.Annotated[str, _p.StringConstraints(max_length=50)]
-
-    contact_name: paw_types.optional_truncated_printable_str_type(30)
-    telephone: str | None = None
-    fax: str | None = None
+    # fax: str | None = None
 
     senders_name: paw_types.optional_truncated_printable_str_type(25)
     notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
@@ -138,13 +129,15 @@ def collection_info_from_state(state: CollectionStateProtocol):
 
 
 class RequestedShipmentZero(pf_shared.BasePFType):
-    recipient_contact: Contact
+    recipient_contact: ContactMininmum
     recipient_address: pf_ext.AddressRecipient
-    total_number_of_parcels: int
+    total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
     shipping_date: dt.date
 
 
 class RequestedShipmentMinimum(RequestedShipmentZero):
+    recipient_contact: Contact
+
     contract_number: str
     department_id: int = shipr_types.DepartmentNum
 
