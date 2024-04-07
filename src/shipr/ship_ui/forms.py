@@ -199,7 +199,7 @@ async def ship_fields(state: states.ShipState, manual=False):
         ),
         c.FormFieldInput(
             name='special_instructions',
-            title='Special Delivery/Colelction Instructions',
+            title='Special Delivery/Collection Instructions',
             initial=state.special_instructions,
         ),
         *await contact_fields(state),
