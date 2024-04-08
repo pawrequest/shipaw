@@ -264,6 +264,34 @@ class NotificationType(str, Enum):
     SMS_COLL_REC = 'SMSCOLLRECEIVED'
 
 
+notification_label_map = {
+    NotificationType.EMAIL: 'Email',
+    NotificationType.EMAIL_DOD_INT: 'Email Day of Delivery Interactive',
+    NotificationType.EMAIL_ATTEMPT: 'Email Attempted Delivery',
+    NotificationType.EMAIL_COLL_REC: 'Email Collection Received',
+    NotificationType.EMAIL_START_DEL: 'Email Start of Delivery',
+    NotificationType.DELIVERY: 'Email Delivery',
+    NotificationType.SMS_DOD: 'SMS Day of Despatch',
+    NotificationType.SMS_START_DEL: 'SMS Start of Delivery',
+    NotificationType.SMS_ATTEMPT_DEL: 'SMS Attempted Delivery',
+    NotificationType.SMS_COLL_REC: 'SMS Collection Received',
+}
+
+#
+# notification_label_map = {
+#     'EMAIL': 'Email',
+#     'EMAILDODINT': 'Email Day of Delivery Interactive',
+#     'EMAIL_ATTEMPT': 'Email Attempted Delivery',
+#     'EMAIL_COLL_REC': 'Email Collection Received',
+#     'EMAIL_START_DEL': 'Email Start of Delivery',
+#     'DELIVERY': 'Email Delivery',
+#     'SMS_DOD': 'SMS Day of Despatch',
+#     'SMS_START_DEL': 'SMS Start of Delivery',
+#     'SMS_ATTEMPT_DEL': 'SMS Attempted Delivery',
+#     'SMS_COLL_REC': 'SMS Collection Received',
+# }
+
+
 class CollectionNotificationType(str, Enum):
     EMAIL = 'EMAIL'
     EMAIL_RECIEVED = 'EMAILCOLLRECEIVED'
