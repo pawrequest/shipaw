@@ -13,7 +13,7 @@ from zeep.proxy import ServiceProxy
 
 # from amherst.shipper import shipstate_to_collection
 from . import models, msgs, ship_ui, shipr_types
-from .models import pf_shared, pf_ext
+from .models import pf_shared
 
 SCORER = fuzz.token_sort_ratio
 
@@ -56,10 +56,28 @@ class ELClient(pydantic.BaseModel):
         serv = client.create_service(binding_name=self.config.binding, address=self.config.endpoint)
         return serv
 
-    def backend(self, service_prot: type[ServiceProtocolT]) -> ServiceProxy:
+    def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
+        """Get a Combadge backend for a service protocol.
+
+        Args:
+            service_prot: type[ServiceProtocolT] - service protocol to get backend for
+
+        Returns:
+            ServiceProxy - Zeep Proxy
+
+        """
         return ZeepBackend(self.service)[service_prot]
 
-    def get_shipment_resp(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
+    def shipment_req_to_resp(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
+        """Create a shipment.
+
+        Args:
+            req: .msgs.CreateShipmentRequest - ShipmenmtRequest to book
+
+        Returns:
+            .msgs.CreateShipmentResponse - response from Parcelforce
+
+        """
         back = self.backend(msgs.CreateShipmentService)
         resp = back.createshipment(request=req.model_dump(by_alias=True))
         logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
@@ -67,6 +85,15 @@ class ELClient(pydantic.BaseModel):
         return msgs.CreateShipmentResponse.model_validate(resp)
 
     def get_candidates(self, postcode: str) -> list[models.AddressRecipient]:
+        """Get candidate addresses at a postcode.
+
+        Args:
+            postcode: str - postcode to search for
+
+        Returns:
+            list[.models.AddressRecipient] - list of candidate addresses
+
+        """
         req = msgs.FindRequest(authentication=self.config.auth, paf=models.PAF(postcode=postcode))
         back = self.backend(msgs.FindService)
         response = back.find(request=req.model_dump(by_alias=True))
@@ -77,10 +104,13 @@ class ELClient(pydantic.BaseModel):
     def get_label(self, ship_num, dl_path=None) -> Path:
         """Get the label for a shipment number.
 
-        args:
-            pf_com2: PFCom - PFCom combadge client
-            pf_auth: elt.Authentication - PFCom authentication
+        Args:
             ship_num: str - shipment number
+            dl_path: str - path to download the label to, defaults to './temp_label.pdf'
+
+        Returns:
+            Path - path to the downloaded label
+
         """
         dl_path = dl_path or 'temp_label.pdf'
         back = self.backend(msgs.PrintLabelService)
@@ -108,17 +138,13 @@ class ELClient(pydantic.BaseModel):
         return {add.lines_str: add
                 for add in self.get_candidates(postcode)}
 
-    def create_outbound_request(self, state: ship_ui.ShipState):
+    def state_to_outbound_request(self, state: ship_ui.ShipState):
         ship_req = shipstate_to_outbound(state)
         req = msgs.CreateShipmentRequest(
             authentication=self.config.auth,
             requested_shipment=ship_req
         )
         return req
-
-    # def state_to_response(self, state: ship_ui.ShipState) -> msgs.CreateShipmentResponse:
-    #     req = self.create_outbound_request(state)
-    #     return self.get_shipment_resp(req)
 
 
 def shipstate_to_outbound(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
@@ -132,5 +158,3 @@ def shipstate_to_outbound(state: ship_ui.ShipState) -> models.RequestedShipmentM
         total_number_of_parcels=state.boxes,
         reference_number1=state.reference,
     )
-
-
