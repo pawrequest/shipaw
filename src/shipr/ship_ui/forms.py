@@ -71,7 +71,7 @@ class FullForm(_p.BaseModel):
 def get_services():
     return [
         fastui_forms.SelectOption(value=service.value, label=service.name)
-        for service in pf_shared.ServiceCode
+        for service in pf_shared.ServiceCode2
     ]
 
 
