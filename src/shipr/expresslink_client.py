@@ -11,7 +11,6 @@ from loguru import logger
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-# from amherst.shipper import shipstate_to_collection
 from . import models, msgs, ship_ui, shipr_types
 from .models import pf_shared
 
@@ -38,7 +37,7 @@ class ZeepConfig(pydantic.BaseModel):
 class ELClient(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
     config: ZeepConfig
-    service: zeep.proxy.ServiceProxy
+    service: ServiceProxy
 
     @classmethod
     def from_config(cls, config: ZeepConfig):
