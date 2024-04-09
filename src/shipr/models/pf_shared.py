@@ -15,9 +15,8 @@ from .. import shipr_types
 
 
 def scope_from_env_live() -> shipr_types.ShipperScope:
-    live = os.environ.get('SHIP_LIVE', 'false')
-    scope: shipr_types.ShipperScope = 'LIVE' if live == 'true' else 'SAND'
-    logger.info(f'Using scope: {scope}')
+    live = os.environ.get('SHIP_LIVE', 'false').lower() == 'true'
+    scope: shipr_types.ShipperScope = 'LIVE' if live else 'SAND'
     return scope
 
 
