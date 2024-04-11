@@ -9,7 +9,9 @@ from pawdantic import paw_types
 from shipr import shipr_types
 from shipr.models import pf_shared
 from shipr.ship_ui import states
-from shipr.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # noqa F401
+# from shipr.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # F401
+# todo check the noqa unused imports were not needed?
+from shipr.ship_ui.dynamic import get_addresses, get_dates
 from shipr.shipr_types import VALID_PC
 
 
@@ -27,6 +29,7 @@ class AddressForm(_p.BaseModel):
     town: paw_types.truncated_printable_str_type(30)
     postcode: str
     country: str = 'GB'
+
 
 #
 
