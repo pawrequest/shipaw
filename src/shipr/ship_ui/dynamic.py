@@ -6,13 +6,15 @@ from datetime import date, timedelta
 from enum import Enum, auto
 
 import pydantic as _p
-from fastui import class_name as _class_name, components as c, forms as fastui_forms
+from fastui import class_name as _class_name
+from fastui import components as c
+from fastui import forms as fastui_forms
 from pydantic import BaseModel
 
+import pawdantic.paw_strings
 from pawdantic.paw_strings import date_string
 from pawdantic.pawui import styles
 from shipr.models import pf_ext, pf_shared
-import pawdantic.paw_strings
 
 
 def get_dates() -> list[fastui_forms.SelectOption]:
@@ -40,17 +42,17 @@ DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(14) if
 DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in DATE_RANGE_LIST}
 
 
-def date_range_enum():
-    return Enum(
-        'DateRange',
-        DATE_RANGE_DICT
-    )
-
-
 def make_address_enum(candidates: list[pf_ext.AddressRecipient]):
     return Enum(
         'AddressChoice',
         {f'address {i}': cand.address_line1 for i, cand in enumerate(candidates)}
+    )
+
+
+def date_range_enum():
+    return Enum(
+        'DateRange',
+        DATE_RANGE_DICT
     )
 
 
