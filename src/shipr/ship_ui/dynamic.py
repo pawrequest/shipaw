@@ -16,6 +16,8 @@ from pawdantic.paw_strings import date_string
 from pawdantic.pawui import styles
 from shipr.models import pf_ext, pf_shared
 
+ADVANCE_BOOKING_RANGE = 28
+
 
 def get_dates() -> list[fastui_forms.SelectOption]:
     return [
@@ -37,7 +39,7 @@ def get_addresses(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_form
     ]
 
 
-DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(14) if
+DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(ADVANCE_BOOKING_RANGE) if
                    (date.today() + timedelta(days=i)).weekday() < 5]
 DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in DATE_RANGE_LIST}
 

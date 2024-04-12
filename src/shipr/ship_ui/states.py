@@ -84,7 +84,7 @@ class ShipState(ShipStatePartial):
     service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
-    ship_date: shipr_types.fixed_date_type(14)
+    ship_date: shipr_types.fixed_date_type(28)
     direction: shipr_types.ShipDirection = 'out'
 
 
