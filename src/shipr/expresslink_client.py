@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import os
-from functools import lru_cache
 from pathlib import Path
 
 import pydantic
-import pydantic as _p
 import zeep
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
@@ -13,8 +11,7 @@ from loguru import logger
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from amherst import am_config
-from . import models, msgs, ship_ui, shipr_types
+from . import models, msgs, pf_config, ship_ui
 from .models import pf_shared
 
 SCORER = fuzz.token_sort_ratio
@@ -27,18 +24,8 @@ class ZeepConfig(pydantic.BaseModel):
     endpoint: str
 
     @classmethod
-    def from_env(cls):
-        scope: shipr_types.ShipperScope = pf_shared.scope_from_env_live()
-        return cls(
-            auth=models.Authentication.from_env(),
-            binding=os.environ.get('PF_BINDING'),
-            wsdl=os.environ.get('PF_WSDL'),
-            endpoint=os.environ.get(f'PF_ENDPOINT_{scope}'),
-        )
-
-    @classmethod
-    def from_p_settings(cls, settings: _p.BaseSettings = am_config.AmSettings):
-        sett = settings()
+    def fetch(cls):
+        sett = pf_config.PF_SETTINGS
         return cls(
             auth=models.Authentication(
                 password=sett.pf_expr_pwd,
@@ -46,7 +33,7 @@ class ZeepConfig(pydantic.BaseModel):
             ),
             binding=sett.pf_binding,
             wsdl=sett.pf_wsdl,
-            endpoint=sett.pf_endpoint
+            endpoint=str(sett.pf_endpoint)
         )
 
 
@@ -62,13 +49,14 @@ class ELClient(pydantic.BaseModel):
         return cls(config=config, service=service)
 
     @classmethod
-    @lru_cache(maxsize=1)
-    def from_env(cls):
-        return cls.from_zeep_config(ZeepConfig.from_env())
-
-    @classmethod
-    def from_p_settings(cls, settings: _p.BaseSettings = am_config.AmSettings):
-        return cls.from_zeep_config(ZeepConfig.from_p_settings(settings))
+    def from_pyd(cls, settings=None):
+        sett = settings or pf_config.PF_SETTINGS
+        client = zeep.Client(wsdl=sett.pf_wsdl)
+        service = client.create_service(sett.pf_binding, sett.pf_endpoint)
+        return cls(
+            config=ZeepConfig.fetch(),
+            service=service,
+        )
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.config.wsdl)

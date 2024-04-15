@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import os
 
+import pydantic as _p
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,4 +23,17 @@ class PFSettings(BaseSettings):
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=os.getenv('SHIP_ENV'))
 
 
-pf_settings = PFSettings()
+class PFSandboxSettings(PFSettings):
+    ship_live: bool = False
+
+    @_p.field_validator('ship_live', mode='after')
+    def ship_live_validator(cls, v, values):
+        return False
+
+    @_p.field_validator('pf_endpoint', mode='after')
+    def pf_endpoint_validator(cls, v, values):
+        return 'https://expresslink-test.parcelforce.net/ws/'
+
+
+PF_SETTINGS = PFSettings()
+PF_SANDBOX_SETTINGS = PFSandboxSettings()

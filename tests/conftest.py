@@ -4,38 +4,50 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-from shipr import ZeepConfig, ELClient
+from shipr import ELClient, ZeepConfig, pf_config
+from shipr.models import pf_ext, pf_shared, pf_top
 from shipr.models.pf_shared import ServiceCode
-from shipr.shipr_types import DeliveryKind, DepartmentNum
-from shipr.express.pf_shipment import RequestedShipmentMinimum
-from shipr.express.pf_types import AddressPF, ContactPF, Authentication
+from shipr.shipr_types import DepartmentNum
 
-ENV_FILE = r"../../amherst/.env"
+ENV_FILE = r'../../amherst/.env'
 load_dotenv(ENV_FILE)
-CONTRACT_NO = os.environ.get("PF_CONT_NUM_1")
+CONTRACT_NO = os.environ.get('PF_CONT_NUM_1')
 ...
 
 
 @pytest.fixture
-def pf_auth():
-    auth = {"user_name": os.getenv("PF_EXPR_SAND_USR"), "password": os.getenv("PF_EXPR_SAND_PWD")}
-    pfauth = Authentication.model_validate(auth)
+def sett():
+    return pf_config.PF_SANDBOX_SETTINGS
+
+
+# @pytest.fixture
+# def pf_auth(sett):
+#     auth = {'user_name': os.getenv('PF_EXPR_SAND_USR'), 'password': os.getenv('PF_EXPR_SAND_PWD')}
+#     pfauth = pf_shared.Authentication.model_validate(auth)
+#     return pfauth
+
+
+@pytest.fixture
+def pf_auth(sett):
+    pfauth = pf_shared.Authentication.model_validate(
+        {'user_name': sett.pf_expr_usr, 'password': sett.pf_expr_pwd}
+    )
     return pfauth
 
 
 @pytest.fixture
-def zconfig(pf_auth):
-    pf_auth = Authentication.model_validate(pf_auth)
-    wsdl = os.environ.get("PF_WSDL")
-    binding = os.environ.get("PF_BINDING")
-    ep = os.environ.get("PF_ENDPOINT_SAND")
+def zconfig(sett: pf_config.PFSandboxSettings):
+    pf_auth = pf_shared.Authentication.model_validate(sett.config.auth.model_dump())
+    wsdl = os.environ.get('PF_WSDL')
+    binding = os.environ.get('PF_BINDING')
+    ep = os.environ.get('PF_ENDPOINT_SAND')
     conf = ZeepConfig(binding=binding, wsdl=wsdl, auth=pf_auth, endpoint=ep)
     return conf
 
 
 @pytest.fixture
-def pf_com(zconfig):
-    return ELClient.from_zeep_config(zconfig)
+def pf_com(sett):
+    return ELClient.from_pyd(sett)
 
 
 @pytest.fixture
@@ -44,31 +56,31 @@ def service(pf_com):
 
 
 @pytest.fixture
-def address_r() -> AddressPF:
-    return AddressPF(
-        address_line1="30 Bennet Close",
-        town="East Wickham",
-        postcode="DA16 3HU",
+def address_r() -> pf_ext.AddressRecipient:
+    return pf_ext.AddressRecipient(
+        address_line1='30 Bennet Close',
+        town='East Wickham',
+        postcode='DA16 3HU',
     )
 
 
 @pytest.fixture
-def contact_r() -> ContactPF:
-    return ContactPF(
-        business_name="Test Business",
-        email_address="notreal@fake.com",
-        mobile_phone="1234567890",
+def contact_r() -> pf_top.Contact:
+    return pf_top.Contact(
+        business_name='Test Business',
+        email_address='notreal@fake.com',
+        mobile_phone='1234567890',
     )
 
 
 @pytest.fixture
-def min_shipment_r(address_r, contact_r) -> RequestedShipmentMinimum:
-    return RequestedShipmentMinimum(
-        department_id=DepartmentNum.MAIN,
-        shipment_type=DeliveryKind.DELIVERY,
-        contract_number=CONTRACT_NO,
+def min_shipment_r(address_r, contact_r, sett) -> pf_top.RequestedShipmentMinimum:
+    return pf_top.RequestedShipmentMinimum(
+        department_id=DepartmentNum,
+        shipment_type='DELIVERY',
+        contract_number=sett.pf_contract_num_1,
         service_code=ServiceCode.EXPRESS24,
-        shipping_date=datetime.date(2024, 2, 21),
+        shipping_date=datetime.date.today() + datetime.timedelta(days=1),
         recipient_contact=contact_r,
         recipient_address=address_r,
         total_number_of_parcels=1,
