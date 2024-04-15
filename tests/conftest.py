@@ -35,7 +35,7 @@ def zconfig(pf_auth):
 
 @pytest.fixture
 def pf_com(zconfig):
-    return ELClient.from_config(zconfig)
+    return ELClient.from_zeep_config(zconfig)
 
 
 @pytest.fixture

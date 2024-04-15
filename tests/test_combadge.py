@@ -20,7 +20,7 @@ load_dotenv(ENV_FILE)
 
 
 def test_find_paf(zconfig):
-    pfc = PFCom.from_config(zconfig)
+    pfc = PFCom.from_zeep_config(zconfig)
     service = ZeepBackend(pfc.service)[FindService]
     paf = PAF(postcode='NW6 4TE')
     req = FindRequest(authentication=zconfig.auth, paf=paf)
