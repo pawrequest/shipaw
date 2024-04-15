@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -16,7 +15,7 @@ class PFSettings(BaseSettings):
 
     pf_wsdl: str
     pf_binding: str = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
-    pf_endpoint: Path = 'https://expresslink-test.parcelforce.net/ws/'
+    pf_endpoint: str
 
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=os.getenv('SHIP_ENV'))
 
