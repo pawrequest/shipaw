@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import os
+from functools import lru_cache
 from pathlib import Path
 
 import pydantic
+import pydantic as _p
 import zeep
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
@@ -11,6 +13,7 @@ from loguru import logger
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
+from amherst import am_config
 from . import models, msgs, ship_ui, shipr_types
 from .models import pf_shared
 
@@ -33,6 +36,19 @@ class ZeepConfig(pydantic.BaseModel):
             endpoint=os.environ.get(f'PF_ENDPOINT_{scope}'),
         )
 
+    @classmethod
+    def from_p_settings(cls, settings: _p.BaseSettings = am_config.AmSettings):
+        sett = settings()
+        return cls(
+            auth=models.Authentication(
+                password=sett.pf_expr_pwd,
+                user_name=sett.pf_expr_usr
+            ),
+            binding=sett.pf_binding,
+            wsdl=sett.pf_wsdl,
+            endpoint=sett.pf_endpoint
+        )
+
 
 class ELClient(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
@@ -40,15 +56,19 @@ class ELClient(pydantic.BaseModel):
     service: ServiceProxy
 
     @classmethod
-    def from_config(cls, config: ZeepConfig):
+    def from_zeep_config(cls, config: ZeepConfig):
         client = zeep.Client(wsdl=config.wsdl)
         service = client.create_service(config.binding, config.endpoint)
         return cls(config=config, service=service)
 
     @classmethod
-    # @lru_cache(maxsize=1)
+    @lru_cache(maxsize=1)
     def from_env(cls):
-        return cls.from_config(ZeepConfig.from_env())
+        return cls.from_zeep_config(ZeepConfig.from_env())
+
+    @classmethod
+    def from_p_settings(cls, settings: _p.BaseSettings = am_config.AmSettings):
+        return cls.from_zeep_config(ZeepConfig.from_p_settings(settings))
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.config.wsdl)
