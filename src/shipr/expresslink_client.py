@@ -155,9 +155,9 @@ class ELClient(pydantic.BaseModel):
 
 
 def shipstate_to_outbound(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
-    # add = elt.AddressRecipientPF.model_validate(state.address)
+    sett = pf_config.PF_SETTINGS
     return models.RequestedShipmentMinimum(
-        contract_number=os.environ['PF_CONT_NUM_1'],
+        contract_number=sett.pf_contract_num_1,
         service_code=pf_shared.ServiceCode.EXPRESS24,
         shipping_date=state.ship_date,
         recipient_contact=state.contact,
