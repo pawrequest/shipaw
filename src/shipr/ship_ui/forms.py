@@ -196,14 +196,14 @@ async def ship_fields(state: states.ShipState, manual=False):
             initial=state.service,
         ),
         c.FormFieldInput(
-            name='reference',
-            title='Reference on Label',
-            initial=state.reference,
+            name='special_instructions',
+            title='Big "Special Instructions" middle of label',
+            initial=state.special_instructions,
         ),
         c.FormFieldInput(
-            name='special_instructions',
-            title='Special Delivery/Collection Instructions',
-            initial=state.special_instructions,
+            name='reference',
+            title='Small "Reference" bottom corner of label',
+            initial=state.reference,
         ),
         *await contact_fields(state),
     ]
