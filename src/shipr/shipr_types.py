@@ -95,7 +95,7 @@ def validate_uk_postcode(v: str):
 
 def is_valid_postcode(s):
     pattern = re.compile(r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})')
-    return bool(re.match(pattern, s))
+    return bool(re.match(pattern, s.upper()))
 
 
 ValidPostcode = _t.Annotated[
