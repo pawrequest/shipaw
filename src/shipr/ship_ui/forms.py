@@ -227,29 +227,11 @@ async def address_select(state):
     return c.FormFieldSelect(
         name='address',
         options=get_addresses(state.candidates),
-        title='Address From Postcode',
+        title='Select Address',
         required=True,
         # initial='',
         # initial=state.address.model_dump(),
         initial=state.address.model_dump_json(),
-        # placeholder=state.address.address_line1,
-
-        class_name='row'
-    )
-
-
-async def address_select2(state):
-    return c.FormFieldSelect(
-        name='address',
-        options=[
-            {'value': 'val1', 'label': 'label1'},
-            {'value': 'val2', 'label': 'label2'},
-            {'value': 'val3', 'label': 'label3'},
-        ],
-        title='Address From Postcode',
-        initial='val1',
-        # initial=state.address.model_dump(),
-        # initial=state.address.model_dump_json(),
         # placeholder=state.address.address_line1,
 
         class_name='row'
