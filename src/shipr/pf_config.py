@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 import pydantic as _p
+from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,3 +38,7 @@ class PFSandboxSettings(PFSettings):
 
 PF_SETTINGS = PFSettings()
 PF_SANDBOX_SETTINGS = PFSandboxSettings()
+logger.info(f'SHIP_LIVE is {PF_SETTINGS.ship_live}')
+logger.info(f'PF_ENDPOINT is {PF_SETTINGS.pf_endpoint}')
+if 'test' not in PF_SETTINGS.pf_endpoint:
+    logger.warning('USING PROD ENDPOINT')
