@@ -11,6 +11,7 @@ dependencies = [
     'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
     'suppawt @ git+https://github.com/pawrequest/suppawt',
     'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+    'fastui',
     'fastapi',
     'sqlmodel',
     "aiohttp",
@@ -19,7 +20,7 @@ dependencies = [
     'loguru',
     'python-multipart',
     'pydantic-extra-types',
-    'pydantic_settings',
+    'pydantic-settings',
 ]
 
 [project.optional-dependencies]
