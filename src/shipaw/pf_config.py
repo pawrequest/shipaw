@@ -8,6 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class PFSettings(BaseSettings):
+    """Load Parcelforce ExpressLink configuration from environment variables.
+
+    location of environment file is set by the environment variable SHIP_ENV.
+    """
     pf_ac_num_1: str
     pf_contract_num_1: str
     pf_ac_num_2: str | None
