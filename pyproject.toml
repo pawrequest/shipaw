@@ -3,7 +3,7 @@ name = "shipaw"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
-    { name = "Paul-Sees-Solutions", email = "79617825+Paul-Sees-Solutions@users.noreply.github.com" }
+    { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -41,7 +41,13 @@ dev-dependencies = [
     "datamodel-code-generator",
     "pytest",
     "pytest-asyncio",
-    "pyinstaller",
+    'autodoc_pydantic',
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "myst-parser",
+    "sphinx-readme",
+    "sphinx_rtd_dark_mode",
 ]
 
 [tool.hatch.metadata]
