@@ -6,6 +6,8 @@ import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+SHIP_ENV = os.getenv('SHIP_ENV')
+
 
 class PFSettings(BaseSettings):
     """Load Parcelforce ExpressLink configuration from environment variables.
@@ -25,7 +27,7 @@ class PFSettings(BaseSettings):
     pf_binding: str = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     pf_endpoint: str
 
-    model_config = SettingsConfigDict(env_ignore_empty=True, env_file=os.getenv('SHIP_ENV'))
+    model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
 
 
 class PFSandboxSettings(PFSettings):
@@ -33,13 +35,18 @@ class PFSandboxSettings(PFSettings):
 
     @_p.field_validator('ship_live', mode='after')
     def ship_live_validator(cls, v, values):
-        return False
+        if v:
+            raise ValueError('ship_live must be False for sandbox')
+        return v
 
     @_p.field_validator('pf_endpoint', mode='after')
     def pf_endpoint_validator(cls, v, values):
-        return 'https://expresslink-test.parcelforce.net/ws/'
+        if v != 'https://expresslink-test.parcelforce.net/ws/':
+            raise ValueError('pf_endpoint must be https://expresslink-test.parcelforce.net/ws/')
+        return v
 
 
+logger.info(f'SHIP_ENV is {SHIP_ENV}')
 PF_SETTINGS = PFSettings()
 PF_SANDBOX_SETTINGS = PFSandboxSettings()
 logger.info(f'SHIP_LIVE is {PF_SETTINGS.ship_live}')

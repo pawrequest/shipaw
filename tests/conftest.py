@@ -31,23 +31,19 @@ def pf_auth(sett):
 
 
 @pytest.fixture
-def zconfig(sett: pf_config.PFSandboxSettings):
-    pf_auth = pf_shared.Authentication.model_validate(sett.config.auth.model_dump())
-    wsdl = os.environ.get('PF_WSDL')
-    binding = os.environ.get('PF_BINDING')
-    ep = os.environ.get('PF_ENDPOINT_SAND')
-    conf = ZeepConfig(binding=binding, wsdl=wsdl, auth=pf_auth, endpoint=ep)
+def zconfig(sett: pf_config.PFSandboxSettings, pf_auth):
+    conf = ZeepConfig(binding=sett.pf_binding, wsdl=sett.pf_wsdl, auth=pf_auth, endpoint=sett.pf_endpoint)
     return conf
 
 
 @pytest.fixture
-def pf_com(sett):
-    return ELClient.from_pyd(sett)
+def el_client():
+    return ELClient.from_pyd(prod=False)
 
 
 @pytest.fixture
-def service(pf_com):
-    return pf_com.new_service()
+def service(el_client):
+    return el_client.new_service()
 
 
 @pytest.fixture

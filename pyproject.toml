@@ -27,7 +27,13 @@ dev = [
     "datamodel-code-generator",
     "pytest",
     "pytest-asyncio",
-    "pyinstaller",
+    'autodoc_pydantic',
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "myst-parser",
+    "sphinx-readme",
+    "sphinx_rtd_dark_mode",
 ]
 
 

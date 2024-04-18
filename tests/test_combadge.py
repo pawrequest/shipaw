@@ -1,13 +1,10 @@
 import pytest
 from combadge.support.zeep.backends.sync import ZeepBackend
 
-from shipaw import ELClient, msgs
+from shipaw import ELClient, msgs, pf_config
 from shipaw.models import PAF, pf_ext
 
 
-@pytest.fixture
-def el_client():
-    yield ELClient.from_pyd()
 
 def test_find_paf(el_client):
 
