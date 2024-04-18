@@ -48,7 +48,8 @@ class ELClient(pydantic.BaseModel):
         return cls(config=config, service=service)
 
     @classmethod
-    def from_pyd(cls, settings=pf_config.PF_SANDBOX_SETTINGS):
+    def from_pyd(cls):
+        settings = pf_config.PF_SETTINGS
         client = zeep.Client(wsdl=settings.pf_wsdl)
         service = client.create_service(settings.pf_binding, settings.pf_endpoint)
         return cls(
