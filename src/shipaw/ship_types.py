@@ -11,6 +11,7 @@ import pydantic as _p
 import sqlalchemy as sqa
 from loguru import logger
 
+FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # noqa: UP040 fastui not support
 
 def shipable_date(v: date, delta_days=7) -> _t.Literal['TRUE', 'HIGH', 'LOW', 'WK_END']:
     if v:

@@ -4,8 +4,8 @@ from enum import Enum
 
 import pydantic as _p
 from fastui import components as c, forms as fastui_forms
-
 from pawdantic import paw_types
+
 from shipaw import ship_types
 from shipaw.models import pf_shared
 from shipaw.ship_ui import states
@@ -221,6 +221,14 @@ async def ship_fields_manual(state: states.ShipState):
         *await ship_fields(state),
         *await address_fields(state),
     ]
+
+
+async def get_form_fields(kind:FormKind, state):
+    if kind == 'manual':
+        return await ship_fields_manual(state)
+    if kind == 'select':
+        return await ship_fields_select(state)
+    raise ValueError(f'Invalid kind {kind!r}')
 
 
 async def address_select(state):
