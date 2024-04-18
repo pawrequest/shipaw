@@ -6,13 +6,13 @@ import pydantic as _p
 from fastui import components as c, forms as fastui_forms
 
 from pawdantic import paw_types
-from shipr import shipr_types
-from shipr.models import pf_shared
-from shipr.ship_ui import states
-# from shipr.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # F401
+from shipaw import shipaw_types
+from shipaw.models import pf_shared
+from shipaw.ship_ui import states
+# from shipaw.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # F401
 # todo check the noqa unused imports were not needed?
-from shipr.ship_ui.dynamic import get_addresses, get_dates
-from shipr.shipr_types import VALID_PC
+from shipaw.ship_ui.dynamic import get_addresses, get_dates
+from shipaw.shipaw_types import VALID_PC
 
 
 class ContactForm(_p.BaseModel):
@@ -53,7 +53,7 @@ class DirectionEnum(str, Enum):
 
 
 class FullForm(_p.BaseModel):
-    ship_date: shipr_types.fixed_date_type(7)
+    ship_date: shipaw_types.fixed_date_type(7)
     # ship_date: adate
     boxes: int
     direction: DirectionEnum = DirectionEnum.out

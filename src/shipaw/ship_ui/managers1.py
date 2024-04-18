@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import sqlmodel as sqm
 
-import shipr.shipr_types
+import shipaw.shipaw_types
 from pawdantic.pawui import states
 
 class BaseManager(sqm.SQLModel):
     state: states.BaseUIState = sqm.Field(sa_column=sqm.Column(
-        shipr.types.GenericJSONType(states.BaseUIState)))
+        shipaw.types.GenericJSONType(states.BaseUIState)))
 
 
 class BaseManagerDB(BaseManager):

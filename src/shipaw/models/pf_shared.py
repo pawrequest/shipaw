@@ -11,12 +11,12 @@ import pydantic as _p
 from loguru import logger
 from pydantic.alias_generators import to_pascal
 
-from .. import shipr_types
+from .. import shipaw_types
 
 
-def scope_from_env_live() -> shipr_types.ShipperScope:
+def scope_from_env_live() -> shipaw_types.ShipperScope:
     live = os.environ.get('SHIP_LIVE', 'false').lower() == 'true'
-    scope: shipr_types.ShipperScope = 'LIVE' if live else 'SAND'
+    scope: shipaw_types.ShipperScope = 'LIVE' if live else 'SAND'
     return scope
 
 
@@ -247,7 +247,7 @@ class Enhancement(BasePFType):
 class Alert(BasePFType):
     code: int
     message: str
-    type: shipr_types.AlertType
+    type: shipaw_types.AlertType
 
 
 class NotificationType(str, Enum):

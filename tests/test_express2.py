@@ -2,14 +2,14 @@ import os
 
 import pytest
 
-import shipr.expresslink_specs
-import shipr.shipr_types
-from shipr import expresslink2 as pf, expresslink_specs2 as pf_specs
+import shipaw.expresslink_specs
+import shipaw.shipaw_types
+from shipaw import expresslink2 as pf, expresslink_specs2 as pf_specs
 
 
 @pytest.fixture
 def pf_endpoint():
-    return shipr.expresslink_specs.PFEndPointSpec.ship()
+    return shipaw.expresslink_specs.PFEndPointSpec.ship()
 
 
 @pytest.fixture

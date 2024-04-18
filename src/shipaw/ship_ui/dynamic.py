@@ -14,7 +14,7 @@ from pydantic import BaseModel
 import pawdantic.paw_strings
 from pawdantic.paw_strings import date_string
 from pawdantic.pawui import styles
-from shipr.models import pf_ext, pf_shared
+from shipaw.models import pf_ext, pf_shared
 
 ADVANCE_BOOKING_RANGE = 28
 

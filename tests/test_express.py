@@ -18,7 +18,7 @@
 #
 #
 # def test_get_service(pf_client):
-#     serv = pf_client.get_service(shipr.expresslink_specs.PFEndPointSpec.sandbox())
+#     serv = pf_client.get_service(shipaw.expresslink_specs.PFEndPointSpec.sandbox())
 #     assert isinstance(serv, ServiceProxy)
 #
 #

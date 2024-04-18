@@ -8,21 +8,21 @@ import pydantic as pyd
 import sqlmodel as sqm
 
 from pawdantic.pawui import states as ui_states
-from shipr.models import pf_ext, pf_shared, pf_top
-from shipr.shipr_types import ShipDirection
-from .. import msgs, shipr_types
+from shipaw.models import pf_ext, pf_shared, pf_top
+from shipaw.shipaw_types import ShipDirection
+from .. import msgs, shipaw_types
 
 BookingReqSQM = _t.Annotated[
     msgs.CreateShipmentRequest, sqm.Field(
         sa_column=sqm.Column(
-            shipr_types.GenericJSONType(msgs.CreateShipmentRequest)
+            shipaw_types.GenericJSONType(msgs.CreateShipmentRequest)
         )
     )
 ]
 BookingRespSQM = _t.Annotated[
     msgs.CreateShipmentResponse, sqm.Field(
         sa_column=sqm.Column(
-            shipr_types.GenericJSONType(msgs.CreateShipmentResponse)
+            shipaw_types.GenericJSONType(msgs.CreateShipmentResponse)
         )
     )
 ]
@@ -46,7 +46,7 @@ class BookingState(ui_states.BaseUIState):
     # def state_alerts(self) -> list:
     #     return self.response.alerts.alert if self.response.alerts else []
     # 
-    # def alert_dict(self) -> dict[str, shipr.types.AlertType]:
+    # def alert_dict(self) -> dict[str, shipaw.types.AlertType]:
     #     return {a.message: a.type for a in self.state_alerts()}
 
     @property
@@ -59,7 +59,7 @@ class ShipStatePartial(ui_states.BaseUIState):
 
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
-    ship_date: shipr_types.fixed_date_type(14) | None = None
+    ship_date: shipaw_types.fixed_date_type(14) | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
@@ -84,8 +84,8 @@ class ShipState(ShipStatePartial):
     service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
-    ship_date: shipr_types.fixed_date_type(28)
-    direction: shipr_types.ShipDirection = 'out'
+    ship_date: shipaw_types.fixed_date_type(28)
+    direction: shipaw_types.ShipDirection = 'out'
 
 
 def response_alert_dict(response):

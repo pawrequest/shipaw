@@ -4,7 +4,7 @@ import typing as _t
 import pydantic as _p
 
 from pawdantic import paw_types
-from .. import shipr_types
+from .. import shipaw_types
 from . import pf_ext, pf_lists, pf_shared
 
 
@@ -139,9 +139,9 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     recipient_contact: Contact
 
     contract_number: str
-    department_id: int = shipr_types.DepartmentNum
+    department_id: int = shipaw_types.DepartmentNum
 
-    shipment_type: shipr_types.DeliveryKind = 'DELIVERY'
+    shipment_type: shipaw_types.DeliveryKind = 'DELIVERY'
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     reference_number1: paw_types.optional_truncated_printable_str_type(
         24
@@ -155,7 +155,7 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
 
 
 class CollectionMinimum(RequestedShipmentMinimum):
-    shipment_type: shipr_types.DeliveryKind = 'COLLECTION'
+    shipment_type: shipaw_types.DeliveryKind = 'COLLECTION'
     print_own_label: bool = True
     collection_info: CollectionInfo
 
@@ -215,7 +215,7 @@ class InternationalInfo(pf_shared.BasePFType):
 class RequestedShipmentComplex(RequestedShipmentSimple):
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
-    drop_off_ind: shipr_types.DropOffInd | None = None
+    drop_off_ind: shipaw_types.DropOffInd | None = None
     exchange_instructions1: _p.constr(max_length=25) | None = None
     exchange_instructions2: _p.constr(max_length=25) | None = None
     exchange_instructions3: _p.constr(max_length=25) | None = None
