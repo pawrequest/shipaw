@@ -1,7 +1,7 @@
 import pydantic as pyd
 from loguru import logger
 
-from .. import shipaw_types
+from .. import ship_types
 from ..models import pf_ext, pf_lists, pf_shared, pf_top
 
 
@@ -89,7 +89,7 @@ class PrintLabelRequest(BaseRequest):
     shipment_number: str
     print_format: str | None = None
     barcode_format: str | None = None
-    print_type: shipaw_types.PrintType = 'ALL_PARCELS'
+    print_type: ship_types.PrintType = 'ALL_PARCELS'
 
 
 class PrintLabelResponse(BaseResponse):

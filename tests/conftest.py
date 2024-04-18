@@ -2,17 +2,12 @@ import datetime
 import os
 
 import pytest
-from dotenv import load_dotenv
 
 from shipaw import ELClient, ZeepConfig, pf_config
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.models.pf_shared import ServiceCode
-from shipaw.shipaw_types import DepartmentNum
+from shipaw.ship_types import DepartmentNum
 
-ENV_FILE = r'../../amherst/.env'
-load_dotenv(ENV_FILE)
-CONTRACT_NO = os.environ.get('PF_CONT_NUM_1')
-...
 
 
 @pytest.fixture

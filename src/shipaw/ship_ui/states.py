@@ -9,20 +9,20 @@ import sqlmodel as sqm
 
 from pawdantic.pawui import states as ui_states
 from shipaw.models import pf_ext, pf_shared, pf_top
-from shipaw.shipaw_types import ShipDirection
-from .. import msgs, shipaw_types
+from shipaw.ship_types import ShipDirection
+from .. import msgs, ship_types
 
 BookingReqSQM = _t.Annotated[
     msgs.CreateShipmentRequest, sqm.Field(
         sa_column=sqm.Column(
-            shipaw_types.GenericJSONType(msgs.CreateShipmentRequest)
+            ship_types.GenericJSONType(msgs.CreateShipmentRequest)
         )
     )
 ]
 BookingRespSQM = _t.Annotated[
     msgs.CreateShipmentResponse, sqm.Field(
         sa_column=sqm.Column(
-            shipaw_types.GenericJSONType(msgs.CreateShipmentResponse)
+            ship_types.GenericJSONType(msgs.CreateShipmentResponse)
         )
     )
 ]
@@ -59,7 +59,7 @@ class ShipStatePartial(ui_states.BaseUIState):
 
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
-    ship_date: shipaw_types.fixed_date_type(14) | None = None
+    ship_date: ship_types.fixed_date_type(14) | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
@@ -84,8 +84,8 @@ class ShipState(ShipStatePartial):
     service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
-    ship_date: shipaw_types.fixed_date_type(28)
-    direction: shipaw_types.ShipDirection = 'out'
+    ship_date: ship_types.fixed_date_type(28)
+    direction: ship_types.ShipDirection = 'out'
 
 
 def response_alert_dict(response):

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pydantic
@@ -49,10 +48,9 @@ class ELClient(pydantic.BaseModel):
         return cls(config=config, service=service)
 
     @classmethod
-    def from_pyd(cls, settings=None):
-        sett = settings or pf_config.PF_SETTINGS
-        client = zeep.Client(wsdl=sett.pf_wsdl)
-        service = client.create_service(sett.pf_binding, sett.pf_endpoint)
+    def from_pyd(cls, settings=pf_config.PF_SANDBOX_SETTINGS):
+        client = zeep.Client(wsdl=settings.pf_wsdl)
+        service = client.create_service(settings.pf_binding, settings.pf_endpoint)
         return cls(
             config=ZeepConfig.fetch(),
             service=service,

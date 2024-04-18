@@ -9,10 +9,8 @@ readme = "README.md"
 requires-python = ">= 3.10"
 dependencies = [
     'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
-
-#    'flaskwebgui',
-    "suppawt",
-    'pawdantic',
+    'suppawt @ git+https://github.com/pawrequest/suppawt',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
     'fastapi',
     'sqlmodel',
     "aiohttp",
@@ -30,11 +28,6 @@ dev = [
     "pytest-asyncio",
     "pyinstaller",
 ]
-paw-git = [
-    'flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui',
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
-    'suppawt @ git+https://github.com/pawrequest/suppawt',
-]
 
 
 [build-system]
@@ -42,7 +35,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.rye]
-managed = true
+managed = false
 dev-dependencies = [
     "datamodel-code-generator",
     "pytest",

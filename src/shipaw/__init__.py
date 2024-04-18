@@ -1,6 +1,6 @@
-from shipaw.shipaw_types import ExpressLinkError
+from shipaw.ship_types import ExpressLinkError
 
-from . import models, shipaw_types
+from . import models
 from .expresslink_client import ELClient, ZeepConfig
 from .ship_ui import (
     # BookingManager,
@@ -20,7 +20,7 @@ __all__ = models.__all__ + [
     'ShipStatePartial',
     'ShipState',
     'BookingState',
-    'shipaw_types',
+    'ship_types',
     'ExpressLinkError',
 
 ]

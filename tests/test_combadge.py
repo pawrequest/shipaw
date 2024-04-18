@@ -1,11 +1,7 @@
 from combadge.support.zeep.backends.sync import ZeepBackend
-from dotenv import load_dotenv
 
 from shipaw import ELClient, msgs
 from shipaw.models import PAF, pf_ext
-
-ENV_FILE = r'R:\paul_r\.internal\envs\sandbox.env'
-load_dotenv(ENV_FILE)
 
 
 def test_find_paf():
