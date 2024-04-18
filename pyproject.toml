@@ -19,6 +19,7 @@ dependencies = [
     'loguru',
     'python-multipart',
     'pydantic-extra-types',
+    'pydantic_settings',
 ]
 
 [project.optional-dependencies]
