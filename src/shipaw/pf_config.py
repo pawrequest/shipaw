@@ -7,11 +7,13 @@ from pathlib import Path
 import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from shipaw.models import pf_shared
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
     raise ValueError('SHIP_ENV not set')
+
 
 class PFSettings(BaseSettings):
     """Load Parcelforce ExpressLink configuration from environment variables.
