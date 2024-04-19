@@ -104,7 +104,8 @@ class ELClient(pydantic.BaseModel):
             Path - path to the downloaded label
 
         """
-        dl_path = dl_path or "temp_label.pdf"
+        sett = pf_config.PF_SETTINGS
+        dl_path = dl_path or sett.label_dir / "temp_label.pdf"
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
