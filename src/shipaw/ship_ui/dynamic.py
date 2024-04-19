@@ -2,21 +2,25 @@ from __future__ import annotations
 
 import typing as _t
 from abc import ABC
-from datetime import date, timedelta
 from enum import Enum, auto
 
 import pydantic as _p
-from fastui import class_name as _class_name
-from fastui import components as c
-from fastui import forms as fastui_forms
+from fastui import class_name as _class_name, components as c, forms as fastui_forms
 from pydantic import BaseModel
-
 import pawdantic.paw_strings
 from pawdantic.paw_strings import date_string
 from pawdantic.pawui import styles
+
 from shipaw.models import pf_ext, pf_shared
+from shipaw.ship_types import WEEKDAYS_IN_RANGE
 
 ADVANCE_BOOKING_RANGE = 28
+#
+DATE_RANGE_LIST = WEEKDAYS_IN_RANGE
+# DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(ADVANCE_BOOKING_RANGE) if
+#                    (date.today() + timedelta(days=i)).weekday() < 5]
+# DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in DATE_RANGE_LIST}
+DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in WEEKDAYS_IN_RANGE}
 
 
 def get_dates() -> list[fastui_forms.SelectOption]:
@@ -39,9 +43,6 @@ def get_addresses(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_form
     ]
 
 
-DATE_RANGE_LIST = [date.today() + timedelta(days=i) for i in range(ADVANCE_BOOKING_RANGE) if
-                   (date.today() + timedelta(days=i)).weekday() < 5]
-DATE_RANGE_DICT = {d.isoformat(): date_string(d) for d in DATE_RANGE_LIST}
 
 
 def make_address_enum(candidates: list[pf_ext.AddressRecipient]):

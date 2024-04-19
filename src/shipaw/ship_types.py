@@ -22,8 +22,17 @@ DepartmentNum = 1
 TOD = date.today()
 SHIPPING_CUTOFF = datetime.time(17, 0)
 ADVANCE_BOOKING_DAYS = 28
-WEEKDAYS_IN_RANGE = [TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
-                     (TOD + timedelta(days=i)).weekday() < 5]
+AVAILABLE_DATES = []
+
+for i in range(ADVANCE_BOOKING_DAYS):
+    if (TOD + timedelta(days=i)).weekday() < 5:
+        if i == 0 and datetime.datetime.now().time() > SHIPPING_CUTOFF:
+            continue
+        AVAILABLE_DATES.append(TOD + timedelta(days=i))
+
+WEEKDAYS_IN_RANGE = AVAILABLE_DATES
+# WEEKDAYS_IN_RANGE = [TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
+#                      (TOD + timedelta(days=i)).weekday() < 5]
 
 POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
 VALID_PC = _t.Annotated[
@@ -43,14 +52,22 @@ def limit_daterange_no_weekends(v: date) -> date:
             if v < TOD:
                 logger.info(f'Date {v} is in the past - using today')
                 v = TOD
-            if v > max(WEEKDAYS_IN_RANGE):
-                logger.info(f'Date {v} is too far in the future - using latest available)')
-                v = max(WEEKDAYS_IN_RANGE)
+
             if v == TOD and datetime.datetime.now().time() > SHIPPING_CUTOFF:
                 logger.warning('Current time is past shipping cutoff - using next available date')
                 v = v + timedelta(days=1)
-            if v.weekday() > 5:
-                v = v - timedelta(days=7 - v.weekday())
+
+            if v > max(WEEKDAYS_IN_RANGE):
+                logger.info(f'Date {v} is too far in the future - using latest available)')
+                v = max(WEEKDAYS_IN_RANGE)
+
+            if v.weekday() > 4:
+                logger.info(f'Date {v} is a weekend - adjusting to previous Friday')
+                v = v - timedelta(days=6 - v.weekday())
+                if v < TOD or datetime.datetime.now().time() > SHIPPING_CUTOFF:
+                    logger.info(f'Date {v} is in the past - adding 3 days')
+                    v = v + timedelta(days=3)
+
             return v
 
 

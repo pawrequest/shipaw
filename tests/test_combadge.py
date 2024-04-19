@@ -1,13 +1,10 @@
-import pytest
 from combadge.support.zeep.backends.sync import ZeepBackend
 
-from shipaw import ELClient, msgs, pf_config
+from shipaw import msgs
 from shipaw.models import PAF, pf_ext
 
 
-
 def test_find_paf(el_client):
-
     service = ZeepBackend(el_client.service)[msgs.FindService]
     paf = PAF(postcode='NW6 4TE')
     req = msgs.FindRequest(authentication=el_client.settings.auth, paf=paf)
