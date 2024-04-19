@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import os
+from pathlib import Path
 
 import pydantic as _p
 from loguru import logger
@@ -28,6 +29,8 @@ class PFSettings(BaseSettings):
     pf_wsdl: str
     pf_binding: str = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     pf_endpoint: str
+
+    label_dir: Path
 
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
 

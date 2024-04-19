@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime as dt
 import enum
-import os
 import typing as _t
 from enum import Enum
 from pathlib import Path
@@ -12,12 +11,6 @@ from loguru import logger
 from pydantic.alias_generators import to_pascal
 
 from .. import ship_types
-
-
-def scope_from_env_live() -> ship_types.ShipperScope:
-    live = os.environ.get('SHIP_LIVE', 'false').lower() == 'true'
-    scope: ship_types.ShipperScope = 'LIVE' if live else 'SAND'
-    return scope
 
 
 # Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
@@ -111,14 +104,6 @@ class BasePFType(_p.BaseModel):
 class Authentication(BasePFType):
     user_name: _t.Annotated[str, _p.StringConstraints(max_length=80)]
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
-
-    @classmethod
-    def from_env(cls):
-        scope = scope_from_env_live()
-        logger.info(f'Getting auth for {scope}')
-        username = os.getenv(f'PF_EXPR_{scope}_USR')
-        password = os.getenv(f'PF_EXPR_{scope}_PWD')
-        return cls(user_name=username, password=password)
 
 
 class DayHours(BasePFType):
@@ -275,6 +260,7 @@ notification_label_map = {
     NotificationType.SMS_ATTEMPT_DEL: 'SMS Attempted Delivery',
     NotificationType.SMS_COLL_REC: 'SMS Collection Received',
 }
+
 
 #
 # notification_label_map = {

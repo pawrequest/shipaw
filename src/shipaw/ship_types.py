@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import functools
 import re
 import typing as _t
 from datetime import date, timedelta
@@ -12,99 +11,53 @@ import sqlalchemy as sqa
 from loguru import logger
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # noqa: UP040 fastui not support
+ShipperScope = _t.Literal['SAND', 'LIVE']
+ShipDirection = _t.Literal['in', 'out']
 
-def shipable_date(v: date, delta_days=7) -> _t.Literal['TRUE', 'HIGH', 'LOW', 'WK_END']:
-    if v:
-        if isinstance(v, str):
-            v = datetime.datetime.strptime(v, '%Y-%m-%d').date()
-
-        if isinstance(v, date):
-            if v < TOD:
-                return 'LOW'
-            if v > TOD + timedelta(days=delta_days):
-                return 'HIGH'
-            if v.weekday() > 5:
-                return 'WK_END'
-            return 'TRUE'
-
-
-def limit_daterange_no_weekends(v: date, delta_days=7) -> date:
-    date_range = [TOD + datetime.timedelta(days=x) for x in range(7)]
-    weekday_dates = [d for d in date_range if d.weekday() < 5]
-    latest_wkd = max(weekday_dates)
-    res = shipable_date(v, delta_days)
-
-    match res:
-        case 'TRUE':
-            return v
-        case 'LOW':
-            logger.info(f'Date {v} is in the past - using today')
-            return TOD
-        case 'HIGH':
-            logger.info(
-                f'Date {v} is too far in the future - using latest available weekday ({latest_wkd})'
-            )
-            return latest_wkd
-        case 'WK_END':
-            logger.info(f'Date {v} is a weekend - using latest available weekday ({latest_wkd})')
-            return latest_wkd
-        case _:
-            raise ValueError(f'unable to fix date: {v}')
-
-
-TOD = date.today()
-ValidShipDateType = _p.condate(ge=TOD, le=TOD + timedelta(days=7))
 PrintType = _t.Literal['ALL_PARCELS', 'SINGLE_PARCEL']
 AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
 DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
-FixedDate = _t.Annotated[ValidShipDateType, _p.BeforeValidator(limit_daterange_no_weekends)]
+
+TOD = date.today()
+SHIPPING_CUTOFF = datetime.time(17, 0)
+ADVANCE_BOOKING_DAYS = 28
+WEEKDAYS_IN_RANGE = [TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
+                     (TOD + timedelta(days=i)).weekday() < 5]
+
+POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
+VALID_PC = _t.Annotated[
+    str,
+    _p.StringConstraints(pattern=POSTCODE_PATTERN),
+    _p.BeforeValidator(lambda s: s.strip().upper()),
+    _p.Field(description='A valid UK postcode'),
+]
 
 
-def fixed_date_type(days_delta: int = 7):
-    fix_date_validator = functools.partial(limit_daterange_no_weekends, delta_days=days_delta)
-    return _t.Annotated[_p.condate(ge=TOD, le=TOD + timedelta(days=days_delta)), _p.BeforeValidator(
-        fix_date_validator
-    )]
+
+def limit_daterange_no_weekends(v: date) -> date:
+    if v:
+        if isinstance(v,str):
+            v = datetime.date.fromisoformat(v)
+
+        if isinstance(v, date):
+            if v < TOD:
+                logger.info(f'Date {v} is in the past - using today')
+                v = TOD
+            if v > max(WEEKDAYS_IN_RANGE):
+                logger.info(f'Date {v} is too far in the future - using latest available)')
+                v = max(WEEKDAYS_IN_RANGE)
+            if v.weekday() > 5:
+                v = v - timedelta(days=7 - v.weekday())
+            if v == TOD and datetime.datetime.now().time() > SHIPPING_CUTOFF:
+                logger.warning('Current time is past shipping cutoff - using next available date')
+                v = v + timedelta(days=1)
+            return v
+
+SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
 
 
-#
-#
-# def truncated_safe_str_type(max_length: int):
-#     return _t.Annotated[
-#         SafeStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length)]
-#
-#
-# def optional_truncated_safe_str_type(max_length: int):
-#     return _t.Annotated[
-#         SafeStr, _p.StringConstraints(max_length=max_length), truncate_before(max_length), _p.Field(
-#             ''
-#         )
-#     ]
-
-
-excluded_chars = {'C', 'I', 'K', 'M', 'O', 'V'}
-
-
-def validate_uk_postcode(v: str):
-    pattern = re.compile(r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})')
-    if not re.match(pattern, v) and not set(v[-2:]).intersection(excluded_chars):
-        raise _p.ValidationError('Invalid UK postcode')
-    return v
-
-
-def is_valid_postcode(s):
-    pattern = re.compile(r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})')
-    return bool(re.match(pattern, s.upper()))
-
-
-ValidPostcode = _t.Annotated[
-    str, _p.BeforeValidator(validate_uk_postcode), _p.BeforeValidator(lambda v: v.upper())]
-
-
-def default_gen(typ, **kwargs):
-    return _t.Annotated[typ, _p.Field(**kwargs)]
 
 
 class GenericJSONType(sqa.TypeDecorator):
@@ -121,19 +74,7 @@ class GenericJSONType(sqa.TypeDecorator):
         return self.model_class.model_validate_json(value) if value else None
 
 
-ShipperScope = _t.Literal['SAND', 'LIVE']
-
-
 class ExpressLinkError(Exception):
     ...
 
 
-POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
-VALID_PC = _t.Annotated[
-    str,
-    _p.StringConstraints(pattern=POSTCODE_PATTERN),
-    _p.BeforeValidator(lambda s: s.strip().upper()),
-    _p.Field(description='A valid UK postcode'),
-]
-
-ShipDirection = _t.Literal['in', 'out']

@@ -26,13 +26,10 @@ class ZeepConfig(pydantic.BaseModel):
     @classmethod
     def fetch(cls, settings=pf_config.PF_SETTINGS):
         return cls(
-            auth=models.Authentication(
-                password=settings.pf_expr_pwd,
-                user_name=settings.pf_expr_usr
-            ),
+            auth=models.Authentication(password=settings.pf_expr_pwd, user_name=settings.pf_expr_usr),
             binding=settings.pf_binding,
             wsdl=settings.pf_wsdl,
-            endpoint=str(settings.pf_endpoint)
+            endpoint=str(settings.pf_endpoint),
         )
 
 
@@ -42,22 +39,14 @@ class ELClient(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True, validate_default=True)
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def get_service(self):
         if self.service is None:
-            client = zeep.Client(wsdl=self.settings.pf_wsdl)
-            self.service = client.create_service(
-                self.settings.pf_binding,
-                self.settings.pf_endpoint
-            )
+            self.service = self.new_service()
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.settings.pf_wsdl)
-        serv = client.create_service(
-            binding_name=self.settings.pf_binding,
-            address=self.settings.pf_endpoint
-        )
-        return serv
+        return client.create_service(binding_name=self.settings.pf_binding, address=self.settings.pf_endpoint)
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
         """Get a Combadge backend for a service protocol.
@@ -83,7 +72,7 @@ class ELClient(pydantic.BaseModel):
         """
         back = self.backend(msgs.CreateShipmentService)
         resp = back.createshipment(request=req.model_dump(by_alias=True))
-        logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
+        logger.warning(f"BOOKED {req.requested_shipment.recipient_address.lines_str}")
 
         return msgs.CreateShipmentResponse.model_validate(resp)
 
@@ -115,38 +104,27 @@ class ELClient(pydantic.BaseModel):
             Path - path to the downloaded label
 
         """
-        dl_path = dl_path or 'temp_label.pdf'
+        dl_path = dl_path or "temp_label.pdf"
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
         out_path = response.label.download(Path(dl_path))
         return out_path
 
-    def choose_address(
-            self,
-            address: models.AddressRecipient
-    ) -> models.AddressRecipient:
+    def choose_address(self, address: models.AddressRecipient) -> models.AddressRecipient:
         if candidates := self.candidates_dict(address.postcode):
-            chosen, score = process.extractOne(
-                address.lines_str,
-                list(candidates.keys()),
-                scorer=SCORER
-            )
+            chosen, score = process.extractOne(address.lines_str, list(candidates.keys()), scorer=SCORER)
             add = candidates[chosen]
             return add
         else:
-            raise ValueError(f'No candidates found for {address.postcode}')
+            raise ValueError(f"No candidates found for {address.postcode}")
 
     def candidates_dict(self, postcode):
-        return {add.lines_str: add
-                for add in self.get_candidates(postcode)}
+        return {add.lines_str: add for add in self.get_candidates(postcode)}
 
     def state_to_outbound_request(self, state: ship_ui.ShipState):
         ship_req = shipstate_to_outbound(state)
-        req = msgs.CreateShipmentRequest(
-            authentication=self.settings.auth,
-            requested_shipment=ship_req
-        )
+        req = msgs.CreateShipmentRequest(authentication=self.settings.auth, requested_shipment=ship_req)
         return req
 
 

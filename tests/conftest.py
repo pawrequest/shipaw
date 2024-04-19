@@ -24,7 +24,6 @@ def el_client(sett):
 def service(el_client):
     return el_client.new_service()
 
-
 @pytest.fixture
 def address_r() -> pf_ext.AddressRecipient:
     return pf_ext.AddressRecipient(

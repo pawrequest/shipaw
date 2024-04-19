@@ -53,7 +53,7 @@ class DirectionEnum(str, Enum):
 
 
 class FullForm(_p.BaseModel):
-    ship_date: ship_types.fixed_date_type(7)
+    ship_date: ship_types.SHIPPING_DATE
     # ship_date: adate
     boxes: int
     direction: DirectionEnum = DirectionEnum.out

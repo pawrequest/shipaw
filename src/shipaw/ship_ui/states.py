@@ -1,51 +1,42 @@
 from __future__ import annotations
 
-import os
 import pathlib
 import typing as _t
 
 import pydantic as pyd
 import sqlmodel as sqm
-
 from pawdantic.pawui import states as ui_states
+from pydantic import ConfigDict, Field
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
-from .. import msgs, ship_types
+
+from .. import msgs, pf_config, ship_types
 
 BookingReqSQM = _t.Annotated[
-    msgs.CreateShipmentRequest, sqm.Field(
-        sa_column=sqm.Column(
-            ship_types.GenericJSONType(msgs.CreateShipmentRequest)
-        )
-    )
+    msgs.CreateShipmentRequest, sqm.Field(sa_column=sqm.Column(ship_types.GenericJSONType(msgs.CreateShipmentRequest)))
 ]
 BookingRespSQM = _t.Annotated[
-    msgs.CreateShipmentResponse, sqm.Field(
-        sa_column=sqm.Column(
-            ship_types.GenericJSONType(msgs.CreateShipmentResponse)
-        )
-    )
+    msgs.CreateShipmentResponse,
+    sqm.Field(sa_column=sqm.Column(ship_types.GenericJSONType(msgs.CreateShipmentResponse))),
 ]
 
 
 class BookingState(ui_states.BaseUIState):
     request: BookingReqSQM
     response: BookingRespSQM
-    # label_path: pathlib.Path | None = None
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None
 
     def shipment_num(self):
         return (
-            self.response.completed_shipment_info.completed_shipments.completed_shipment[
-                0].shipment_number
+            self.response.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
             if self.booked
             else None
         )
 
     # def state_alerts(self) -> list:
     #     return self.response.alerts.alert if self.response.alerts else []
-    # 
+    #
     # def alert_dict(self) -> dict[str, shipaw.types.AlertType]:
     #     return {a.message: a.type for a in self.state_alerts()}
 
@@ -59,7 +50,7 @@ class ShipStatePartial(ui_states.BaseUIState):
 
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
-    ship_date: ship_types.fixed_date_type(14) | None = None
+    ship_date: ship_types.SHIPPING_DATE | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressRecipient | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
@@ -69,23 +60,30 @@ class ShipStatePartial(ui_states.BaseUIState):
 
     @property
     def pf_label_name(self):
-        return f'Parcelforce Collection Label for {self.contact.business_name} on {self.ship_date}'
+        return f"Parcelforce Collection Label for {self.contact.business_name} on {self.ship_date}"
 
     @property
     def named_label_path(self):
-        pdir = os.environ.get('PARCELFORCE_LABELS_DIR')
-        if not pdir:
-            raise ValueError('PARCELFORCE_LABELS_DIR not set')
-        return (pathlib.Path(pdir) / self.pf_label_name).with_suffix('.pdf')
+        sett = pf_config.PF_SETTINGS
+        return (sett.label_dir / self.pf_label_name).with_suffix(".pdf")
 
 
 class ShipState(ShipStatePartial):
-    boxes: pyd.PositiveInt = 1
-    service: pf_shared.ServiceCode
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
-    ship_date: ship_types.fixed_date_type(28)
-    direction: ship_types.ShipDirection = 'out'
+    ship_date: ship_types.SHIPPING_DATE
+    boxes: pyd.PositiveInt = 1
+    service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+    direction: ship_types.ShipDirection = "out"
+    candidates: list[pf_ext.AddressRecipient] | None = Field(None)
+    reference: str | None = None
+    special_instructions: str | None = None
+
+
+class ShipStateExtra(ShipState):
+    model_config = ConfigDict(
+        extra="ignore",
+    )
 
 
 def response_alert_dict(response):
