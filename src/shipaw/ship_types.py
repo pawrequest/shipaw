@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import re
 import typing as _t
 from datetime import date, timedelta
 
@@ -35,10 +34,9 @@ VALID_PC = _t.Annotated[
 ]
 
 
-
 def limit_daterange_no_weekends(v: date) -> date:
     if v:
-        if isinstance(v,str):
+        if isinstance(v, str):
             v = datetime.date.fromisoformat(v)
 
         if isinstance(v, date):
@@ -52,12 +50,11 @@ def limit_daterange_no_weekends(v: date) -> date:
                 v = v - timedelta(days=7 - v.weekday())
             if v == TOD and datetime.datetime.now().time() > SHIPPING_CUTOFF:
                 logger.warning('Current time is past shipping cutoff - using next available date')
-                v = v + timedelta(days=1)
+                v = max(WEEKDAYS_IN_RANGE)
             return v
 
+
 SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
-
-
 
 
 class GenericJSONType(sqa.TypeDecorator):
@@ -76,5 +73,3 @@ class GenericJSONType(sqa.TypeDecorator):
 
 class ExpressLinkError(Exception):
     ...
-
-
