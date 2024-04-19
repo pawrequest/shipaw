@@ -39,7 +39,7 @@ def test_go_find2(pf_client):
         serv = pf_client._client.service
         fnc = getattr(serv, 'Find')
         resp = fnc(
-            Authentication=pf_client.config.auth.get_auth(),
+            Authentication=pf_client.settings.auth.get_auth(),
             PAF={'Postcode': 'NW6 4TE'}
         )
         assert resp

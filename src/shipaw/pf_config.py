@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import functools
 import os
 
 import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from shipaw.models import pf_shared
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 
@@ -29,10 +31,20 @@ class PFSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
 
+    @property
+    def auth(self):
+        return pf_shared.Authentication(user_name=self.pf_expr_usr, password=self.pf_expr_pwd)
+
+    @_p.field_validator('ship_live', mode='after')
+    def check_setting_scope(cls, v):
+        if v:
+            logger.warning('Creating Shipper with Live Creds')
+        else:
+            logger.info('Creating Shipper with Sandbox Creds')
+        return v
+
 
 class PFSandboxSettings(PFSettings):
-    ship_live: bool = False
-
     @_p.field_validator('ship_live', mode='after')
     def ship_live_validator(cls, v, values):
         if v:
@@ -48,8 +60,13 @@ class PFSandboxSettings(PFSettings):
 
 logger.info(f'SHIP_ENV is {SHIP_ENV}')
 PF_SETTINGS = PFSettings()
-PF_SANDBOX_SETTINGS = PFSandboxSettings()
-logger.info(f'SHIP_LIVE is {PF_SETTINGS.ship_live}')
-logger.info(f'PF_ENDPOINT is {PF_SETTINGS.pf_endpoint}')
-if 'test' not in PF_SETTINGS.pf_endpoint:
-    logger.warning('USING PROD ENDPOINT')
+
+
+@functools.lru_cache(maxsize=1)
+def sandbox_settings():
+    return PFSandboxSettings()
+
+
+@functools.lru_cache(maxsize=1)
+def prod_settings():
+    return PFSettings()

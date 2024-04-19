@@ -7,6 +7,7 @@ import zeep
 from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
 from loguru import logger
+from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
@@ -23,43 +24,39 @@ class ZeepConfig(pydantic.BaseModel):
     endpoint: str
 
     @classmethod
-    def fetch(cls):
-        sett = pf_config.PF_SETTINGS
+    def fetch(cls, settings=pf_config.PF_SETTINGS):
         return cls(
             auth=models.Authentication(
-                password=sett.pf_expr_pwd,
-                user_name=sett.pf_expr_usr
+                password=settings.pf_expr_pwd,
+                user_name=settings.pf_expr_usr
             ),
-            binding=sett.pf_binding,
-            wsdl=sett.pf_wsdl,
-            endpoint=str(sett.pf_endpoint)
+            binding=settings.pf_binding,
+            wsdl=settings.pf_wsdl,
+            endpoint=str(settings.pf_endpoint)
         )
 
 
 class ELClient(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
-    config: ZeepConfig
-    service: ServiceProxy
+    settings: pf_config.PFSettings = pf_config.PF_SETTINGS
+    service: ServiceProxy | None = None
 
-    @classmethod
-    def from_zeep_config(cls, config: ZeepConfig):
-        client = zeep.Client(wsdl=config.wsdl)
-        service = client.create_service(config.binding, config.endpoint)
-        return cls(config=config, service=service)
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True, validate_default=True)
 
-    @classmethod
-    def from_pyd(cls, prod: bool = False):
-        settings = pf_config.PF_SETTINGS if prod else pf_config.PF_SANDBOX_SETTINGS
-        client = zeep.Client(wsdl=settings.pf_wsdl)
-        service = client.create_service(settings.pf_binding, settings.pf_endpoint)
-        return cls(
-            config=ZeepConfig.fetch(),
-            service=service,
-        )
+    @model_validator(mode='after')
+    def get_service(self):
+        if self.service is None:
+            client = zeep.Client(wsdl=self.settings.pf_wsdl)
+            self.service = client.create_service(
+                self.settings.pf_binding,
+                self.settings.pf_endpoint
+            )
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
-        client = zeep.Client(wsdl=self.config.wsdl)
-        serv = client.create_service(binding_name=self.config.binding, address=self.config.endpoint)
+        client = zeep.Client(wsdl=self.settings.pf_wsdl)
+        serv = client.create_service(
+            binding_name=self.settings.pf_binding,
+            address=self.settings.pf_endpoint
+        )
         return serv
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
@@ -100,7 +97,7 @@ class ELClient(pydantic.BaseModel):
             list[.models.AddressRecipient] - list of candidate addresses
 
         """
-        req = msgs.FindRequest(authentication=self.config.auth, paf=models.PAF(postcode=postcode))
+        req = msgs.FindRequest(authentication=self.settings.auth, paf=models.PAF(postcode=postcode))
         back = self.backend(msgs.FindService)
         response = back.find(request=req.model_dump(by_alias=True))
         if not response.paf:
@@ -120,7 +117,7 @@ class ELClient(pydantic.BaseModel):
         """
         dl_path = dl_path or 'temp_label.pdf'
         back = self.backend(msgs.PrintLabelService)
-        req = msgs.PrintLabelRequest(authentication=self.config.auth, shipment_number=ship_num)
+        req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
         out_path = response.label.download(Path(dl_path))
         return out_path
@@ -147,7 +144,7 @@ class ELClient(pydantic.BaseModel):
     def state_to_outbound_request(self, state: ship_ui.ShipState):
         ship_req = shipstate_to_outbound(state)
         req = msgs.CreateShipmentRequest(
-            authentication=self.config.auth,
+            authentication=self.settings.auth,
             requested_shipment=ship_req
         )
         return req

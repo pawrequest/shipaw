@@ -11,8 +11,8 @@ from shipaw.models import pf_shared
 from shipaw.ship_ui import states
 # from shipaw.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # F401
 # todo check the noqa unused imports were not needed?
-from shipaw.ship_ui.dynamic import get_addresses, get_dates
-from shipaw.ship_types import FormKind, VALID_PC
+from shipaw.ship_ui.dynamic import get_dates
+from shipaw.ship_types import VALID_PC
 
 
 class ContactForm(_p.BaseModel):
@@ -85,66 +85,57 @@ def get_services():
 #     ]
 
 
-async def contact_fields(state):
+async def contact_fields():
     return [
         c.FormFieldInput(
             name='business_name',
             title='Business Name',
-            initial=state.contact.business_name,
         ),
 
         c.FormFieldInput(
             name='contact_name',
             title='Contact Name',
-            initial=state.contact.contact_name,
         ),
 
         c.FormFieldInput(
             name='email',
             title='Delivery Email',
-            initial=state.contact.email_address,
             html_type='email',
         ),
 
         c.FormFieldInput(
             name='phone',
             title='Delivery Mobile Phone',
-            initial=state.contact.mobile_phone,
         )
     ]
 
 
-async def address_fields(state):
+async def address_fields():
     return [
         c.FormFieldInput(
             name='address_line1',
             title='Address Line 1',
-            initial=state.address.address_line1,
             required=True,
         ),
 
         c.FormFieldInput(
             name='address_line2',
             title='Address Line 2',
-            initial=state.address.address_line2,
         ),
 
         c.FormFieldInput(
             name='address_line3',
             title='Address Line 3',
-            initial=state.address.address_line3,
         ),
 
         c.FormFieldInput(
             name='town',
             title='Town',
-            initial=state.address.town,
         ),
 
         c.FormFieldInput(
             name='postcode',
             title='Postcode',
-            initial=state.address.postcode,
         ),
 
         # c.FormFieldInput(
@@ -155,15 +146,12 @@ async def address_fields(state):
     ]
 
 
-async def ship_fields(state: states.ShipState, manual=False):
+async def ship_fields():
     return [
         c.FormFieldSelect(
             name='date',
             options=get_dates(),
-            initial=str(state.ship_date.isoformat()),
             title='date',
-            # class_name='col-3',
-            # display_mode='inline',
         ),
         c.FormFieldSelect(
             name='boxes',
@@ -171,11 +159,7 @@ async def ship_fields(state: states.ShipState, manual=False):
                 fastui_forms.SelectOption(value=str(i), label=str(i))
                 for i in range(1, 11)
             ],
-            initial=str(state.boxes),
             title='boxes',
-            # class_name='width-50',
-            # display_mode='inline',
-
         ),
         c.FormFieldSelect(
             name='direction',
@@ -185,66 +169,29 @@ async def ship_fields(state: states.ShipState, manual=False):
                 fastui_forms.SelectOption(value='out', label='Outbound'),
             ],
             initial='out',
-            # class_name='col-2',
-            # display_mode='inline',
         ),
         c.FormFieldSelect(
             name='service',
             options=get_services(),
             title='Service',
-            # initial=state.service.value,
-            initial=state.service,
+            initial=pf_shared.ServiceCode2.EXPRESS24,
         ),
         c.FormFieldInput(
             name='special_instructions',
             title='Big "Special Instructions" middle of label',
-            initial=state.special_instructions,
         ),
         c.FormFieldInput(
             name='reference',
             title='Small "Reference" bottom corner of label',
-            initial=state.reference,
         ),
-        *await contact_fields(state),
     ]
 
 
-async def ship_fields_select(state: states.ShipState):
+async def ship_fields_partial(state: states.ShipStatePartial = None):
+    if state:
+        initial = state.model_dump()
     return [
-        *await ship_fields(state),
-        await address_select(state),
+        *await ship_fields(),
+        *await contact_fields(),
+        *await address_fields(),
     ]
-
-
-async def ship_fields_manual(state: states.ShipState):
-    return [
-        *await ship_fields(state),
-        *await address_fields(state),
-    ]
-
-
-async def get_form_fields(kind: FormKind, state):
-    if kind == 'manual':
-        return await ship_fields_manual(state)
-    if kind == 'select':
-        return await ship_fields_select(state)
-    raise ValueError(f'Invalid kind {kind!r}')
-
-
-async def address_select(state):
-    return c.FormFieldSelect(
-        name='address',
-        options=get_addresses(state.candidates),
-        title='Select Address',
-        required=True,
-        # initial='',
-        # initial=state.address.model_dump(),
-        initial=state.address.model_dump_json(),
-        # placeholder=state.address.address_line1,
-
-        class_name='row'
-    )
-
-
-class PostcodeSelect(_p.BaseModel):
-    fetch_address_from_postcode: VALID_PC

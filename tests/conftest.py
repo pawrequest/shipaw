@@ -1,44 +1,23 @@
 import datetime
-import os
 
 import pytest
 
-from shipaw import ELClient, ZeepConfig, pf_config
-from shipaw.models import pf_ext, pf_shared, pf_top
+from shipaw import ELClient, pf_config
+from shipaw.models import pf_ext, pf_top
 from shipaw.models.pf_shared import ServiceCode
 from shipaw.ship_types import DepartmentNum
 
 
-
 @pytest.fixture
 def sett():
-    return pf_config.PF_SANDBOX_SETTINGS
-
-
-# @pytest.fixture
-# def pf_auth(sett):
-#     auth = {'user_name': os.getenv('PF_EXPR_SAND_USR'), 'password': os.getenv('PF_EXPR_SAND_PWD')}
-#     pfauth = pf_shared.Authentication.model_validate(auth)
-#     return pfauth
+    settings = pf_config.sandbox_settings()
+    pf_config.PFSandboxSettings.model_validate(settings, from_attributes=True)
+    yield settings
 
 
 @pytest.fixture
-def pf_auth(sett):
-    pfauth = pf_shared.Authentication.model_validate(
-        {'user_name': sett.pf_expr_usr, 'password': sett.pf_expr_pwd}
-    )
-    return pfauth
-
-
-@pytest.fixture
-def zconfig(sett: pf_config.PFSandboxSettings, pf_auth):
-    conf = ZeepConfig(binding=sett.pf_binding, wsdl=sett.pf_wsdl, auth=pf_auth, endpoint=sett.pf_endpoint)
-    return conf
-
-
-@pytest.fixture
-def el_client():
-    return ELClient.from_pyd(prod=False)
+def el_client(sett):
+    yield ELClient(settings=sett)
 
 
 @pytest.fixture
