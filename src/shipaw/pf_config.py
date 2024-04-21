@@ -35,9 +35,9 @@ class PFSettings(BaseSettings):
 
     label_dir: Path
 
-    home_add_line1: str
-    home_add_line2: str | None = None
-    home_add_line3: str | None = None
+    home_address_line1: str
+    home_address_line2: str | None = None
+    home_address_line3: str | None = None
     home_town: str
     home_postcode: str
     home_country: str = 'GB'
@@ -75,9 +75,9 @@ class PFSettings(BaseSettings):
     def home_address_validator(self):
         if self.home_address is None:
             self.home_address = pf_ext.AddressCollection(
-                address_line1=self.home_add_line1,
-                address_line2=self.home_add_line2,
-                address_line3=self.home_add_line3,
+                address_line1=self.home_address_line1,
+                address_line2=self.home_address_line2,
+                address_line3=self.home_address_line3,
                 town=self.home_town,
                 postcode=self.home_postcode,
                 country=self.home_country,
