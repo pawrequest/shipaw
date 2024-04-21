@@ -8,7 +8,7 @@ import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from shipaw.models import pf_shared
+from shipaw.models import pf_ext, pf_shared, pf_top
 
 SHIP_ENV = os.getenv("SHIP_ENV")
 
@@ -34,7 +34,41 @@ class PFSettings(BaseSettings):
 
     label_dir: Path
 
+    home_address_line1: str
+    home_address_line2: str | None = None
+    home_address_line3: str | None = None
+    home_town: str
+    home_postcode: str
+    home_country: str = "GB"
+
+    home_contact_name: str
+    home_email: str
+    home_phone: str | None = None
+    home_mobile_phone: str
+    home_business_name: str
+
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
+
+    @property
+    def home_address(self):
+        return pf_ext.AddressCollection(
+            address_line1=self.home_address_line1,
+            address_line2=self.home_address_line2,
+            address_line3=self.home_address_line3,
+            town=self.home_town,
+            postcode=self.home_postcode,
+            country=self.home_country,
+        )
+
+    @property
+    def home_contact(self):
+        return pf_top.Contact(
+            contact_name=self.home_contact_name,
+            email_address=self.home_email,
+            mobile_phone=self.home_mobile_phone,
+            business_name=self.home_business_name,
+            telephone=self.home_phone,
+        )
 
     @property
     def auth(self):

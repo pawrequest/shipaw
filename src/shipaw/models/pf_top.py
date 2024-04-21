@@ -2,29 +2,20 @@ import datetime as dt
 import typing as _t
 
 import pydantic as _p
-
 from pawdantic import paw_types
+
 from .. import ship_types
 from . import pf_ext, pf_lists, pf_shared
 
 
-
 class ContactMininmum(pf_shared.BasePFType):
-    business_name: paw_types.truncated_printable_str_type(40) = _p.Field(
-        ...,
-        title='Business Name'
-    )
-    mobile_phone: str = _p.Field(..., description='Mobile phone number')
-    email_address: _p.EmailStr = _p.Field(
-        title='Email Address',
-    )
+    business_name: paw_types.truncated_printable_str_type(40)
+    mobile_phone: str
+    email_address: _p.EmailStr
 
 
 class Contact(ContactMininmum):
-    contact_name: paw_types.optional_truncated_printable_str_type(30) = _p.Field(
-        None,
-        title='Contact Name'
-    )
+    contact_name: paw_types.optional_truncated_printable_str_type(30) | None = None
     telephone: str | None = None
     # fax: str | None = None
 
@@ -35,22 +26,22 @@ class Contact(ContactMininmum):
 class CollectionContact(Contact):
     notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
 
-    @_p.field_validator('telephone', mode='after')
+    @_p.field_validator("telephone", mode="after")
     def tel_is_none(cls, v, values):
         if not v:
-            v = values.data.get('mobile_phone')
+            v = values.data.get("mobile_phone")
         return v
 
 
 class PAF(pf_shared.BasePFType):
     postcode: str | None = None
     count: int | None = _p.Field(None)
-    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description='')
+    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description="")
 
 
 class Department(pf_shared.BasePFType):
-    department_id: list[int | None] = _p.Field(None, description='')
-    service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description='')
+    department_id: list[int | None] = _p.Field(None, description="")
+    service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description="")
     nominated_delivery_date_list: pf_lists.NominatedDeliveryDatelist | None = None
 
 
@@ -74,7 +65,7 @@ class ParcelLabelData(pf_shared.BasePFType):
     label_data: pf_lists.LabelData | None = None
     barcodes: pf_lists.Barcodes | None = None
     images: pf_lists.Images | None = None
-    parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description='')
+    parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description="")
 
 
 class CompletedManifestInfo(pf_shared.BasePFType):
@@ -113,17 +104,14 @@ class CollectionStateProtocol(_t.Protocol):
 
 
 def collection_info_from_state(state: CollectionStateProtocol):
-    col_contact_ = CollectionContact(**state.contact.model_dump(exclude={'notifications'}))
+    col_contact_ = CollectionContact(**state.contact.model_dump(exclude={"notifications"}))
     col_contact = col_contact_.model_validate(col_contact_)
     info = CollectionInfo(
         collection_contact=col_contact,
         collection_address=state.address,
         collection_time=pf_shared.DateTimeRange.from_datetimes(
-            dt.datetime.combine(state.ship_date, dt.time(9, 0)),
-            dt.datetime.combine(
-                state.ship_date, dt.time(17, 0)
-            )
-        )
+            dt.datetime.combine(state.ship_date, dt.time(9, 0)), dt.datetime.combine(state.ship_date, dt.time(17, 0))
+        ),
     )
     return info.model_validate(info)
 
@@ -131,7 +119,7 @@ def collection_info_from_state(state: CollectionStateProtocol):
 class RequestedShipmentZero(pf_shared.BasePFType):
     recipient_contact: ContactMininmum
     recipient_address: pf_ext.AddressRecipient
-    total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
+    total_number_of_parcels: int = _p.Field(..., description="Number of parcels in the shipment")
     shipping_date: dt.date
 
 
@@ -141,21 +129,19 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     contract_number: str
     department_id: int = ship_types.DepartmentNum
 
-    shipment_type: ship_types.DeliveryKind = 'DELIVERY'
+    shipment_type: ship_types.DeliveryKind = "DELIVERY"
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-    reference_number1: paw_types.optional_truncated_printable_str_type(
-        24
-    )  # first 14 visible on label
+    reference_number1: paw_types.optional_truncated_printable_str_type(24)  # first 14 visible on label
 
-    @_p.field_validator('reference_number1', mode='after')
+    @_p.field_validator("reference_number1", mode="after")
     def ref_num_validator(cls, v, values):
         if not v:
-            v = values['recipient_contact'].business_name
+            v = values["recipient_contact"].business_name
         return v
 
 
 class CollectionMinimum(RequestedShipmentMinimum):
-    shipment_type: ship_types.DeliveryKind = 'COLLECTION'
+    shipment_type: ship_types.DeliveryKind = "COLLECTION"
     print_own_label: bool = True
     collection_info: CollectionInfo
 
