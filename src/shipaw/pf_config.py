@@ -7,7 +7,8 @@ from pathlib import Path
 import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from shipaw.models import pf_shared
+
+from shipaw.models import pf_ext, pf_lists, pf_shared, pf_top
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 
@@ -17,6 +18,7 @@ class PFSettings(BaseSettings):
 
     location of environment file is set by the environment variable SHIP_ENV.
     """
+
     pf_ac_num_1: str
     pf_contract_num_1: str
     pf_ac_num_2: str | None
@@ -32,7 +34,29 @@ class PFSettings(BaseSettings):
 
     label_dir: Path
 
+    home_add_line1: str
+    home_add_line2: str | None = None
+    home_add_line3: str | None = None
+    home_town: str
+    home_postcode: str
+    home_country: str = 'GB'
+
+    home_business_name: str
+    home_contact_name: str
+    home_email: str
+    home_phone: str | None = None
+    home_mobile_phone: str
+
+    home_address: pf_ext.AddressCollection | None = None
+    home_contact: pf_top.Contact | None = None
+
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
+
+    @_p.field_validator('label_dir', mode='after')
+    def path_exists(cls, v, values):
+        if not v.exists():
+            v.mkdir(parents=True, exist_ok=True)
+        return v
 
     @property
     def auth(self):
@@ -45,6 +69,37 @@ class PFSettings(BaseSettings):
         else:
             logger.info('Creating Shipper with Sandbox Creds')
         return v
+
+    @_p.model_validator(mode='after')
+    def home_address_validator(self):
+        if self.home_address is None:
+            self.home_address = pf_ext.AddressCollection(
+                address_line1=self.home_add_line1,
+                address_line2=self.home_add_line2,
+                address_line3=self.home_add_line3,
+                town=self.home_town,
+                postcode=self.home_postcode,
+                country=self.home_country,
+            )
+        return self
+
+    @_p.model_validator(mode='after')
+    def home_contact_validator(self):
+        if self.home_contact is None:
+            self.home_contact = pf_top.Contact(
+                business_name=self.home_business_name,
+                contact_name=self.home_contact_name,
+                email_address=self.home_email,
+                mobile_phone=self.home_mobile_phone,
+                telephone=self.home_phone,
+                notifications=pf_lists.RecipientNotifications(
+                    notification_type=[
+                        pf_shared.NotificationType.DELIVERY,
+                        pf_shared.NotificationType.EMAIL,
+                    ]
+                ),
+            )
+        return self
 
 
 class PFSandboxSettings(PFSettings):
@@ -68,8 +123,3 @@ PF_SETTINGS = PFSettings()
 @functools.lru_cache(maxsize=1)
 def sandbox_settings():
     return PFSandboxSettings()
-
-
-@functools.lru_cache(maxsize=1)
-def prod_settings():
-    return PFSettings()

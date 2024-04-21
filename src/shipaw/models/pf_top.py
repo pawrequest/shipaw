@@ -102,13 +102,13 @@ class CompletedShipmentInfo(pf_shared.BasePFType):
 
 class CollectionInfo(pf_shared.BasePFType):
     collection_contact: Contact
-    collection_address: pf_ext.AddressRecipient
+    collection_address: pf_ext.AddressCollection
     collection_time: pf_shared.DateTimeRange
 
 
 class CollectionStateProtocol(_t.Protocol):
     contact: Contact
-    address: pf_ext.AddressRecipient
+    address: pf_ext.AddressCollection
     ship_date: dt.date
 
 
@@ -130,7 +130,7 @@ def collection_info_from_state(state: CollectionStateProtocol):
 
 class RequestedShipmentZero(pf_shared.BasePFType):
     recipient_contact: ContactMininmum
-    recipient_address: pf_ext.AddressRecipient
+    recipient_address: pf_ext.AddTypes
     total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
     shipping_date: dt.date
 

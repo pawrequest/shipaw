@@ -7,9 +7,9 @@ import pydantic as pyd
 import sqlmodel as sqm
 from pawdantic.pawui import states as ui_states
 from pydantic import ConfigDict, Field
+
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
-
 from .. import msgs, pf_config, ship_types
 
 BookingReqSQM = _t.Annotated[
@@ -52,38 +52,36 @@ class ShipStatePartial(ui_states.BaseUIState):
     service: pf_shared.ServiceCode | None = None
     ship_date: ship_types.SHIPPING_DATE | None = None
     contact: pf_top.Contact | None = None
-    address: pf_ext.AddressRecipient | None = None
-    candidates: list[pf_ext.AddressRecipient] | None = None
+    address: pf_ext.AddTypes | None = None
+    candidates: list[pf_ext.AddTypes] | None = None
     direction: ShipDirection | None = None
     reference: str | None = None
     special_instructions: str | None = None
 
     @property
     def pf_label_name(self):
-        return f"Parcelforce Collection Label for {self.contact.business_name} on {self.ship_date}"
+        return f'Parcelforce Collection Label for {self.contact.business_name} on {self.ship_date}'
 
     @property
     def named_label_path(self):
         sett = pf_config.PF_SETTINGS
-        return (sett.label_dir / self.pf_label_name).with_suffix(".pdf")
+        return (sett.label_dir / self.pf_label_name).with_suffix('.pdf')
 
 
 class ShipState(ShipStatePartial):
     contact: pf_top.Contact
-    address: pf_ext.AddressRecipient
+    address: pf_ext.AddTypes
     ship_date: ship_types.SHIPPING_DATE
     boxes: pyd.PositiveInt = 1
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-    direction: ship_types.ShipDirection = "out"
-    candidates: list[pf_ext.AddressRecipient] | None = Field(None)
+    direction: ship_types.ShipDirection = 'out'
+    candidates: list[pf_ext.AddTypes] | None = Field(None)
     reference: str | None = None
     special_instructions: str | None = None
 
 
 class ShipStateExtra(ShipState):
-    model_config = ConfigDict(
-        extra="ignore",
-    )
+    model_config = ConfigDict(extra='ignore')
 
 
 def response_alert_dict(response):

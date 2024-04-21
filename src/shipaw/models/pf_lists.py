@@ -89,4 +89,4 @@ class ServiceCodes(pf_shared.BasePFType):
 
 
 class SpecifiedNeighbour(pf_shared.BasePFType):
-    address: list[pf_ext.AddressRecipient] = _p.Field(default_factory=list)
+    address: list[pf_ext.AddTypes] = _p.Field(default_factory=list)

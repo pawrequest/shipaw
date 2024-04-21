@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import re
 import typing as _t
 from datetime import date, timedelta
 
@@ -10,7 +9,7 @@ import pydantic as _p
 import sqlalchemy as sqa
 from loguru import logger
 
-FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # noqa: UP040 fastui not support
+FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
 ShipperScope = _t.Literal['SAND', 'LIVE']
 ShipDirection = _t.Literal['in', 'out']
 
@@ -23,8 +22,9 @@ DepartmentNum = 1
 TOD = date.today()
 SHIPPING_CUTOFF = datetime.time(17, 0)
 ADVANCE_BOOKING_DAYS = 28
-WEEKDAYS_IN_RANGE = [TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
-                     (TOD + timedelta(days=i)).weekday() < 5]
+WEEKDAYS_IN_RANGE = [
+    TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + timedelta(days=i)).weekday() < 5
+]
 
 POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
 VALID_PC = _t.Annotated[
@@ -35,10 +35,9 @@ VALID_PC = _t.Annotated[
 ]
 
 
-
 def limit_daterange_no_weekends(v: date) -> date:
     if v:
-        if isinstance(v,str):
+        if isinstance(v, str):
             v = datetime.date.fromisoformat(v)
 
         if isinstance(v, date):
@@ -55,9 +54,8 @@ def limit_daterange_no_weekends(v: date) -> date:
                 v = v + timedelta(days=1)
             return v
 
+
 SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
-
-
 
 
 class GenericJSONType(sqa.TypeDecorator):
@@ -76,5 +74,3 @@ class GenericJSONType(sqa.TypeDecorator):
 
 class ExpressLinkError(Exception):
     ...
-
-

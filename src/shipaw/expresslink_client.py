@@ -12,34 +12,25 @@ from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
 from . import models, msgs, pf_config, ship_ui
-from .models import pf_shared
+from .models import pf_ext, pf_top
 
 SCORER = fuzz.token_sort_ratio
 
 
-class ZeepConfig(pydantic.BaseModel):
-    auth: models.Authentication
-    binding: str
-    wsdl: str
-    endpoint: str
-
-    @classmethod
-    def fetch(cls, settings=pf_config.PF_SETTINGS):
-        return cls(
-            auth=models.Authentication(password=settings.pf_expr_pwd, user_name=settings.pf_expr_usr),
-            binding=settings.pf_binding,
-            wsdl=settings.pf_wsdl,
-            endpoint=str(settings.pf_endpoint),
-        )
-
-
 class ELClient(pydantic.BaseModel):
+    """Client for Parcelforce ExpressLink API.
+
+    Attributes:
+        settings: pf_config.PFSettings - settings for the client
+        service: ServiceProxy | None - Zeep ServiceProxy (generated from settings)
+    """
+
     settings: pf_config.PFSettings = pf_config.PF_SETTINGS
     service: ServiceProxy | None = None
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True, validate_default=True)
 
-    @model_validator(mode="after")
+    @model_validator(mode='after')
     def get_service(self):
         if self.service is None:
             self.service = self.new_service()
@@ -61,7 +52,7 @@ class ELClient(pydantic.BaseModel):
         return ZeepBackend(self.service)[service_prot]
 
     def shipment_req_to_resp(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
-        """Create a shipment.
+        """Submit a CreateShipmentRequest to Parcelforce, booking carriage.
 
         Args:
             req: .msgs.CreateShipmentRequest - ShipmenmtRequest to book
@@ -72,7 +63,7 @@ class ELClient(pydantic.BaseModel):
         """
         back = self.backend(msgs.CreateShipmentService)
         resp = back.createshipment(request=req.model_dump(by_alias=True))
-        logger.warning(f"BOOKED {req.requested_shipment.recipient_address.lines_str}")
+        logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
 
         return msgs.CreateShipmentResponse.model_validate(resp)
 
@@ -90,6 +81,7 @@ class ELClient(pydantic.BaseModel):
         back = self.backend(msgs.FindService)
         response = back.find(request=req.model_dump(by_alias=True))
         if not response.paf:
+            logger.info(f'No candidates found for {postcode}')
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
@@ -104,38 +96,61 @@ class ELClient(pydantic.BaseModel):
             Path - path to the downloaded label
 
         """
-        dl_path = dl_path or "temp_label.pdf"
+        sett = pf_config.PF_SETTINGS
+        dl_path = dl_path or sett.label_dir / 'temp_label.pdf'
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
         out_path = response.label.download(Path(dl_path))
         return out_path
 
-    def choose_address(self, address: models.AddressRecipient) -> models.AddressRecipient:
-        if candidates := self.candidates_dict(address.postcode):
-            chosen, score = process.extractOne(address.lines_str, list(candidates.keys()), scorer=SCORER)
-            add = candidates[chosen]
-            return add
-        else:
-            raise ValueError(f"No candidates found for {address.postcode}")
+    def choose_address(
+        self, address: pf_ext.AddressCollection
+    ) -> tuple[models.AddressRecipient, list[models.AddressRecipient]]:
+        candidate_dict = self.candidates_dict(address.postcode)
+        chosen, score = process.extractOne(address.lines_str, list(candidate_dict.keys()), scorer=SCORER)
+        return candidate_dict[chosen], list(candidate_dict.values())
 
     def candidates_dict(self, postcode):
         return {add.lines_str: add for add in self.get_candidates(postcode)}
 
     def state_to_outbound_request(self, state: ship_ui.ShipState):
-        ship_req = shipstate_to_outbound(state)
-        req = msgs.CreateShipmentRequest(authentication=self.settings.auth, requested_shipment=ship_req)
-        return req
+        return msgs.CreateShipmentRequest(
+            authentication=self.settings.auth,
+            requested_shipment=models.RequestedShipmentMinimum(
+                contract_number=self.settings.pf_contract_num_1,
+                service_code=state.service,
+                shipping_date=state.ship_date,
+                recipient_contact=state.contact,
+                recipient_address=state.address,
+                total_number_of_parcels=state.boxes,
+                reference_number1=state.reference,
+            ),
+        )
 
+    def state_to_inbound_request(
+        self,
+        state: ship_ui.ShipState,
+    ):
+        return msgs.CreateShipmentRequest(
+            authentication=self.settings.auth,
+            requested_shipment=pf_top.CollectionSimple(
+                contract_number=self.settings.pf_contract_num_1,
+                service_code=state.service,
+                shipping_date=state.ship_date,
+                recipient_contact=self.settings.home_contact,
+                recipient_address=self.settings.home_address,
+                total_number_of_parcels=state.boxes,
+                print_own_label=True,
+                collection_info=pf_top.collection_info_from_state(state),
+                reference_number1=state.reference,
+                special_instructions1=state.special_instructions,
+            ),
+        )
 
-def shipstate_to_outbound(state: ship_ui.ShipState) -> models.RequestedShipmentMinimum:
-    sett = pf_config.PF_SETTINGS
-    return models.RequestedShipmentMinimum(
-        contract_number=sett.pf_contract_num_1,
-        service_code=pf_shared.ServiceCode.EXPRESS24,
-        shipping_date=state.ship_date,
-        recipient_contact=state.contact,
-        recipient_address=state.address,
-        total_number_of_parcels=state.boxes,
-        reference_number1=state.reference,
-    )
+    def state_to_request(self, state: ship_ui.ShipState):
+        if state.direction == 'in':
+            return self.state_to_inbound_request(state)
+        if state.direction == 'out':
+            return self.state_to_outbound_request(state)
+        raise ValueError('Invalid direction')

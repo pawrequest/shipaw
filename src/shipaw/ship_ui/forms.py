@@ -11,7 +11,7 @@ from shipaw.models import pf_shared
 from shipaw.ship_ui import states
 # from shipaw.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # F401
 # todo check the noqa unused imports were not needed?
-from shipaw.ship_ui.dynamic import get_addresses, get_dates
+from shipaw.ship_ui.dynamic import address_select_options, date_select_options
 from shipaw.ship_types import FormKind, VALID_PC
 
 
@@ -52,26 +52,26 @@ class DirectionEnum(str, Enum):
     out = 'out'
 
 
-class FullForm(_p.BaseModel):
-    ship_date: ship_types.SHIPPING_DATE
-    # ship_date: adate
-    boxes: int
-    direction: DirectionEnum = DirectionEnum.out
+# class FullForm(_p.BaseModel):
+#     ship_date: ship_types.SHIPPING_DATE
+#     # ship_date: adate
+#     boxes: int
+#     direction: DirectionEnum = DirectionEnum.out
+#
+#     business_name: paw_types.truncated_printable_str_type(40)
+#     email_address: str
+#     mobile_phone: str
+#     contact_name: paw_types.optional_truncated_printable_str_type(30)
+#
+#     address_line1: paw_types.truncated_printable_str_type(40)
+#     address_line2: paw_types.optional_truncated_printable_str_type(50)
+#     address_line3: paw_types.optional_truncated_printable_str_type(60)
+#     town: paw_types.truncated_printable_str_type(30)
+#     postcode: str
+#     country: str = 'GB'
 
-    business_name: paw_types.truncated_printable_str_type(40)
-    email_address: str
-    mobile_phone: str
-    contact_name: paw_types.optional_truncated_printable_str_type(30)
 
-    address_line1: paw_types.truncated_printable_str_type(40)
-    address_line2: paw_types.optional_truncated_printable_str_type(50)
-    address_line3: paw_types.optional_truncated_printable_str_type(60)
-    town: paw_types.truncated_printable_str_type(30)
-    postcode: str
-    country: str = 'GB'
-
-
-def get_services():
+def service_select_options():
     return [
         fastui_forms.SelectOption(value=service.value, label=service.name)
         for service in pf_shared.ServiceCode2
@@ -85,7 +85,7 @@ def get_services():
 #     ]
 
 
-async def contact_fields(state):
+async def contact_form_inputs(state):
     return [
         c.FormFieldInput(
             name='business_name',
@@ -114,7 +114,7 @@ async def contact_fields(state):
     ]
 
 
-async def address_fields(state):
+async def address_form_inputs(state):
     return [
         c.FormFieldInput(
             name='address_line1',
@@ -155,11 +155,11 @@ async def address_fields(state):
     ]
 
 
-async def ship_fields(state: states.ShipState, manual=False):
+async def shipping_form_inputs(state: states.ShipState, manual=False):
     return [
         c.FormFieldSelect(
             name='date',
-            options=get_dates(),
+            options=date_select_options(),
             initial=str(state.ship_date.isoformat()),
             title='date',
             # class_name='col-3',
@@ -190,7 +190,7 @@ async def ship_fields(state: states.ShipState, manual=False):
         ),
         c.FormFieldSelect(
             name='service',
-            options=get_services(),
+            options=service_select_options(),
             title='Service',
             # initial=state.service.value,
             initial=state.service,
@@ -205,44 +205,40 @@ async def ship_fields(state: states.ShipState, manual=False):
             title='Small "Reference" bottom corner of label',
             initial=state.reference,
         ),
-        *await contact_fields(state),
+        *await contact_form_inputs(state),
     ]
 
 
-async def ship_fields_select(state: states.ShipState):
+async def ship_inputs_select(state: states.ShipState):
     return [
-        *await ship_fields(state),
+        *await shipping_form_inputs(state),
         await address_select(state),
     ]
 
 
-async def ship_fields_manual(state: states.ShipState):
+async def ship_inputs_manual(state: states.ShipState):
     return [
-        *await ship_fields(state),
-        *await address_fields(state),
+        *await shipping_form_inputs(state),
+        *await address_form_inputs(state),
     ]
 
 
 async def get_form_fields(kind: FormKind, state):
     if kind == 'manual':
-        return await ship_fields_manual(state)
+        return await ship_inputs_manual(state)
     if kind == 'select':
-        return await ship_fields_select(state)
+        return await ship_inputs_select(state)
     raise ValueError(f'Invalid kind {kind!r}')
 
 
 async def address_select(state):
     return c.FormFieldSelect(
         name='address',
-        options=get_addresses(state.candidates),
+        options=address_select_options(state.candidates),
         title='Select Address',
         required=True,
-        # initial='',
-        # initial=state.address.model_dump(),
         initial=state.address.model_dump_json(),
-        # placeholder=state.address.address_line1,
-
-        class_name='row'
+        # class_name='row'
     )
 
 

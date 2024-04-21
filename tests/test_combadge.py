@@ -1,20 +1,17 @@
-import pytest
 from combadge.support.zeep.backends.sync import ZeepBackend
 
-from shipaw import ELClient, msgs, pf_config
+from shipaw import msgs
 from shipaw.models import PAF, pf_ext
 
 
-
 def test_find_paf(el_client):
-
     service = ZeepBackend(el_client.service)[msgs.FindService]
     paf = PAF(postcode='NW6 4TE')
     req = msgs.FindRequest(authentication=el_client.settings.auth, paf=paf)
     response = service.find(request=req)
     assert isinstance(response, msgs.FindResponse)
     assert isinstance(response.paf, PAF)
-    assert isinstance(response.paf.specified_neighbour[0].address[0], pf_ext.AddressRecipient)
+    assert isinstance(response.paf.specified_neighbour[0].address[0], pf_ext.AddTypes)
 
 
 def test_get_shipment(min_shipment_r, service, sett):

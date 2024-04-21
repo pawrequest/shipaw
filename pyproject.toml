@@ -10,7 +10,7 @@ requires-python = ">= 3.10"
 dependencies = [
     'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
     'suppawt @ git+https://github.com/pawrequest/suppawt',
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+    'pawdantic',
     'fastui',
     'fastapi',
     'sqlmodel',
@@ -24,11 +24,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+from-git = [
+    'suppawt @ git+https://github.com/pawrequest/suppawt',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+]
 dev = [
+    'autodoc_pydantic',
     "datamodel-code-generator",
     "pytest",
     "pytest-asyncio",
-    'autodoc_pydantic',
     "sphinx",
     "sphinx-autodoc-typehints",
     "sphinx-rtd-theme",
@@ -43,12 +47,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.rye]
-managed = false
+managed = true
 dev-dependencies = [
+    'autodoc_pydantic',
     "datamodel-code-generator",
     "pytest",
     "pytest-asyncio",
-    'autodoc_pydantic',
     "sphinx",
     "sphinx-autodoc-typehints",
     "sphinx-rtd-theme",
@@ -62,6 +66,6 @@ allow-direct-references = true
 
 [tool.ruff]
 line-length = 120
-extend-select = ["Q", "RUF100", "UP", "I"]
+extend-select = ["Q", "RUF100", "UP"]
 flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
 format.quote-style="single"
