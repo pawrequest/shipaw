@@ -11,6 +11,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from shipaw.models import pf_ext, pf_lists, pf_shared, pf_top
 
 SHIP_ENV = os.getenv('SHIP_ENV')
+if not Path(SHIP_ENV).exists():
+    raise ValueError('SHIP_ENV not set')
 
 
 class PFSettings(BaseSettings):
@@ -18,7 +20,6 @@ class PFSettings(BaseSettings):
 
     location of environment file is set by the environment variable SHIP_ENV.
     """
-
     pf_ac_num_1: str
     pf_contract_num_1: str
     pf_ac_num_2: str | None

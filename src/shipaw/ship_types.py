@@ -47,8 +47,8 @@ def limit_daterange_no_weekends(v: date) -> date:
             if v > max(WEEKDAYS_IN_RANGE):
                 logger.info(f'Date {v} is too far in the future - using latest available)')
                 v = max(WEEKDAYS_IN_RANGE)
-            if v.weekday() > 5:
-                v = v - timedelta(days=7 - v.weekday())
+            if v.weekday() > 4:
+                v = v - timedelta(days=6 - v.weekday())
             if v == TOD and datetime.datetime.now().time() > SHIPPING_CUTOFF:
                 logger.warning('Current time is past shipping cutoff - using next available date')
                 v = v + timedelta(days=1)

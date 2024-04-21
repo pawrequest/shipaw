@@ -34,6 +34,7 @@ class ELClient(pydantic.BaseModel):
     def get_service(self):
         if self.service is None:
             self.service = self.new_service()
+        return self
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.settings.pf_wsdl)
@@ -102,6 +103,7 @@ class ELClient(pydantic.BaseModel):
         req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
         out_path = response.label.download(Path(dl_path))
+        logger.info(f'Downloaded label to {out_path}')
         return out_path
 
     def choose_address(
