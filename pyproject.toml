@@ -1,0 +1,67 @@
+[project]
+name = "shipaw"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+dependencies = [
+    'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
+    'suppawt @ git+https://github.com/pawrequest/suppawt',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+    'fastui',
+    'fastapi',
+    'sqlmodel',
+    "aiohttp",
+    'combadge[zeep]',
+    'thefuzz',
+    'loguru',
+    'python-multipart',
+    'pydantic-extra-types',
+    'pydantic-settings',
+]
+
+[project.optional-dependencies]
+dev = [
+    'autodoc_pydantic',
+    "datamodel-code-generator",
+    "pytest",
+    "pytest-asyncio",
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "myst-parser",
+    "sphinx-readme",
+    "sphinx_rtd_dark_mode",
+]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    'autodoc_pydantic',
+    "datamodel-code-generator",
+    "pytest",
+    "pytest-asyncio",
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-rtd-theme",
+    "myst-parser",
+    "sphinx-readme",
+    "sphinx_rtd_dark_mode",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+#[tool.ruff]
+#line-length = 120
+#extend-select = ["Q", "RUF100", "UP", "I"]
+#flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
+#format.quote-style="single"

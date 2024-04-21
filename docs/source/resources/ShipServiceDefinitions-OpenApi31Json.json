@@ -1,0 +1,6165 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ShipServiceDefinitions",
+    "contact": {},
+    "version": "1.0"
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "servers": [
+    {
+      "url": "https://expresslink-uat1.neopost-id.com/ws/",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/createShipment": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "createShipment",
+        "operationId": "createShipment",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateShipmentRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "CreateShipmentRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CreateShipmentReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "CreateShipmentReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/createPrint": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "createPrint",
+        "operationId": "createPrint",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePrintRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "CreatePrintRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CreatePrintReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "CreatePrintReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/printLabel": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "printLabel",
+        "operationId": "printLabel",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PrintLabelRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "PrintLabelRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PrintLabelReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "PrintLabelReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/printDocument": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "printDocument",
+        "operationId": "printDocument",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PrintDocumentRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "PrintDocumentRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PrintDocumentReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "PrintDocumentReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/createManifest": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "createManifest",
+        "operationId": "createManifest",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateManifestRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "CreateManifestRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CreateManifestReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "CreateManifestReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/printManifest": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "printManifest",
+        "operationId": "printManifest",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PrintManifestRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "PrintManifestRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PrintManifestReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "PrintManifestReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/returnShipment": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "returnShipment",
+        "operationId": "returnShipment",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReturnShipmentRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "ReturnShipmentRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ReturnShipmentReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "ReturnShipmentReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/Find": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "Find",
+        "operationId": "Find",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FindRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "FindRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FindReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "FindReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/CCReserve": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "CCReserve",
+        "operationId": "CCReserve",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CCReserveRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "CCReserveRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CCReserveReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "CCReserveReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    },
+    "/CancelShipment": {
+      "post": {
+        "tags": [
+          "ShipServiceSoapBinding"
+        ],
+        "summary": "CancelShipment",
+        "operationId": "CancelShipment",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CancelShipmentRequest1"
+                  },
+                  {
+                    "xml": {
+                      "name": "CancelShipmentRequest",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ],
+                "contentMediaType": "application/xml"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the response",
+            "headers": {},
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CancelShipmentReply1"
+                    },
+                    {
+                      "xml": {
+                        "name": "CancelShipmentReply",
+                        "attribute": false,
+                        "wrapped": false
+                      }
+                    }
+                  ],
+                  "contentMediaType": "application/xml"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateShipmentRequest": {
+        "title": "CreateShipmentRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "RequestedShipment"
+            ],
+            "type": "object",
+            "properties": {
+              "RequestedShipment": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestedShipment"
+                  },
+                  {
+                    "xml": {
+                      "name": "RequestedShipment",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "CreateShipmentRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CreateShipmentReply": {
+        "title": "CreateShipmentReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "CompletedShipmentInfo": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompletedShipmentInfo"
+                  },
+                  {
+                    "xml": {
+                      "name": "CompletedShipmentInfo",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "CreateShipmentReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CreatePrintRequest": {
+        "title": "CreatePrintRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "RequestedShipment"
+            ],
+            "type": "object",
+            "properties": {
+              "RequestedShipment": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestedShipment"
+                  },
+                  {
+                    "xml": {
+                      "name": "RequestedShipment",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "CreatePrintRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CreatePrintReply": {
+        "title": "CreatePrintReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "CompletedShipmentInfoCreatePrint": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompletedShipmentInfoCreatePrint"
+                  },
+                  {
+                    "xml": {
+                      "name": "CompletedShipmentInfoCreatePrint",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "Label": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Document"
+                  },
+                  {
+                    "xml": {
+                      "name": "Label",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "LabelData": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ShipmentLabelData"
+                  },
+                  {
+                    "xml": {
+                      "name": "LabelData",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "PartnerCode": {
+                "type": "string",
+                "xml": {
+                  "name": "PartnerCode",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "CreatePrintReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "PrintLabelRequest": {
+        "title": "PrintLabelRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "ShipmentNumber"
+            ],
+            "type": "object",
+            "properties": {
+              "ShipmentNumber": {
+                "type": "string",
+                "xml": {
+                  "name": "ShipmentNumber",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "PrintFormat": {
+                "type": "string",
+                "xml": {
+                  "name": "PrintFormat",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "BarcodeFormat": {
+                "type": "string",
+                "xml": {
+                  "name": "BarcodeFormat",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "PrintType": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PrintType"
+                  },
+                  {
+                    "xml": {
+                      "name": "PrintType",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "PrintLabelRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "PrintLabelReply": {
+        "title": "PrintLabelReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Label": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Document"
+                  },
+                  {
+                    "xml": {
+                      "name": "Label",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "LabelData": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ShipmentLabelData"
+                  },
+                  {
+                    "xml": {
+                      "name": "LabelData",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "PartnerCode": {
+                "type": "string",
+                "xml": {
+                  "name": "PartnerCode",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "PrintLabelReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "PrintDocumentRequest": {
+        "title": "PrintDocumentRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "ShipmentNumber",
+              "DocumentType"
+            ],
+            "type": "object",
+            "properties": {
+              "ShipmentNumber": {
+                "type": "string",
+                "xml": {
+                  "name": "ShipmentNumber",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "DocumentType": {
+                "type": "integer",
+                "contentEncoding": "int32",
+                "xml": {
+                  "name": "DocumentType",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "PrintFormat": {
+                "type": "string",
+                "xml": {
+                  "name": "PrintFormat",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "PrintDocumentRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "PrintDocumentReply": {
+        "title": "PrintDocumentReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Label": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Document"
+                  },
+                  {
+                    "xml": {
+                      "name": "Label",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "LabelData": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ShipmentLabelData"
+                  },
+                  {
+                    "xml": {
+                      "name": "LabelData",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "DocumentType": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Document"
+                  },
+                  {
+                    "xml": {
+                      "name": "DocumentType",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "PrintDocumentReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CreateManifestRequest": {
+        "title": "CreateManifestRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "DepartmentId": {
+                "type": "integer",
+                "contentEncoding": "int32",
+                "xml": {
+                  "name": "DepartmentId",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "CreateManifestRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CreateManifestReply": {
+        "title": "CreateManifestReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "CompletedManifests": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompletedManifests"
+                  },
+                  {
+                    "xml": {
+                      "name": "CompletedManifests",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "CreateManifestReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "PrintManifestRequest": {
+        "title": "PrintManifestRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "ManifestNumber"
+            ],
+            "type": "object",
+            "properties": {
+              "ManifestNumber": {
+                "type": "string",
+                "xml": {
+                  "name": "ManifestNumber",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "PrintFormat": {
+                "type": "string",
+                "xml": {
+                  "name": "PrintFormat",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "PrintManifestRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "PrintManifestReply": {
+        "title": "PrintManifestReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Manifest": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Document"
+                  },
+                  {
+                    "xml": {
+                      "name": "Manifest",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "PrintManifestReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "ReturnShipmentRequest": {
+        "title": "ReturnShipmentRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "ShipmentNumber",
+              "CollectionTime"
+            ],
+            "type": "object",
+            "properties": {
+              "ShipmentNumber": {
+                "type": "string",
+                "xml": {
+                  "name": "ShipmentNumber",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "CollectionTime": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DateTimeRange"
+                  },
+                  {
+                    "xml": {
+                      "name": "CollectionTime",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "ReturnShipmentRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "ReturnShipmentReply": {
+        "title": "ReturnShipmentReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "CompletedShipmentInfo": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompletedReturnInfo"
+                  },
+                  {
+                    "xml": {
+                      "name": "CompletedShipmentInfo",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "ReturnShipmentReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "FindRequest": {
+        "title": "FindRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "ConvenientCollect": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ConvenientCollect"
+                  },
+                  {
+                    "xml": {
+                      "name": "ConvenientCollect",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "SpecifiedPostOffice": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SpecifiedPostOffice"
+                  },
+                  {
+                    "xml": {
+                      "name": "SpecifiedPostOffice",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "PAF": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PAF"
+                  },
+                  {
+                    "xml": {
+                      "name": "PAF",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "SafePlaces": {
+                "type": "boolean",
+                "xml": {
+                  "name": "SafePlaces",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              },
+              "NominatedDeliveryDates": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NominatedDeliveryDates"
+                  },
+                  {
+                    "xml": {
+                      "name": "NominatedDeliveryDates",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "PostcodeExclusion": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PostcodeExclusion"
+                  },
+                  {
+                    "xml": {
+                      "name": "PostcodeExclusion",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "FindRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "FindReply": {
+        "title": "FindReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "ConvenientCollect": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ConvenientCollect"
+                  },
+                  {
+                    "xml": {
+                      "name": "ConvenientCollect",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "SpecifiedPostOffice": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SpecifiedPostOffice"
+                  },
+                  {
+                    "xml": {
+                      "name": "SpecifiedPostOffice",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "PAF": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PAF"
+                  },
+                  {
+                    "xml": {
+                      "name": "PAF",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "SafePlaceList": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SafePlaceList"
+                  },
+                  {
+                    "xml": {
+                      "name": "SafePlaceList",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "NominatedDeliveryDates": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/NominatedDeliveryDates"
+                  },
+                  {
+                    "xml": {
+                      "name": "NominatedDeliveryDates",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              },
+              "PostcodeExclusion": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PostcodeExclusion"
+                  },
+                  {
+                    "xml": {
+                      "name": "PostcodeExclusion",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "FindReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CCReserveRequest": {
+        "title": "CCReserveRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "BookingReference"
+            ],
+            "type": "object",
+            "properties": {
+              "BookingReference": {
+                "type": "string",
+                "xml": {
+                  "name": "BookingReference",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "CCReserveRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CCReserveReply": {
+        "title": "CCReserveReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "PostOffice": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PostOffice"
+                  },
+                  {
+                    "xml": {
+                      "name": "PostOffice",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "CCReserveReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CancelShipmentRequest": {
+        "title": "CancelShipmentRequest",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequest"
+          },
+          {
+            "required": [
+              "ShipmentNumber"
+            ],
+            "type": "object",
+            "properties": {
+              "ShipmentNumber": {
+                "type": "string",
+                "xml": {
+                  "name": "ShipmentNumber",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            },
+            "xml": {
+              "name": "CancelShipmentRequest",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "CancelShipmentReply": {
+        "title": "CancelShipmentReply",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseReply"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "CompletedCancel": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompletedCancel"
+                  },
+                  {
+                    "xml": {
+                      "name": "CompletedCancel",
+                      "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                      "prefix": "tns",
+                      "attribute": false,
+                      "wrapped": false
+                    }
+                  }
+                ]
+              }
+            },
+            "xml": {
+              "name": "CancelShipmentReply",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        ],
+        "description": ""
+      },
+      "BaseRequest": {
+        "title": "BaseRequest",
+        "required": [
+          "Authentication"
+        ],
+        "type": "object",
+        "properties": {
+          "Authentication": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Authentication"
+              },
+              {
+                "xml": {
+                  "name": "Authentication",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "BaseRequest",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "BaseReply": {
+        "title": "BaseReply",
+        "type": "object",
+        "properties": {
+          "Alerts": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Alerts"
+              },
+              {
+                "xml": {
+                  "name": "Alerts",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "BaseReply",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "RequestedShipment": {
+        "title": "RequestedShipment",
+        "required": [
+          "ShipmentType",
+          "ContractNumber",
+          "ServiceCode",
+          "RecipientContact",
+          "RecipientAddress"
+        ],
+        "type": "object",
+        "properties": {
+          "DepartmentId": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "DepartmentId",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShipmentType": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentType",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ContractNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ContractNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "RequestId": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "RequestId",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ServiceCode": {
+            "type": "string",
+            "xml": {
+              "name": "ServiceCode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PrePrinted": {
+            "type": "boolean",
+            "xml": {
+              "name": "PrePrinted",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShippingDate": {
+            "type": "string",
+            "contentEncoding": "date",
+            "xml": {
+              "name": "ShippingDate",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "JobReference": {
+            "type": "string",
+            "xml": {
+              "name": "JobReference",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "RecipientContact": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              },
+              {
+                "xml": {
+                  "name": "RecipientContact",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "RecipientAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "RecipientAddress",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ImporterContact": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              },
+              {
+                "xml": {
+                  "name": "ImporterContact",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ImporterAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "ImporterAddress",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ExporterContact": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              },
+              {
+                "xml": {
+                  "name": "ExporterContact",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ExporterAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "ExporterAddress",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "SenderContact": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              },
+              {
+                "xml": {
+                  "name": "SenderContact",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "SenderAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "SenderAddress",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "TotalNumberOfParcels": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "TotalNumberOfParcels",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "TotalShipmentWeight": {
+            "type": "number",
+            "xml": {
+              "name": "TotalShipmentWeight",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Enhancement": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Enhancement"
+              },
+              {
+                "xml": {
+                  "name": "Enhancement",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "DeliveryOptions": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryOptions"
+              },
+              {
+                "xml": {
+                  "name": "DeliveryOptions",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "HazardousGoods": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HazardousGoods"
+              },
+              {
+                "xml": {
+                  "name": "HazardousGoods",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Returns": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Returns"
+              },
+              {
+                "xml": {
+                  "name": "Returns",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "DropOffInd": {
+            "type": "string",
+            "xml": {
+              "name": "DropOffInd",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PrintOwnLabel": {
+            "type": "boolean",
+            "xml": {
+              "name": "PrintOwnLabel",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CollectionInfo": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CollectionInfo"
+              },
+              {
+                "xml": {
+                  "name": "CollectionInfo",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "InternationalInfo": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InternationalInfo"
+              },
+              {
+                "xml": {
+                  "name": "InternationalInfo",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ReferenceNumber1": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber1",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber2": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber2",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber3": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber3",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber4": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber4",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber5": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber5",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions1": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions1",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions2": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions2",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions3": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions3",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions4": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions4",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "InBoundContact": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              },
+              {
+                "xml": {
+                  "name": "InBoundContact",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "InBoundAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "InBoundAddress",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "InBoundDetails": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InBoundDetails"
+              },
+              {
+                "xml": {
+                  "name": "InBoundDetails",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ExchangeInstructions1": {
+            "type": "string",
+            "xml": {
+              "name": "ExchangeInstructions1",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ExchangeInstructions2": {
+            "type": "string",
+            "xml": {
+              "name": "ExchangeInstructions2",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ExchangeInstructions3": {
+            "type": "string",
+            "xml": {
+              "name": "ExchangeInstructions3",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ConsignmentHandling": {
+            "type": "boolean",
+            "xml": {
+              "name": "ConsignmentHandling",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "RequestedShipment",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Contact": {
+        "title": "Contact",
+        "required": [
+          "BusinessName"
+        ],
+        "type": "object",
+        "properties": {
+          "BusinessName": {
+            "type": "string",
+            "xml": {
+              "name": "BusinessName",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ContactName": {
+            "type": "string",
+            "xml": {
+              "name": "ContactName",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "EmailAddress": {
+            "type": "string",
+            "xml": {
+              "name": "EmailAddress",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Telephone": {
+            "type": "string",
+            "xml": {
+              "name": "Telephone",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Fax": {
+            "type": "string",
+            "xml": {
+              "name": "Fax",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "MobilePhone": {
+            "type": "string",
+            "xml": {
+              "name": "MobilePhone",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SendersName": {
+            "type": "string",
+            "xml": {
+              "name": "SendersName",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Notifications": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Notifications"
+              },
+              {
+                "xml": {
+                  "name": "Notifications",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Contact",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Notifications": {
+        "title": "Notifications",
+        "required": [
+          "NotificationType"
+        ],
+        "type": "object",
+        "properties": {
+          "NotificationType": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "NotificationType",
+                "attribute": false,
+                "wrapped": false
+              }
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Notifications",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Address": {
+        "title": "Address",
+        "required": [
+          "AddressLine1",
+          "Country"
+        ],
+        "type": "object",
+        "properties": {
+          "AddressLine1": {
+            "type": "string",
+            "xml": {
+              "name": "AddressLine1",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "AddressLine2": {
+            "type": "string",
+            "xml": {
+              "name": "AddressLine2",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "AddressLine3": {
+            "type": "string",
+            "xml": {
+              "name": "AddressLine3",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Town": {
+            "type": "string",
+            "xml": {
+              "name": "Town",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Postcode": {
+            "type": "string",
+            "xml": {
+              "name": "Postcode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Country": {
+            "type": "string",
+            "xml": {
+              "name": "Country",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Address",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "InBoundDetails": {
+        "title": "InBoundDetails",
+        "required": [
+          "ContractNumber",
+          "ServiceCode"
+        ],
+        "type": "object",
+        "properties": {
+          "ContractNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ContractNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ServiceCode": {
+            "type": "string",
+            "xml": {
+              "name": "ServiceCode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "TotalShipmentWeight": {
+            "type": "string",
+            "xml": {
+              "name": "TotalShipmentWeight",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Enhancement": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Enhancement"
+              },
+              {
+                "xml": {
+                  "name": "Enhancement",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ReferenceNumber1": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber1",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber2": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber2",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber3": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber3",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber4": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber4",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ReferenceNumber5": {
+            "type": "string",
+            "xml": {
+              "name": "ReferenceNumber5",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions1": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions1",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions2": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions2",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions3": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions3",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecialInstructions4": {
+            "type": "string",
+            "xml": {
+              "name": "SpecialInstructions4",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "InBoundDetails",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Enhancement": {
+        "title": "Enhancement",
+        "type": "object",
+        "properties": {
+          "EnhancedCompensation": {
+            "type": "string",
+            "xml": {
+              "name": "EnhancedCompensation",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SaturdayDeliveryRequired": {
+            "type": "boolean",
+            "xml": {
+              "name": "SaturdayDeliveryRequired",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Enhancement",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "DeliveryOptions": {
+        "title": "DeliveryOptions",
+        "type": "object",
+        "properties": {
+          "ConvenientCollect": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConvenientCollect"
+              },
+              {
+                "xml": {
+                  "name": "ConvenientCollect",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "IRTS": {
+            "type": "boolean",
+            "xml": {
+              "name": "IRTS",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Letterbox": {
+            "type": "boolean",
+            "xml": {
+              "name": "Letterbox",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecifiedPostOffice": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SpecifiedPostOffice"
+              },
+              {
+                "xml": {
+                  "name": "SpecifiedPostOffice",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "SpecifiedNeighbour": {
+            "type": "string",
+            "xml": {
+              "name": "SpecifiedNeighbour",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SafePlace": {
+            "type": "string",
+            "xml": {
+              "name": "SafePlace",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PIN": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "PIN",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "NamedRecipient": {
+            "type": "boolean",
+            "xml": {
+              "name": "NamedRecipient",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "AddressOnly": {
+            "type": "boolean",
+            "xml": {
+              "name": "AddressOnly",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "NominatedDeliveryDate": {
+            "type": "string",
+            "contentEncoding": "date",
+            "xml": {
+              "name": "NominatedDeliveryDate",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PersonalParcel": {
+            "type": "string",
+            "xml": {
+              "name": "PersonalParcel",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "DeliveryOptions",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "HazardousGoods": {
+        "title": "HazardousGoods",
+        "required": [
+          "HazardousGood"
+        ],
+        "type": "object",
+        "properties": {
+          "HazardousGood": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HazardousGood"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "HazardousGoods",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "HazardousGood": {
+        "title": "HazardousGood",
+        "type": "object",
+        "properties": {
+          "LQDGUNCode": {
+            "type": "string",
+            "xml": {
+              "name": "LQDGUNCode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "LQDGDescription": {
+            "type": "string",
+            "xml": {
+              "name": "LQDGDescription",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "LQDGVolume": {
+            "type": "number",
+            "xml": {
+              "name": "LQDGVolume",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Firearms": {
+            "type": "string",
+            "xml": {
+              "name": "Firearms",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "HazardousGood",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Returns": {
+        "title": "Returns",
+        "required": [
+          "EmailLabel"
+        ],
+        "type": "object",
+        "properties": {
+          "ReturnsEmail": {
+            "type": "string",
+            "xml": {
+              "name": "ReturnsEmail",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "EmailMessage": {
+            "type": "string",
+            "xml": {
+              "name": "EmailMessage",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "EmailLabel": {
+            "type": "boolean",
+            "xml": {
+              "name": "EmailLabel",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Returns",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "InternationalInfo": {
+        "title": "InternationalInfo",
+        "type": "object",
+        "properties": {
+          "Parcels": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Parcels"
+              },
+              {
+                "xml": {
+                  "name": "Parcels",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ExporterCustomsReference": {
+            "type": "string",
+            "xml": {
+              "name": "ExporterCustomsReference",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "RecipientImporterVatNo": {
+            "type": "string",
+            "xml": {
+              "name": "RecipientImporterVatNo",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "OriginalExportShipmentNo": {
+            "type": "string",
+            "xml": {
+              "name": "OriginalExportShipmentNo",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "DocumentsOnly": {
+            "type": "boolean",
+            "xml": {
+              "name": "DocumentsOnly",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "DocumentsDescription": {
+            "type": "string",
+            "xml": {
+              "name": "DocumentsDescription",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ValueUnder200USDollars": {
+            "type": "boolean",
+            "xml": {
+              "name": "ValueUnder200USDollars",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShipmentDescription": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentDescription",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Comments": {
+            "type": "string",
+            "xml": {
+              "name": "Comments",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "InvoiceDate": {
+            "type": "string",
+            "contentEncoding": "date",
+            "xml": {
+              "name": "InvoiceDate",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "TermsOfDelivery": {
+            "type": "string",
+            "xml": {
+              "name": "TermsOfDelivery",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PurchaseOrderRef": {
+            "type": "string",
+            "xml": {
+              "name": "PurchaseOrderRef",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "Only for international shipments",
+        "xml": {
+          "name": "InternationalInfo",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Parcels": {
+        "title": "Parcels",
+        "required": [
+          "Parcel"
+        ],
+        "type": "object",
+        "properties": {
+          "Parcel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Parcel"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Parcels",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Parcel": {
+        "title": "Parcel",
+        "type": "object",
+        "properties": {
+          "Weight": {
+            "type": "number",
+            "xml": {
+              "name": "Weight",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Length": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Length",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Height": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Height",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Width": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Width",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PurposeOfShipment": {
+            "type": "string",
+            "xml": {
+              "name": "PurposeOfShipment",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "InvoiceNumber": {
+            "type": "string",
+            "xml": {
+              "name": "InvoiceNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ExportLicenseNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ExportLicenseNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CertificateNumber": {
+            "type": "string",
+            "xml": {
+              "name": "CertificateNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ContentDetails": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContentDetails"
+              },
+              {
+                "xml": {
+                  "name": "ContentDetails",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ShippingCost": {
+            "type": "number",
+            "xml": {
+              "name": "ShippingCost",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Parcel",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ContentDetails": {
+        "title": "ContentDetails",
+        "required": [
+          "ContentDetail"
+        ],
+        "type": "object",
+        "properties": {
+          "ContentDetail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentDetail"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ContentDetails",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ContentDetail": {
+        "title": "ContentDetail",
+        "required": [
+          "CountryOfManufacture",
+          "Description",
+          "UnitWeight",
+          "UnitQuantity",
+          "UnitValue",
+          "Currency"
+        ],
+        "type": "object",
+        "properties": {
+          "CountryOfManufacture": {
+            "type": "string",
+            "xml": {
+              "name": "CountryOfManufacture",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CountryOfOrigin": {
+            "type": "string",
+            "xml": {
+              "name": "CountryOfOrigin",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ManufacturersName": {
+            "type": "string",
+            "xml": {
+              "name": "ManufacturersName",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Description": {
+            "type": "string",
+            "xml": {
+              "name": "Description",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "UnitWeight": {
+            "type": "number",
+            "xml": {
+              "name": "UnitWeight",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "UnitQuantity": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "UnitQuantity",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "UnitValue": {
+            "type": "number",
+            "xml": {
+              "name": "UnitValue",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Currency": {
+            "type": "string",
+            "xml": {
+              "name": "Currency",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "TariffCode": {
+            "type": "string",
+            "xml": {
+              "name": "TariffCode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "TariffDescription": {
+            "type": "string",
+            "xml": {
+              "name": "TariffDescription",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ArticleReference": {
+            "type": "string",
+            "xml": {
+              "name": "ArticleReference",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ContentDetail",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CollectionInfo": {
+        "title": "CollectionInfo",
+        "required": [
+          "CollectionContact",
+          "CollectionAddress"
+        ],
+        "type": "object",
+        "properties": {
+          "CollectionContact": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Contact"
+              },
+              {
+                "xml": {
+                  "name": "CollectionContact",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "CollectionAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "CollectionAddress",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "CollectionTime": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DateTimeRange"
+              },
+              {
+                "xml": {
+                  "name": "CollectionTime",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "Only required for collections",
+        "xml": {
+          "name": "CollectionInfo",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "DateTimeRange": {
+        "title": "DateTimeRange",
+        "required": [
+          "From",
+          "To"
+        ],
+        "type": "object",
+        "properties": {
+          "From": {
+            "type": "string",
+            "contentEncoding": "date-time",
+            "xml": {
+              "name": "From",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "To": {
+            "type": "string",
+            "contentEncoding": "date-time",
+            "xml": {
+              "name": "To",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "DateTimeRange",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ShipmentLabelData": {
+        "title": "ShipmentLabelData",
+        "required": [
+          "ParcelLabelData"
+        ],
+        "type": "object",
+        "properties": {
+          "ParcelLabelData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParcelLabelData"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ShipmentLabelData",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ParcelLabelData": {
+        "title": "ParcelLabelData",
+        "type": "object",
+        "properties": {
+          "ParcelNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ParcelNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "JourneyLeg": {
+            "type": "string",
+            "xml": {
+              "name": "JourneyLeg",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "LabelData": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LabelData"
+              },
+              {
+                "xml": {
+                  "name": "LabelData",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Barcodes": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Barcodes"
+              },
+              {
+                "xml": {
+                  "name": "Barcodes",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Images": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Images"
+              },
+              {
+                "xml": {
+                  "name": "Images",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "ParcelContents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParcelContents"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ParcelLabelData",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ParcelContents": {
+        "title": "ParcelContents",
+        "required": [
+          "Item"
+        ],
+        "type": "object",
+        "properties": {
+          "Item": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentData"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ParcelContents",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ContentData": {
+        "title": "ContentData",
+        "required": [
+          "Name",
+          "Data"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "xml": {
+              "name": "Name",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Data": {
+            "type": "string",
+            "xml": {
+              "name": "Data",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ContentData",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "LabelData": {
+        "title": "LabelData",
+        "required": [
+          "Item"
+        ],
+        "type": "object",
+        "properties": {
+          "Item": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LabelItem"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "LabelData",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "LabelItem": {
+        "title": "LabelItem",
+        "required": [
+          "Name",
+          "Data"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "xml": {
+              "name": "Name",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Data": {
+            "type": "string",
+            "xml": {
+              "name": "Data",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "LabelItem",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Barcodes": {
+        "title": "Barcodes",
+        "required": [
+          "Barcode"
+        ],
+        "type": "object",
+        "properties": {
+          "Barcode": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Barcode"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Barcodes",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Barcode": {
+        "title": "Barcode",
+        "required": [
+          "Name",
+          "Data"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "xml": {
+              "name": "Name",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Data": {
+            "type": "string",
+            "contentEncoding": "base64",
+            "xml": {
+              "name": "Data",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Barcode",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Images": {
+        "title": "Images",
+        "required": [
+          "Image"
+        ],
+        "type": "object",
+        "properties": {
+          "Image": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Images",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Image": {
+        "title": "Image",
+        "required": [
+          "Name",
+          "Data"
+        ],
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "xml": {
+              "name": "Name",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Data": {
+            "type": "string",
+            "contentEncoding": "base64",
+            "xml": {
+              "name": "Data",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Image",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PrintType": {
+        "title": "PrintType",
+        "enum": [
+          "ALL_PARCELS",
+          "SINGLE_PARCEL"
+        ],
+        "type": "string",
+        "description": "",
+        "xml": {
+          "name": "PrintType",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Document": {
+        "title": "Document",
+        "required": [
+          "Data"
+        ],
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "string",
+            "contentEncoding": "base64",
+            "xml": {
+              "name": "Data",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Document",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedManifests": {
+        "title": "CompletedManifests",
+        "required": [
+          "CompletedManifestInfo"
+        ],
+        "type": "object",
+        "properties": {
+          "CompletedManifestInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompletedManifestInfo"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedManifests",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedManifestInfo": {
+        "title": "CompletedManifestInfo",
+        "required": [
+          "DepartmentId",
+          "ManifestNumber",
+          "ManifestType",
+          "TotalShipmentCount",
+          "ManifestShipments"
+        ],
+        "type": "object",
+        "properties": {
+          "DepartmentId": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "DepartmentId",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ManifestNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ManifestNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ManifestType": {
+            "type": "string",
+            "xml": {
+              "name": "ManifestType",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "TotalShipmentCount": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "TotalShipmentCount",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ManifestShipments": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ManifestShipments"
+              },
+              {
+                "xml": {
+                  "name": "ManifestShipments",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedManifestInfo",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ManifestShipments": {
+        "title": "ManifestShipments",
+        "required": [
+          "ManifestShipment"
+        ],
+        "type": "object",
+        "properties": {
+          "ManifestShipment": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManifestShipment"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ManifestShipments",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ManifestShipment": {
+        "title": "ManifestShipment",
+        "required": [
+          "ShipmentNumber",
+          "ServiceCode"
+        ],
+        "type": "object",
+        "properties": {
+          "ShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ServiceCode": {
+            "type": "string",
+            "xml": {
+              "name": "ServiceCode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ManifestShipment",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedShipmentInfo": {
+        "title": "CompletedShipmentInfo",
+        "required": [
+          "Status",
+          "CompletedShipments",
+          "RequestedShipment"
+        ],
+        "type": "object",
+        "properties": {
+          "LeadShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "LeadShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "DeliveryDate": {
+            "type": "string",
+            "contentEncoding": "date",
+            "xml": {
+              "name": "DeliveryDate",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Status": {
+            "type": "string",
+            "xml": {
+              "name": "Status",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CompletedShipments": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompletedShipments"
+              },
+              {
+                "xml": {
+                  "name": "CompletedShipments",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "RequestedShipment": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RequestedShipment"
+              },
+              {
+                "xml": {
+                  "name": "RequestedShipment",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedShipmentInfo",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedShipmentInfoCreatePrint": {
+        "title": "CompletedShipmentInfoCreatePrint",
+        "required": [
+          "Status",
+          "CompletedShipments"
+        ],
+        "type": "object",
+        "properties": {
+          "LeadShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "LeadShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "DeliveryDate": {
+            "type": "string",
+            "contentEncoding": "date",
+            "xml": {
+              "name": "DeliveryDate",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Status": {
+            "type": "string",
+            "xml": {
+              "name": "Status",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CompletedShipments": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompletedShipments"
+              },
+              {
+                "xml": {
+                  "name": "CompletedShipments",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedShipmentInfoCreatePrint",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedShipments": {
+        "title": "CompletedShipments",
+        "required": [
+          "CompletedShipment"
+        ],
+        "type": "object",
+        "properties": {
+          "CompletedShipment": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompletedShipment"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedShipments",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedShipment": {
+        "title": "CompletedShipment",
+        "type": "object",
+        "properties": {
+          "ShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "OutBoundShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "OutBoundShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "InBoundShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "InBoundShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PartnerNumber": {
+            "type": "string",
+            "xml": {
+              "name": "PartnerNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedShipment",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedReturnInfo": {
+        "title": "CompletedReturnInfo",
+        "required": [
+          "Status",
+          "ShipmentNumber",
+          "CollectionTime"
+        ],
+        "type": "object",
+        "properties": {
+          "Status": {
+            "type": "string",
+            "xml": {
+              "name": "Status",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CollectionTime": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DateTimeRange"
+              },
+              {
+                "xml": {
+                  "name": "CollectionTime",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedReturnInfo",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Authentication": {
+        "title": "Authentication",
+        "required": [
+          "UserName",
+          "Password"
+        ],
+        "type": "object",
+        "properties": {
+          "UserName": {
+            "type": "string",
+            "xml": {
+              "name": "UserName",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Password": {
+            "type": "string",
+            "xml": {
+              "name": "Password",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Authentication",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Alerts": {
+        "title": "Alerts",
+        "required": [
+          "Alert"
+        ],
+        "type": "object",
+        "properties": {
+          "Alert": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alert"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Alerts",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Alert": {
+        "title": "Alert",
+        "required": [
+          "Code",
+          "Message",
+          "Type"
+        ],
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Code",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Message": {
+            "type": "string",
+            "xml": {
+              "name": "Message",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AlertType"
+              },
+              {
+                "xml": {
+                  "name": "Type",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Alert",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedCancel": {
+        "title": "CompletedCancel",
+        "type": "object",
+        "properties": {
+          "CompletedCancelInfo": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompletedCancelInfo"
+              },
+              {
+                "xml": {
+                  "name": "CompletedCancelInfo",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedCancel",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CompletedCancelInfo": {
+        "title": "CompletedCancelInfo",
+        "type": "object",
+        "properties": {
+          "Status": {
+            "type": "string",
+            "xml": {
+              "name": "Status",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ShipmentNumber": {
+            "type": "string",
+            "xml": {
+              "name": "ShipmentNumber",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "CompletedCancelInfo",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ConvenientCollect": {
+        "title": "ConvenientCollect",
+        "type": "object",
+        "properties": {
+          "Postcode": {
+            "type": "string",
+            "xml": {
+              "name": "Postcode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PostOffice": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostOffice"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Count": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Count",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PostOfficeID": {
+            "type": "string",
+            "xml": {
+              "name": "PostOfficeID",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ConvenientCollect",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "SpecifiedPostOffice": {
+        "title": "SpecifiedPostOffice",
+        "type": "object",
+        "properties": {
+          "Postcode": {
+            "type": "string",
+            "xml": {
+              "name": "Postcode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PostOffice": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostOffice"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Count": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Count",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "PostOfficeID": {
+            "type": "string",
+            "xml": {
+              "name": "PostOfficeID",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "SpecifiedPostOffice",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PAF": {
+        "title": "PAF",
+        "type": "object",
+        "properties": {
+          "Postcode": {
+            "type": "string",
+            "xml": {
+              "name": "Postcode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Count": {
+            "type": "integer",
+            "contentEncoding": "int32",
+            "xml": {
+              "name": "Count",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "SpecifiedNeighbour": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecifiedNeighbour"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "PAF",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "SpecifiedNeighbour": {
+        "title": "SpecifiedNeighbour",
+        "type": "object",
+        "properties": {
+          "Address": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Address"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "SpecifiedNeighbour",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "SafePlaceList": {
+        "title": "SafePlaceList",
+        "type": "object",
+        "properties": {
+          "SafePlace": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "SafePlace",
+                "attribute": false,
+                "wrapped": false
+              }
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "SafePlaceList",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "NominatedDeliveryDates": {
+        "title": "NominatedDeliveryDates",
+        "type": "object",
+        "properties": {
+          "ServiceCode": {
+            "type": "string",
+            "xml": {
+              "name": "ServiceCode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Departments": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Departments"
+              },
+              {
+                "xml": {
+                  "name": "Departments",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "NominatedDeliveryDates",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "NominatedDeliveryDateList": {
+        "title": "NominatedDeliveryDateList",
+        "type": "object",
+        "properties": {
+          "NominatedDeliveryDate": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "contentEncoding": "date",
+              "xml": {
+                "name": "NominatedDeliveryDate",
+                "attribute": false,
+                "wrapped": false
+              }
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "NominatedDeliveryDateList",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PostcodeExclusion": {
+        "title": "PostcodeExclusion",
+        "type": "object",
+        "properties": {
+          "DeliveryPostcode": {
+            "type": "string",
+            "xml": {
+              "name": "DeliveryPostcode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CollectionPostcode": {
+            "type": "string",
+            "xml": {
+              "name": "CollectionPostcode",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Departments": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Departments"
+              },
+              {
+                "xml": {
+                  "name": "Departments",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "PostcodeExclusion",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Departments": {
+        "title": "Departments",
+        "type": "object",
+        "properties": {
+          "Department": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Department"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Departments",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Department": {
+        "title": "Department",
+        "type": "object",
+        "properties": {
+          "DepartmentID": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "contentEncoding": "int32",
+              "xml": {
+                "name": "DepartmentID",
+                "attribute": false,
+                "wrapped": false
+              }
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "ServiceCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceCodes"
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "NominatedDeliveryDateList": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NominatedDeliveryDateList"
+              },
+              {
+                "xml": {
+                  "name": "NominatedDeliveryDateList",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Department",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ServiceCodes": {
+        "title": "ServiceCodes",
+        "type": "object",
+        "properties": {
+          "ServiceCode": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "ServiceCode",
+                "attribute": false,
+                "wrapped": false
+              }
+            },
+            "description": "",
+            "xml": {
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "ServiceCodes",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PostOffice": {
+        "title": "PostOffice",
+        "type": "object",
+        "properties": {
+          "PostOfficeID": {
+            "type": "string",
+            "xml": {
+              "name": "PostOfficeID",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Business": {
+            "type": "string",
+            "xml": {
+              "name": "Business",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Address": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "xml": {
+                  "name": "Address",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "OpeningHours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OpeningHours"
+              },
+              {
+                "xml": {
+                  "name": "OpeningHours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Distance": {
+            "type": "number",
+            "xml": {
+              "name": "Distance",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Availability": {
+            "type": "boolean",
+            "xml": {
+              "name": "Availability",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Position": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Position"
+              },
+              {
+                "xml": {
+                  "name": "Position",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "BookingReference": {
+            "type": "string",
+            "xml": {
+              "name": "BookingReference",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "PostOffice",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "OpeningHours": {
+        "title": "OpeningHours",
+        "type": "object",
+        "properties": {
+          "Mon": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Mon"
+              },
+              {
+                "xml": {
+                  "name": "Mon",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Tue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Tue"
+              },
+              {
+                "xml": {
+                  "name": "Tue",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Wed": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Wed"
+              },
+              {
+                "xml": {
+                  "name": "Wed",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Thu": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Thu"
+              },
+              {
+                "xml": {
+                  "name": "Thu",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Fri": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Fri"
+              },
+              {
+                "xml": {
+                  "name": "Fri",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Sat": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Sat"
+              },
+              {
+                "xml": {
+                  "name": "Sat",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "Sun": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Sun"
+              },
+              {
+                "xml": {
+                  "name": "Sun",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          },
+          "BankHol": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BankHol"
+              },
+              {
+                "xml": {
+                  "name": "BankHol",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "OpeningHours",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Mon": {
+        "title": "Mon",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Mon",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Tue": {
+        "title": "Tue",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Tue",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Wed": {
+        "title": "Wed",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Wed",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Thu": {
+        "title": "Thu",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Thu",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Fri": {
+        "title": "Fri",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Fri",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Sat": {
+        "title": "Sat",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Sat",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Sun": {
+        "title": "Sun",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Sun",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "BankHol": {
+        "title": "BankHol",
+        "type": "object",
+        "properties": {
+          "Hours": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hours"
+              },
+              {
+                "xml": {
+                  "name": "Hours",
+                  "namespace": "http://www.parcelforce.net/ws/ship/v14",
+                  "prefix": "tns",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "BankHol",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Hours": {
+        "title": "Hours",
+        "type": "object",
+        "properties": {
+          "Open": {
+            "type": "string",
+            "xml": {
+              "name": "Open",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Close": {
+            "type": "string",
+            "xml": {
+              "name": "Close",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "CloseLunch": {
+            "type": "string",
+            "xml": {
+              "name": "CloseLunch",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "AfterLunchOpening": {
+            "type": "string",
+            "xml": {
+              "name": "AfterLunchOpening",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Hours",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "Position": {
+        "title": "Position",
+        "type": "object",
+        "properties": {
+          "Longitude": {
+            "type": "number",
+            "xml": {
+              "name": "Longitude",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          },
+          "Latitude": {
+            "type": "number",
+            "xml": {
+              "name": "Latitude",
+              "namespace": "http://www.parcelforce.net/ws/ship/v14",
+              "prefix": "tns",
+              "attribute": false,
+              "wrapped": false
+            }
+          }
+        },
+        "description": "",
+        "xml": {
+          "name": "Position",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "AlertType": {
+        "title": "AlertType",
+        "enum": [
+          "ERROR",
+          "WARNING",
+          "NOTIFICATION"
+        ],
+        "type": "string",
+        "description": "",
+        "xml": {
+          "name": "AlertType",
+          "namespace": "http://www.parcelforce.net/ws/ship/v14",
+          "prefix": "tns",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CancelShipmentReply1": {
+        "title": "CancelShipmentReply1",
+        "required": [
+          "CancelShipmentReply"
+        ],
+        "type": "object",
+        "properties": {
+          "CancelShipmentReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CancelShipmentReply"
+              },
+              {
+                "xml": {
+                  "name": "CancelShipmentReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "CancelShipmentReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CancelShipmentRequest1": {
+        "title": "CancelShipmentRequest1",
+        "required": [
+          "CancelShipmentRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "CancelShipmentRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CancelShipmentRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "CCReserveReply1": {
+        "title": "CCReserveReply1",
+        "required": [
+          "CCReserveReply"
+        ],
+        "type": "object",
+        "properties": {
+          "CCReserveReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CCReserveReply"
+              },
+              {
+                "xml": {
+                  "name": "CCReserveReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "CCReserveReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CCReserveRequest1": {
+        "title": "CCReserveRequest1",
+        "required": [
+          "CCReserveRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "CCReserveRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CCReserveRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "CreateManifestReply1": {
+        "title": "CreateManifestReply1",
+        "required": [
+          "CreateManifestReply"
+        ],
+        "type": "object",
+        "properties": {
+          "CreateManifestReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateManifestReply"
+              },
+              {
+                "xml": {
+                  "name": "CreateManifestReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "CreateManifestReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CreateManifestRequest1": {
+        "title": "CreateManifestRequest1",
+        "required": [
+          "CreateManifestRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "CreateManifestRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateManifestRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "CreatePrintReply1": {
+        "title": "CreatePrintReply1",
+        "required": [
+          "CreatePrintReply"
+        ],
+        "type": "object",
+        "properties": {
+          "CreatePrintReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreatePrintReply"
+              },
+              {
+                "xml": {
+                  "name": "CreatePrintReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "CreatePrintReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CreatePrintRequest1": {
+        "title": "CreatePrintRequest1",
+        "required": [
+          "CreatePrintRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "CreatePrintRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreatePrintRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "CreateShipmentReply1": {
+        "title": "CreateShipmentReply1",
+        "required": [
+          "CreateShipmentReply"
+        ],
+        "type": "object",
+        "properties": {
+          "CreateShipmentReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateShipmentReply"
+              },
+              {
+                "xml": {
+                  "name": "CreateShipmentReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "CreateShipmentReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "CreateShipmentRequest1": {
+        "title": "CreateShipmentRequest1",
+        "required": [
+          "CreateShipmentRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "CreateShipmentRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateShipmentRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "FindReply1": {
+        "title": "FindReply1",
+        "required": [
+          "FindReply"
+        ],
+        "type": "object",
+        "properties": {
+          "FindReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FindReply"
+              },
+              {
+                "xml": {
+                  "name": "FindReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "FindReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "FindRequest1": {
+        "title": "FindRequest1",
+        "required": [
+          "FindRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "FindRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FindRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "PrintDocumentReply1": {
+        "title": "PrintDocumentReply1",
+        "required": [
+          "PrintDocumentReply"
+        ],
+        "type": "object",
+        "properties": {
+          "PrintDocumentReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintDocumentReply"
+              },
+              {
+                "xml": {
+                  "name": "PrintDocumentReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "PrintDocumentReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PrintDocumentRequest1": {
+        "title": "PrintDocumentRequest1",
+        "required": [
+          "PrintDocumentRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "PrintDocumentRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintDocumentRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "PrintLabelReply1": {
+        "title": "PrintLabelReply1",
+        "required": [
+          "PrintLabelReply"
+        ],
+        "type": "object",
+        "properties": {
+          "PrintLabelReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintLabelReply"
+              },
+              {
+                "xml": {
+                  "name": "PrintLabelReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "PrintLabelReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PrintLabelRequest1": {
+        "title": "PrintLabelRequest1",
+        "required": [
+          "PrintLabelRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "PrintLabelRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintLabelRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "PrintManifestReply1": {
+        "title": "PrintManifestReply1",
+        "required": [
+          "PrintManifestReply"
+        ],
+        "type": "object",
+        "properties": {
+          "PrintManifestReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintManifestReply"
+              },
+              {
+                "xml": {
+                  "name": "PrintManifestReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "PrintManifestReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "PrintManifestRequest1": {
+        "title": "PrintManifestRequest1",
+        "required": [
+          "PrintManifestRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "PrintManifestRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintManifestRequest"
+              },
+              {}
+            ]
+          }
+        }
+      },
+      "ReturnShipmentReply1": {
+        "title": "ReturnShipmentReply1",
+        "required": [
+          "ReturnShipmentReply"
+        ],
+        "type": "object",
+        "properties": {
+          "ReturnShipmentReply": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReturnShipmentReply"
+              },
+              {
+                "xml": {
+                  "name": "ReturnShipmentReply",
+                  "attribute": false,
+                  "wrapped": false
+                }
+              }
+            ]
+          }
+        },
+        "xml": {
+          "name": "ReturnShipmentReply",
+          "attribute": false,
+          "wrapped": false
+        }
+      },
+      "ReturnShipmentRequest1": {
+        "title": "ReturnShipmentRequest1",
+        "required": [
+          "ReturnShipmentRequest"
+        ],
+        "type": "object",
+        "properties": {
+          "ReturnShipmentRequest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReturnShipmentRequest"
+              },
+              {}
+            ]
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "ShipServiceSoapBinding",
+      "description": ""
+    }
+  ]
+}
