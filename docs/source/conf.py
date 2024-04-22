@@ -1,8 +1,7 @@
 import sys
 import inspect
-import pathlib
 
-from loguru import logger
+
 # README needs copying from index.rst manually
 
 project = 'Shipaw'
@@ -30,11 +29,11 @@ html_static_path = ['_static']
 html_css_files = ['custom.css']
 
 html_context = {
-    "display_github": True,
-    "github_user": "PawRequest",
-    "github_repo": "shipaw",
-    "github_version": "main",
-    "conf_py_path": "/docs/source/",
+    'display_github': True,
+    'github_user': 'PawRequest',
+    'github_repo': 'shipaw',
+    'github_version': 'main',
+    'conf_py_path': '/docs/source/',
 }
 html_baseurl = 'https://pawrequest.github.io/shipaw/'
 readme_src_files = 'index.rst'
@@ -84,7 +83,7 @@ def linkcode_resolve(domain, info):
         source_file = inspect.getsourcefile(obj)
         if source_file is None:
             return None
-    except Exception as e:
+    except Exception:
         return None
 
     try:

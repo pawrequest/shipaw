@@ -2,12 +2,18 @@ import datetime as dt
 import typing as _t
 
 import pydantic as _p
+<<<<<<< HEAD
 from pawdantic import paw_types
 
+=======
+
+from pawdantic import paw_types
+>>>>>>> recov
 from .. import ship_types
 from . import pf_ext, pf_lists, pf_shared
 
 
+<<<<<<< HEAD
 class ContactMininmum(pf_shared.BasePFType):
     business_name: paw_types.truncated_printable_str_type(40)
     mobile_phone: str
@@ -16,6 +22,25 @@ class ContactMininmum(pf_shared.BasePFType):
 
 class Contact(ContactMininmum):
     contact_name: paw_types.optional_truncated_printable_str_type(30) | None = None
+=======
+
+class ContactMininmum(pf_shared.BasePFType):
+    business_name: paw_types.truncated_printable_str_type(40) = _p.Field(
+        ...,
+        title='Business Name'
+    )
+    mobile_phone: str = _p.Field(..., description='Mobile phone number')
+    email_address: _p.EmailStr = _p.Field(
+        title='Email Address',
+    )
+
+
+class Contact(ContactMininmum):
+    contact_name: paw_types.optional_truncated_printable_str_type(30) = _p.Field(
+        None,
+        title='Contact Name'
+    )
+>>>>>>> recov
     telephone: str | None = None
     # fax: str | None = None
 
@@ -26,22 +51,38 @@ class Contact(ContactMininmum):
 class CollectionContact(Contact):
     notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
 
+<<<<<<< HEAD
     @_p.field_validator("telephone", mode="after")
     def tel_is_none(cls, v, values):
         if not v:
             v = values.data.get("mobile_phone")
+=======
+    @_p.field_validator('telephone', mode='after')
+    def tel_is_none(cls, v, values):
+        if not v:
+            v = values.data.get('mobile_phone')
+>>>>>>> recov
         return v
 
 
 class PAF(pf_shared.BasePFType):
     postcode: str | None = None
     count: int | None = _p.Field(None)
+<<<<<<< HEAD
     specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description="")
 
 
 class Department(pf_shared.BasePFType):
     department_id: list[int | None] = _p.Field(None, description="")
     service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description="")
+=======
+    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description='')
+
+
+class Department(pf_shared.BasePFType):
+    department_id: list[int | None] = _p.Field(None, description='')
+    service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description='')
+>>>>>>> recov
     nominated_delivery_date_list: pf_lists.NominatedDeliveryDatelist | None = None
 
 
@@ -65,7 +106,11 @@ class ParcelLabelData(pf_shared.BasePFType):
     label_data: pf_lists.LabelData | None = None
     barcodes: pf_lists.Barcodes | None = None
     images: pf_lists.Images | None = None
+<<<<<<< HEAD
     parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description="")
+=======
+    parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description='')
+>>>>>>> recov
 
 
 class CompletedManifestInfo(pf_shared.BasePFType):
@@ -93,33 +138,58 @@ class CompletedShipmentInfo(pf_shared.BasePFType):
 
 class CollectionInfo(pf_shared.BasePFType):
     collection_contact: Contact
+<<<<<<< HEAD
     collection_address: pf_ext.AddressRecipient
+=======
+    collection_address: pf_ext.AddressCollection
+>>>>>>> recov
     collection_time: pf_shared.DateTimeRange
 
 
 class CollectionStateProtocol(_t.Protocol):
     contact: Contact
+<<<<<<< HEAD
     address: pf_ext.AddressRecipient
+=======
+    address: pf_ext.AddressCollection
+>>>>>>> recov
     ship_date: dt.date
 
 
 def collection_info_from_state(state: CollectionStateProtocol):
+<<<<<<< HEAD
     col_contact_ = CollectionContact(**state.contact.model_dump(exclude={"notifications"}))
+=======
+    col_contact_ = CollectionContact(**state.contact.model_dump(exclude={'notifications'}))
+>>>>>>> recov
     col_contact = col_contact_.model_validate(col_contact_)
     info = CollectionInfo(
         collection_contact=col_contact,
         collection_address=state.address,
         collection_time=pf_shared.DateTimeRange.from_datetimes(
+<<<<<<< HEAD
             dt.datetime.combine(state.ship_date, dt.time(9, 0)), dt.datetime.combine(state.ship_date, dt.time(17, 0))
         ),
+=======
+            dt.datetime.combine(state.ship_date, dt.time(9, 0)),
+            dt.datetime.combine(
+                state.ship_date, dt.time(17, 0)
+            )
+        )
+>>>>>>> recov
     )
     return info.model_validate(info)
 
 
 class RequestedShipmentZero(pf_shared.BasePFType):
     recipient_contact: ContactMininmum
+<<<<<<< HEAD
     recipient_address: pf_ext.AddressRecipient
     total_number_of_parcels: int = _p.Field(..., description="Number of parcels in the shipment")
+=======
+    recipient_address: pf_ext.AddTypes
+    total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
+>>>>>>> recov
     shipping_date: dt.date
 
 
@@ -129,6 +199,7 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     contract_number: str
     department_id: int = ship_types.DepartmentNum
 
+<<<<<<< HEAD
     shipment_type: ship_types.DeliveryKind = "DELIVERY"
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     reference_number1: paw_types.optional_truncated_printable_str_type(24)  # first 14 visible on label
@@ -137,11 +208,27 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     def ref_num_validator(cls, v, values):
         if not v:
             v = values["recipient_contact"].business_name
+=======
+    shipment_type: ship_types.DeliveryKind = 'DELIVERY'
+    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+    reference_number1: paw_types.optional_truncated_printable_str_type(
+        24
+    )  # first 14 visible on label
+
+    @_p.field_validator('reference_number1', mode='after')
+    def ref_num_validator(cls, v, values):
+        if not v:
+            v = values.data.get('recipient_contact').business_name
+>>>>>>> recov
         return v
 
 
 class CollectionMinimum(RequestedShipmentMinimum):
+<<<<<<< HEAD
     shipment_type: ship_types.DeliveryKind = "COLLECTION"
+=======
+    shipment_type: ship_types.DeliveryKind = 'COLLECTION'
+>>>>>>> recov
     print_own_label: bool = True
     collection_info: CollectionInfo
 
