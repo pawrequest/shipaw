@@ -150,7 +150,7 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     @_p.field_validator('reference_number1', mode='after')
     def ref_num_validator(cls, v, values):
         if not v:
-            v = values['recipient_contact'].business_name
+            v = values.data.get('recipient_contact').business_name
         return v
 
 

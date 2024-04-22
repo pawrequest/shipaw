@@ -52,7 +52,7 @@ class ELClient(pydantic.BaseModel):
         """
         return ZeepBackend(self.service)[service_prot]
 
-    def shipment_req_to_resp(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
+    def send_shipment_request(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
         """Submit a CreateShipmentRequest to Parcelforce, booking carriage.
 
         Args:
@@ -64,7 +64,14 @@ class ELClient(pydantic.BaseModel):
         """
         back = self.backend(msgs.CreateShipmentService)
         resp = back.createshipment(request=req.model_dump(by_alias=True))
-        logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
+        if resp.alerts:
+            for alt in resp.alerts.alert:
+                if alt.type == 'ERROR':
+                    raise ValueError(f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}')
+                if alt.type == 'WARNING':
+                    logger.warning(f'ExpressLink Warning: {alt.message} for {req.requested_shipment.recipient_address.lines_str}')
+        else:
+            logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
 
         return msgs.CreateShipmentResponse.model_validate(resp)
 

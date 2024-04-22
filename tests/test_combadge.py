@@ -1,7 +1,7 @@
 from combadge.support.zeep.backends.sync import ZeepBackend
 
-from shipaw import msgs
-from shipaw.models import PAF, pf_ext
+from shipaw import ShipState, msgs
+from shipaw.models import PAF, pf_ext, shipable
 
 
 def test_find_paf(el_client):
@@ -14,13 +14,29 @@ def test_find_paf(el_client):
     assert isinstance(response.paf.specified_neighbour[0].address[0], pf_ext.AddTypes)
 
 
-def test_get_shipment(min_shipment_r, service, sett):
-    cb = combadge_service(service, msgs.CreateShipmentService)
-    req = msgs.CreateShipmentRequest(authentication=sett.auth, requested_shipment=min_shipment_r)
-    resp: msgs.CreateShipmentResponse = cb.createshipment(request=req)
-    shipment_ = resp.completed_shipment_info.completed_shipments.completed_shipment[0]
-    assert isinstance(shipment_.shipment_number, str)
+def test_shipable_record(outbound_record):
+    shipable.Shipable.model_validate(outbound_record)
+    assert ShipState.model_validate(outbound_record.ship_state)
 
 
-def combadge_service(service, service_prot):
-    return ZeepBackend(service)[service_prot]
+def test_client_sends_outbound(outbound_record, el_client, tmp_path):
+    req = el_client.state_to_outbound_request(outbound_record.ship_state)
+    assert isinstance(req, msgs.CreateShipmentRequest)
+    resp = el_client.send_shipment_request(req)
+    assert isinstance(resp, msgs.CreateShipmentResponse)
+    assert not resp.alerts
+    check_label(el_client, resp, tmp_path)
+
+
+def check_label(el_client, resp, tmp_path):
+    label = el_client.get_label(ship_num=resp.shipment_num, dl_path=tmp_path / 'tmp.pdf')
+    assert label.exists()
+
+
+def test_client_sends_inbound(inbound_record, el_client, tmp_path):
+    req = el_client.state_to_inbound_request(inbound_record.ship_state)
+    assert isinstance(req, msgs.CreateShipmentRequest)
+    resp = el_client.send_shipment_request(req)
+    assert isinstance(resp, msgs.CreateShipmentResponse)
+    assert not resp.alerts
+    check_label(el_client, resp, tmp_path)
