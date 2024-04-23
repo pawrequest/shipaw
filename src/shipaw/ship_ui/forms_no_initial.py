@@ -6,13 +6,9 @@ import pydantic as _p
 from fastui import components as c, forms as fastui_forms
 from pawdantic import paw_types
 
-from shipaw import ship_types
 from shipaw.models import pf_shared
 from shipaw.ship_ui import states
-# from shipaw.ship_ui.dynamic import BookingForm, BoxesModelForm, get_addresses, get_dates  # F401
-# todo check the noqa unused imports were not needed?
-from shipaw.ship_ui.dynamic import date_select_options
-from shipaw.ship_types import VALID_PC
+from shipaw.ship_ui.forms import date_select_options
 
 
 class ContactForm(_p.BaseModel):
@@ -32,6 +28,7 @@ class AddressForm(_p.BaseModel):
 
 
 #
+
 
 class ContactAndAddressForm(_p.BaseModel):
     business_name: paw_types.truncated_printable_str_type(40)
@@ -72,10 +69,7 @@ class DirectionEnum(str, Enum):
 
 
 def get_services():
-    return [
-        fastui_forms.SelectOption(value=service.value, label=service.name)
-        for service in pf_shared.ServiceCode2
-    ]
+    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in pf_shared.ServiceCode2]
 
 
 # def get_services():
@@ -91,22 +85,19 @@ async def contact_fields():
             name='business_name',
             title='Business Name',
         ),
-
         c.FormFieldInput(
             name='contact_name',
             title='Contact Name',
         ),
-
         c.FormFieldInput(
             name='email',
             title='Delivery Email',
             html_type='email',
         ),
-
         c.FormFieldInput(
             name='phone',
             title='Delivery Mobile Phone',
-        )
+        ),
     ]
 
 
@@ -117,27 +108,22 @@ async def address_fields():
             title='Address Line 1',
             required=True,
         ),
-
         c.FormFieldInput(
             name='address_line2',
             title='Address Line 2',
         ),
-
         c.FormFieldInput(
             name='address_line3',
             title='Address Line 3',
         ),
-
         c.FormFieldInput(
             name='town',
             title='Town',
         ),
-
         c.FormFieldInput(
             name='postcode',
             title='Postcode',
         ),
-
         # c.FormFieldInput(
         #     name='country',
         #     title='Country',
@@ -155,10 +141,7 @@ async def ship_fields():
         ),
         c.FormFieldSelect(
             name='boxes',
-            options=[
-                fastui_forms.SelectOption(value=str(i), label=str(i))
-                for i in range(1, 11)
-            ],
+            options=[fastui_forms.SelectOption(value=str(i), label=str(i)) for i in range(1, 11)],
             title='boxes',
         ),
         c.FormFieldSelect(
