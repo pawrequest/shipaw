@@ -11,12 +11,24 @@ def test_find_paf(el_client):
     response = service.find(request=req)
     assert isinstance(response, msgs.FindResponse)
     assert isinstance(response.paf, PAF)
-    assert isinstance(response.paf.specified_neighbour[0].address[0], pf_ext.AddTypes)
+    assert isinstance(response.paf.specified_neighbour[0].address[0], pf_ext.AddressRecipient)
 
 
-def test_shipable_record(outbound_record):
+def test_client_gets_candidates(el_client, address_r):
+    addresses = el_client.get_candidates(address_r.postcode)
+    assert isinstance(addresses, list)
+    assert isinstance(addresses[0], pf_ext.AddressRecipient)
+    assert addresses[0].postcode == address_r.postcode
+
+
+def test_outbound_record(outbound_record):
     shipable.Shipable.model_validate(outbound_record)
     assert ShipState.model_validate(outbound_record.ship_state)
+
+
+def test_inbound_record(inbound_record):
+    shipable.Shipable.model_validate(inbound_record)
+    assert ShipState.model_validate(inbound_record.ship_state)
 
 
 def test_client_sends_outbound(outbound_record, el_client, tmp_path):

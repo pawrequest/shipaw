@@ -52,25 +52,6 @@ class DirectionEnum(str, Enum):
     out = 'out'
 
 
-<<<<<<< HEAD
-class FullForm(_p.BaseModel):
-    ship_date: ship_types.SHIPPING_DATE
-    # ship_date: adate
-    boxes: int
-    direction: DirectionEnum = DirectionEnum.out
-
-    business_name: paw_types.truncated_printable_str_type(40)
-    email_address: str
-    mobile_phone: str
-    contact_name: paw_types.optional_truncated_printable_str_type(30)
-
-    address_line1: paw_types.truncated_printable_str_type(40)
-    address_line2: paw_types.optional_truncated_printable_str_type(50)
-    address_line3: paw_types.optional_truncated_printable_str_type(60)
-    town: paw_types.truncated_printable_str_type(30)
-    postcode: str
-    country: str = 'GB'
-=======
 # class FullForm(_p.BaseModel):
 #     ship_date: ship_types.SHIPPING_DATE
 #     # ship_date: adate
@@ -88,7 +69,6 @@ class FullForm(_p.BaseModel):
 #     town: paw_types.truncated_printable_str_type(30)
 #     postcode: str
 #     country: str = 'GB'
->>>>>>> recov
 
 
 def service_select_options():

@@ -65,7 +65,7 @@ def inbound_record(address_r, contact_collection):
 
 
 @pytest.fixture
-def min_shipment_r(address_r, contact_r, sett) -> pf_top.RequestedShipmentMinimum:
+def shipment_outbound(address_r, contact_r, sett) -> pf_top.RequestedShipmentMinimum:
     return pf_top.RequestedShipmentMinimum(
         department_id=DepartmentNum,
         shipment_type='DELIVERY',

@@ -45,9 +45,7 @@ class Alerts(pf_shared.BasePFType):
 
 
 class CollectionNotifications(pf_shared.BasePFType):
-    notification_type: list[pf_shared.CollectionNotificationType] = _p.Field(
-        default_factory=list
-    )
+    notification_type: list[pf_shared.CollectionNotificationType] = _p.Field(default_factory=list)
 
     @classmethod
     def standard_coll(cls):
@@ -61,9 +59,7 @@ class CollectionNotifications(pf_shared.BasePFType):
 
 
 class RecipientNotifications(pf_shared.BasePFType):
-    notification_type: list[pf_shared.NotificationType] = _p.Field(
-        default_factory=list
-    )
+    notification_type: list[pf_shared.NotificationType] = _p.Field(default_factory=list)
 
     @classmethod
     def standard_recip(cls):
@@ -89,8 +85,15 @@ class ServiceCodes(pf_shared.BasePFType):
 
 
 class SpecifiedNeighbour(pf_shared.BasePFType):
-<<<<<<< HEAD
     address: list[pf_ext.AddressRecipient] = _p.Field(default_factory=list)
-=======
-    address: list[pf_ext.AddTypes] = _p.Field(default_factory=list)
->>>>>>> recov
+
+    @_p.field_validator('address', mode='after')
+    def check_add_type(cls, v, values):
+        outaddrs = []
+        for add in v:
+            try:
+                addr = pf_ext.AddressRecipient.model_validate(add.model_dump(by_alias=True))
+            except _p.ValidationError:
+                addr = pf_ext.AddressCollection.model_validate(add.model_dump(by_alias=True))
+            outaddrs.append(addr)
+        return outaddrs

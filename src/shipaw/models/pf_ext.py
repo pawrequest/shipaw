@@ -1,24 +1,9 @@
-<<<<<<< HEAD
-# from __future__ import annotations
-
-import sqlmodel as sqm
-
-from pawdantic import paw_types
-from . import pf_shared
-
-
-# if _ty.TYPE_CHECKING:
-#     pass
-=======
 from __future__ import annotations
 
-import typing as _t
-
 import sqlmodel as sqm
 from pawdantic import paw_types
 
 from . import pf_shared
->>>>>>> recov
 
 
 def address_string_to_dict(address_str: str) -> dict[str, str]:
@@ -37,11 +22,7 @@ def address_string_to_dict(address_str: str) -> dict[str, str]:
 addr_lines_fields_set = sorted({'address_line1', 'address_line2', 'address_line3'})
 
 
-<<<<<<< HEAD
-class BaseAddress(pf_shared.BasePFType):
-=======
 class AddressSender(pf_shared.BasePFType):
->>>>>>> recov
     address_line1: paw_types.truncated_printable_str_type(24)
     address_line2: paw_types.optional_truncated_printable_str_type(24)
     address_line3: paw_types.optional_truncated_printable_str_type(24)
@@ -94,13 +75,6 @@ class AddressSender(pf_shared.BasePFType):
     #     }
 
 
-<<<<<<< HEAD
-class AddressSender(BaseAddress):
-    ...
-
-
-class AddressRecipient(BaseAddress):
-=======
 class AddressCollection(AddressSender):
     address_line1: paw_types.truncated_printable_str_type(40)
     address_line2: paw_types.optional_truncated_printable_str_type(40)
@@ -109,33 +83,19 @@ class AddressCollection(AddressSender):
 
 
 class AddressRecipient(AddressCollection):
->>>>>>> recov
     address_line1: paw_types.truncated_printable_str_type(40)
     address_line2: paw_types.optional_truncated_printable_str_type(50)
     address_line3: paw_types.optional_truncated_printable_str_type(60)
     town: paw_types.truncated_printable_str_type(30)
 
 
-<<<<<<< HEAD
-class AddressCollection(BaseAddress):
-    address_line1: paw_types.truncated_printable_str_type(40)
-    address_line2: paw_types.optional_truncated_printable_str_type(40)
-    address_line3: paw_types.optional_truncated_printable_str_type(40)
-    town: paw_types.truncated_printable_str_type(30)
-=======
 AddTypes = AddressCollection | AddressRecipient
-AddTypeVar = _t.TypeVar('AddTypeVar', AddressCollection, AddressRecipient)
->>>>>>> recov
 
 
 class PostOffice(pf_shared.BasePFType):
     post_office_id: str | None = None
     business: str | None = None
-<<<<<<< HEAD
     address: AddressRecipient | None = None
-=======
-    address: AddTypes | None = None
->>>>>>> recov
     opening_hours: pf_shared.OpeningHours | None = None
     distance: float | None = None
     availability: bool | None = None

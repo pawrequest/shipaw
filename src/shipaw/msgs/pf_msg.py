@@ -28,19 +28,6 @@ class BaseRequest(pf_shared.BasePFType):
 class BaseResponse(pf_shared.BasePFType):
     alerts: pf_lists.Alerts | None = pyd.Field(default_factory=list)
 
-<<<<<<< HEAD
-    @pyd.field_validator("alerts")
-    def check_alerts(cls, v, info):
-        if v:
-            for alt in v.alert:
-                if alt.type == "WARNING":
-                    logger.warning(f"ExpressLink Warning: {alt.message} in {cls.__name__}")
-                elif alt.type == "ERROR":
-                    logger.error(f"ExpressLink Error: {alt.message} in {cls.__name__}")
-                    # raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
-                else:
-                    logger.info(f"ExpressLink {alt.type}: {alt.message} in {cls.__name__}")
-=======
     @pyd.field_validator('alerts')
     def check_alerts(cls, v, info):
         if v:
@@ -52,18 +39,13 @@ class BaseResponse(pf_shared.BasePFType):
                     # raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
                 else:
                     logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
->>>>>>> recov
         return v
 
 
 class FindMessage(pf_shared.BasePFType):
     convenient_collect: pf_ext.ConvenientCollect | None = None
     specified_post_office: pf_ext.SpecifiedPostOffice | None = None
-<<<<<<< HEAD
-    paf: pf_top.PAF | None = pyd.Field(None, alias="PAF")
-=======
     paf: pf_top.PAF | None = pyd.Field(None, alias='PAF')
->>>>>>> recov
     safe_places: bool | None = None
     nominated_delivery_dates: pf_top.NominatedDeliveryDates | None = None
     postcode_exclusion: pf_top.PostcodeExclusion | None = None
@@ -99,13 +81,10 @@ class CreateCollectionRequest(CreateShipmentRequest):
 class CreateShipmentResponse(BaseResponse):
     completed_shipment_info: pf_top.CompletedShipmentInfo | None = None
 
-<<<<<<< HEAD
-=======
     @property
     def shipment_num(self):
         return self.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
 
->>>>>>> recov
 
 ################################################################
 
@@ -114,11 +93,7 @@ class PrintLabelRequest(BaseRequest):
     shipment_number: str
     print_format: str | None = None
     barcode_format: str | None = None
-<<<<<<< HEAD
-    print_type: ship_types.PrintType = "ALL_PARCELS"
-=======
     print_type: ship_types.PrintType = 'ALL_PARCELS'
->>>>>>> recov
 
 
 class PrintLabelResponse(BaseResponse):

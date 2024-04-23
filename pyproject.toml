@@ -6,11 +6,11 @@ authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
 ]
 readme = "README.md"
-requires-python = ">= 3.12"
+requires-python = ">= 3.10"
 dependencies = [
     'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
     'suppawt @ git+https://github.com/pawrequest/suppawt',
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+    'pawdantic',
     'fastui',
     'fastapi',
     'sqlmodel',
@@ -24,6 +24,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+from-git = [
+    'suppawt @ git+https://github.com/pawrequest/suppawt',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+]
 dev = [
     'autodoc_pydantic',
     "datamodel-code-generator",
@@ -60,8 +64,8 @@ dev-dependencies = [
 [tool.hatch.metadata]
 allow-direct-references = true
 
-#[tool.ruff]
-#line-length = 120
-#extend-select = ["Q", "RUF100", "UP", "I"]
-#flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
-#format.quote-style="single"
+[tool.ruff]
+line-length = 120
+extend-select = ["Q", "RUF100", "UP"]
+flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
+format.quote-style="single"
