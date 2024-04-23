@@ -59,7 +59,7 @@ def shipment_outbound(address_r, contact_r, sett) -> pf_top.RequestedShipmentMin
 
 
 @pytest.fixture
-def ship_state():
+def shipment():
     return Shipment(
         contact=pf_top.Contact(
             business_name='Test Business',

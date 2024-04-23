@@ -23,8 +23,8 @@ def test_client_gets_candidates(el_client, address_r):
     assert addresses[0].postcode == address_r.postcode
 
 
-def test_client_sends_outbound(ship_state, el_client, tmp_path):
-    req = el_client.state_to_outbound_request(ship_state)
+def test_client_sends_outbound(shipment, el_client, tmp_path):
+    req = el_client.state_to_outbound_request(shipment)
     assert isinstance(req, msgs.CreateShipmentRequest)
     resp = el_client.send_shipment_request(req)
     assert isinstance(resp, msgs.CreateShipmentResponse)
@@ -32,8 +32,8 @@ def test_client_sends_outbound(ship_state, el_client, tmp_path):
     check_label(el_client, resp, tmp_path)
 
 
-def test_client_sends_inbound(ship_state, el_client, tmp_path):
-    req = el_client.state_to_inbound_request(ship_state)
+def test_client_sends_inbound(shipment, el_client, tmp_path):
+    req = el_client.state_to_inbound_request(shipment)
     assert isinstance(req, msgs.CreateShipmentRequest)
     resp = el_client.send_shipment_request(req)
     assert isinstance(resp, msgs.CreateShipmentResponse)
