@@ -1,11 +1,12 @@
-from __future__ import annotations
+from __future__ import annotations, annotations
 
 import pathlib
 import typing as _t
 
+import pydantic as _p
 import pydantic as pyd
 import sqlmodel as sqm
-from pawdantic.pawui import states as ui_states
+from pawdantic.pawui import states as ui_states, pawui_types
 from pydantic import ConfigDict, Field
 
 from shipaw.models import pf_ext, pf_shared, pf_top
@@ -26,6 +27,16 @@ class BookingState(ui_states.BaseUIState):
     response: BookingRespSQM
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None
+
+    @_p.model_validator(mode='after')
+    def get_alerts(self):
+        if self.response.alerts:
+            self.alert_dict = pawui_types.AlertDict({a.message: a.type for a in self.response.alerts.alert})
+        return self
+
+    @property
+    def response_alert_dict(self):
+        return {a.message: a.type for a in self.response.alerts.alert} if self.response.alerts else {}
 
     def shipment_num(self):
         return (
