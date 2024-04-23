@@ -125,7 +125,7 @@ async def address_form_inputs(state):
     ]
 
 
-async def shipping_form_inputs(state: states.ShipState, manual=False):
+async def shipping_form_inputs(state: states.Shipment, manual=False):
     return [
         c.FormFieldSelect(
             name='date',
@@ -175,14 +175,14 @@ async def shipping_form_inputs(state: states.ShipState, manual=False):
     ]
 
 
-async def ship_inputs_select(state: states.ShipState):
+async def ship_inputs_select(state: states.Shipment):
     return [
         *await shipping_form_inputs(state),
         await address_select(state),
     ]
 
 
-async def ship_inputs_manual(state: states.ShipState):
+async def ship_inputs_manual(state: states.Shipment):
     return [
         *await shipping_form_inputs(state),
         *await address_form_inputs(state),

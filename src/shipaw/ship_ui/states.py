@@ -78,7 +78,7 @@ class ShipStatePartial(ui_states.BaseUIState):
         return (sett.label_dir / self.pf_label_name).with_suffix('.pdf')
 
 
-class ShipState(ShipStatePartial):
+class Shipment(ShipStatePartial):
     contact: pf_top.Contact
     address: pf_ext.AddressRecipient
     ship_date: ship_types.SHIPPING_DATE
@@ -90,7 +90,7 @@ class ShipState(ShipStatePartial):
     special_instructions: str | None = None
 
 
-class ShipStateExtra(ShipState):
+class ShipmentExtra(Shipment):
     model_config = ConfigDict(extra='ignore')
 
 
@@ -102,5 +102,5 @@ def state_alert_dict(state: BookingState):
     return response_alert_dict(state.response)
 
 
-class ShipStateBooked(ShipState):
+class ShipmentBooked(Shipment):
     booking_state: BookingState

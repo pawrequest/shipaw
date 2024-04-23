@@ -4,7 +4,7 @@ from . import models
 from .expresslink_client import ELClient
 from .ship_ui import (
     BookingState,
-    ShipState,
+    Shipment,
     ShipStatePartial,
 )
 

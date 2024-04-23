@@ -125,7 +125,7 @@ class ELClient(pydantic.BaseModel):
     def candidates_dict(self, postcode):
         return {add.lines_str: add for add in self.get_candidates(postcode)}
 
-    def state_to_outbound_request(self, state: ship_ui.ShipState):
+    def state_to_outbound_request(self, state: ship_ui.Shipment):
         return msgs.CreateShipmentRequest(
             authentication=self.settings.auth,
             requested_shipment=models.RequestedShipmentMinimum(
@@ -141,7 +141,7 @@ class ELClient(pydantic.BaseModel):
 
     def state_to_inbound_request(
         self,
-        state: ship_ui.ShipState,
+        state: ship_ui.Shipment,
     ):
         return msgs.CreateCollectionRequest(
             authentication=self.settings.auth,
@@ -159,7 +159,7 @@ class ELClient(pydantic.BaseModel):
             ),
         )
 
-    def state_to_request(self, state: ship_ui.ShipState):
+    def state_to_request(self, state: ship_ui.Shipment):
         if state.direction == 'in':
             return self.state_to_inbound_request(state)
         if state.direction == 'out':

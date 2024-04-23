@@ -1,6 +1,6 @@
-from .states import BookingState, ShipState, ShipStatePartial
+from .states import BookingState, Shipment, ShipStatePartial
 __all__ = [
     'ShipStatePartial',
-    'ShipState',
+    'Shipment',
     'BookingState',
 ]

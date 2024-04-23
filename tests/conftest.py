@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from shipaw import ELClient, ShipState, pf_config
+from shipaw import ELClient, Shipment, pf_config
 from shipaw.models import pf_ext, pf_top
 from shipaw.models.pf_shared import ServiceCode
 from shipaw.ship_types import DepartmentNum
@@ -60,7 +60,7 @@ def shipment_outbound(address_r, contact_r, sett) -> pf_top.RequestedShipmentMin
 
 @pytest.fixture
 def ship_state():
-    return ShipState(
+    return Shipment(
         contact=pf_top.Contact(
             business_name='Test Business',
             mobile_phone='07999999999',
