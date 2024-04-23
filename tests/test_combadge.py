@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from combadge.support.zeep.backends.sync import ZeepBackend
 
-from shipaw import ShipState, msgs
-from shipaw.models import PAF, pf_ext, shipable
+from shipaw import msgs
+from shipaw.models import PAF, pf_ext
 
 
 def test_find_paf(el_client):
@@ -21,18 +23,17 @@ def test_client_gets_candidates(el_client, address_r):
     assert addresses[0].postcode == address_r.postcode
 
 
-def test_outbound_record(outbound_record):
-    shipable.Shipable.model_validate(outbound_record)
-    assert ShipState.model_validate(outbound_record.ship_state)
+def test_client_sends_outbound(ship_state, el_client, tmp_path):
+    req = el_client.state_to_outbound_request(ship_state)
+    assert isinstance(req, msgs.CreateShipmentRequest)
+    resp = el_client.send_shipment_request(req)
+    assert isinstance(resp, msgs.CreateShipmentResponse)
+    assert not resp.alerts
+    check_label(el_client, resp, tmp_path)
 
 
-def test_inbound_record(inbound_record):
-    shipable.Shipable.model_validate(inbound_record)
-    assert ShipState.model_validate(inbound_record.ship_state)
-
-
-def test_client_sends_outbound(outbound_record, el_client, tmp_path):
-    req = el_client.state_to_outbound_request(outbound_record.ship_state)
+def test_client_sends_inbound(ship_state, el_client, tmp_path):
+    req = el_client.state_to_inbound_request(ship_state)
     assert isinstance(req, msgs.CreateShipmentRequest)
     resp = el_client.send_shipment_request(req)
     assert isinstance(resp, msgs.CreateShipmentResponse)
@@ -45,10 +46,3 @@ def check_label(el_client, resp, tmp_path):
     assert label.exists()
 
 
-def test_client_sends_inbound(inbound_record, el_client, tmp_path):
-    req = el_client.state_to_inbound_request(inbound_record.ship_state)
-    assert isinstance(req, msgs.CreateShipmentRequest)
-    resp = el_client.send_shipment_request(req)
-    assert isinstance(resp, msgs.CreateShipmentResponse)
-    assert not resp.alerts
-    check_label(el_client, resp, tmp_path)

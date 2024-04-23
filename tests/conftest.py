@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from shipaw import ELClient, pf_config
-from shipaw.models import pf_ext, pf_top, shipable
+from shipaw import ELClient, ShipState, pf_config
+from shipaw.models import pf_ext, pf_top
 from shipaw.models.pf_shared import ServiceCode
 from shipaw.ship_types import DepartmentNum
 
@@ -45,26 +45,6 @@ def contact_collection(contact_r):
 
 
 @pytest.fixture
-def outbound_record(address_r, contact_r):
-    return shipable.Shipable(
-        name='Test Item',
-        ship_date=datetime.date.today() + datetime.timedelta(days=1),
-        address=address_r,
-        contact=contact_r,
-    )
-
-
-@pytest.fixture
-def inbound_record(address_r, contact_collection):
-    return shipable.Shipable(
-        name='Test Item',
-        ship_date=datetime.date.today() + datetime.timedelta(days=1),
-        address=address_r,
-        contact=contact_collection,
-    )
-
-
-@pytest.fixture
 def shipment_outbound(address_r, contact_r, sett) -> pf_top.RequestedShipmentMinimum:
     return pf_top.RequestedShipmentMinimum(
         department_id=DepartmentNum,
@@ -75,6 +55,24 @@ def shipment_outbound(address_r, contact_r, sett) -> pf_top.RequestedShipmentMin
         recipient_contact=contact_r,
         recipient_address=address_r,
         total_number_of_parcels=1,
+    )
+
+
+@pytest.fixture
+def ship_state():
+    return ShipState(
+        contact=pf_top.Contact(
+            business_name='Test Business',
+            mobile_phone='07999999999',
+            email_address='fake@aslrksf.com',
+            contact_name='Test Contact',
+        ),
+        address=pf_ext.AddressRecipient(
+            address_line1='30 Bennet Close',
+            town='East Wickham',
+            postcode='DA16 3HU',
+        ),
+        ship_date=datetime.date.today() + datetime.timedelta(days=1),
     )
 
 
