@@ -28,15 +28,14 @@ class BookingState(ui_states.BaseUIState):
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None
 
+    alerts: list[pf_shared.Alert] | None = None
+
     @_p.model_validator(mode='after')
     def get_alerts(self):
         if self.response.alerts:
-            self.alert_dict = pawui_types.AlertDict({a.message: a.type for a in self.response.alerts.alert})
+            # self.alert_dict = pawui_types.AlertDict({a.message: a.type for a in self.response.alerts.alert})
+            self.alerts = self.response.alerts.alert
         return self
-
-    @property
-    def response_alert_dict(self):
-        return {a.message: a.type for a in self.response.alerts.alert} if self.response.alerts else {}
 
     def shipment_num(self):
         return (
