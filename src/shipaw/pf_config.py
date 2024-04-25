@@ -9,6 +9,8 @@ from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shipaw.models import pf_ext, pf_lists, pf_shared, pf_top
+from importlib import resources
+
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -29,7 +31,7 @@ class PFSettings(BaseSettings):
     pf_expr_usr: str
     pf_expr_pwd: str
 
-    pf_wsdl: str
+    pf_wsdl: str | None = None
     pf_binding: str = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     pf_endpoint: str
 
@@ -54,9 +56,17 @@ class PFSettings(BaseSettings):
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
 
     @_p.field_validator('label_dir', mode='after')
-    def path_exists(cls, v, values):
+    def make_path(cls, v, values):
         if not v.exists():
             v.mkdir(parents=True, exist_ok=True)
+        return v
+
+    @_p.field_validator('pf_wsdl', mode='after')
+    def get_wsdl(cls, v, values):
+        if v is None or not Path(v).exists():
+            with resources.path('shipaw.rsrc', 'expresslink_api.wsdl') as wsdl_path:
+                logger.info(f'WSDL path not exist - using {wsdl_path} from importlib.resources')
+                v = str(wsdl_path)
         return v
 
     @property
