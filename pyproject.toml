@@ -10,7 +10,7 @@ requires-python = ">= 3.10"
 dependencies = [
     'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
     'suppawt @ git+https://github.com/pawrequest/suppawt',
-    'pawdantic',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
     'fastui',
     'fastapi',
     'sqlmodel',
