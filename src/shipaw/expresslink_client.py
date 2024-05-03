@@ -136,6 +136,22 @@ class ELClient(pydantic.BaseModel):
                 recipient_address=state.address,
                 total_number_of_parcels=state.boxes,
                 reference_number1=state.reference,
+                special_instructions1=state.special_instructions,
+
+            ),
+        )
+
+    def state_to_return_dropoff(self, shipment: ship_ui.Shipment):
+        return msgs.CreateShipmentRequest(
+            authentication=self.settings.auth,
+            requested_shipment=models.RequestedShipmentMinimum(
+                contract_number=self.settings.pf_contract_num_1,
+                service_code=shipment.service,
+                shipping_date=shipment.ship_date,
+                recipient_contact=self.settings.home_contact,
+                recipient_address=self.settings.home_address,
+                total_number_of_parcels=shipment.boxes,
+                reference_number1=shipment.reference,
             ),
         )
 

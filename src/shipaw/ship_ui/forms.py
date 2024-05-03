@@ -120,7 +120,7 @@ async def address_form_inputs(state):
         # c.FormFieldInput(
         #     name='country',
         #     title='Country',
-        #     initial=state.address.country,
+        #     initial=shipment.address.country,
         # )
     ]
 
@@ -158,7 +158,7 @@ async def shipping_form_inputs(state: states.Shipment, manual=False):
             name='service',
             options=service_select_options(),
             title='Service',
-            # initial=state.service.value,
+            # initial=shipment.service.value,
             initial=state.service,
         ),
         c.FormFieldInput(

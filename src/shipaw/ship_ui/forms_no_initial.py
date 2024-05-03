@@ -69,7 +69,8 @@ class DirectionEnum(str, Enum):
 
 
 def get_services():
-    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in pf_shared.ServiceCode2]
+    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in
+            pf_shared.ServiceCode2]
 
 
 # def get_services():
@@ -127,7 +128,7 @@ async def address_fields():
         # c.FormFieldInput(
         #     name='country',
         #     title='Country',
-        #     initial=state.address.country,
+        #     initial=shipment.address.country,
         # )
     ]
 
@@ -150,6 +151,7 @@ async def ship_fields():
             options=[
                 fastui_forms.SelectOption(value='in', label='Inbound'),
                 fastui_forms.SelectOption(value='out', label='Outbound'),
+                fastui_forms.SelectOption(value='dropoff', label='DropOff'),
             ],
             initial='out',
         ),
