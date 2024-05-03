@@ -38,7 +38,10 @@ class ELClient(pydantic.BaseModel):
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.settings.pf_wsdl)
-        return client.create_service(binding_name=self.settings.pf_binding, address=self.settings.pf_endpoint)
+        return client.create_service(
+            binding_name=self.settings.pf_binding,
+            address=self.settings.pf_endpoint
+        )
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
         """Get a Combadge backend for a service protocol.
@@ -119,7 +122,11 @@ class ELClient(pydantic.BaseModel):
 
     def choose_address[T: pf_ext.AddTypes](self, address: T) -> tuple[T, list[T]]:
         candidate_dict = self.candidates_dict(address.postcode)
-        chosen, score = process.extractOne(address.lines_str, list(candidate_dict.keys()), scorer=SCORER)
+        chosen, score = process.extractOne(
+            address.lines_str,
+            list(candidate_dict.keys()),
+            scorer=SCORER
+        )
         return candidate_dict[chosen], list(candidate_dict.values())
 
     def candidates_dict(self, postcode):
@@ -156,8 +163,8 @@ class ELClient(pydantic.BaseModel):
         )
 
     def state_to_inbound_request(
-        self,
-        state: ship_ui.Shipment,
+            self,
+            state: ship_ui.Shipment,
     ):
         return msgs.CreateCollectionRequest(
             authentication=self.settings.auth,
@@ -176,8 +183,12 @@ class ELClient(pydantic.BaseModel):
         )
 
     def state_to_request(self, state: ship_ui.Shipment):
-        if state.direction == 'in':
-            return self.state_to_inbound_request(state)
-        if state.direction == 'out':
-            return self.state_to_outbound_request(state)
-        raise ValueError('Invalid direction')
+        match state.direction:
+            case 'in':
+                return self.state_to_inbound_request(state)
+            case 'out':
+                return self.state_to_outbound_request(state)
+            case 'dropoff':
+                return self.state_to_return_dropoff(state)
+            case _:
+                raise ValueError('Invalid direction')
