@@ -25,7 +25,7 @@ class ELClient(pydantic.BaseModel):
         service: ServiceProxy | None - Zeep ServiceProxy (generated from settings)
     """
 
-    settings: pf_config.PFSettings = pf_config.PF_SETTINGS
+    settings: pf_config.PFSettings = pf_config.pf_sett()
     service: ServiceProxy | None = None
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True, validate_default=True)
@@ -111,7 +111,7 @@ class ELClient(pydantic.BaseModel):
             Path - path to the downloaded label
 
         """
-        sett = pf_config.PF_SETTINGS
+        sett = pf_config.pf_sett()
         dl_path = dl_path or sett.label_dir / 'temp_label.pdf'
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)

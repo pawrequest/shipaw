@@ -3,14 +3,13 @@ from __future__ import annotations
 import functools
 import os
 from pathlib import Path
+from importlib import resources
 
 import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shipaw.models import pf_ext, pf_lists, pf_shared, pf_top
-from importlib import resources
-
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -127,10 +126,12 @@ class PFSandboxSettings(PFSettings):
         return v
 
 
-logger.info(f'SHIP_ENV is {SHIP_ENV}')
-PF_SETTINGS = PFSettings()
-
-
 @functools.lru_cache(maxsize=1)
-def sandbox_settings():
+def pf_sandbox_sett():
     return PFSandboxSettings()
+
+
+@functools.lru_cache
+def pf_sett():
+    logger.info(f'SHIP_ENV is {SHIP_ENV}')
+    return PFSettings()

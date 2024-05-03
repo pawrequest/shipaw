@@ -6,7 +6,7 @@ import typing as _t
 import pydantic as _p
 import pydantic as pyd
 import sqlmodel as sqm
-from pawdantic.pawui import states as ui_states, pawui_types
+from pawdantic.pawui import states as ui_states
 from pydantic import ConfigDict, Field
 
 from shipaw.models import pf_ext, pf_shared, pf_top
@@ -14,7 +14,9 @@ from shipaw.ship_types import ShipDirection
 from .. import msgs, pf_config, ship_types
 
 BookingReqSQM = _t.Annotated[
-    msgs.CreateShipmentRequest, sqm.Field(sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateShipmentRequest)))
+    msgs.CreateShipmentRequest, sqm.Field(
+        sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateShipmentRequest))
+    )
 ]
 BookingRespSQM = _t.Annotated[
     msgs.CreateShipmentResponse,
@@ -39,7 +41,8 @@ class BookingState(ui_states.BaseUIState):
 
     def shipment_num(self):
         return (
-            self.response.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
+            self.response.completed_shipment_info.completed_shipments.completed_shipment[
+                0].shipment_number
             if self.booked
             else None
         )
@@ -70,11 +73,11 @@ class ShipStatePartial(ui_states.BaseUIState):
 
     @property
     def pf_label_name(self):
-        return f'Parcelforce Collection Label for {self.contact.business_name} on {self.ship_date}'
+        return f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label for {self.contact.business_name} on {self.ship_date}'
 
     @property
     def named_label_path(self):
-        sett = pf_config.PF_SETTINGS
+        sett = pf_config.pf_sett()
         return (sett.label_dir / self.pf_label_name).with_suffix('.pdf')
 
 

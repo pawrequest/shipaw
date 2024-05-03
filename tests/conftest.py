@@ -10,7 +10,7 @@ from shipaw.ship_types import DepartmentNum
 
 @pytest.fixture
 def sett():
-    settings = pf_config.sandbox_settings()
+    settings = pf_config.pf_sandbox_sett()
     pf_config.PFSandboxSettings.model_validate(settings, from_attributes=True)
     yield settings
 
