@@ -149,6 +149,7 @@ async def shipping_form_inputs(state: states.Shipment, manual=False):
             options=[
                 fastui_forms.SelectOption(value='in', label='Inbound'),
                 fastui_forms.SelectOption(value='out', label='Outbound'),
+                fastui_forms.SelectOption(value='dropoff', label='DropOff'),
             ],
             initial='out',
             # class_name='col-2',
