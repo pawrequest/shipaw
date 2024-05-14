@@ -14,11 +14,15 @@ class ContactMininmum(pf_shared.BasePFType):
         ...,
         title='Business Name'
     )
+
     mobile_phone: str = _p.Field(..., description='Mobile phone number')
     email_address: _p.EmailStr = _p.Field(
         title='Email Address',
     )
 
+    @_p.field_validator('mobile_phone', mode='after')
+    def nospace_in_phone(cls, v):
+        return v.replace(' ', '').strip()
 
 class Contact(ContactMininmum):
     contact_name: paw_types.optional_truncated_printable_str_type(30) = _p.Field(

@@ -9,6 +9,7 @@ import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from shipaw import rsrc
 from shipaw.models import pf_ext, pf_lists, pf_shared, pf_top
 
 SHIP_ENV = os.getenv('SHIP_ENV')
@@ -63,7 +64,7 @@ class PFSettings(BaseSettings):
     @_p.field_validator('pf_wsdl', mode='after')
     def get_wsdl(cls, v, values):
         if v is None or not Path(v).exists():
-            with resources.path('shipaw.rsrc', 'expresslink_api.wsdl') as wsdl_path:
+            with resources.path(rsrc, 'expresslink_api.wsdl') as wsdl_path:
                 logger.info(f'WSDL path not exist - using {wsdl_path} from importlib.resources')
                 v = str(wsdl_path)
         return v

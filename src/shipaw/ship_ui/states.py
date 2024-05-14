@@ -8,9 +8,9 @@ import pydantic as pyd
 import sqlmodel as sqm
 from pawdantic.pawui import states as ui_states
 from pydantic import ConfigDict, Field
-
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
+
 from .. import msgs, pf_config, ship_types
 
 BookingReqSQM = _t.Annotated[
@@ -89,8 +89,8 @@ class Shipment(ShipStatePartial):
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     direction: ship_types.ShipDirection = 'out'
     candidates: list[pf_ext.AddressRecipient] | None = Field(None)
-    reference: str | None = None
-    special_instructions: str | None = None
+    reference: str = ''
+    special_instructions: str = ''
 
 
 class ShipmentExtra(Shipment):

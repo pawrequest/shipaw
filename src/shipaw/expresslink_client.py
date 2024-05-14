@@ -75,11 +75,10 @@ class ELClient(pydantic.BaseModel):
                     )
                 if alt.type == 'WARNING':
                     logger.warning(
-                        f'ExpressLink Warning: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
+                        f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
                     )
-        else:
-            logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
 
+        logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
         return msgs.CreateShipmentResponse.model_validate(resp)
 
     def get_candidates(self, postcode: str) -> list[models.AddressRecipient]:
