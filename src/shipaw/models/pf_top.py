@@ -2,11 +2,10 @@ import datetime as dt
 import typing as _t
 
 import pydantic as _p
-
 from pawdantic import paw_types
+
 from .. import ship_types
 from . import pf_ext, pf_lists, pf_shared
-
 
 
 class ContactMininmum(pf_shared.BasePFType):
@@ -23,6 +22,7 @@ class ContactMininmum(pf_shared.BasePFType):
     @_p.field_validator('mobile_phone', mode='after')
     def nospace_in_phone(cls, v):
         return v.replace(' ', '').strip()
+
 
 class Contact(ContactMininmum):
     contact_name: paw_types.optional_truncated_printable_str_type(30) = _p.Field(
@@ -151,6 +151,10 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
         24
     )  # first 14 visible on label
 
+    special_instructions1: _p.constr(max_length=25) | None = None
+    special_instructions2: _p.constr(max_length=25) | None = None
+
+
     @_p.field_validator('reference_number1', mode='after')
     def ref_num_validator(cls, v, values):
         if not v:
@@ -162,11 +166,6 @@ class CollectionMinimum(RequestedShipmentMinimum):
     shipment_type: ship_types.DeliveryKind = 'COLLECTION'
     print_own_label: bool = True
     collection_info: CollectionInfo
-
-
-class CollectionSimple(CollectionMinimum):
-    special_instructions1: _p.constr(max_length=25) | None = None
-    special_instructions2: _p.constr(max_length=25) | None = None
 
 
 class RequestedShipmentSimple(RequestedShipmentMinimum):
