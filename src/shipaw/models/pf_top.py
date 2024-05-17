@@ -125,7 +125,7 @@ def collection_info_from_state(state: CollectionStateProtocol):
         collection_time=pf_shared.DateTimeRange.from_datetimes(
             dt.datetime.combine(state.ship_date, dt.time(9, 0)),
             dt.datetime.combine(
-                state.ship_date, dt.time(17, 0)
+                state.ship_date, dt.time(16, 30)
             )
         )
     )

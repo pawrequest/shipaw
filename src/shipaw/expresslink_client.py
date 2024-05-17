@@ -167,7 +167,7 @@ class ELClient(pydantic.BaseModel):
     ):
         return msgs.CreateCollectionRequest(
             authentication=self.settings.auth,
-            requested_shipment=pf_top.CollectionSimple(
+            requested_shipment=pf_top.CollectionMinimum(
                 contract_number=self.settings.pf_contract_num_1,
                 service_code=state.service,
                 shipping_date=state.ship_date,
