@@ -5,10 +5,10 @@ from enum import Enum
 
 import pydantic as _p
 from fastui import components as c, forms as fastui_forms
-from pawdantic import paw_types, paw_strings
+from pawdantic import paw_strings, paw_types
 
 from shipaw import Shipment
-from shipaw.models import pf_shared, pf_ext
+from shipaw.models import pf_ext, pf_shared
 from shipaw.ship_types import FormKind, VALID_PC
 
 
@@ -50,10 +50,9 @@ class DirectionEnum(str, Enum):
     out = 'out'
 
 
-
-
 def service_select_options():
-    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in pf_shared.ServiceCode2]
+    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in
+            pf_shared.ServiceCode2]
 
 
 # def get_services():
@@ -89,7 +88,7 @@ async def contact_form_inputs(state):
     ]
 
 
-async def address_form_inputs(state):
+async def manual_address_inputs(state):
     return [
         c.FormFieldInput(
             name='address_line1',
@@ -125,7 +124,7 @@ async def address_form_inputs(state):
     ]
 
 
-async def shipping_form_inputs(state: Shipment, manual=False):
+async def standard_shipping_inputs(state: Shipment, manual=False):
     return [
         c.FormFieldSelect(
             name='date',
@@ -176,29 +175,19 @@ async def shipping_form_inputs(state: Shipment, manual=False):
     ]
 
 
-async def ship_inputs_select(state: Shipment):
-    return [
-        *await shipping_form_inputs(state),
-        await address_select(state),
-    ]
+async def get_form_fields(kind: FormKind, shipment):
+    match kind:
+        case 'manual':
+            inputs = await manual_address_inputs(shipment)
+        case 'select':
+            inputs = await select_address_inputs(shipment)
+        case _:
+            raise ValueError(f'Invalid kind {kind!r}')
+    return await standard_shipping_inputs(shipment) + inputs
 
 
-async def ship_inputs_manual(state: Shipment):
-    return [
-        *await shipping_form_inputs(state),
-        *await address_form_inputs(state),
-    ]
 
-
-async def get_form_fields(kind: FormKind, state):
-    if kind == 'manual':
-        return await ship_inputs_manual(state)
-    if kind == 'select':
-        return await ship_inputs_select(state)
-    raise ValueError(f'Invalid kind {kind!r}')
-
-
-async def address_select(state):
+async def select_address_inputs(state):
     return c.FormFieldSelect(
         name='address',
         options=address_select_options(state.candidates),
@@ -231,7 +220,8 @@ def date_select_options() -> list[fastui_forms.SelectOption]:
     ]
 
 
-def address_select_options(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_forms.SelectOption]:
+def address_select_options(candidates: list[pf_ext.AddressRecipient]) -> list[
+    fastui_forms.SelectOption]:
     return [
         fastui_forms.SelectOption(
             value=cand.model_dump_json(),

@@ -57,7 +57,8 @@ def limit_daterange_no_weekends(v: date) -> date:
             return v
 
 
-SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
+SHIPPING_DATE = date
+# SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
 
 
 class PawdanticJSON(sqa.TypeDecorator):
