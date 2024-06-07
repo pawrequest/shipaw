@@ -23,7 +23,7 @@ paths:
               allOf:
               - $ref: '#/components/schemas/CreateShipmentRequest1'
               - xml:
-                  name: CreateShipmentRequest
+                  name: CreateRequest
                   attribute: false
                   wrapped: false
               contentMediaType: application/xml
@@ -371,7 +371,7 @@ paths:
 components:
   schemas:
     CreateShipmentRequest:
-      title: CreateShipmentRequest
+      title: CreateRequest
       allOf:
       - $ref: '#/components/schemas/BaseRequest'
       - required:
@@ -388,7 +388,7 @@ components:
                 attribute: false
                 wrapped: false
         xml:
-          name: CreateShipmentRequest
+          name: CreateRequest
           namespace: http://www.parcelforce.net/ws/ship/v14
           prefix: tns
           attribute: false

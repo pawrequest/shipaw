@@ -7,8 +7,8 @@ import pydantic as _p
 from fastui import components as c, forms as fastui_forms
 from pawdantic import paw_types, paw_strings
 
+from shipaw import Shipment
 from shipaw.models import pf_shared, pf_ext
-from shipaw.ship_ui import states
 from shipaw.ship_types import FormKind, VALID_PC
 
 
@@ -125,7 +125,7 @@ async def address_form_inputs(state):
     ]
 
 
-async def shipping_form_inputs(state: states.Shipment, manual=False):
+async def shipping_form_inputs(state: Shipment, manual=False):
     return [
         c.FormFieldSelect(
             name='date',
@@ -149,7 +149,7 @@ async def shipping_form_inputs(state: states.Shipment, manual=False):
             options=[
                 fastui_forms.SelectOption(value='in', label='Inbound'),
                 fastui_forms.SelectOption(value='out', label='Outbound'),
-                fastui_forms.SelectOption(value='dropoff', label='DropOff'),
+                fastui_forms.SelectOption(value='dropoff', label='Inbound DropOff'),
             ],
             initial='out',
             # class_name='col-2',
@@ -176,14 +176,14 @@ async def shipping_form_inputs(state: states.Shipment, manual=False):
     ]
 
 
-async def ship_inputs_select(state: states.Shipment):
+async def ship_inputs_select(state: Shipment):
     return [
         *await shipping_form_inputs(state),
         await address_select(state),
     ]
 
 
-async def ship_inputs_manual(state: states.Shipment):
+async def ship_inputs_manual(state: Shipment):
     return [
         *await shipping_form_inputs(state),
         *await address_form_inputs(state),

@@ -14,6 +14,6 @@ working_models = [
 not_working_array_fields = [
     pf_msg.CreatePrintRequest,
     pf_msg.FindRequest,
-    pf_msg.CreateShipmentRequest,
+    pf_msg.CreateRequest,
 
 ]

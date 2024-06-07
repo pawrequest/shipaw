@@ -21,7 +21,7 @@ DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
 TOD = date.today()
-SHIPPING_CUTOFF = datetime.time(17, 0)
+COLLECTION_CUTOFF = datetime.time(17, 0)
 ADVANCE_BOOKING_DAYS = 28
 WEEKDAYS_IN_RANGE = [
     TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + timedelta(days=i)).weekday() < 5
@@ -50,9 +50,10 @@ def limit_daterange_no_weekends(v: date) -> date:
                 v = max(WEEKDAYS_IN_RANGE)
             if v.weekday() > 4:
                 v = v - timedelta(days=6 - v.weekday())
-            if v == TOD and datetime.datetime.now().time() > SHIPPING_CUTOFF:
-                logger.warning('Current time is past shipping cutoff - using next available date')
-                v = v + timedelta(days=1)
+            if v == TOD and datetime.datetime.now().time() > COLLECTION_CUTOFF:
+                logger.warning('Current time is past collection cutoff - using next available date')
+                logger.warning('just kidding, uncomment to re-enable')
+                # v = v + timedelta(days=1)
             return v
 
 

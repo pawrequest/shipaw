@@ -12,8 +12,8 @@ def test_client_gets_candidates(el_client, address_r):
 
 
 def test_client_sends_outbound(shipment, el_client, tmp_path):
-    req = el_client.state_to_outbound_request(shipment)
-    assert isinstance(req, msgs.CreateShipmentRequest)
+    req = el_client.outbound_shipment_request(shipment)
+    assert isinstance(req, msgs.CreateRequest)
     resp = el_client.send_shipment_request(req)
     assert isinstance(resp, msgs.CreateShipmentResponse)
     assert not resp.alerts
@@ -21,8 +21,8 @@ def test_client_sends_outbound(shipment, el_client, tmp_path):
 
 
 def test_client_sends_inbound(shipment, el_client, tmp_path):
-    req = el_client.state_to_inbound_request(shipment)
-    assert isinstance(req, msgs.CreateShipmentRequest)
+    req = el_client.inbound_shipment_request_collection(shipment)
+    assert isinstance(req, msgs.CreateRequest)
     resp = el_client.send_shipment_request(req)
     assert isinstance(resp, msgs.CreateShipmentResponse)
     assert not resp.alerts

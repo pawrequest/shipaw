@@ -1,5 +1,8 @@
+from typing import Union
+
 import pydantic as pyd
 from loguru import logger
+from pydantic_core.core_schema import ValidationInfo
 
 from .. import ship_types
 from ..models import pf_ext, pf_lists, pf_shared, pf_top
@@ -29,13 +32,16 @@ class BaseResponse(pf_shared.BasePFType):
     alerts: pf_lists.Alerts | None = pyd.Field(default_factory=list)
 
     @pyd.field_validator('alerts')
-    def check_alerts(cls, v, info):
+    def check_alerts(cls, v, info: ValidationInfo):
         if v:
             for alt in v.alert:
                 if alt.type == 'WARNING':
                     logger.warning(f'ExpressLink Warning: {alt.message} in {cls.__name__}')
                 elif alt.type == 'ERROR':
-                    logger.error(f'ExpressLink Error: {alt.message} in {cls.__name__}')
+                    logger.error(
+                        f'ExpressLink Error: {alt.message} in {cls.__name__} - {"; ".join(f"{k}: {v}" for k, v in info.data)}'
+                    )
+                    # logger.error(f'ExpressLink Error: {alt.message} in {cls.__name__} - {f"{k}: {v}" for k,v in info.items()}')
                     # raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
                 else:
                     logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
@@ -70,12 +76,21 @@ class FindResponse(FindMessage, BaseResponse):
 ################################################################
 
 
-class CreateShipmentRequest(BaseRequest):
-    requested_shipment: pf_top.RequestedShipmentMinimum
+#
+# class CreateRequest(BaseRequest):
+#     requested_shipment: pf_top.RequestedShipmentMinimum
 
 
-class CreateCollectionRequest(CreateShipmentRequest):
-    requested_shipment: pf_top.CollectionMinimum
+#
+# class CreateCollectionRequest(CreateRequest):
+#     requested_shipment: pf_top.CollectionMinimum
+
+
+type RequestedShipment = Union[pf_top.CollectionMinimum, pf_top.RequestedShipmentMinimum]
+
+
+class CreateRequest(BaseRequest):
+    requested_shipment: RequestedShipment
 
 
 class CreateShipmentResponse(BaseResponse):
@@ -83,7 +98,8 @@ class CreateShipmentResponse(BaseResponse):
 
     @property
     def shipment_num(self):
-        return self.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
+        return self.completed_shipment_info.completed_shipments.completed_shipment[
+            0].shipment_number
 
 
 ################################################################
@@ -186,6 +202,5 @@ class CreatePrintResponse(BaseResponse):
     label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
-
 
 ################################################################

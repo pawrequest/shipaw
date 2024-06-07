@@ -22,7 +22,7 @@ class CreateShipmentService(SupportsService, Protocol):
     @operation_name('createShipment')
     def createshipment(
             self,
-            request: Annotated[pf_msg.CreateShipmentRequest, Payload(by_alias=True)],
+            request: Annotated[pf_msg.CreateRequest, Payload(by_alias=True)],
     ) -> pf_msg.CreateShipmentResponse:
         ...
 

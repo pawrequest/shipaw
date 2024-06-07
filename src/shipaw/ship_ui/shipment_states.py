@@ -10,12 +10,15 @@ from pawdantic.pawui import states as ui_states
 from pydantic import ConfigDict, Field
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
+from loguru import logger
 
 from .. import msgs, pf_config, ship_types
 
+
 BookingReqSQM = _t.Annotated[
-    msgs.CreateShipmentRequest, sqm.Field(
-        sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateShipmentRequest))
+    msgs.CreateRequest, sqm.Field(
+        # sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
+        sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
     )
 ]
 BookingRespSQM = _t.Annotated[
@@ -25,25 +28,34 @@ BookingRespSQM = _t.Annotated[
 
 
 class BookingState(ui_states.BaseUIState):
-    request: BookingReqSQM
-    response: BookingRespSQM
+    # requested_shipment:  = None
+    # request: msgs.CreateRequest
+    request: msgs.CreateRequest | None = None
+    response: BookingRespSQM | None = None
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None
-
     alerts: list[pf_shared.Alert] | None = None
+    booked: bool = False
+
+    @property
+    def completed(self):
+        if self.response:
+            return self.response.completed_shipment_info is not None
+        return False
 
     @_p.model_validator(mode='after')
     def get_alerts(self):
-        if self.response.alerts:
-            # self.alert_dict = pawui_types.AlertDict({a.message: a.type for a in self.response.alerts.alert})
-            self.alerts = self.response.alerts.alert
+        if self.response:
+            if self.response.alerts:
+                # self.alert_dict = pawui_types.AlertDict({a.message: a.type for a in self.response.alerts.alert})
+                self.alerts = self.response.alerts.alert
         return self
 
     def shipment_num(self):
         return (
             self.response.completed_shipment_info.completed_shipments.completed_shipment[
                 0].shipment_number
-            if self.booked
+            if self.completed
             else None
         )
 
@@ -53,19 +65,15 @@ class BookingState(ui_states.BaseUIState):
     # def alert_dict(self) -> dict[str, shipaw.types.AlertType]:
     #     return {a.message: a.type for a in self.state_alerts()}
 
-    @property
-    def booked(self):
-        return self.response.completed_shipment_info is not None
 
-
-class ShipStatePartial(ui_states.BaseUIState):
-    booking_state: BookingState | None = None
+class ShipmentPartial(ui_states.BaseUIState):
+    # booking_state: BookingState | None = None
 
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
     ship_date: ship_types.SHIPPING_DATE | None = None
     contact: pf_top.Contact | None = None
-    address: pf_ext.AddressRecipient | None = None
+    address: pf_ext.AddressCollection | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
     direction: ShipDirection | None = None
     reference: str | None = None
@@ -73,7 +81,10 @@ class ShipStatePartial(ui_states.BaseUIState):
 
     @property
     def pf_label_name(self):
-        return f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label for {self.contact.business_name} on {self.ship_date}'
+        ln = f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label for {self.contact.business_name} on {self.ship_date}'
+        if not ln:
+            logger.warning('pf_label_name not set')
+        return ln
 
     @property
     def named_label_path(self):
@@ -81,9 +92,9 @@ class ShipStatePartial(ui_states.BaseUIState):
         return (sett.label_dir / self.pf_label_name).with_suffix('.pdf')
 
 
-class Shipment(ShipStatePartial):
+class Shipment(ShipmentPartial):
     contact: pf_top.Contact
-    address: pf_ext.AddressRecipient
+    address: pf_ext.AddressCollection
     ship_date: ship_types.SHIPPING_DATE
     boxes: pyd.PositiveInt = 1
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
@@ -101,9 +112,5 @@ def response_alert_dict(response):
     return {a.message: a.type for a in response.alerts.alert} if response.alerts else {}
 
 
-def state_alert_dict(state: BookingState):
-    return response_alert_dict(state.response)
-
-
-class ShipmentBooked(Shipment):
-    booking_state: BookingState
+def shipment_alert_dict(booking_state: BookingState):
+    return response_alert_dict(booking_state.response)

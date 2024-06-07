@@ -55,11 +55,11 @@ class ELClient(pydantic.BaseModel):
         """
         return ZeepBackend(self.service)[service_prot]
 
-    def send_shipment_request(self, req: msgs.CreateShipmentRequest) -> msgs.CreateShipmentResponse:
-        """Submit a CreateShipmentRequest to Parcelforce, booking carriage.
+    def send_shipment_request(self, req: msgs.CreateRequest) -> msgs.CreateShipmentResponse:
+        """Submit a CreateRequest to Parcelforce, booking carriage.
 
         Args:
-            req: .msgs.CreateShipmentRequest - ShipmenmtRequest to book
+            req: .msgs.CreateRequest - ShipmenmtRequest to book
 
         Returns:
             .msgs.CreateShipmentResponse - response from Parcelforce
@@ -71,11 +71,13 @@ class ELClient(pydantic.BaseModel):
             for alt in resp.alerts.alert:
                 if alt.type == 'ERROR':
                     raise ValueError(
-                        f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
+                        f'ExpressLink Error: {alt.message} for Shipment reference "{req.requested_shipment.reference_number1}"'
+                        # f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
                     )
                 if alt.type == 'WARNING':
                     logger.warning(
-                        f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
+                        f'ExpressLink Warning: {alt.message} for Shipment reference "{req.requested_shipment.reference_number1}"'
+                        # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
                     )
 
         logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
@@ -131,26 +133,26 @@ class ELClient(pydantic.BaseModel):
     def candidates_dict(self, postcode):
         return {add.lines_str: add for add in self.get_candidates(postcode)}
 
-    def state_to_outbound_request(self, state: ship_ui.Shipment):
-        return msgs.CreateShipmentRequest(
+    def outbound_shipment_request(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
+        return msgs.CreateRequest(
             authentication=self.settings.auth,
             requested_shipment=models.RequestedShipmentMinimum(
                 contract_number=self.settings.pf_contract_num_1,
-                service_code=state.service,
-                shipping_date=state.ship_date,
-                recipient_contact=state.contact,
-                recipient_address=state.address,
-                total_number_of_parcels=state.boxes,
-                reference_number1=state.reference,
-                special_instructions1=state.special_instructions,
+                service_code=shipment.service,
+                shipping_date=shipment.ship_date,
+                recipient_contact=shipment.contact,
+                recipient_address=shipment.address,
+                total_number_of_parcels=shipment.boxes,
+                reference_number1=shipment.reference,
+                special_instructions1=shipment.special_instructions,
 
             ),
         )
 
-    def state_to_return_dropoff(self, shipment: ship_ui.Shipment):
-        return msgs.CreateShipmentRequest(
+    def inbound_shipment_request_dropoff(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
+        return msgs.CreateRequest(
             authentication=self.settings.auth,
-            requested_shipment=models.RequestedShipmentMinimum(
+            requested_shipment=pf_top.RequestedShipmentMinimum(
                 contract_number=self.settings.pf_contract_num_1,
                 service_code=shipment.service,
                 shipping_date=shipment.ship_date,
@@ -161,33 +163,30 @@ class ELClient(pydantic.BaseModel):
             ),
         )
 
-    def state_to_inbound_request(
-            self,
-            state: ship_ui.Shipment,
-    ):
-        return msgs.CreateCollectionRequest(
+    def inbound_shipment_request_collection(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
+        return msgs.CreateRequest(
             authentication=self.settings.auth,
             requested_shipment=pf_top.CollectionMinimum(
                 contract_number=self.settings.pf_contract_num_1,
-                service_code=state.service,
-                shipping_date=state.ship_date,
+                service_code=shipment.service,
+                shipping_date=shipment.ship_date,
                 recipient_contact=self.settings.home_contact,
                 recipient_address=self.settings.home_address,
-                total_number_of_parcels=state.boxes,
+                total_number_of_parcels=shipment.boxes,
                 print_own_label=True,
-                collection_info=pf_top.collection_info_from_state(state),
-                reference_number1=state.reference,
-                special_instructions1=state.special_instructions,
+                collection_info=pf_top.collection_info_from_state(shipment),
+                reference_number1=shipment.reference,
+                special_instructions1=shipment.special_instructions,
             ),
         )
 
-    def state_to_request(self, state: ship_ui.Shipment):
-        match state.direction:
+    def shipment_to_request(self, shipment: ship_ui.Shipment):
+        match shipment.direction:
             case 'in':
-                return self.state_to_inbound_request(state)
+                return self.inbound_shipment_request_collection(shipment)
             case 'out':
-                return self.state_to_outbound_request(state)
+                return self.outbound_shipment_request(shipment)
             case 'dropoff':
-                return self.state_to_return_dropoff(state)
+                return self.inbound_shipment_request_dropoff(shipment)
             case _:
                 raise ValueError('Invalid direction')

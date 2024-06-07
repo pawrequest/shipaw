@@ -2,17 +2,12 @@ from shipaw.ship_types import ExpressLinkError
 
 from . import models
 from .expresslink_client import ELClient
-from .ship_ui import (
-    BookingState,
-    Shipment,
-    ShipStatePartial,
-)
+from .ship_ui import BookingState, Shipment, ShipmentPartial
 
 __all__ = models.__all__ + [
     'ELClient',
-    'ShipStatePartial',
-    'ShipState',
+    'ShipmentPartial',
+    'Shipment',
     'BookingState',
-    'ship_types',
     'ExpressLinkError',
 ]

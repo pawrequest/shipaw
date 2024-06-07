@@ -1,6 +1,6 @@
 from .pf_msg import (
-    CreateCollectionRequest,
-    CreateShipmentRequest,
+    CreateRequest,
+    CreateRequest,
     CreateShipmentResponse,
     FindRequest,
     FindResponse,
@@ -12,12 +12,12 @@ from .pf_msg_protocols import CreateShipmentService, FindService, PrintLabelServ
 __all__ = [
     'FindRequest',
     'FindResponse',
-    'CreateShipmentRequest',
+    'CreateRequest',
     'CreateShipmentResponse',
     'PrintLabelRequest',
     'PrintLabelResponse',
     'CreateShipmentService',
     'FindService',
     'PrintLabelService',
-    'CreateCollectionRequest',
+    'CreateRequest',
 ]

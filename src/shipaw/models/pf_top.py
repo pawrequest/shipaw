@@ -7,6 +7,9 @@ from pawdantic import paw_types
 from .. import ship_types
 from . import pf_ext, pf_lists, pf_shared
 
+COLLECTION_TIME_FROM = dt.time(0, 0)
+COLLECTION_TIME_TO = dt.time(0, 0)
+
 
 class ContactMininmum(pf_shared.BasePFType):
     business_name: paw_types.truncated_printable_str_type(40) = _p.Field(
@@ -123,10 +126,8 @@ def collection_info_from_state(state: CollectionStateProtocol):
         collection_contact=col_contact,
         collection_address=state.address,
         collection_time=pf_shared.DateTimeRange.from_datetimes(
-            dt.datetime.combine(state.ship_date, dt.time(9, 0)),
-            dt.datetime.combine(
-                state.ship_date, dt.time(16, 30)
-            )
+            dt.datetime.combine(state.ship_date, COLLECTION_TIME_FROM),
+            dt.datetime.combine(state.ship_date, COLLECTION_TIME_TO)
         )
     )
     return info.model_validate(info)
@@ -153,7 +154,6 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
 
     special_instructions1: _p.constr(max_length=25) | None = None
     special_instructions2: _p.constr(max_length=25) | None = None
-
 
     @_p.field_validator('reference_number1', mode='after')
     def ref_num_validator(cls, v, values):

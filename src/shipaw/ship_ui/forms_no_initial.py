@@ -172,7 +172,7 @@ async def ship_fields():
     ]
 
 
-async def ship_fields_partial(state: states.ShipStatePartial = None):
+async def ship_fields_partial(state: states.ShipmentPartial = None):
     if state:
         initial = state.model_dump()
     return [
