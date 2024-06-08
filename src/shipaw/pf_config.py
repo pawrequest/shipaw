@@ -26,6 +26,7 @@ class PFSettings(BaseSettings):
     pf_contract_num_1: str
     pf_ac_num_2: str | None
     pf_contract_num_2: str | None
+    department_id: int = 1
 
     ship_live: bool = False
     pf_expr_usr: str
