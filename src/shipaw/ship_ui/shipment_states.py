@@ -18,11 +18,11 @@ from ..models.all_shipment_types import AllShipmentTypes
 from ..models.pf_top import CollectionContact
 from ..pf_config import pf_sett
 
-BookingReqSQM = _t.Annotated[
-    msgs.CreateRequest,
+RequestedShipmentSQM = _t.Annotated[
+    AllShipmentTypes,
     sqm.Field(
         # sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
-        sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
+        sa_column=sqm.Column(ship_types.PawdanticJSON(AllShipmentTypes))
     ),
 ]
 BookingRespSQM = _t.Annotated[
@@ -32,9 +32,7 @@ BookingRespSQM = _t.Annotated[
 
 
 class BookingState(ui_states.BaseUIState):
-    # requested_shipment:  = None
-    # request: msgs.CreateRequest
-    request: msgs.CreateRequest | None = None
+    requested_shipment: RequestedShipmentSQM
     response: BookingRespSQM | None = None
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None

@@ -13,6 +13,7 @@ from zeep.proxy import ServiceProxy
 
 from . import models, msgs, pf_config, ship_ui
 from .models import pf_ext
+from .models.all_shipment_types import AllShipmentTypes
 
 SCORER = fuzz.token_sort_ratio
 
@@ -58,33 +59,35 @@ class ELClient(pydantic.BaseModel):
             requested_shipment=shipment.shipment_request(),
         )
 
-    def send_shipment_request(self, req: msgs.CreateRequest) -> msgs.CreateShipmentResponse:
+    def send_shipment_request(self, requested_shipment: AllShipmentTypes) -> msgs.CreateShipmentResponse:
         """Submit a CreateRequest to Parcelforce, booking carriage.
 
         Args:
-            req: .msgs.CreateRequest - ShipmenmtRequest to book
+            requested_shipment: AllShipmentTypes - ShipmenmtRequest to book
 
         Returns:
             .msgs.CreateShipmentResponse - response from Parcelforce
 
         """
         back = self.backend(msgs.CreateShipmentService)
-        resp = back.createshipment(request=req.model_dump(by_alias=True))
+        authorized_shipment = msgs.CreateRequest(authentication=self.settings.auth, requested_shipment=requested_shipment)
+        resp = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
         if resp.alerts:
             for alt in resp.alerts.alert:
                 if alt.type == 'ERROR':
                     raise ValueError(
-                        f'ExpressLink Error: {alt.message} for Shipment reference "{req.requested_shipment.reference_number1}"'
+                        f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}"'
                         # f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
                     )
                 if alt.type == 'WARNING':
                     logger.warning(
-                        f'ExpressLink Warning: {alt.message} for Shipment reference "{req.requested_shipment.reference_number1}"'
+                        f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}"'
                         # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
                     )
 
-        logger.warning(f'BOOKED {req.requested_shipment.recipient_address.lines_str}')
-        return msgs.CreateShipmentResponse.model_validate(resp)
+        logger.warning(f'BOOKED {requested_shipment.recipient_address.lines_str}')
+        return resp
+        # return msgs.CreateShipmentResponse.model_validate(resp)
 
     def get_candidates(self, postcode: str) -> list[models.AddressRecipient]:
         """Get candidate addresses at a postcode.

@@ -87,11 +87,10 @@ class FindResponse(FindMessage, BaseResponse):
 #     requested_shipment: pf_top.CollectionMinimum
 
 
-type RequestedShipment = AllShipmentTypes
 
 
 class CreateRequest(BaseRequest):
-    requested_shipment: RequestedShipment
+    requested_shipment: AllShipmentTypes
 
 
 class CreateShipmentResponse(BaseResponse):
