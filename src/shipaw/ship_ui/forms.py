@@ -51,8 +51,7 @@ class DirectionEnum(str, Enum):
 
 
 def service_select_options():
-    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in
-            pf_shared.ServiceCode2]
+    return [fastui_forms.SelectOption(value=service.value, label=service.name) for service in pf_shared.ServiceCode2]
 
 
 # def get_services():
@@ -154,6 +153,7 @@ async def standard_shipping_inputs(state: Shipment, manual=False):
             # class_name='col-2',
             # display_mode='inline',
         ),
+        *await contact_form_inputs(state),
         c.FormFieldSelect(
             name='service',
             options=service_select_options(),
@@ -171,31 +171,30 @@ async def standard_shipping_inputs(state: Shipment, manual=False):
             title='Small "Reference" bottom corner of label',
             initial=state.reference,
         ),
-        *await contact_form_inputs(state),
     ]
 
 
-async def get_form_fields(kind: FormKind, shipment):
+async def get_form_fields(kind: FormKind, shipment: Shipment, candidates):
     match kind:
         case 'manual':
             inputs = await manual_address_inputs(shipment)
         case 'select':
-            inputs = await select_address_inputs(shipment)
+            inputs = await select_address_inputs(shipment, candidates)
         case _:
             raise ValueError(f'Invalid kind {kind!r}')
-    return await standard_shipping_inputs(shipment) + inputs
+    return inputs + await standard_shipping_inputs(shipment)
 
 
-
-async def select_address_inputs(state):
-    return [c.FormFieldSelect(
-        name='address',
-        options=address_select_options(state.candidates),
-        title='Select Address',
-        required=True,
-        initial=state.address.model_dump_json(),
-        # class_name='row'
-    )]
+async def select_address_inputs(shipment: Shipment, candidates):
+    return [
+        c.FormFieldSelect(
+            name='address',
+            options=address_select_options(candidates),
+            title='Select Address',
+            required=True,
+            initial=shipment.address.model_dump_json(),
+        )
+    ]
 
 
 class PostcodeSelect(_p.BaseModel):
@@ -220,8 +219,7 @@ def date_select_options() -> list[fastui_forms.SelectOption]:
     ]
 
 
-def address_select_options(candidates: list[pf_ext.AddressRecipient]) -> list[
-    fastui_forms.SelectOption]:
+def address_select_options(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_forms.SelectOption]:
     return [
         fastui_forms.SelectOption(
             value=cand.model_dump_json(),

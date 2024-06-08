@@ -75,7 +75,7 @@ class ShipmentPartial(ui_states.BaseUIState):
     ship_date: date | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressCollection | None = None
-    candidates: list[pf_ext.AddressRecipient] | None = None
+    # candidates: list[pf_ext.AddressRecipient] | None = None
     direction: ShipDirection | None = None
     reference: str | None = None
     special_instructions: str | None = None
@@ -100,7 +100,7 @@ class Shipment(ShipmentPartial):
     boxes: pyd.PositiveInt = 1
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     direction: ship_types.ShipDirection = 'out'
-    candidates: list[pf_ext.AddressRecipient] | None = Field(None)
+    # candidates: list[pf_ext.AddressRecipient] | None = Field(None)
     reference: str = ''
     special_instructions: str = ''
 
