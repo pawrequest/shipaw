@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import datetime as dt
 import json
 import typing as _t
 from datetime import date, timedelta
@@ -21,11 +22,15 @@ DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
 TOD = date.today()
-COLLECTION_CUTOFF = datetime.time(17, 0)
+COLLECTION_CUTOFF = datetime.time(23, 59, 59)
 ADVANCE_BOOKING_DAYS = 28
 WEEKDAYS_IN_RANGE = [
     TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + timedelta(days=i)).weekday() < 5
 ]
+
+
+COLLECTION_TIME_FROM = dt.time(0, 0)
+COLLECTION_TIME_TO = dt.time(0, 0)
 
 POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
 VALID_PC = _t.Annotated[
@@ -42,23 +47,20 @@ def limit_daterange_no_weekends(v: date) -> date:
             v = datetime.date.fromisoformat(v)
 
         if isinstance(v, date):
-            if v < TOD:
-                logger.info(f'Date {v} is in the past - using today')
-                v = TOD
+            if v < TOD or v.weekday() > 4:
+                logger.info(f'Date {v} is a weekend or in the past - using next weekday')
+                v = min(WEEKDAYS_IN_RANGE)
+
             if v > max(WEEKDAYS_IN_RANGE):
-                logger.info(f'Date {v} is too far in the future - using latest available)')
+                logger.info(f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)')
                 v = max(WEEKDAYS_IN_RANGE)
-            if v.weekday() > 4:
-                v = v - timedelta(days=6 - v.weekday())
-            if v == TOD and datetime.datetime.now().time() > COLLECTION_CUTOFF:
-                logger.warning('Current time is past collection cutoff - using next available date')
-                logger.warning('just kidding, uncomment to re-enable')
-                # v = v + timedelta(days=1)
+
+            logger.debug(f'Validated date: {v}')
             return v
 
 
-SHIPPING_DATE = date
-# SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
+# SHIPPING_DATE = date
+SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
 
 
 class PawdanticJSON(sqa.TypeDecorator):

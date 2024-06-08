@@ -88,7 +88,7 @@ async def contact_form_inputs(state):
     ]
 
 
-async def manual_address_inputs(state):
+async def manual_address_inputs(state) -> list[c.FormFieldInput]:
     return [
         c.FormFieldInput(
             name='address_line1',
@@ -188,14 +188,14 @@ async def get_form_fields(kind: FormKind, shipment):
 
 
 async def select_address_inputs(state):
-    return c.FormFieldSelect(
+    return [c.FormFieldSelect(
         name='address',
         options=address_select_options(state.candidates),
         title='Select Address',
         required=True,
         initial=state.address.model_dump_json(),
         # class_name='row'
-    )
+    )]
 
 
 class PostcodeSelect(_p.BaseModel):

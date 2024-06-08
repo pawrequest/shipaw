@@ -2,24 +2,28 @@ from __future__ import annotations, annotations
 
 import pathlib
 import typing as _t
+from datetime import date, datetime
 
 import pydantic as _p
 import pydantic as pyd
 import sqlmodel as sqm
 from pawdantic.pawui import states as ui_states
 from pydantic import ConfigDict, Field
-from shipaw.models import pf_ext, pf_shared, pf_top
-from shipaw.ship_types import ShipDirection
 from loguru import logger
 
+from shipaw.models import pf_ext, pf_shared, pf_top
+from shipaw.ship_types import ShipDirection
 from .. import msgs, pf_config, ship_types
-
+from ..models.all_shipment_types import AllShipmentTypes
+from ..models.pf_top import CollectionContact
+from ..pf_config import pf_sett
 
 BookingReqSQM = _t.Annotated[
-    msgs.CreateRequest, sqm.Field(
+    msgs.CreateRequest,
+    sqm.Field(
         # sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
         sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
-    )
+    ),
 ]
 BookingRespSQM = _t.Annotated[
     msgs.CreateShipmentResponse,
@@ -53,8 +57,7 @@ class BookingState(ui_states.BaseUIState):
 
     def shipment_num(self):
         return (
-            self.response.completed_shipment_info.completed_shipments.completed_shipment[
-                0].shipment_number
+            self.response.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
             if self.completed
             else None
         )
@@ -71,7 +74,7 @@ class ShipmentPartial(ui_states.BaseUIState):
 
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
-    ship_date: ship_types.SHIPPING_DATE | None = None
+    ship_date: date | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressCollection | None = None
     candidates: list[pf_ext.AddressRecipient] | None = None
@@ -95,13 +98,70 @@ class ShipmentPartial(ui_states.BaseUIState):
 class Shipment(ShipmentPartial):
     contact: pf_top.Contact
     address: pf_ext.AddressCollection
-    ship_date: ship_types.SHIPPING_DATE
+    ship_date: date
     boxes: pyd.PositiveInt = 1
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     direction: ship_types.ShipDirection = 'out'
     candidates: list[pf_ext.AddressRecipient] | None = Field(None)
     reference: str = ''
     special_instructions: str = ''
+
+    def shipment_request(self):
+        match self.direction:
+            case 'in':
+                return self.requested_shipment_inbound()
+            case 'out':
+                return self.requested_shipment_outbound()
+            case 'dropoff':
+                return self.requested_shipment_inbound_dropoff()
+
+    def requested_shipment_outbound(self) -> AllShipmentTypes:
+        return AllShipmentTypes(
+            service_code=self.service,
+            shipping_date=self.ship_date,
+            recipient_contact=self.contact,
+            recipient_address=self.address,
+            total_number_of_parcels=self.boxes,
+            reference_number1=self.reference,
+            special_instructions1=self.special_instructions,
+        )
+
+    def requested_shipment_inbound(
+        self, print_own_label=True, collect_from_time=None, collect_to_time=None
+    ) -> AllShipmentTypes:
+        collect_from_time = collect_from_time or ship_types.COLLECTION_TIME_FROM
+        collect_to_time = collect_to_time or ship_types.COLLECTION_TIME_TO
+        return AllShipmentTypes(
+            service_code=self.service,
+            shipping_date=self.ship_date,
+            recipient_contact=pf_sett().home_contact,
+            recipient_address=pf_sett().home_address,
+            total_number_of_parcels=self.boxes,
+            reference_number1=self.reference,
+            special_instructions1=self.special_instructions,
+            shipment_type='COLLECTION',
+            print_own_label=print_own_label,
+            collection_info=pf_top.CollectionInfo(
+                collection_contact=CollectionContact.model_validate(self.contact.model_dump(exclude={'notifications'})),
+                collection_address=self.address,
+                collection_time=pf_shared.DateTimeRange.from_datetimes(
+                    datetime.combine(self.ship_date, collect_from_time),
+                    datetime.combine(self.ship_date, collect_to_time),
+                ),
+            ),
+        )
+
+    def requested_shipment_inbound_dropoff(self) -> AllShipmentTypes:
+        return AllShipmentTypes(
+            service_code=self.service,
+            shipping_date=self.ship_date,
+            recipient_contact=pf_sett().home_contact,
+            recipient_address=pf_sett().home_address,
+            total_number_of_parcels=self.boxes,
+            reference_number1=self.reference,
+            special_instructions1=self.special_instructions,
+            shipment_type='DELIVERY',
+        )
 
 
 class ShipmentExtra(Shipment):

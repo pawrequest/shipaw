@@ -12,6 +12,13 @@ from shipaw.pf_config import pf_sett
 
 
 class AllShipmentTypes(pf_shared.BasePFType):
+    """Model for all shipment types.
+
+    Minimum required fields:
+    - recipient_contact
+    - recipient_address
+
+    """
     # from settings
     contract_number: str = pf_sett().pf_contract_num_1
     department_id: int = pf_sett().department_id
@@ -62,11 +69,11 @@ class AllShipmentTypes(pf_shared.BasePFType):
     request_id: int | None = None
     returns: pf_shared.Returns | None = None
 
-    @_p.field_validator('shipping_date', mode='after')
-    def ship_date_validator(cls, v, values):
-        if v < dt.date.today():
-            logger.info(f'Shipping date {v} is in the past, using today')
-            return dt.date.today()
+    # @_p.field_validator('shipping_date', mode='after')
+    # def ship_date_validator(cls, v, values):
+    #     if v < dt.date.today():
+    #         logger.info(f'Shipping date {v} is in the past, using today')
+    #         return dt.date.today()
 
     @_p.field_validator('reference_number1', mode='after')
     def ref_num_validator(cls, v, values):

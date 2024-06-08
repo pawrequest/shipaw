@@ -6,6 +6,7 @@ from pydantic_core.core_schema import ValidationInfo
 
 from .. import ship_types
 from ..models import pf_ext, pf_lists, pf_shared, pf_top
+from ..models.all_shipment_types import AllShipmentTypes
 
 
 class BaseRequest(pf_shared.BasePFType):
@@ -86,7 +87,7 @@ class FindResponse(FindMessage, BaseResponse):
 #     requested_shipment: pf_top.CollectionMinimum
 
 
-type RequestedShipment = Union[pf_top.CollectionMinimum, pf_top.RequestedShipmentMinimum]
+type RequestedShipment = AllShipmentTypes
 
 
 class CreateRequest(BaseRequest):

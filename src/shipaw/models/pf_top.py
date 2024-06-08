@@ -6,9 +6,7 @@ from pawdantic import paw_types
 
 from .. import ship_types
 from . import pf_ext, pf_lists, pf_shared
-
-COLLECTION_TIME_FROM = dt.time(0, 0)
-COLLECTION_TIME_TO = dt.time(0, 0)
+from ..ship_types import COLLECTION_TIME_FROM, COLLECTION_TIME_TO
 
 
 class ContactMininmum(pf_shared.BasePFType):
@@ -108,7 +106,7 @@ class CompletedShipmentInfo(pf_shared.BasePFType):
 
 
 class CollectionInfo(pf_shared.BasePFType):
-    collection_contact: Contact
+    collection_contact: CollectionContact
     collection_address: pf_ext.AddressCollection
     collection_time: pf_shared.DateTimeRange
 
