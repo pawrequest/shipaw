@@ -117,18 +117,18 @@ class CollectionStateProtocol(_t.Protocol):
     ship_date: dt.date
 
 
-def collection_info_from_state(state: CollectionStateProtocol):
-    col_contact_ = CollectionContact(**state.contact.model_dump(exclude={'notifications'}))
-    col_contact = col_contact_.model_validate(col_contact_)
-    info = CollectionInfo(
-        collection_contact=col_contact,
-        collection_address=state.address,
-        collection_time=pf_shared.DateTimeRange.from_datetimes(
-            dt.datetime.combine(state.ship_date, COLLECTION_TIME_FROM),
-            dt.datetime.combine(state.ship_date, COLLECTION_TIME_TO)
-        )
-    )
-    return info.model_validate(info)
+# def collection_info_from_state(state: CollectionStateProtocol):
+#     col_contact_ = CollectionContact(**state.contact.model_dump(exclude={'notifications'}))
+#     col_contact = col_contact_.model_validate(col_contact_)
+#     info = CollectionInfo(
+#         collection_contact=col_contact,
+#         collection_address=state.address,
+#         collection_time=pf_shared.DateTimeRange.from_datetimes(
+#             dt.datetime.combine(state.ship_date, COLLECTION_TIME_FROM),
+#             dt.datetime.combine(state.ship_date, COLLECTION_TIME_TO)
+#         )
+#     )
+#     return info.model_validate(info)
 
 
 class RequestedShipmentZero(pf_shared.BasePFType):

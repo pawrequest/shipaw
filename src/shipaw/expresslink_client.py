@@ -70,7 +70,9 @@ class ELClient(pydantic.BaseModel):
 
         """
         back = self.backend(msgs.CreateShipmentService)
-        authorized_shipment = msgs.CreateRequest(authentication=self.settings.auth, requested_shipment=requested_shipment)
+        authorized_shipment = msgs.CreateRequest(
+            authentication=self.settings.auth, requested_shipment=requested_shipment
+        )
         resp = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
         if resp.alerts:
             for alt in resp.alerts.alert:
@@ -127,13 +129,19 @@ class ELClient(pydantic.BaseModel):
         logger.info(f'Downloaded label to {out_path}')
         return out_path
 
-    def choose_address[T: pf_ext.AddTypes](self, address: T) -> tuple[T, list[T]]:
-        candidate_dict = self.candidates_dict(address.postcode)
-        chosen, score = process.extractOne(address.lines_str, list(candidate_dict.keys()), scorer=SCORER)
-        return candidate_dict[chosen], list(candidate_dict.values())
+    def choose_address[T: pf_ext.AddTypes](self, address: T) -> T:
+        # candidate_dict = self.candidates_dict(address.postcode)
+        # chosen, score = process.extractOne(address.lines_str, list(candidate_dict.keys()), scorer=SCORER)
+        candidates = self.get_candidates(address.postcode)
+        chosen, score = process.extractOne(address.lines_str, candidates, scorer=SCORER)
+        return chosen
+        # return candidate_dict[chosen]
 
     def candidates_dict(self, postcode):
         return {add.lines_str: add for add in self.get_candidates(postcode)}
+
+    def candidates_json(self, postcode):
+        return {add.lines_str: add.model_dump_json() for add in self.get_candidates(postcode)}
 
     # def outbound_shipment_request(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
     #     return msgs.CreateRequest(

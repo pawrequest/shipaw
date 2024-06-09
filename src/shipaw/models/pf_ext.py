@@ -19,7 +19,7 @@ def address_string_to_dict(address_str: str) -> dict[str, str]:
     }
 
 
-addr_lines_fields_set = sorted({'address_line1', 'address_line2', 'address_line3'})
+addr_lines_fields_set = {'address_line1', 'address_line2', 'address_line3'}
 
 
 class AddressSender(pf_shared.BasePFType):

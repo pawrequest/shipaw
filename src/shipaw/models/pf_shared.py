@@ -160,17 +160,13 @@ class DateTimeRange(BasePFType):
     to: str
 
     @classmethod
-    def from_datetimes(cls, from_dt: dt.datetime, to_dt: dt.datetime):
-        now = dt.datetime.now()
-        if to_dt < now:
-            logger.warning(f'To date {to_dt} is in the past, using next day')
-            from_dt = from_dt + dt.timedelta(days=1)
-            to_dt = to_dt + dt.timedelta(days=1)
+    def null_times_from_date(cls, null_date: dt.date):
+        null_isodatetime = dt.datetime.combine(null_date, dt.time(0, 0)).isoformat(timespec='seconds')
+        return cls(from_=null_isodatetime, to=null_isodatetime)
 
-        return cls(
-            from_=from_dt.isoformat(timespec='seconds'),
-            to=to_dt.isoformat(timespec='seconds')
-        )
+    @classmethod
+    def from_datetimes(cls, from_dt: dt.datetime, to_dt: dt.datetime):
+        return cls(from_=from_dt.isoformat(timespec='seconds'), to=to_dt.isoformat(timespec='seconds'))
 
 
 class ContentData(BasePFType):

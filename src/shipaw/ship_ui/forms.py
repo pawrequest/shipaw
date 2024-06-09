@@ -9,7 +9,7 @@ from pawdantic import paw_strings, paw_types
 
 from shipaw import Shipment
 from shipaw.models import pf_ext, pf_shared
-from shipaw.ship_types import FormKind, VALID_PC
+from shipaw.ship_types import FormKind, VALID_POSTCODE
 
 
 class ContactForm(_p.BaseModel):
@@ -61,28 +61,28 @@ def service_select_options():
 #     ]
 
 
-async def contact_form_inputs(state):
+async def contact_form_inputs(shipment:Shipment):
     return [
         c.FormFieldInput(
             name='business_name',
             title='Business Name',
-            initial=state.contact.business_name,
+            initial=shipment.contact.business_name,
         ),
         c.FormFieldInput(
             name='contact_name',
             title='Contact Name',
-            initial=state.contact.contact_name,
+            initial=shipment.contact.contact_name,
         ),
         c.FormFieldInput(
             name='email',
             title='Delivery Email',
-            initial=state.contact.email_address,
+            initial=shipment.contact.email_address,
             html_type='email',
         ),
         c.FormFieldInput(
             name='phone',
             title='Delivery Mobile Phone',
-            initial=state.contact.mobile_phone,
+            initial=shipment.contact.mobile_phone,
         ),
     ]
 
@@ -164,12 +164,12 @@ async def standard_shipping_inputs(state: Shipment, manual=False):
         c.FormFieldInput(
             name='special_instructions',
             title='Big "Special Instructions" middle of label',
-            initial=state.special_instructions,
+            initial=state.special_instructions1,
         ),
         c.FormFieldInput(
             name='reference',
             title='Small "Reference" bottom corner of label',
-            initial=state.reference,
+            initial=state.reference1,
         ),
     ]
 
@@ -190,7 +190,7 @@ async def select_address_inputs(shipment: Shipment, candidates):
         c.FormFieldSelect(
             name='address',
             options=address_select_options(candidates),
-            title='Select Address',
+            title=f'Select Address from {shipment.address.postcode}',
             required=True,
             initial=shipment.address.model_dump_json(),
         )
@@ -198,7 +198,7 @@ async def select_address_inputs(shipment: Shipment, candidates):
 
 
 class PostcodeSelect(_p.BaseModel):
-    fetch_address_from_postcode: VALID_PC
+    fetch_address_from_postcode: VALID_POSTCODE
 
 
 ADVANCE_BOOKING_RANGE = 28

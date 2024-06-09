@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import datetime as dt
-import json
+import re
 import typing as _t
 from datetime import date, timedelta
 
@@ -28,17 +28,20 @@ WEEKDAYS_IN_RANGE = [
     TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + timedelta(days=i)).weekday() < 5
 ]
 
-
 COLLECTION_TIME_FROM = dt.time(0, 0)
 COLLECTION_TIME_TO = dt.time(0, 0)
 
 POSTCODE_PATTERN = r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})'
-VALID_PC = _t.Annotated[
+VALID_POSTCODE = _t.Annotated[
     str,
     _p.StringConstraints(pattern=POSTCODE_PATTERN),
     _p.BeforeValidator(lambda s: s.strip().upper()),
     _p.Field(description='A valid UK postcode'),
 ]
+
+
+def is_valid_postcode(pc):
+    return bool(re.match(POSTCODE_PATTERN, pc.strip().upper()))
 
 
 def limit_daterange_no_weekends(v: date) -> date:

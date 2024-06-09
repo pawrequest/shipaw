@@ -2,13 +2,13 @@ from __future__ import annotations, annotations
 
 import pathlib
 import typing as _t
-from datetime import date, datetime
+from datetime import date
 
 import pydantic as _p
 import pydantic as pyd
 import sqlmodel as sqm
 from pawdantic.pawui import states as ui_states
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, constr
 from loguru import logger
 
 from shipaw.models import pf_ext, pf_shared, pf_top
@@ -68,17 +68,21 @@ class BookingState(ui_states.BaseUIState):
 
 
 class ShipmentPartial(ui_states.BaseUIState):
-    # booking_state: BookingState | None = None
-
+    special_instructions3: constr(max_length=25) = ''
+    special_instructions2: constr(max_length=25) = ''
+    special_instructions1: constr(max_length=25) = ''
+    reference3: constr(max_length=24) = ''
+    reference2: constr(max_length=24) = ''
+    reference1: constr(max_length=24) = ''
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
     ship_date: date | None = None
     contact: pf_top.Contact | None = None
     address: pf_ext.AddressCollection | None = None
-    # candidates: list[pf_ext.AddressRecipient] | None = None
     direction: ShipDirection | None = None
-    reference: str | None = None
-    special_instructions: str | None = None
+
+    collection_times: pf_shared.DateTimeRange | None = None
+    print_own_label: bool = True
 
     @property
     def pf_label_name(self):
@@ -95,14 +99,17 @@ class ShipmentPartial(ui_states.BaseUIState):
 
 class Shipment(ShipmentPartial):
     contact: pf_top.Contact
-    address: pf_ext.AddressCollection
+    address: pf_ext.AddressCollection  # Recipient is more liberal with lengths, but differnetiating everywhere is tiresome
     ship_date: date
     boxes: pyd.PositiveInt = 1
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     direction: ship_types.ShipDirection = 'out'
-    # candidates: list[pf_ext.AddressRecipient] | None = Field(None)
-    reference: str = ''
-    special_instructions: str = ''
+
+    @_p.field_validator('collection_times', mode='after')
+    def validate_collection_times(cls, v, values):
+        if values.data.get('direction') == 'in' and v is None:
+            v = pf_shared.DateTimeRange.null_times_from_date(values.data.get('ship_date'))
+        return v
 
     def shipment_request(self):
         match self.direction:
@@ -115,51 +122,48 @@ class Shipment(ShipmentPartial):
 
     def requested_shipment_outbound(self) -> AllShipmentTypes:
         return AllShipmentTypes(
-            service_code=self.service,
-            shipping_date=self.ship_date,
+            **self.standard_params,
             recipient_contact=self.contact,
             recipient_address=self.address,
-            total_number_of_parcels=self.boxes,
-            reference_number1=self.reference,
-            special_instructions1=self.special_instructions,
         )
 
-    def requested_shipment_inbound(
-        self, print_own_label=True, collect_from_time=None, collect_to_time=None
-    ) -> AllShipmentTypes:
-        collect_from_time = collect_from_time or ship_types.COLLECTION_TIME_FROM
-        collect_to_time = collect_to_time or ship_types.COLLECTION_TIME_TO
+    def requested_shipment_inbound(self) -> AllShipmentTypes:
         return AllShipmentTypes(
-            service_code=self.service,
-            shipping_date=self.ship_date,
+            **self.standard_params,
+            **self.collection_params,
             recipient_contact=pf_sett().home_contact,
             recipient_address=pf_sett().home_address,
-            total_number_of_parcels=self.boxes,
-            reference_number1=self.reference,
-            special_instructions1=self.special_instructions,
-            shipment_type='COLLECTION',
-            print_own_label=print_own_label,
-            collection_info=pf_top.CollectionInfo(
-                collection_contact=CollectionContact.model_validate(self.contact.model_dump(exclude={'notifications'})),
-                collection_address=self.address,
-                collection_time=pf_shared.DateTimeRange.from_datetimes(
-                    datetime.combine(self.ship_date, collect_from_time),
-                    datetime.combine(self.ship_date, collect_to_time),
-                ),
-            ),
         )
 
     def requested_shipment_inbound_dropoff(self) -> AllShipmentTypes:
         return AllShipmentTypes(
-            service_code=self.service,
-            shipping_date=self.ship_date,
+            **self.standard_params,
             recipient_contact=pf_sett().home_contact,
             recipient_address=pf_sett().home_address,
-            total_number_of_parcels=self.boxes,
-            reference_number1=self.reference,
-            special_instructions1=self.special_instructions,
             shipment_type='DELIVERY',
         )
+
+    @property
+    def standard_params(self):
+        return {
+            'service_code': self.service,
+            'shipping_date': self.ship_date,
+            'total_number_of_parcels': self.boxes,
+            'reference_number1': self.reference1,
+            'special_instructions1': self.special_instructions1,
+        }
+
+    @property
+    def collection_params(self):
+        return {
+            'shipment_type': 'COLLECTION',
+            'print_own_label': self.print_own_label,
+            'collection_info': pf_top.CollectionInfo(
+                collection_contact=CollectionContact.model_validate(self.contact.model_dump(exclude={'notifications'})),
+                collection_address=self.address,
+                collection_time=pf_shared.DateTimeRange.null_times_from_date(self.ship_date),
+            ),
+        }
 
 
 class ShipmentExtra(Shipment):
