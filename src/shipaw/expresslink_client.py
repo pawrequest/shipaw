@@ -138,17 +138,20 @@ class ELClient(pydantic.BaseModel):
         return chosen
         # return candidate_dict[chosen]
 
-    def get_choices[T: pf_ext.AddTypes](self, address: T) -> list[AddressChoice]:
-        candidates = {add.lines_str: add for add in self.get_candidates(address.postcode)}
+    def get_choices[T: pf_ext.AddTypes](self, postcode: str, address: T | None = None) -> list[AddressChoice]:
+        candidates = self.get_candidates(postcode)
+        if not address:
+            return [AddressChoice(address=add, score=0) for add in candidates]
+
+        candidate_dict = {add.lines_str: add for add in candidates}
 
         scored = process.extract(
             address.lines_str,
-            candidates.keys(),
-            # {add.lines_str: add.model_dump_json() for add in self.get_candidates(address.postcode)},
+            candidate_dict.keys(),
             scorer=SCORER,
             limit=None,
         )
-        return sorted([AddressChoice(address=candidates[add], score=score) for add, score in scored], key=lambda x: x.score, reverse=True)
+        return sorted([AddressChoice(address=candidate_dict[add], score=score) for add, score in scored], key=lambda x: x.score, reverse=True)
 
     def candidates_dict(self, postcode):
         return {add.address_line1: add for add in self.get_candidates(postcode)}
@@ -156,85 +159,3 @@ class ELClient(pydantic.BaseModel):
     def candidates_json(self, postcode):
         return {add.lines_str: add.model_dump_json() for add in self.get_candidates(postcode)}
 
-    # def outbound_shipment_request(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
-    #     return msgs.CreateRequest(
-    #         authentication=self.settings.auth,
-    #         requested_shipment=models.RequestedShipmentMinimum(
-    #             contract_number=self.settings.pf_contract_num_1,
-    #             service_code=shipment.service,
-    #             shipping_date=shipment.ship_date,
-    #             recipient_contact=shipment.contact,
-    #             recipient_address=shipment.address,
-    #             total_number_of_parcels=shipment.boxes,
-    #             reference_number1=shipment.reference,
-    #             special_instructions1=shipment.special_instructions,
-    #
-    #         ),
-    #     )
-
-    # def requested_shipment_outbound(self, shipment: ship_ui.Shipment) -> AllShipmentTypes:
-    #     return AllShipmentTypes(
-    #             service_code=shipment.service,
-    #             shipping_date=shipment.ship_date,
-    #             recipient_contact=shipment.contact,
-    #             recipient_address=shipment.address,
-    #             total_number_of_parcels=shipment.boxes,
-    #             reference_number1=shipment.reference,
-    #             special_instructions1=shipment.special_instructions,
-    #         )
-
-    # def inbound_shipment_request_dropoff(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
-    #     return msgs.CreateRequest(
-    #         authentication=self.settings.auth,
-    #         requested_shipment=pf_top.RequestedShipmentMinimum(
-    #             contract_number=self.settings.pf_contract_num_1,
-    #             service_code=shipment.service,
-    #             shipping_date=shipment.ship_date,
-    #             recipient_contact=self.settings.home_contact,
-    #             recipient_address=self.settings.home_address,
-    #             total_number_of_parcels=shipment.boxes,
-    #             reference_number1=shipment.reference,
-    #         ),
-    #     )
-
-    # def requested_shipment_dropoff(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
-    #     return msgs.CreateRequest(
-    #         authentication=self.settings.auth,
-    #         requested_shipment=pf_top.RequestedShipmentMinimum(
-    #             contract_number=self.settings.pf_contract_num_1,
-    #             service_code=shipment.service,
-    #             shipping_date=shipment.ship_date,
-    #             recipient_contact=self.settings.home_contact,
-    #             recipient_address=self.settings.home_address,
-    #             total_number_of_parcels=shipment.boxes,
-    #             reference_number1=shipment.reference,
-    #         ),
-    #     )
-
-    # def inbound_shipment_request_collection(self, shipment: ship_ui.Shipment) -> msgs.CreateRequest:
-    #     return msgs.CreateRequest(
-    #         authentication=self.settings.auth,
-    #         requested_shipment=pf_top.CollectionMinimum(
-    #             contract_number=self.settings.pf_contract_num_1,
-    #             service_code=shipment.service,
-    #             shipping_date=shipment.ship_date,
-    #             recipient_contact=self.settings.home_contact,
-    #             recipient_address=self.settings.home_address,
-    #             total_number_of_parcels=shipment.boxes,
-    #             print_own_label=True,
-    #             collection_info=pf_top.collection_info_from_state(shipment),
-    #             reference_number1=shipment.reference,
-    #             special_instructions1=shipment.special_instructions,
-    #         ),
-    #     )
-
-    # def shipment_to_request(self, shipment: ship_ui.Shipment):
-    #     match shipment.direction:
-    #         case 'in':
-    #             return self.inbound_shipment_request_collection(shipment)
-    #         case 'out':
-    #             return self.outbound_shipment_request(shipment)
-    #         case 'dropoff':
-    #             return self.inbound_shipment_request_dropoff(shipment)
-    #         case _:
-    #             raise ValueError('Invalid direction')

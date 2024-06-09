@@ -94,7 +94,8 @@ class PostOffice(pf_shared.BasePFType):
 
 
 class AddressChoice[T: AddressCollection | AddressRecipient](pf_shared.BasePFType):
-    address: T = sqm.Field(sa_column=sqm.Column(sqm.JSON))
+    address: T
+    # address: T = sqm.Field(sa_column=sqm.Column(sqm.JSON))
     score: int
 
 
