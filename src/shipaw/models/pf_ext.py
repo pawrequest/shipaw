@@ -33,16 +33,6 @@ class AddressSender(pf_shared.BasePFType):
     postcode: str
     country: str = 'GB'
 
-    def to_collection(self):
-        return AddressCollection(
-            address_line1=self.address_line1,
-            address_line2=self.address_line2,
-            address_line3=self.address_line3,
-            town=self.town,
-            postcode=self.postcode,
-            country=self.country,
-        )
-
     @property
     def lines_dict(self):
         return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
@@ -103,8 +93,8 @@ class PostOffice(pf_shared.BasePFType):
     booking_reference: str | None = None
 
 
-class AddressChoice(pf_shared.BasePFType):
-    address: AddressRecipient = sqm.Field(sa_column=sqm.Column(sqm.JSON))
+class AddressChoice[T: AddressCollection | AddressRecipient](pf_shared.BasePFType):
+    address: T = sqm.Field(sa_column=sqm.Column(sqm.JSON))
     score: int
 
 

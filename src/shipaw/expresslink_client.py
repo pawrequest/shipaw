@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from pprint import pprint
 
 import pydantic
 import zeep
@@ -12,7 +13,7 @@ from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
 from . import models, msgs, pf_config, ship_ui
-from .models import pf_ext
+from .models import AddressChoice, pf_ext
 from .models.all_shipment_types import AllShipmentTypes
 
 SCORER = fuzz.token_sort_ratio
@@ -137,8 +138,20 @@ class ELClient(pydantic.BaseModel):
         return chosen
         # return candidate_dict[chosen]
 
+    def get_choices[T: pf_ext.AddTypes](self, address: T) -> list[AddressChoice]:
+        candidates = {add.lines_str: add for add in self.get_candidates(address.postcode)}
+
+        scored = process.extract(
+            address.lines_str,
+            candidates.keys(),
+            # {add.lines_str: add.model_dump_json() for add in self.get_candidates(address.postcode)},
+            scorer=SCORER,
+            limit=None,
+        )
+        return sorted([AddressChoice(address=candidates[add], score=score) for add, score in scored], key=lambda x: x.score, reverse=True)
+
     def candidates_dict(self, postcode):
-        return {add.lines_str: add for add in self.get_candidates(postcode)}
+        return {add.address_line1: add for add in self.get_candidates(postcode)}
 
     def candidates_json(self, postcode):
         return {add.lines_str: add.model_dump_json() for add in self.get_candidates(postcode)}
