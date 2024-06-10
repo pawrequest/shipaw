@@ -38,14 +38,6 @@ class AddressSender(pf_shared.BasePFType):
         return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
 
     @property
-    def lines_list(self):
-        return list(self.lines_dict.values())
-
-    @property
-    def lines_set_vals(self):
-        return {getattr(self, _) for _ in self.lines_fields_set}
-
-    @property
     def lines_fields_set(self):
         return {_ for _ in addr_lines_fields_set if getattr(self, _)}
 
