@@ -14,15 +14,15 @@ from loguru import logger
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
 from .. import msgs, pf_config, ship_types
-from ..models.all_shipment_types import AllShipmentTypes, ShipmentReferenceFields
+from ..models.all_shipment_types import ShipmentRequest, ShipmentReferenceFields
 from ..models.pf_top import CollectionContact
 from ..pf_config import pf_sett
 
 RequestedShipmentSQM = _t.Annotated[
-    AllShipmentTypes,
+    ShipmentRequest,
     sqm.Field(
         # sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
-        sa_column=sqm.Column(ship_types.PawdanticJSON(AllShipmentTypes))
+        sa_column=sqm.Column(ship_types.PawdanticJSON(ShipmentRequest))
     ),
 ]
 BookingRespSQM = _t.Annotated[
@@ -115,7 +115,7 @@ class Shipment(ShipmentPartial):
             v = pf_shared.DateTimeRange.null_times_from_date(values.data.get('ship_date'))
         return v
 
-    def shipment_request(self) -> AllShipmentTypes:
+    def shipment_request(self) -> ShipmentRequest:
         match self.direction:
             case 'in':
                 return self.requested_shipment_inbound()
@@ -124,23 +124,23 @@ class Shipment(ShipmentPartial):
             case 'dropoff':
                 return self.requested_shipment_inbound_dropoff()
 
-    def requested_shipment_outbound(self) -> AllShipmentTypes:
-        return AllShipmentTypes(
+    def requested_shipment_outbound(self) -> ShipmentRequest:
+        return ShipmentRequest(
             **self.standard_params,
             recipient_contact=self.contact,
             recipient_address=self.address,
         )
 
-    def requested_shipment_inbound(self) -> AllShipmentTypes:
-        return AllShipmentTypes(
+    def requested_shipment_inbound(self) -> ShipmentRequest:
+        return ShipmentRequest(
             **self.standard_params,
             **self.collection_params,
             recipient_contact=pf_sett().home_contact,
             recipient_address=pf_sett().home_address,
         )
 
-    def requested_shipment_inbound_dropoff(self) -> AllShipmentTypes:
-        return AllShipmentTypes(
+    def requested_shipment_inbound_dropoff(self) -> ShipmentRequest:
+        return ShipmentRequest(
             **self.standard_params,
             recipient_contact=pf_sett().home_contact,
             recipient_address=pf_sett().home_address,

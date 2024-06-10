@@ -14,7 +14,7 @@ from zeep.proxy import ServiceProxy
 
 from . import models, msgs, pf_config, ship_ui
 from .models import AddressChoice, pf_ext
-from .models.all_shipment_types import AllShipmentTypes
+from .models.all_shipment_types import ShipmentRequest
 
 SCORER = fuzz.token_sort_ratio
 
@@ -60,11 +60,11 @@ class ELClient(pydantic.BaseModel):
             requested_shipment=shipment.shipment_request(),
         )
 
-    def send_shipment_request(self, requested_shipment: AllShipmentTypes) -> msgs.CreateShipmentResponse:
+    def send_shipment_request(self, requested_shipment: ShipmentRequest) -> msgs.CreateShipmentResponse:
         """Submit a CreateRequest to Parcelforce, booking carriage.
 
         Args:
-            requested_shipment: AllShipmentTypes - ShipmenmtRequest to book
+            requested_shipment: ShipmentRequest - ShipmenmtRequest to book
 
         Returns:
             .msgs.CreateShipmentResponse - response from Parcelforce

@@ -6,17 +6,15 @@ import pydantic as _p
 from loguru import logger
 from pawdantic import paw_types
 
-from shipaw import ship_types
+from shipaw import pf_config, ship_types
 from shipaw.models import pf_ext, pf_lists, pf_shared
 from shipaw.models.pf_top import CollectionInfo, Contact, InternationalInfo
 from shipaw.pf_config import pf_sett
-from shipaw.ship_types import WEEKDAYS_IN_RANGE, COLLECTION_WEEKDAYS
+from shipaw.ship_types import COLLECTION_WEEKDAYS
 
 
 class ShipmentReferenceFields(pf_shared.BasePFType):
-    reference_number1: paw_types.truncated_printable_str_type(
-        24
-    ) | None = None  # first 14 visible on label
+    reference_number1: paw_types.truncated_printable_str_type(24) | None = None
     reference_number2: paw_types.truncated_printable_str_type(24) | None = None
     reference_number3: paw_types.truncated_printable_str_type(24) | None = None
     reference_number4: paw_types.truncated_printable_str_type(24) | None = None
@@ -27,7 +25,9 @@ class ShipmentReferenceFields(pf_shared.BasePFType):
     special_instructions4: paw_types.truncated_printable_str_type(25) | None = None
 
 
-class AllShipmentTypes(ShipmentReferenceFields):
+SHIPMENT_NOTES_FIELDNAMES = list(ShipmentReferenceFields.model_fields.keys())
+
+class ShipmentRequest(ShipmentReferenceFields):
     """Model for all shipment types.
 
     Minimum required fields:
@@ -99,3 +99,9 @@ class AllShipmentTypes(ShipmentReferenceFields):
                 )
                 self.shipping_date = min(COLLECTION_WEEKDAYS)
         return self
+
+    @property
+    def label_path(self):
+        label_str = f'Parcelforce {self.shipment_type.title()} Label for {self.recipient_contact.business_name} at {self.recipient_address.address_line1} on {self.shipping_date}'
+        sett = pf_config.pf_sett()
+        return (sett.label_dir / label_str).with_suffix('.pdf')

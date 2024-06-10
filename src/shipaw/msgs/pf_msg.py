@@ -6,7 +6,7 @@ from pydantic_core.core_schema import ValidationInfo
 
 from .. import ship_types
 from ..models import pf_ext, pf_lists, pf_shared, pf_top
-from ..models.all_shipment_types import AllShipmentTypes
+from ..models.all_shipment_types import ShipmentRequest
 
 
 class BaseRequest(pf_shared.BasePFType):
@@ -90,7 +90,7 @@ class FindResponse(FindMessage, BaseResponse):
 
 
 class CreateRequest(BaseRequest):
-    requested_shipment: AllShipmentTypes
+    requested_shipment: ShipmentRequest
 
 
 class CreateShipmentResponse(BaseResponse):
