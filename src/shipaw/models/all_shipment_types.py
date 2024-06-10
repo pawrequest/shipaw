@@ -10,11 +10,14 @@ from shipaw import ship_types
 from shipaw.models import pf_ext, pf_lists, pf_shared
 from shipaw.models.pf_top import CollectionInfo, Contact, InternationalInfo
 from shipaw.pf_config import pf_sett
+from shipaw.ship_types import WEEKDAYS_IN_RANGE, COLLECTION_WEEKDAYS
 
 
 class ShipmentReferenceFields(pf_shared.BasePFType):
-    reference_number1: paw_types.truncated_printable_str_type(24) | None = None  # first 14 visible on label
-    reference_number2:paw_types.truncated_printable_str_type(24) | None = None
+    reference_number1: paw_types.truncated_printable_str_type(
+        24
+    ) | None = None  # first 14 visible on label
+    reference_number2: paw_types.truncated_printable_str_type(24) | None = None
     reference_number3: paw_types.truncated_printable_str_type(24) | None = None
     reference_number4: paw_types.truncated_printable_str_type(24) | None = None
     reference_number5: paw_types.truncated_printable_str_type(24) | None = None
@@ -90,4 +93,9 @@ class AllShipmentTypes(ShipmentReferenceFields):
                 self.collection_info, CollectionInfo
             ), 'collection_info is required for collection shipments'
             assert self.print_own_label is not None, 'print_own_label is required for collection shipments'
+            if self.shipping_date <= dt.date.today():
+                logger.info(
+                    f'Shipping date {self.shipping_date} must be in the future. using tomorrow'
+                )
+                self.shipping_date = min(COLLECTION_WEEKDAYS)
         return self

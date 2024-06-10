@@ -115,7 +115,7 @@ class Shipment(ShipmentPartial):
             v = pf_shared.DateTimeRange.null_times_from_date(values.data.get('ship_date'))
         return v
 
-    def shipment_request(self):
+    def shipment_request(self) -> AllShipmentTypes:
         match self.direction:
             case 'in':
                 return self.requested_shipment_inbound()

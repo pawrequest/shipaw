@@ -28,6 +28,8 @@ WEEKDAYS_IN_RANGE = [
     TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + timedelta(days=i)).weekday() < 5
 ]
 
+COLLECTION_WEEKDAYS = [i for i in WEEKDAYS_IN_RANGE if not i == TOD]
+
 COLLECTION_TIME_FROM = dt.time(0, 0)
 COLLECTION_TIME_TO = dt.time(0, 0)
 

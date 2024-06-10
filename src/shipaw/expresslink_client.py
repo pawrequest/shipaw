@@ -153,8 +153,6 @@ class ELClient(pydantic.BaseModel):
         )
         return sorted([AddressChoice(address=candidate_dict[add], score=score) for add, score in scored], key=lambda x: x.score, reverse=True)
 
-    def candidates_dict(self, postcode):
-        return {add.address_line1: add for add in self.get_candidates(postcode)}
 
     def candidates_json(self, postcode):
         return {add.lines_str: add.model_dump_json() for add in self.get_candidates(postcode)}
