@@ -61,7 +61,7 @@ def service_select_options():
 #     ]
 
 
-async def contact_form_inputs(shipment:Shipment):
+async def contact_form_inputs(shipment: Shipment):
     return [
         c.FormFieldInput(
             name='business_name',
@@ -74,46 +74,46 @@ async def contact_form_inputs(shipment:Shipment):
             initial=shipment.contact.contact_name,
         ),
         c.FormFieldInput(
+            name='phone',
+            title='Delivery Mobile Phone',
+            initial=shipment.contact.mobile_phone,
+        ),
+        c.FormFieldInput(
             name='email',
             title='Delivery Email',
             initial=shipment.contact.email_address,
             html_type='email',
         ),
-        c.FormFieldInput(
-            name='phone',
-            title='Delivery Mobile Phone',
-            initial=shipment.contact.mobile_phone,
-        ),
     ]
 
 
-async def manual_address_inputs(state) -> list[c.FormFieldInput]:
+async def manual_address_inputs(shipment: Shipment) -> list[c.FormFieldInput]:
     return [
         c.FormFieldInput(
             name='address_line1',
             title='Address Line 1',
-            initial=state.address.address_line1,
+            initial=shipment.address.address_line1,
             required=True,
         ),
         c.FormFieldInput(
             name='address_line2',
             title='Address Line 2',
-            initial=state.address.address_line2,
+            initial=shipment.address.address_line2,
         ),
         c.FormFieldInput(
             name='address_line3',
             title='Address Line 3',
-            initial=state.address.address_line3,
+            initial=shipment.address.address_line3,
         ),
         c.FormFieldInput(
             name='town',
             title='Town',
-            initial=state.address.town,
+            initial=shipment.address.town,
         ),
         c.FormFieldInput(
             name='postcode',
             title='Postcode',
-            initial=state.address.postcode,
+            initial=shipment.address.postcode,
         ),
         # c.FormFieldInput(
         #     name='country',
@@ -123,23 +123,20 @@ async def manual_address_inputs(state) -> list[c.FormFieldInput]:
     ]
 
 
-async def standard_shipping_inputs(state: Shipment, manual=False):
+async def standard_shipping_inputs(shipment: Shipment):
     return [
+        *await contact_form_inputs(shipment),
         c.FormFieldSelect(
             name='date',
             options=date_select_options(),
-            initial=str(state.ship_date.isoformat()),
+            initial=str(shipment.ship_date.isoformat()),
             title='date',
-            # class_name='col-3',
-            # display_mode='inline',
         ),
         c.FormFieldSelect(
             name='boxes',
             options=[fastui_forms.SelectOption(value=str(i), label=str(i)) for i in range(1, 11)],
-            initial=str(state.boxes),
+            initial=str(shipment.boxes),
             title='boxes',
-            # class_name='width-50',
-            # display_mode='inline',
         ),
         c.FormFieldSelect(
             name='direction',
@@ -150,26 +147,22 @@ async def standard_shipping_inputs(state: Shipment, manual=False):
                 fastui_forms.SelectOption(value='dropoff', label='Inbound DropOff'),
             ],
             initial='out',
-            # class_name='col-2',
-            # display_mode='inline',
         ),
-        *await contact_form_inputs(state),
         c.FormFieldSelect(
             name='service',
             options=service_select_options(),
             title='Service',
-            # initial=shipment.service.value,
-            initial=state.service,
+            initial=shipment.service,
         ),
         c.FormFieldInput(
             name='special_instructions',
             title='Big "Special Instructions" middle of label',
-            initial=state.special_instructions1,
+            initial=shipment.special_instructions1,
         ),
         c.FormFieldInput(
             name='reference',
             title='Small "Reference" bottom corner of label',
-            initial=state.reference1,
+            initial=shipment.reference_number1,
         ),
     ]
 

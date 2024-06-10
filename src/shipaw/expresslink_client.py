@@ -79,12 +79,12 @@ class ELClient(pydantic.BaseModel):
             for alt in resp.alerts.alert:
                 if alt.type == 'ERROR':
                     raise ValueError(
-                        f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}"'
+                        f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
                         # f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
                     )
                 if alt.type == 'WARNING':
                     logger.warning(
-                        f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}"'
+                        f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
                         # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
                     )
 

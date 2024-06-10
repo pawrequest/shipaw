@@ -14,7 +14,7 @@ from loguru import logger
 from shipaw.models import pf_ext, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
 from .. import msgs, pf_config, ship_types
-from ..models.all_shipment_types import AllShipmentTypes
+from ..models.all_shipment_types import AllShipmentTypes, ShipmentReferenceFields
 from ..models.pf_top import CollectionContact
 from ..pf_config import pf_sett
 
@@ -67,13 +67,7 @@ class BookingState(ui_states.BaseUIState):
     #     return {a.message: a.type for a in self.state_alerts()}
 
 
-class ShipmentPartial(ui_states.BaseUIState):
-    special_instructions3: constr(max_length=25) = ''
-    special_instructions2: constr(max_length=25) = ''
-    special_instructions1: constr(max_length=25) = ''
-    reference3: constr(max_length=24) = ''
-    reference2: constr(max_length=24) = ''
-    reference1: constr(max_length=24) = ''
+class ShipmentPartial(ui_states.BaseUIState, ShipmentReferenceFields):
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
     ship_date: date | None = None
@@ -83,6 +77,16 @@ class ShipmentPartial(ui_states.BaseUIState):
 
     collection_times: pf_shared.DateTimeRange | None = None
     print_own_label: bool = True
+
+    # reference_number1: constr(max_length=24) = ''
+    # reference_number2: constr(max_length=24) = ''
+    # reference_number3: constr(max_length=24) = ''
+    # reference_number4: constr(max_length=24) = ''
+    # reference_number5: constr(max_length=24) = ''
+    # special_instructions1: constr(max_length=25) = ''
+    # special_instructions2: constr(max_length=25) = ''
+    # special_instructions3: constr(max_length=25) = ''
+    # special_instructions4: constr(max_length=25) = ''
 
     @property
     def pf_label_name(self):
@@ -149,7 +153,7 @@ class Shipment(ShipmentPartial):
             'service_code': self.service,
             'shipping_date': self.ship_date,
             'total_number_of_parcels': self.boxes,
-            'reference_number1': self.reference1,
+            'reference_number1': self.reference_number1,
             'special_instructions1': self.special_instructions1,
         }
 

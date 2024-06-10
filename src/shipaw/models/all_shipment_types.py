@@ -11,7 +11,19 @@ from shipaw.models.pf_top import CollectionInfo, Contact, InternationalInfo
 from shipaw.pf_config import pf_sett
 
 
-class AllShipmentTypes(pf_shared.BasePFType):
+class ShipmentReferenceFields(pf_shared.BasePFType):
+    reference_number1: _p.constr(max_length=24) | None = None  # first 14 visible on label
+    reference_number2: _p.constr(max_length=24) | None = None
+    reference_number3: _p.constr(max_length=24) | None = None
+    reference_number4: _p.constr(max_length=24) | None = None
+    reference_number5: _p.constr(max_length=24) | None = None
+    special_instructions1: _p.constr(max_length=25) | None = None
+    special_instructions2: _p.constr(max_length=25) | None = None
+    special_instructions3: _p.constr(max_length=25) | None = None
+    special_instructions4: _p.constr(max_length=25) | None = None
+
+
+class AllShipmentTypes(ShipmentReferenceFields):
     """Model for all shipment types.
 
     Minimum required fields:
@@ -38,17 +50,6 @@ class AllShipmentTypes(pf_shared.BasePFType):
     # notes and extras
     enhancement: pf_shared.Enhancement | None = None
     delivery_options: pf_ext.DeliveryOptions | None = None
-
-    reference_number1: _p.constr(max_length=24) | None = None  # first 14 visible on label
-    reference_number2: _p.constr(max_length=24) | None = None
-    reference_number3: _p.constr(max_length=24) | None = None
-    reference_number4: _p.constr(max_length=24) | None = None
-    reference_number5: _p.constr(max_length=24) | None = None
-
-    special_instructions1: _p.constr(max_length=25) | None = None
-    special_instructions2: _p.constr(max_length=25) | None = None
-    special_instructions3: _p.constr(max_length=25) | None = None
-    special_instructions4: _p.constr(max_length=25) | None = None
 
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
