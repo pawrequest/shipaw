@@ -4,6 +4,7 @@ import datetime as dt
 
 import pydantic as _p
 from loguru import logger
+from pawdantic import paw_types
 
 from shipaw import ship_types
 from shipaw.models import pf_ext, pf_lists, pf_shared
@@ -12,15 +13,15 @@ from shipaw.pf_config import pf_sett
 
 
 class ShipmentReferenceFields(pf_shared.BasePFType):
-    reference_number1: _p.constr(max_length=24) | None = None  # first 14 visible on label
-    reference_number2: _p.constr(max_length=24) | None = None
-    reference_number3: _p.constr(max_length=24) | None = None
-    reference_number4: _p.constr(max_length=24) | None = None
-    reference_number5: _p.constr(max_length=24) | None = None
-    special_instructions1: _p.constr(max_length=25) | None = None
-    special_instructions2: _p.constr(max_length=25) | None = None
-    special_instructions3: _p.constr(max_length=25) | None = None
-    special_instructions4: _p.constr(max_length=25) | None = None
+    reference_number1: paw_types.truncated_printable_str_type(24) | None = None  # first 14 visible on label
+    reference_number2:paw_types.truncated_printable_str_type(24) | None = None
+    reference_number3: paw_types.truncated_printable_str_type(24) | None = None
+    reference_number4: paw_types.truncated_printable_str_type(24) | None = None
+    reference_number5: paw_types.truncated_printable_str_type(24) | None = None
+    special_instructions1: paw_types.truncated_printable_str_type(25) | None = None
+    special_instructions2: paw_types.truncated_printable_str_type(25) | None = None
+    special_instructions3: paw_types.truncated_printable_str_type(25) | None = None
+    special_instructions4: paw_types.truncated_printable_str_type(25) | None = None
 
 
 class AllShipmentTypes(ShipmentReferenceFields):
@@ -54,9 +55,9 @@ class AllShipmentTypes(ShipmentReferenceFields):
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
     drop_off_ind: ship_types.DropOffInd | None = None
-    exchange_instructions1: _p.constr(max_length=25) | None = None
-    exchange_instructions2: _p.constr(max_length=25) | None = None
-    exchange_instructions3: _p.constr(max_length=25) | None = None
+    exchange_instructions1: paw_types.truncated_printable_str_type(25) | None = None
+    exchange_instructions2: paw_types.truncated_printable_str_type(25) | None = None
+    exchange_instructions3: paw_types.truncated_printable_str_type(25) | None = None
     exporter_address: pf_ext.AddressRecipient | None = None
     exporter_contact: Contact | None = None
     importer_address: pf_ext.AddressRecipient | None = None

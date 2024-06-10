@@ -226,7 +226,7 @@ class Enhancement(BasePFType):
 
 
 class Alert(BasePFType):
-    code: int
+    code: int | None = None
     message: str
     type: ship_types.AlertType
 
