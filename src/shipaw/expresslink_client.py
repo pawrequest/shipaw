@@ -15,6 +15,7 @@ from zeep.proxy import ServiceProxy
 from . import models, msgs, pf_config, ship_ui
 from .models import AddressChoice, pf_ext
 from .models.all_shipment_types import ShipmentRequest
+from .msgs import CreateShipmentResponse
 
 SCORER = fuzz.token_sort_ratio
 
@@ -74,7 +75,7 @@ class ELClient(pydantic.BaseModel):
         authorized_shipment = msgs.CreateRequest(
             authentication=self.settings.auth, requested_shipment=requested_shipment
         )
-        resp = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
+        resp: CreateShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
         if resp.alerts:
             for alt in resp.alerts.alert:
                 if alt.type == 'ERROR':
@@ -87,7 +88,8 @@ class ELClient(pydantic.BaseModel):
                         f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
                         # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
                     )
-
+        if resp.shipment_num:
+            logger.info(f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}')
         logger.warning(f'BOOKED {requested_shipment.recipient_address.lines_str}')
         return resp
         # return msgs.CreateShipmentResponse.model_validate(resp)
@@ -126,6 +128,12 @@ class ELClient(pydantic.BaseModel):
         back = self.backend(msgs.PrintLabelService)
         req = msgs.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: msgs.PrintLabelResponse = back.printlabel(request=req)
+        if response.alerts:
+            for alt in response.alerts.alert:
+                if alt.type == 'ERROR':
+                    raise ValueError(f'ExpressLink Error: {alt.message}')
+                logger.warning(f'ExpressLink Warning: {alt.message}')
+
         out_path = response.label.download(Path(dl_path))
         logger.info(f'Downloaded label to {out_path}')
         return out_path

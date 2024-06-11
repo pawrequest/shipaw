@@ -1,5 +1,3 @@
-from typing import Union
-
 import pydantic as pyd
 from loguru import logger
 from pydantic_core.core_schema import ValidationInfo
@@ -85,8 +83,6 @@ class FindResponse(FindMessage, BaseResponse):
 #
 # class CreateCollectionRequest(CreateRequest):
 #     requested_shipment: pf_top.CollectionMinimum
-
-
 
 
 class CreateRequest(BaseRequest):
