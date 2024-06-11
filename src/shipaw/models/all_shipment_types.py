@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 
 import pydantic as _p
 from loguru import logger
@@ -102,6 +103,7 @@ class ShipmentRequest(ShipmentReferenceFields):
 
     @property
     def label_path(self):
-        label_str = f'Parcelforce {self.shipment_type.title()} Label for {self.recipient_contact.business_name} at {self.recipient_address.address_line1} on {self.shipping_date}'
+        label_str = rf'Parcelforce {self.shipment_type.title()} Label for {self.recipient_contact.business_name} at {self.recipient_address.address_line1} on {self.shipping_date}'
+        safe_label_str = re.sub(r'[<>:"/\\|?*]', '_', label_str)
         sett = pf_config.pf_sett()
-        return (sett.label_dir / label_str).with_suffix('.pdf')
+        return (sett.label_dir / safe_label_str).with_suffix('.pdf')
