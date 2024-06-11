@@ -5,7 +5,7 @@ import pydantic as _p
 from pawdantic import paw_types
 
 from .. import ship_types
-from . import pf_ext, pf_lists, pf_shared
+from . import pf_models, pf_lists, pf_shared
 from ..ship_types import COLLECTION_TIME_FROM, COLLECTION_TIME_TO
 
 
@@ -107,13 +107,13 @@ class CompletedShipmentInfo(pf_shared.BasePFType):
 
 class CollectionInfo(pf_shared.BasePFType):
     collection_contact: CollectionContact
-    collection_address: pf_ext.AddressCollection
+    collection_address: pf_models.AddressCollection
     collection_time: pf_shared.DateTimeRange
 
 
 class CollectionStateProtocol(_t.Protocol):
     contact: Contact
-    address: pf_ext.AddressCollection
+    address: pf_models.AddressCollection
     ship_date: dt.date
 
 
@@ -133,7 +133,7 @@ class CollectionStateProtocol(_t.Protocol):
 
 class RequestedShipmentZero(pf_shared.BasePFType):
     recipient_contact: ContactMininmum
-    recipient_address: pf_ext.AddTypes
+    recipient_address: pf_models.AddTypes
     total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
     shipping_date: dt.date
 
@@ -168,7 +168,7 @@ class CollectionMinimum(RequestedShipmentMinimum):
 
 class RequestedShipmentSimple(RequestedShipmentMinimum):
     enhancement: pf_shared.Enhancement | None = None
-    delivery_options: pf_ext.DeliveryOptions | None = None
+    delivery_options: pf_models.DeliveryOptions | None = None
 
 
 class Parcels(pf_shared.BasePFType):
@@ -220,13 +220,13 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     exchange_instructions1: _p.constr(max_length=25) | None = None
     exchange_instructions2: _p.constr(max_length=25) | None = None
     exchange_instructions3: _p.constr(max_length=25) | None = None
-    exporter_address: pf_ext.AddressRecipient | None = None
+    exporter_address: pf_models.AddressRecipient | None = None
     exporter_contact: Contact | None = None
-    importer_address: pf_ext.AddressRecipient | None = None
+    importer_address: pf_models.AddressRecipient | None = None
     importer_contact: Contact | None = None
-    in_bound_address: pf_ext.AddressRecipient | None = None
+    in_bound_address: pf_models.AddressRecipient | None = None
     in_bound_contact: Contact | None = None
-    in_bound_details: pf_ext.InBoundDetails | None = None
+    in_bound_details: pf_models.InBoundDetails | None = None
     international_info: InternationalInfo | None = None
     pre_printed: bool | None = None
     print_own_label: bool | None = None
@@ -244,7 +244,7 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
 
     # job_reference: str | None = None  # not required for domestic
     # sender_contact: Contact | None = None
-    # sender_address: pf_ext.AddressSender | None = None
+    # sender_address: pf_models.AddressSender | None = None
     # total_shipment_weight: float | None = None
     # enhancement: pf_shared.Enhancement | None = None
-    # delivery_options: pf_ext.DeliveryOptions | None = None
+    # delivery_options: pf_models.DeliveryOptions | None = None

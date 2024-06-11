@@ -8,7 +8,7 @@ from loguru import logger
 from pawdantic import paw_types
 
 from shipaw import pf_config, ship_types
-from shipaw.models import pf_ext, pf_lists, pf_shared
+from shipaw.models import pf_models, pf_lists, pf_shared
 from shipaw.models.pf_top import CollectionInfo, Contact, InternationalInfo
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import COLLECTION_WEEKDAYS
@@ -34,7 +34,6 @@ class ShipmentRequest(ShipmentReferenceFields):
     Minimum required fields:
     - recipient_contact
     - recipient_address
-
     """
     # from settings
     contract_number: str = pf_sett().pf_contract_num_1
@@ -42,7 +41,7 @@ class ShipmentRequest(ShipmentReferenceFields):
 
     # from user input
     recipient_contact: Contact
-    recipient_address: pf_ext.AddTypes
+    recipient_address: pf_models.AddTypes
     total_number_of_parcels: int = 1
     shipping_date: dt.date = dt.date.today()
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
@@ -54,7 +53,7 @@ class ShipmentRequest(ShipmentReferenceFields):
 
     # notes and extras
     enhancement: pf_shared.Enhancement | None = None
-    delivery_options: pf_ext.DeliveryOptions | None = None
+    delivery_options: pf_models.DeliveryOptions | None = None
 
     hazardous_goods: pf_lists.HazardousGoods | None = None
     consignment_handling: bool | None = None
@@ -62,13 +61,13 @@ class ShipmentRequest(ShipmentReferenceFields):
     exchange_instructions1: paw_types.truncated_printable_str_type(25) | None = None
     exchange_instructions2: paw_types.truncated_printable_str_type(25) | None = None
     exchange_instructions3: paw_types.truncated_printable_str_type(25) | None = None
-    exporter_address: pf_ext.AddressRecipient | None = None
+    exporter_address: pf_models.AddressRecipient | None = None
     exporter_contact: Contact | None = None
-    importer_address: pf_ext.AddressRecipient | None = None
+    importer_address: pf_models.AddressRecipient | None = None
     importer_contact: Contact | None = None
-    in_bound_address: pf_ext.AddressRecipient | None = None
+    in_bound_address: pf_models.AddressRecipient | None = None
     in_bound_contact: Contact | None = None
-    in_bound_details: pf_ext.InBoundDetails | None = None
+    in_bound_details: pf_models.InBoundDetails | None = None
     international_info: InternationalInfo | None = None
     pre_printed: bool | None = None
 

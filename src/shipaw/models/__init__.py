@@ -1,5 +1,4 @@
-from .base_item import BaseItem
-from .pf_ext import AddressChoice, AddressRecipient, AddressSender
+from .pf_models import AddressChoice, AddressRecipient, AddressSender
 from .pf_shared import Authentication
 from .pf_top import (
     PAF,
@@ -11,7 +10,6 @@ from .pf_top import (
 )
 
 __all__ = [
-    'BaseItem',
     'AddressRecipient',
     'AddressSender',
     'AddressChoice',

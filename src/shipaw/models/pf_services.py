@@ -6,7 +6,6 @@ from combadge.core.interfaces import SupportsService
 from combadge.support.http.markers import Payload
 from combadge.support.soap.markers import operation_name
 
-from . import pf_msg
 
 
 class FindService(SupportsService, Protocol):

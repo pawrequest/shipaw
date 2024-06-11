@@ -10,7 +10,7 @@ from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shipaw import rsrc
-from shipaw.models import pf_ext, pf_lists, pf_shared, pf_top
+from shipaw.models import pf_models, pf_lists, pf_shared, pf_top
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -51,7 +51,7 @@ class PFSettings(BaseSettings):
     home_phone: str | None = None
     home_mobile_phone: str
 
-    home_address: pf_ext.AddressCollection | None = None
+    home_address: pf_models.AddressCollection | None = None
     home_contact: pf_top.Contact | None = None
 
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
@@ -85,7 +85,7 @@ class PFSettings(BaseSettings):
     @_p.model_validator(mode='after')
     def home_address_validator(self):
         if self.home_address is None:
-            self.home_address = pf_ext.AddressCollection(
+            self.home_address = pf_models.AddressCollection(
                 address_line1=self.home_address_line1,
                 address_line2=self.home_address_line2,
                 address_line3=self.home_address_line3,

@@ -3,8 +3,8 @@ from loguru import logger
 from pydantic_core.core_schema import ValidationInfo
 
 from .. import ship_types
-from ..models import pf_ext, pf_lists, pf_shared, pf_top
-from ..models.all_shipment_types import ShipmentRequest
+from ..models import pf_models, pf_lists, pf_shared, pf_top
+from ..models.pf_shipment import ShipmentRequest
 
 
 class BaseRequest(pf_shared.BasePFType):
@@ -48,8 +48,8 @@ class BaseResponse(pf_shared.BasePFType):
 
 
 class FindMessage(pf_shared.BasePFType):
-    convenient_collect: pf_ext.ConvenientCollect | None = None
-    specified_post_office: pf_ext.SpecifiedPostOffice | None = None
+    convenient_collect: pf_models.ConvenientCollect | None = None
+    specified_post_office: pf_models.SpecifiedPostOffice | None = None
     paf: pf_top.PAF | None = pyd.Field(None, alias='PAF')
     safe_places: bool | None = None
     nominated_delivery_dates: pf_top.NominatedDeliveryDates | None = None
@@ -161,7 +161,7 @@ class ReturnShipmentRequest(BaseRequest):
 
 
 class ReturnShipmentResponse(BaseResponse):
-    completed_shipment_info: pf_ext.CompletedReturnInfo | None = None
+    completed_shipment_info: pf_models.CompletedReturnInfo | None = None
 
 
 ################################################################
@@ -172,7 +172,7 @@ class CCReserveRequest(BaseRequest):
 
 
 class CCReserveResponse(BaseResponse):
-    post_office: pf_ext.PostOffice | None = None
+    post_office: pf_models.PostOffice | None = None
 
 
 ################################################################

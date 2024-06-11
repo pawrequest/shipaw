@@ -8,7 +8,7 @@ from fastui import components as c, forms as fastui_forms
 from pawdantic import paw_strings, paw_types
 
 from shipaw import Shipment
-from shipaw.models import pf_ext, pf_shared
+from shipaw.models import pf_models, pf_shared
 from shipaw.ship_types import FormKind, VALID_POSTCODE
 
 
@@ -212,7 +212,7 @@ def date_select_options() -> list[fastui_forms.SelectOption]:
     ]
 
 
-def address_select_options(candidates: list[pf_ext.AddressRecipient]) -> list[fastui_forms.SelectOption]:
+def address_select_options(candidates: list[pf_models.AddressRecipient]) -> list[fastui_forms.SelectOption]:
     return [
         fastui_forms.SelectOption(
             value=cand.model_dump_json(),

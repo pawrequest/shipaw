@@ -1,39 +1,34 @@
 from __future__ import annotations, annotations
 
 import pathlib
-import typing as _t
 from datetime import date
 
 import pydantic as _p
 import pydantic as pyd
 import sqlmodel as sqm
 from pawdantic.pawui import states as ui_states
-from pydantic import ConfigDict, constr
+from pydantic import ConfigDict
 from loguru import logger
 
-from shipaw.models import pf_ext, pf_shared, pf_top
+from shipaw import pf_config, ship_types
+from shipaw.models import pf_models, pf_shared, pf_top
 from shipaw.ship_types import ShipDirection
-from .. import msgs, pf_config, ship_types
-from ..models.all_shipment_types import ShipmentRequest, ShipmentReferenceFields
+from ..models.pf_msg import CreateShipmentResponse
+from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
 from ..models.pf_top import CollectionContact
 from ..pf_config import pf_sett
 
-RequestedShipmentSQM = _t.Annotated[
-    ShipmentRequest,
-    sqm.Field(
-        # sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateRequest))
-        sa_column=sqm.Column(ship_types.PawdanticJSON(ShipmentRequest))
-    ),
-]
-BookingRespSQM = _t.Annotated[
-    msgs.CreateShipmentResponse,
-    sqm.Field(sa_column=sqm.Column(ship_types.PawdanticJSON(msgs.CreateShipmentResponse))),
-]
-
 
 class BookingState(ui_states.BaseUIState):
-    requested_shipment: RequestedShipmentSQM
-    response: BookingRespSQM | None = None
+    requested_shipment: ShipmentRequest = sqm.Field(
+        sa_column=sqm.Column(ship_types.PawdanticJSON(ShipmentRequest))
+    )
+    response: CreateShipmentResponse | None = sqm.Field(
+        None,
+        sa_column=sqm.Column(ship_types.PawdanticJSON(CreateShipmentResponse))
+    )
+    # requested_shipment: RequestedShipmentSQM
+    # response: BookingRespSQM | None = None
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None
     alerts: list[pf_shared.Alert] | None = None
@@ -55,7 +50,8 @@ class BookingState(ui_states.BaseUIState):
 
     def shipment_num(self):
         return (
-            self.response.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
+            self.response.completed_shipment_info.completed_shipments.completed_shipment[
+                0].shipment_number
             if self.completed
             else None
         )
@@ -72,7 +68,7 @@ class ShipmentPartial(ui_states.BaseUIState, ShipmentReferenceFields):
     service: pf_shared.ServiceCode | None = None
     ship_date: date | None = None
     contact: pf_top.Contact | None = None
-    address: pf_ext.AddressCollection | None = None
+    address: pf_models.AddressCollection | None = None
     direction: ShipDirection | None = None
 
     collection_times: pf_shared.DateTimeRange | None = None
@@ -103,7 +99,7 @@ class ShipmentPartial(ui_states.BaseUIState, ShipmentReferenceFields):
 
 class Shipment(ShipmentPartial):
     contact: pf_top.Contact
-    address: pf_ext.AddressCollection  # Recipient is more liberal with lengths, but differnetiating everywhere is tiresome
+    address: pf_models.AddressCollection  # Recipient is more liberal with lengths, but differnetiating everywhere is tiresome
     ship_date: date
     boxes: pyd.PositiveInt = 1
     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
@@ -163,7 +159,9 @@ class Shipment(ShipmentPartial):
             'shipment_type': 'COLLECTION',
             'print_own_label': self.print_own_label,
             'collection_info': pf_top.CollectionInfo(
-                collection_contact=CollectionContact.model_validate(self.contact.model_dump(exclude={'notifications'})),
+                collection_contact=CollectionContact.model_validate(
+                    self.contact.model_dump(exclude={'notifications'})
+                ),
                 collection_address=self.address,
                 collection_time=pf_shared.DateTimeRange.null_times_from_date(self.ship_date),
             ),
