@@ -134,6 +134,6 @@ def pf_sandbox_sett():
 
 
 @functools.lru_cache
-def pf_sett():
+def pf_sett() -> PFSettings:
     logger.info(f'SHIP_ENV is {SHIP_ENV}')
     return PFSettings()
