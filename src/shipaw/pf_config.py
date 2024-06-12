@@ -8,9 +8,8 @@ from importlib import resources
 import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 from shipaw import rsrc
-from shipaw.models import pf_models, pf_lists, pf_shared, pf_top
+from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -34,6 +33,7 @@ class PFSettings(BaseSettings):
 
     pf_wsdl: str | None = None
     pf_binding: str = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
+    tracking_url_stem: str = 'https://www.parcelforce.com/track-trace?trackNumber='
     pf_endpoint: str
 
     label_dir: Path

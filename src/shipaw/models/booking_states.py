@@ -3,7 +3,6 @@ from __future__ import annotations, annotations
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
-
 from shipaw import ship_types
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
@@ -79,6 +78,7 @@ class BookingState(sqm.SQLModel):
                 self.alerts.extend(self.response.alerts.alert)
         return self
 
+    @property
     def shipment_num(self):
         return (
             self.response.completed_shipment_info.completed_shipments.completed_shipment[
@@ -86,6 +86,10 @@ class BookingState(sqm.SQLModel):
             if self.response.completed_shipment_info
             else None
         )
+
+    @property
+    def status(self):
+        return self.response.completed_shipment_info.status
 
 # class ShipmentPartial(ShipmentReferenceFields):
 #     boxes: pyd.PositiveInt | None = None

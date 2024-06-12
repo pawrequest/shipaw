@@ -3,9 +3,9 @@
 import pydantic as pyd
 import sqlmodel as sqm
 from pawdantic.pawsql import JSONColumn
+from shipaw.pf_config import pf_sett
 
 from .pf_lists import Alerts
-from .pf_shared import Alert
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
 from ..models.pf_shipment import ShipmentRequest
@@ -115,6 +115,14 @@ class CreateShipmentResponse(BaseResponse):
     def shipment_num(self):
         return self.completed_shipment_info.completed_shipments.completed_shipment[
             0].shipment_number
+
+    @property
+    def status(self):
+        return self.completed_shipment_info.status
+
+
+    def tracking_link(self):
+        return pf_sett().tracking_url_stem + self.shipment_num
 
 
 ################################################################
