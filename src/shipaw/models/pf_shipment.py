@@ -1,85 +1,86 @@
 # from __future__ import annotations
-import pawdantic
 import datetime as dt
-import re
+from typing import Annotated
 
 import sqlmodel as sqm
 import pydantic as _p
-from loguru import logger
-from pawdantic import paw_types
-from pawdantic.pawsql.sqlpr import GenericJSONColumn
+from pawdantic.pawsql import JSONColumn
 
-from shipaw import pf_config, ship_types
+from shipaw import ship_types
 from shipaw.models import pf_lists, pf_models, pf_shared
-from shipaw.models.pf_shared import PFBaseModel
-from shipaw.models.pf_top import CollectionInfo, Contact, InternationalInfo
+from shipaw.models.pf_top import CollectionInfo, Contact
 from shipaw.pf_config import pf_sett
-from shipaw.ship_types import COLLECTION_WEEKDAYS, PawdanticJSON
+from shipaw.ship_types import limit_daterange_no_weekends
 
 
 class ShipmentReferenceFields(pf_shared.PFBaseModel):
-    reference_number1: paw_types.truncated_printable_str_type(24) | None = None
-    reference_number2: paw_types.truncated_printable_str_type(24) | None = None
-    reference_number3: paw_types.truncated_printable_str_type(24) | None = None
-    reference_number4: paw_types.truncated_printable_str_type(24) | None = None
-    reference_number5: paw_types.truncated_printable_str_type(24) | None = None
-    special_instructions1: paw_types.truncated_printable_str_type(25) | None = None
-    special_instructions2: paw_types.truncated_printable_str_type(25) | None = None
-    special_instructions3: paw_types.truncated_printable_str_type(25) | None = None
-    special_instructions4: paw_types.truncated_printable_str_type(25) | None = None
-#
-#
+    ...
+    reference_number1: str | None = _p.Field(None, max_length=24)
+    reference_number2: str | None = _p.Field(None, max_length=24)
+    reference_number3: str | None = _p.Field(None, max_length=24)
+    reference_number4: str | None = _p.Field(None, max_length=24)
+    reference_number5: str | None = _p.Field(None, max_length=24)
+    special_instructions1: str | None = _p.Field(None, max_length=25)
+    special_instructions2: str | None = _p.Field(None, max_length=25)
+    special_instructions3: str | None = _p.Field(None, max_length=25)
+    special_instructions4: str | None = _p.Field(None, max_length=25)
 
 
-# class ShipmentRequest(ShipmentReferenceFields):
-class ShipmentRequest(PFBaseModel):
-    """Model for all shipment types.
-
-    Minimum required fields:
-    - recipient_contact
-    - recipient_address
-    """
+class ShipmentRequest(ShipmentReferenceFields):
     # from settings
     contract_number: str = pf_sett().pf_contract_num_1
     department_id: int = pf_sett().department_id
 
     # from user input
-    recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(GenericJSONColumn(Contact)))
+    recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(JSONColumn(Contact)))
     # recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(PawdanticJSON(Contact)))
-    recipient_address: pf_models.AddressRecipient = sqm.Field(..., sa_column=sqm.Column(GenericJSONColumn(pf_models.AddressRecipient)))
+    recipient_address: pf_models.AddressRecipient = sqm.Field(
+        ...,
+        sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient))
+    )
     total_number_of_parcels: int = 1
     shipping_date: dt.date = dt.date.today()
-    # service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
 
     # inputs for collections
     shipment_type: ship_types.DeliveryKindEnum = 'DELIVERY'
     print_own_label: bool | None = None
-    collection_info: CollectionInfo | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(CollectionInfo)))
+    collection_info: CollectionInfo | None = sqm.Field(
+        default=None,
+        sa_column=sqm.Column(JSONColumn(CollectionInfo))
+    )
     #
     # # extras
-    enhancement: pf_shared.Enhancement | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_shared.Enhancement)))
-    delivery_options: pf_models.DeliveryOptions | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_models.DeliveryOptions)))
-    hazardous_goods: pf_lists.HazardousGoods | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_lists.HazardousGoods)))
+    enhancement: pf_shared.Enhancement | None = sqm.Field(
+        default=None,
+        sa_column=sqm.Column(JSONColumn(pf_shared.Enhancement))
+    )
+    delivery_options: pf_models.DeliveryOptions | None = sqm.Field(
+        default=None,
+        sa_column=sqm.Column(JSONColumn(pf_models.DeliveryOptions))
+    )
+    hazardous_goods: pf_lists.HazardousGoods | None = sqm.Field(
+        default=None,
+        sa_column=sqm.Column(JSONColumn(pf_lists.HazardousGoods))
+    )
     consignment_handling: bool | None = None
 
     drop_off_ind: ship_types.DropOffIndEnum | None = None
     # exchange_instructions1: _p.constr(max_length=25) | None = None
     # exchange_instructions2: paw_types.truncated_printable_str_type(25) | None = None
     # exchange_instructions3: paw_types.truncated_printable_str_type(25) | None = None
-    # exporter_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_models.AddressRecipient)))
-    # exporter_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(Contact)))
-    # importer_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_models.AddressRecipient)))
-    # importer_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(Contact)))
-    # in_bound_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_models.AddressRecipient)))
-    # in_bound_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(Contact)))
-    # in_bound_details: pf_models.InBoundDetails | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_models.InBoundDetails)))
-    # international_info: InternationalInfo | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(InternationalInfo)))
+    # exporter_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient)))
+    # exporter_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(Contact)))
+    # importer_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient)))
+    # importer_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(Contact)))
+    # in_bound_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient)))
+    # in_bound_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(Contact)))
+    # in_bound_details: pf_models.InBoundDetails | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.InBoundDetails)))
+    # international_info: InternationalInfo | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(InternationalInfo)))
     # pre_printed: bool | None = None
     #
     # request_id: int | None = None
-    # returns: pf_shared.Returns | None = sqm.Field(default=None, sa_column=sqm.Column(GenericJSONColumn(pf_shared.Returns)))
-
-    # direction: ship_types.ShipDirection = 'out'
+    # returns: pf_shared.Returns | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_shared.Returns)))
 
     # @_p.field_validator('shipping_date', mode='after')
     # def ship_date_validator(cls, v, values):
@@ -114,6 +115,5 @@ class ShipmentRequest(PFBaseModel):
     #     sett = pf_config.pf_sett()
     #     return (sett.label_dir / safe_label_str).with_suffix('.pdf')
 
-
-class ShipmentRequestDB(ShipmentRequest, table=True):
-    id: int | None = sqm.Field(primary_key=True)
+# class ShipmentRequestDB(ShipmentRequest, table=True):
+#     id: int | None = sqm.Field(primary_key=True)

@@ -12,25 +12,15 @@ from pydantic.alias_generators import to_pascal
 from .. import ship_types
 
 
-# Valid_D = Annotated[date, pydantic.AfterValidator(lambda v: v >= date.today())]
+class PFBaseModel(sqm.SQLModel):
+    model_config = _p.ConfigDict(
+        alias_generator=_p.AliasGenerator(
+            alias=to_pascal,
+        ),
+        use_enum_values=True,
+        populate_by_name=True,
 
-
-# class ServiceCode(StrEnum):
-#     EXPRESS24 = 'SND'
-#     EXPRESS9 = '09'
-#     EXPRESS10 = 'S10'
-#     EXPRESSAM = 'S12'
-#     EXPRESSPM = 'SPM'
-#     EXPRESS48 = 'SUP'
-
-
-class ServiceCode2(str, Enum):
-    EXPRESS24 = 'SND'
-    EXPRESS9 = '09'
-    EXPRESS10 = 'S10'
-    EXPRESSAM = 'S12'
-    EXPRESSPM = 'SPM'
-    EXPRESS48 = 'SUP'
+    )
 
 
 class ServiceCode(enum.StrEnum):
@@ -42,7 +32,7 @@ class ServiceCode(enum.StrEnum):
     EXPRESS48 = 'SUP'
 
 
-class ServiceCodeFull(str, enum.Enum):
+class ServiceCodeFull(enum.StrEnum):
     FLEX_DELIVERY_SERVICE_PRODUCT = 'S09'
     EXPRESS9 = '09'
     EXPRESS9_SECURE = 'SEN'
@@ -88,16 +78,6 @@ class ServiceCodeFull(str, enum.Enum):
     EURO_PRIORITY_PACK = 'EPK'
     EUROPRIORITY_HOME_PO_BOXES = 'EPP'
     IRELANDEXPRESS = 'I24'
-
-
-class PFBaseModel(sqm.SQLModel):
-    model_config = _p.ConfigDict(
-        alias_generator=_p.AliasGenerator(
-            alias=to_pascal,
-        ),
-        use_enum_values=True,
-        populate_by_name=True,
-    )
 
 
 class Authentication(PFBaseModel):

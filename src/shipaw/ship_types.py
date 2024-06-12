@@ -23,6 +23,12 @@ DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
 
+class ShipDirectionEnum(StrEnum):
+    IN = 'in'
+    OUT = 'out'
+    DROPOFF = 'dropoff'
+
+
 class DropOffIndEnum(StrEnum):
     PO = 'PO'
     DEPOT = 'DEPOT'

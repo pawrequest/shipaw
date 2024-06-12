@@ -1,0 +1,195 @@
+from __future__ import annotations, annotations
+
+import functools
+from pathlib import Path
+
+import pydantic as _p
+import sqlmodel as sqm
+from loguru import logger
+
+from shipaw import ship_types, pf_config
+from shipaw.models import pf_shared, pf_top
+from shipaw.models.pf_top import CollectionContact
+from shipaw.ship_types import ShipDirectionEnum
+from shipaw.models.pf_msg import CreateShipmentResponse
+from shipaw.models.pf_shared import Alert
+from shipaw.models.pf_shipment import ShipmentRequest
+
+
+# from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
+
+
+class BookingState(sqm.SQLModel):
+    shipment_request: ShipmentRequest = sqm.Field(
+        ...,
+        sa_column=sqm.Column(ship_types.PawdanticJSON(ShipmentRequest))
+    )
+    response: CreateShipmentResponse | None = sqm.Field(
+        None,
+        sa_column=sqm.Column(ship_types.PawdanticJSON(CreateShipmentResponse))
+    )
+    direction: ShipDirectionEnum = 'out'
+    label_downloaded: bool = False
+    label_dl_path: str | None = None
+    alerts: list[Alert] = sqm.Field(
+        default_factory=list,
+        sa_column=sqm.Column(sqm.JSON)
+    )
+    booked: bool = False
+
+    def completed(self):
+        return self.booked or self.response.completed_shipment_info is not None
+
+    @_p.model_validator(mode='after')
+    def validate_collection_times(self):
+        if self.direction == 'in' and self.shipment_request.collection_info.collection_time is None:
+            v = pf_shared.DateTimeRange.null_times_from_date(self.shipment_request.shipping_date)
+        return self
+
+    def pf_label_filestem(self):
+        ln = (f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label '
+              f'{f'from {self.shipment_request.collection_info.collection_contact.business_name}' if self.shipment_request.collection_info else ''} '
+              f'to {self.shipment_request.recipient_contact.business_name} '
+              f'on {self.shipment_request.shipping_date}')
+        if not ln:
+            logger.warning('pf_label_name not set')
+        return ln
+
+
+    # def collection_params(self):
+    #     return {
+    #         'shipment_type': 'COLLECTION',
+    #         'print_own_label': True,
+    #         'collection_info': pf_top.CollectionInfo(
+    #             collection_contact=CollectionContact.model_validate(
+    #                 self.shipment_request.recipient_contact.model_dump(exclude={'notifications'})
+    #             ),
+    #             collection_address=self.shipment_request.,
+    #             collection_time=pf_shared.DateTimeRange.null_times_from_date(self.ship_date),
+    #         ),
+    #     }
+
+    @functools.lru_cache
+    def get_label_path(self) -> Path:
+        return (pf_config.pf_sett().label_dir / self.pf_label_filestem()).with_suffix('.pdf')
+
+    @_p.model_validator(mode='after')
+    def get_alerts(self):
+        if self.response:
+            if self.response.alerts:
+                self.alerts.extend(self.response.alerts)
+        return self
+
+    def shipment_num(self):
+        return (
+            self.response.completed_shipment_info.completed_shipments.completed_shipment[
+                0].shipment_number
+            if self.response.completed_shipment_info
+            else None
+        )
+
+# class ShipmentPartial(ShipmentReferenceFields):
+#     boxes: pyd.PositiveInt | None = None
+#     service: pf_shared.ServiceCode | None = None
+#     ship_date: date | None = None
+#     contact: pf_top.Contact | None = None
+#     address: pf_models.AddressCollection | None = None
+#     direction: ShipDirection | None = None
+#
+#     collection_times: pf_shared.DateTimeRange | None = None
+#     print_own_label: bool = True
+#
+#     @property
+#     def pf_label_name(self):
+#         ln = f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label for {self.contact.business_name} on {self.ship_date}'
+#         if not ln:
+#             logger.warning('pf_label_name not set')
+#         return ln
+#
+#     @property
+#     def named_label_path(self):
+#         sett = pf_config.pf_sett()
+#         return (sett.label_dir / self.pf_label_name).with_suffix('.pdf')
+#
+#
+# class Shipment(ShipmentPartial):
+#     contact: pf_top.Contact
+#     address: pf_models.AddressCollection  # Recipient is more liberal with lengths, but differnetiating everywhere is tiresome
+#     ship_date: date
+#     boxes: pyd.PositiveInt = 1
+#     service: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+#     direction: ship_types.ShipDirection = 'out'
+#
+#     @_p.field_validator('collection_times', mode='after')
+#     def validate_collection_times(cls, v, values):
+#         if values.data.get('direction') == 'in' and v is None:
+#             v = pf_shared.DateTimeRange.null_times_from_date(values.data.get('ship_date'))
+#         return v
+#
+#     def shipment_request(self) -> ShipmentRequest:
+#         match self.direction:
+#             case 'in':
+#                 return self.requested_shipment_inbound()
+#             case 'out':
+#                 return self.requested_shipment_outbound()
+#             case 'dropoff':
+#                 return self.requested_shipment_inbound_dropoff()
+#
+#     def requested_shipment_outbound(self) -> ShipmentRequest:
+#         return ShipmentRequest(
+#             **self.standard_params,
+#             recipient_contact=self.contact,
+#             recipient_address=self.address,
+#         )
+#
+#     def requested_shipment_inbound(self) -> ShipmentRequest:
+#         return ShipmentRequest(
+#             **self.standard_params,
+#             **self.collection_params,
+#             recipient_contact=pf_sett().home_contact,
+#             recipient_address=pf_sett().home_address,
+#         )
+#
+#     def requested_shipment_inbound_dropoff(self) -> ShipmentRequest:
+#         return ShipmentRequest(
+#             **self.standard_params,
+#             recipient_contact=pf_sett().home_contact,
+#             recipient_address=pf_sett().home_address,
+#             shipment_type='DELIVERY',
+#         )
+#
+#     @property
+#     def standard_params(self):
+#         return {
+#             'service_code': self.service,
+#             'shipping_date': self.ship_date,
+#             'total_number_of_parcels': self.boxes,
+#             'reference_number1': self.reference_number1,
+#             'special_instructions1': self.special_instructions1,
+#         }
+#
+#     @property
+#     def collection_params(self):
+#         return {
+#             'shipment_type': 'COLLECTION',
+#             'print_own_label': self.print_own_label,
+#             'collection_info': pf_top.CollectionInfo(
+#                 collection_contact=CollectionContact.model_validate(
+#                     self.contact.model_dump(exclude={'notifications'})
+#                 ),
+#                 collection_address=self.address,
+#                 collection_time=pf_shared.DateTimeRange.null_times_from_date(self.ship_date),
+#             ),
+#         }
+#
+#
+# class ShipmentExtra(Shipment):
+#     model_config = ConfigDict(extra='ignore')
+#
+#
+# def response_alert_dict(response):
+#     return {a.message: a.type for a in response.alerts.alert} if response.alerts else {}
+#
+#
+# def shipment_alert_dict(booking_state: BookingState):
+#     return response_alert_dict(booking_state.response)

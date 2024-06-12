@@ -11,7 +11,7 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from . import models, pf_config, ship_ui
+from . import models, pf_config
 from .models import AddressChoice, pf_models, pf_msg
 from .models.pf_msg import CreateShipmentResponse
 from .models.pf_services import CreateShipmentService, FindService, PrintLabelService
@@ -58,10 +58,10 @@ class ELClient(pydantic.BaseModel):
         """
         return ZeepBackend(self.service)[service_prot]
 
-    def shipment_request_authenticated(self, shipment: ship_ui.Shipment):
+    def shipment_request_authenticated(self, shipment_request: ShipmentRequest):
         return pf_msg.CreateRequest(
             authentication=self.settings.auth,
-            requested_shipment=shipment.shipment_request(),
+            requested_shipment=shipment_request,
         )
 
     def send_shipment_request(
@@ -85,7 +85,7 @@ class ELClient(pydantic.BaseModel):
             request=authorized_shipment.model_dump(by_alias=True)
         )
         if resp.alerts:
-            for alt in resp.alerts.alert:
+            for alt in resp.alerts:
                 if alt.type == 'ERROR':
                     raise ValueError(
                         f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'

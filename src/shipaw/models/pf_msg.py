@@ -1,9 +1,13 @@
-import pydantic as pyd
-from loguru import logger
-from pydantic_core.core_schema import ValidationInfo
+# from __future__ import annotations
 
+import pydantic as pyd
+from pydantic_core.core_schema import ValidationInfo
+from loguru import logger
+import sqlmodel as sqm
+
+from .pf_shared import Alert
 from .. import ship_types
-from ..models import pf_models, pf_lists, pf_shared, pf_top
+from ..models import pf_lists, pf_models, pf_shared, pf_top
 from ..models.pf_shipment import ShipmentRequest
 
 
@@ -28,22 +32,22 @@ class BaseRequest(pf_shared.PFBaseModel):
 
 
 class BaseResponse(pf_shared.PFBaseModel):
-    alerts: pf_lists.Alerts | None = pyd.Field(default_factory=list)
+    alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
 
-    @pyd.field_validator('alerts')
+    @pyd.field_validator('alerts', mode='before')
     def check_alerts(cls, v, info: ValidationInfo):
-        if v:
-            for alt in v.alert:
-                if alt.type == 'WARNING':
-                    logger.warning(f'ExpressLink Warning: {alt.message} in {cls.__name__}')
-                elif alt.type == 'ERROR':
-                    logger.error(
-                        f'ExpressLink Error: {alt.message} in {cls.__name__} - {"; ".join(f"{k}: {v}" for k, v in info.data)}'
-                    )
-                    # logger.error(f'ExpressLink Error: {alt.message} in {cls.__name__} - {f"{k}: {v}" for k,v in info.items()}')
-                    # raise types.ExpressLinkError(f'ExpressLink Error: {alt.message} for {cls.__name__}')
-                else:
-                    logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
+        if isinstance(v, dict):
+            if v.get('Alert'):
+                alts = [Alert(**alt) for alt in v['Alert']]
+                for alt in alts:
+                    if alt.type == 'WARNING':
+                        logger.warning(f'ExpressLink Warning: {alt.message} in {cls.__name__}')
+                    elif alt.type == 'ERROR':
+                        logger.error(
+                            f'ExpressLink Error: {alt.message} in {cls.__name__} - {"; ".join(f"{k}: {v}" for k, v in info.data)}'
+                        )
+                    else:
+                        logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
         return v
 
 
