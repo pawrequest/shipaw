@@ -1,6 +1,5 @@
-from __future__ import annotations
+# from __future__ import annotations
 
-import sqlmodel as sqm
 from pawdantic import paw_types
 
 from . import pf_shared
@@ -22,7 +21,7 @@ def address_string_to_dict(address_str: str) -> dict[str, str]:
 addr_lines_fields_set = {'address_line1', 'address_line2', 'address_line3'}
 
 
-class AddressSender(pf_shared.BasePFType):
+class AddressSender(pf_shared.PFBaseModel):
     address_line1: paw_types.truncated_printable_str_type(24)
     address_line2: paw_types.optional_truncated_printable_str_type(24)
     address_line3: paw_types.optional_truncated_printable_str_type(24)
@@ -35,7 +34,8 @@ class AddressSender(pf_shared.BasePFType):
 
     @property
     def lines_dict(self):
-        return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
+        return {line_field: getattr(self, line_field) for line_field in
+                sorted(self.lines_fields_set)}
 
     @property
     def lines_fields_set(self):
@@ -74,7 +74,7 @@ class AddressRecipient(AddressCollection):
 AddTypes = AddressCollection | AddressRecipient
 
 
-class PostOffice(pf_shared.BasePFType):
+class PostOffice(pf_shared.PFBaseModel):
     post_office_id: str | None = None
     business: str | None = None
     address: AddressRecipient | None = None
@@ -85,33 +85,33 @@ class PostOffice(pf_shared.BasePFType):
     booking_reference: str | None = None
 
 
-class AddressChoice[T: AddressCollection | AddressRecipient](pf_shared.BasePFType):
+class AddressChoice[T: AddressCollection | AddressRecipient](pf_shared.PFBaseModel):
     address: T
     # address: T = sqm.Field(sa_column=sqm.Column(sqm.JSON))
     score: int
 
 
-class ConvenientCollect(pf_shared.BasePFType):
+class ConvenientCollect(pf_shared.PFBaseModel):
     postcode: str | None = None
     post_office: list[PostOffice] | None = None
     count: int | None = None
     post_office_id: str | None = None
 
 
-class SpecifiedPostOffice(pf_shared.BasePFType):
+class SpecifiedPostOffice(pf_shared.PFBaseModel):
     postcode: str | None = None
     post_office: list[PostOffice | None]
     count: int | None = None
     post_office_id: str | None = None
 
 
-class CompletedReturnInfo(pf_shared.BasePFType):
+class CompletedReturnInfo(pf_shared.PFBaseModel):
     status: str
     shipment_number: str
     collection_time: pf_shared.DateTimeRange
 
 
-class InBoundDetails(pf_shared.BasePFType):
+class InBoundDetails(pf_shared.PFBaseModel):
     contract_number: str
     service_code: str
     total_shipment_weight: str | None = None
@@ -127,7 +127,7 @@ class InBoundDetails(pf_shared.BasePFType):
     special_instructions4: str | None = None
 
 
-class DeliveryOptions(pf_shared.BasePFType):
+class DeliveryOptions(pf_shared.PFBaseModel):
     convenient_collect: ConvenientCollect | None = None
     irts: bool | None = None
     letterbox: bool | None = None

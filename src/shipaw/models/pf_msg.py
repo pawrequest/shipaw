@@ -7,7 +7,7 @@ from ..models import pf_models, pf_lists, pf_shared, pf_top
 from ..models.pf_shipment import ShipmentRequest
 
 
-class BaseRequest(pf_shared.BasePFType):
+class BaseRequest(pf_shared.PFBaseModel):
     authentication: pf_shared.Authentication
 
     # def req_dict(self):
@@ -27,7 +27,7 @@ class BaseRequest(pf_shared.BasePFType):
     #     return self.alias_dict(all_obs)
 
 
-class BaseResponse(pf_shared.BasePFType):
+class BaseResponse(pf_shared.PFBaseModel):
     alerts: pf_lists.Alerts | None = pyd.Field(default_factory=list)
 
     @pyd.field_validator('alerts')
@@ -47,7 +47,7 @@ class BaseResponse(pf_shared.BasePFType):
         return v
 
 
-class FindMessage(pf_shared.BasePFType):
+class FindMessage(pf_shared.PFBaseModel):
     convenient_collect: pf_models.ConvenientCollect | None = None
     specified_post_office: pf_models.SpecifiedPostOffice | None = None
     paf: pf_top.PAF | None = pyd.Field(None, alias='PAF')

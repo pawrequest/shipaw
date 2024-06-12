@@ -28,7 +28,6 @@ dnspython==2.6.1
 docutils==0.20.1
 email-validator==2.1.1
 fastapi==0.110.2
-fastui==0.5.2
 flaskwebgui @ git+https://github.com/pawrequest/flaskwebgui
 frozenlist==1.4.1
 genson==1.2.2

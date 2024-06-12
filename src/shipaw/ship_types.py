@@ -5,6 +5,7 @@ import datetime as dt
 import re
 import typing as _t
 from datetime import date, timedelta
+from enum import StrEnum
 
 import pydantic
 import pydantic as _p
@@ -21,11 +22,23 @@ DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
+
+class DropOffIndEnum(StrEnum):
+    PO = 'PO'
+    DEPOT = 'DEPOT'
+
+
+class DeliveryKindEnum(StrEnum):
+    DELIVERY = 'DELIVERY'
+    COLLECTION = 'COLLECTION'
+
+
 TOD = date.today()
 COLLECTION_CUTOFF = datetime.time(23, 59, 59)
 ADVANCE_BOOKING_DAYS = 28
 WEEKDAYS_IN_RANGE = [
-    TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + timedelta(days=i)).weekday() < 5
+    TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
+    (TOD + timedelta(days=i)).weekday() < 5
 ]
 
 COLLECTION_WEEKDAYS = [i for i in WEEKDAYS_IN_RANGE if not i == TOD]
@@ -57,7 +70,9 @@ def limit_daterange_no_weekends(v: date) -> date:
                 v = min(WEEKDAYS_IN_RANGE)
 
             if v > max(WEEKDAYS_IN_RANGE):
-                logger.info(f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)')
+                logger.info(
+                    f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)'
+                )
                 v = max(WEEKDAYS_IN_RANGE)
 
             logger.debug(f'Validated date: {v}')

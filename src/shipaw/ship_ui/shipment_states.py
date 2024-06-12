@@ -6,32 +6,36 @@ from datetime import date
 import pydantic as _p
 import pydantic as pyd
 import sqlmodel as sqm
-from pawdantic.pawui import states as ui_states
 from pydantic import ConfigDict
 from loguru import logger
 
 from shipaw import pf_config, ship_types
 from shipaw.models import pf_models, pf_shared, pf_top
-from shipaw.ship_types import ShipDirection
+from shipaw.ship_types import PawdanticJSON, ShipDirection
+from ..models.pf_lists import Alerts
 from ..models.pf_msg import CreateShipmentResponse
 from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
+# from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
 from ..models.pf_top import CollectionContact
 from ..pf_config import pf_sett
 
 
-class BookingState(ui_states.BaseUIState):
+class BookingState(sqm.SQLModel):
     requested_shipment: ShipmentRequest = sqm.Field(
+        ...,
         sa_column=sqm.Column(ship_types.PawdanticJSON(ShipmentRequest))
     )
     response: CreateShipmentResponse | None = sqm.Field(
         None,
         sa_column=sqm.Column(ship_types.PawdanticJSON(CreateShipmentResponse))
     )
-    # requested_shipment: RequestedShipmentSQM
-    # response: BookingRespSQM | None = None
+    direction: ShipDirection = 'out'
     label_downloaded: bool = False
     label_dl_path: pathlib.Path | None = None
-    alerts: list[pf_shared.Alert] | None = None
+    alerts: Alerts = sqm.Field(
+        default_factory=list,
+        sa_column=sqm.Column(PawdanticJSON(Alerts))
+    )
     booked: bool = False
 
     @property
@@ -45,7 +49,7 @@ class BookingState(ui_states.BaseUIState):
         if self.response:
             if self.response.alerts:
                 # self.alert_dict = pawui_types.AlertDict({a.message: a.type for a in self.response.alerts.alert})
-                self.alerts = self.response.alerts.alert
+                self.alerts.append(self.response.alerts.alert)
         return self
 
     def shipment_num(self):
@@ -63,7 +67,7 @@ class BookingState(ui_states.BaseUIState):
     #     return {a.message: a.type for a in self.state_alerts()}
 
 
-class ShipmentPartial(ui_states.BaseUIState, ShipmentReferenceFields):
+class ShipmentPartial(ShipmentReferenceFields):
     boxes: pyd.PositiveInt | None = None
     service: pf_shared.ServiceCode | None = None
     ship_date: date | None = None
@@ -73,16 +77,6 @@ class ShipmentPartial(ui_states.BaseUIState, ShipmentReferenceFields):
 
     collection_times: pf_shared.DateTimeRange | None = None
     print_own_label: bool = True
-
-    # reference_number1: constr(max_length=24) = ''
-    # reference_number2: constr(max_length=24) = ''
-    # reference_number3: constr(max_length=24) = ''
-    # reference_number4: constr(max_length=24) = ''
-    # reference_number5: constr(max_length=24) = ''
-    # special_instructions1: constr(max_length=25) = ''
-    # special_instructions2: constr(max_length=25) = ''
-    # special_instructions3: constr(max_length=25) = ''
-    # special_instructions4: constr(max_length=25) = ''
 
     @property
     def pf_label_name(self):
@@ -178,3 +172,7 @@ def response_alert_dict(response):
 
 def shipment_alert_dict(booking_state: BookingState):
     return response_alert_dict(booking_state.response)
+
+
+# class BookingStateDB(BookingState, table=True):
+#     id: int | None = sqm.Field(primary_key=True)

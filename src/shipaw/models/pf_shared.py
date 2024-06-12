@@ -1,13 +1,12 @@
-from __future__ import annotations
-
+# from __future__ import annotations
 import datetime as dt
 import enum
 import typing as _t
 from enum import Enum
 from pathlib import Path
 
+import sqlmodel as sqm
 import pydantic as _p
-from loguru import logger
 from pydantic.alias_generators import to_pascal
 
 from .. import ship_types
@@ -91,7 +90,7 @@ class ServiceCodeFull(str, enum.Enum):
     IRELANDEXPRESS = 'I24'
 
 
-class BasePFType(_p.BaseModel):
+class PFBaseModel(sqm.SQLModel):
     model_config = _p.ConfigDict(
         alias_generator=_p.AliasGenerator(
             alias=to_pascal,
@@ -101,16 +100,23 @@ class BasePFType(_p.BaseModel):
     )
 
 
-class Authentication(BasePFType):
+class Authentication(PFBaseModel):
     user_name: _t.Annotated[str, _p.StringConstraints(max_length=80)]
     password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
 
 
-class DayHours(BasePFType):
+class Hours(PFBaseModel):
+    open: str | None = None
+    close: str | None = None
+    close_lunch: str | None = None
+    after_lunch_opening: str | None = None
+
+
+class DayHours(PFBaseModel):
     hours: Hours | None = None
 
 
-class OpeningHours(BasePFType):
+class OpeningHours(PFBaseModel):
     mon: DayHours | None = None
     tue: DayHours | None = None
     wed: DayHours | None = None
@@ -121,27 +127,20 @@ class OpeningHours(BasePFType):
     bank_hol: DayHours | None = None
 
 
-class Hours(BasePFType):
-    open: str | None = None
-    close: str | None = None
-    close_lunch: str | None = None
-    after_lunch_opening: str | None = None
-
-
-class HazardousGood(BasePFType):
+class HazardousGood(PFBaseModel):
     lqdgun_code: str | None = None
     lqdg_description: str | None = None
     lqdg_volume: float | None = None
     firearms: str | None = None
 
 
-class Returns(BasePFType):
+class Returns(PFBaseModel):
     returns_email: str | None = None
     email_message: str | None = None
     email_label: bool
 
 
-class ContentDetail(BasePFType):
+class ContentDetail(PFBaseModel):
     country_of_manufacture: str
     country_of_origin: str | None = None
     manufacturers_name: str | None = None
@@ -155,63 +154,68 @@ class ContentDetail(BasePFType):
     article_reference: str | None = None
 
 
-class DateTimeRange(BasePFType):
+class DateTimeRange(PFBaseModel):
     from_: str = _p.Field(alias='From')
     to: str
 
     @classmethod
     def null_times_from_date(cls, null_date: dt.date):
-        null_isodatetime = dt.datetime.combine(null_date, dt.time(0, 0)).isoformat(timespec='seconds')
+        null_isodatetime = dt.datetime.combine(null_date, dt.time(0, 0)).isoformat(
+            timespec='seconds'
+        )
         return cls(from_=null_isodatetime, to=null_isodatetime)
 
     @classmethod
     def from_datetimes(cls, from_dt: dt.datetime, to_dt: dt.datetime):
-        return cls(from_=from_dt.isoformat(timespec='seconds'), to=to_dt.isoformat(timespec='seconds'))
+        return cls(
+            from_=from_dt.isoformat(timespec='seconds'),
+            to=to_dt.isoformat(timespec='seconds')
+        )
 
 
-class ContentData(BasePFType):
+class ContentData(PFBaseModel):
     name: str
     data: str
 
 
-class LabelItem(BasePFType):
+class LabelItem(PFBaseModel):
     name: str
     data: str
 
 
-class Barcode(BasePFType):
+class Barcode(PFBaseModel):
     name: str
     data: str
 
 
-class Image(BasePFType):
+class Image(PFBaseModel):
     name: str
     data: str
 
 
-class ManifestShipment(BasePFType):
+class ManifestShipment(PFBaseModel):
     shipment_number: str
     service_code: str
 
 
-class CompletedShipment(BasePFType):
+class CompletedShipment(PFBaseModel):
     shipment_number: str | None = None
     out_bound_shipment_number: str | None = None
     in_bound_shipment_number: str | None = None
     partner_number: str | None = None
 
 
-class CompletedCancelInfo(BasePFType):
+class CompletedCancelInfo(PFBaseModel):
     status: str | None = None
     shipment_number: str | None = None
 
 
-class Position(BasePFType):
+class Position(PFBaseModel):
     longitude: float | None = None
     latitude: float | None = None
 
 
-class Document(BasePFType):
+class Document(PFBaseModel):
     data: bytes
 
     def download(self, outpath: Path) -> Path:
@@ -220,15 +224,19 @@ class Document(BasePFType):
         return Path(outpath)
 
 
-class Enhancement(BasePFType):
+class Enhancement(PFBaseModel):
     enhanced_compensation: str | None = None
     saturday_delivery_required: bool | None = None
 
 
-class Alert(BasePFType):
+class Alert(PFBaseModel):
     code: int | None = None
     message: str
     type: ship_types.AlertType
+
+    @classmethod
+    def from_exception(cls, e: Exception):
+        return cls(message=str(e), type='ERROR')
 
 
 class NotificationType(str, Enum):

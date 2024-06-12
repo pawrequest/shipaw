@@ -9,7 +9,7 @@ from . import pf_models, pf_lists, pf_shared
 from ..ship_types import COLLECTION_TIME_FROM, COLLECTION_TIME_TO
 
 
-class ContactMininmum(pf_shared.BasePFType):
+class ContactMininmum(pf_shared.PFBaseModel):
     business_name: paw_types.truncated_printable_str_type(40) = _p.Field(
         ...,
         title='Business Name'
@@ -47,19 +47,19 @@ class CollectionContact(Contact):
         return v
 
 
-class PAF(pf_shared.BasePFType):
+class PAF(pf_shared.PFBaseModel):
     postcode: str | None = None
     count: int | None = _p.Field(None)
     specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description='')
 
 
-class Department(pf_shared.BasePFType):
+class Department(pf_shared.PFBaseModel):
     department_id: list[int | None] = _p.Field(None, description='')
     service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description='')
     nominated_delivery_date_list: pf_lists.NominatedDeliveryDatelist | None = None
 
 
-class Parcel(pf_shared.BasePFType):
+class Parcel(pf_shared.PFBaseModel):
     weight: float | None = None
     length: int | None = None
     height: int | None = None
@@ -72,7 +72,7 @@ class Parcel(pf_shared.BasePFType):
     shipping_cost: float | None = None
 
 
-class ParcelLabelData(pf_shared.BasePFType):
+class ParcelLabelData(pf_shared.PFBaseModel):
     parcel_number: str | None = None
     shipment_number: str | None = None
     journey_leg: str | None = None
@@ -82,7 +82,7 @@ class ParcelLabelData(pf_shared.BasePFType):
     parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description='')
 
 
-class CompletedManifestInfo(pf_shared.BasePFType):
+class CompletedManifestInfo(pf_shared.PFBaseModel):
     department_id: int
     manifest_number: str
     manifest_type: str
@@ -90,7 +90,7 @@ class CompletedManifestInfo(pf_shared.BasePFType):
     manifest_shipments: pf_lists.ManifestShipments
 
 
-class CompletedShipmentInfoCreatePrint(pf_shared.BasePFType):
+class CompletedShipmentInfoCreatePrint(pf_shared.PFBaseModel):
     lead_shipment_number: str | None = None
     shipment_number: str | None = None
     delivery_date: str | None = None
@@ -98,14 +98,14 @@ class CompletedShipmentInfoCreatePrint(pf_shared.BasePFType):
     completed_shipments: pf_lists.CompletedShipments
 
 
-class CompletedShipmentInfo(pf_shared.BasePFType):
+class CompletedShipmentInfo(pf_shared.PFBaseModel):
     lead_shipment_number: str | None = None
     delivery_date: dt.date | None = None
     status: str | None = None
     completed_shipments: pf_lists.CompletedShipments | None = None
 
 
-class CollectionInfo(pf_shared.BasePFType):
+class CollectionInfo(pf_shared.PFBaseModel):
     collection_contact: CollectionContact
     collection_address: pf_models.AddressCollection
     collection_time: pf_shared.DateTimeRange
@@ -131,7 +131,7 @@ class CollectionStateProtocol(_t.Protocol):
 #     return info.model_validate(info)
 
 
-class RequestedShipmentZero(pf_shared.BasePFType):
+class RequestedShipmentZero(pf_shared.PFBaseModel):
     recipient_contact: ContactMininmum
     recipient_address: pf_models.AddTypes
     total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
@@ -171,34 +171,34 @@ class RequestedShipmentSimple(RequestedShipmentMinimum):
     delivery_options: pf_models.DeliveryOptions | None = None
 
 
-class Parcels(pf_shared.BasePFType):
+class Parcels(pf_shared.PFBaseModel):
     parcel: list[Parcel]
 
 
-class ShipmentLabelData(pf_shared.BasePFType):
+class ShipmentLabelData(pf_shared.PFBaseModel):
     parcel_label_data: list[ParcelLabelData]
 
 
-class CompletedManifests(pf_shared.BasePFType):
+class CompletedManifests(pf_shared.PFBaseModel):
     completed_manifest_info: list[CompletedManifestInfo]
 
 
-class Departments(pf_shared.BasePFType):
+class Departments(pf_shared.PFBaseModel):
     department: list[Department] = _p.Field(default_factory=list)
 
 
-class NominatedDeliveryDates(pf_shared.BasePFType):
+class NominatedDeliveryDates(pf_shared.PFBaseModel):
     service_code: str | None = None
     departments: Departments | None = None
 
 
-class PostcodeExclusion(pf_shared.BasePFType):
+class PostcodeExclusion(pf_shared.PFBaseModel):
     delivery_postcode: str | None = None
     collection_postcode: str | None = None
     departments: Departments | None = None
 
 
-class InternationalInfo(pf_shared.BasePFType):
+class InternationalInfo(pf_shared.PFBaseModel):
     parcels: Parcels | None = None
     exporter_customs_reference: str | None = None
     recipient_importer_vat_no: str | None = None
