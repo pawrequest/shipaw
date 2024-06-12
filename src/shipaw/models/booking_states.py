@@ -1,12 +1,10 @@
 from __future__ import annotations, annotations
 
-import functools
-
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
 
-from shipaw import pf_config, ship_types
+from shipaw import ship_types
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirectionEnum
@@ -35,6 +33,7 @@ class BookingState(sqm.SQLModel):
         sa_column=sqm.Column(sqm.JSON)
     )
     booked: bool = False
+    commence_updated: bool = False
 
     def completed(self):
         return self.booked or self.response.completed_shipment_info is not None
@@ -72,7 +71,6 @@ class BookingState(sqm.SQLModel):
     #             collection_time=pf_shared.DateTimeRange.null_times_from_date(self.ship_date),
     #         ),
     #     }
-
 
     @_p.model_validator(mode='after')
     def get_alerts(self):
