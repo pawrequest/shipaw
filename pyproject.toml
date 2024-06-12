@@ -46,18 +46,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.rye]
-managed = false
+managed = true
 dev-dependencies = [
-    'autodoc_pydantic',
-    "datamodel-code-generator",
     "pytest",
     "pytest-asyncio",
-    "sphinx",
-    "sphinx-autodoc-typehints",
-    "sphinx-rtd-theme",
-    "myst-parser",
-    "sphinx-readme",
-    "sphinx_rtd_dark_mode",
 ]
 
 [tool.hatch.metadata]

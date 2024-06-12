@@ -1,7 +1,6 @@
 from __future__ import annotations, annotations
 
 import functools
-from pathlib import Path
 
 import pydantic as _p
 import sqlmodel as sqm
@@ -9,6 +8,7 @@ from loguru import logger
 
 from shipaw import pf_config, ship_types
 from shipaw.models import pf_shared
+from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirectionEnum
 from shipaw.models.pf_msg import CreateShipmentResponse
 from shipaw.models.pf_shared import Alert
@@ -29,7 +29,7 @@ class BookingState(sqm.SQLModel):
     )
     direction: ShipDirectionEnum = 'out'
     label_downloaded: bool = False
-    label_dl_path: str | None = None
+    # label_path: str | None = None
     alerts: list[Alert] = sqm.Field(
         default_factory=list,
         sa_column=sqm.Column(sqm.JSON)
@@ -46,6 +46,10 @@ class BookingState(sqm.SQLModel):
                 self.shipment_request.shipping_date
             )
         return self
+
+    # @functools.lru_cache
+    def label_path(self):
+        return (pf_sett().label_dir / self.pf_label_filestem()).with_suffix('.pdf')
 
     def pf_label_filestem(self):
         ln = (f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label '
@@ -69,9 +73,6 @@ class BookingState(sqm.SQLModel):
     #         ),
     #     }
 
-    @functools.lru_cache
-    def get_label_path(self) -> Path:
-        return (pf_config.pf_sett().label_dir / self.pf_label_filestem()).with_suffix('.pdf')
 
     @_p.model_validator(mode='after')
     def get_alerts(self):

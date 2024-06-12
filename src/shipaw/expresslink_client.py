@@ -86,23 +86,22 @@ class ELClient(pydantic.BaseModel):
         resp: CreateShipmentResponse = back.createshipment(
             request=authorized_shipment.model_dump(by_alias=True)
         )
-        if resp.alerts:
-            for alt in resp.alerts:
-                if alt.type == 'ERROR':
-                    raise ValueError(
-                        f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
-                        # f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
-                    )
-                if alt.type == 'WARNING':
-                    logger.warning(
-                        f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
-                        # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
-                    )
+        # if resp.alerts:
+        #     for alt in resp.alerts:
+        #         if alt.type == 'ERROR':
+        #             raise ValueError(
+        #                 f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
+        #                 # f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
+        #             )
+        #         if alt.type == 'WARNING':
+        #             logger.warning(
+        #                 f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
+        #                 # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
+        #             )
         if resp.shipment_num:
             logger.info(
                 f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}'
             )
-        logger.warning(f'BOOKED {requested_shipment.recipient_address.lines_str}')
         return resp
         # return pf_msg.CreateShipmentResponse.model_validate(resp)
 
@@ -127,7 +126,7 @@ class ELClient(pydantic.BaseModel):
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
-    def get_label(self, ship_num, dl_path=None) -> Path:
+    def get_label(self, ship_num, dl_path: str) -> Path:
         """Get the label for a shipment number.
 
         Args:
@@ -139,7 +138,6 @@ class ELClient(pydantic.BaseModel):
 
         """
         sett = pf_config.pf_sett()
-        dl_path = dl_path or sett.label_dir / 'temp_label.pdf'
         back = self.backend(PrintLabelService)
         req = pf_msg.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: pf_msg.PrintLabelResponse = back.printlabel(request=req)
