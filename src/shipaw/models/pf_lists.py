@@ -42,7 +42,7 @@ class CompletedCancel(pf_shared.PFBaseModel):
 
 
 class Alerts(pf_shared.PFBaseModel):
-    alert: list[pf_shared.Alert] = sqm.Field(
+    alert: list[pf_shared.Alert] | None = sqm.Field(
         default_factory=list,
         sa_column=sqm.Column(PawdanticJSON(pf_shared.Alert))
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 from pathlib import Path
 
 import pydantic
@@ -20,6 +21,7 @@ from .models.pf_shipment import ShipmentRequest
 SCORER = fuzz.token_sort_ratio
 
 
+@functools.lru_cache(maxsize=1)
 class ELClient(pydantic.BaseModel):
     """Client for Parcelforce ExpressLink API.
 

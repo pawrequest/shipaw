@@ -5,8 +5,7 @@ import pydantic as _p
 from pawdantic import paw_types
 
 from .. import ship_types
-from . import pf_models, pf_lists, pf_shared
-from ..ship_types import COLLECTION_TIME_FROM, COLLECTION_TIME_TO
+from . import pf_lists, pf_models, pf_shared
 
 
 class ContactMininmum(pf_shared.PFBaseModel):
@@ -21,7 +20,7 @@ class ContactMininmum(pf_shared.PFBaseModel):
     )
 
     @_p.field_validator('mobile_phone', mode='after')
-    def nospace_in_phone(cls, v):
+    def space_in_phone(cls, v):
         return v.replace(' ', '').strip()
 
 
@@ -45,6 +44,25 @@ class CollectionContact(Contact):
         if not v:
             v = values.data.get('mobile_phone')
         return v
+
+
+class ContactTemporary(Contact):
+    business_name: str = ''
+    contact_name: str = ''
+    mobile_phone: str = ''
+    email_address: str = ''
+    telephone: str = ''
+    senders_name: str = ''
+
+    @_p.model_validator(mode='after')
+    def fake(self):
+        for field, value in self.model_dump().items():
+            if not value:
+                value = 'REPLACE_THIS_FAKE'
+                if field == 'email_address':
+                    value = f'{value}@Efakefakefake.com'
+                setattr(self, field, value)
+        return self
 
 
 class PAF(pf_shared.PFBaseModel):

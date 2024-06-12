@@ -1,10 +1,10 @@
 # from __future__ import annotations
 
 import pydantic as pyd
-from pydantic_core.core_schema import ValidationInfo
-from loguru import logger
 import sqlmodel as sqm
+from pawdantic.pawsql import JSONColumn
 
+from .pf_lists import Alerts
 from .pf_shared import Alert
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
@@ -32,23 +32,38 @@ class BaseRequest(pf_shared.PFBaseModel):
 
 
 class BaseResponse(pf_shared.PFBaseModel):
-    alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
+    # alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
+    alerts: Alerts | None = sqm.Field(
+        None,
+        sa_column=sqm.Column(JSONColumn(Alerts))
+    )
 
-    @pyd.field_validator('alerts', mode='before')
-    def check_alerts(cls, v, info: ValidationInfo):
-        if isinstance(v, dict):
-            if v.get('Alert'):
-                alts = [Alert(**alt) for alt in v['Alert']]
-                for alt in alts:
-                    if alt.type == 'WARNING':
-                        logger.warning(f'ExpressLink Warning: {alt.message} in {cls.__name__}')
-                    elif alt.type == 'ERROR':
-                        logger.error(
-                            f'ExpressLink Error: {alt.message} in {cls.__name__} - {"; ".join(f"{k}: {v}" for k, v in info.data)}'
-                        )
-                    else:
-                        logger.info(f'ExpressLink {alt.type}: {alt.message} in {cls.__name__}')
-        return v
+    # @pyd.field_validator('alerts', mode='before')
+    # def check_alerts(cls, v, values) -> list[Alert]:
+    #     if not v:
+    #         return set()
+    #     if isinstance(v, dict):
+    #         if 'Alert' in v:
+    #             return [Alert(**alert) for alert in v['Alert']]
+    #     elif isinstance(v, list):
+    #         return [Alert(**alert) for alert in v]
+    #     return v
+    # @pyd.model_validator(mode='after')
+    # def check_alerts(self):
+    #     if isinstance(self.alerts, dict):
+    #         if alt_ds := self.alerts.get('Alert'):
+    #             alts = {Alert(**alt) for alt in alt_ds}
+    #             self.alerts = self.alerts | alts
+    #             for alt in alts:
+    #                 if alt.type == 'WARNING':
+    #                     logger.warning(f'ExpressLink Warning: {alt.message} in {self.__class__.__name__}')
+    #                 elif alt.type == 'ERROR':
+    #                     logger.error(
+    #                         f'ExpressLink Error: {alt.message} in {self.__class__.__name__} - {"; ".join(f"{k}: {v}" for k, v in info.data)}'
+    #                     )
+    #                 else:
+    #                     logger.info(f'ExpressLink {alt.type}: {alt.message} in {self.__class__.__name__}')
+    #     return v
 
 
 class FindMessage(pf_shared.PFBaseModel):

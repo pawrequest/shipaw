@@ -7,9 +7,8 @@ import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
 
-from shipaw import ship_types, pf_config
-from shipaw.models import pf_shared, pf_top
-from shipaw.models.pf_top import CollectionContact
+from shipaw import pf_config, ship_types
+from shipaw.models import pf_shared
 from shipaw.ship_types import ShipDirectionEnum
 from shipaw.models.pf_msg import CreateShipmentResponse
 from shipaw.models.pf_shared import Alert
@@ -43,7 +42,9 @@ class BookingState(sqm.SQLModel):
     @_p.model_validator(mode='after')
     def validate_collection_times(self):
         if self.direction == 'in' and self.shipment_request.collection_info.collection_time is None:
-            v = pf_shared.DateTimeRange.null_times_from_date(self.shipment_request.shipping_date)
+            self.shipment_request.collection_info.collection_time = pf_shared.DateTimeRange.null_times_from_date(
+                self.shipment_request.shipping_date
+            )
         return self
 
     def pf_label_filestem(self):
@@ -54,7 +55,6 @@ class BookingState(sqm.SQLModel):
         if not ln:
             logger.warning('pf_label_name not set')
         return ln
-
 
     # def collection_params(self):
     #     return {
@@ -77,7 +77,7 @@ class BookingState(sqm.SQLModel):
     def get_alerts(self):
         if self.response:
             if self.response.alerts:
-                self.alerts.extend(self.response.alerts)
+                self.alerts.extend(self.response.alerts.alert)
         return self
 
     def shipment_num(self):

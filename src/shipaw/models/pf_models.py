@@ -71,6 +71,14 @@ class AddressRecipient(AddressCollection):
     town: paw_types.truncated_printable_str_type(30)
 
 
+class AddressTemporary(AddressRecipient):
+    address_line1: str | None = None
+    address_line2: str | None = None
+    address_line3: str | None = None
+    town: str | None = None
+    postcode: str | None = None
+
+
 AddTypes = AddressCollection | AddressRecipient
 
 

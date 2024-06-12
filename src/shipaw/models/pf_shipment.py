@@ -8,6 +8,7 @@ from pawdantic.pawsql import JSONColumn
 
 from shipaw import ship_types
 from shipaw.models import pf_lists, pf_models, pf_shared
+from shipaw.models.pf_shared import Alert
 from shipaw.models.pf_top import CollectionInfo, Contact
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import limit_daterange_no_weekends
