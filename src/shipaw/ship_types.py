@@ -17,11 +17,15 @@ ShipperScope = _t.Literal['SAND', 'LIVE']
 ShipDirection = _t.Literal['in', 'out', 'dropoff']
 
 PrintType = _t.Literal['ALL_PARCELS', 'SINGLE_PARCEL']
-AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
+# AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
 DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
+class AlertType(StrEnum):
+    ERROR = 'ERROR'
+    WARNING = 'WARNING'
+    NOTIFICATION = 'NOTIFICATION'
 
 class ShipDirectionEnum(StrEnum):
     IN = 'in'
