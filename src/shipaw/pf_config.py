@@ -31,9 +31,9 @@ class PFSettings(BaseSettings):
     pf_expr_usr: str
     pf_expr_pwd: str
 
-    pf_wsdl: str | None = None
-    pf_binding: str = '{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
-    tracking_url_stem: str = 'https://www.parcelforce.com/track-trace?trackNumber='
+    pf_wsdl: str = r"R:\paul_r\.internal\expresslink_api.wsdl"
+    pf_binding: str = r'{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
+    tracking_url_stem: str = r'https://www.parcelforce.com/track-trace?trackNumber='
     pf_endpoint: str
 
     label_dir: Path
@@ -62,13 +62,18 @@ class PFSettings(BaseSettings):
             v.mkdir(parents=True, exist_ok=True)
         return v
 
-    @_p.field_validator('pf_wsdl', mode='after')
-    def get_wsdl(cls, v, values):
-        if v is None or not Path(v).exists():
-            with resources.path(rsrc, 'expresslink_api.wsdl') as wsdl_path:
-                logger.info(f'WSDL path not exist - using {wsdl_path} from importlib.resources')
-                v = str(wsdl_path)
-        return v
+    # @_p.field_validator('pf_wsdl', mode='after')
+    # def get_wsdl(cls, v, values):
+    #     if v is None or not Path(v).is_file():
+    #         try:
+    #             v = r"R:\paul_r\.internal\expresslink_api.wsdl"
+    #             assert Path(v).is_file()
+    #             logger.info(f'WSDL path not provided - using hardcoded {v}')
+    #         except (AssertionError, FileNotFoundError) as e:
+    #             with resources.path(rsrc, 'expresslink_api.wsdl') as wsdl_path:
+    #                 logger.info(f'WSDL path not provided - using {wsdl_path} from importlib.resources')
+    #                 v = str(wsdl_path)
+    #     return v
 
     @property
     def auth(self):
