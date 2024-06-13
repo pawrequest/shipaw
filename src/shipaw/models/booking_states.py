@@ -3,13 +3,18 @@ from __future__ import annotations, annotations
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
+from sqlalchemy import Column
+from sqlmodel import Field
+
 from shipaw import ship_types
 from shipaw.models import pf_shared
+from shipaw.models.pf_lists import Alerts
+from shipaw.models.pf_shared import Alert
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirectionEnum
-from shipaw.models.pf_msg import CreateShipmentResponse
-from shipaw.models.pf_shared import Alert
+from shipaw.models.pf_msg import AlertList, CreateShipmentResponse
 from shipaw.models.pf_shipment import ShipmentRequest
+from pawdantic.pawsql import JSONColumn
 
 
 # from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
@@ -18,13 +23,19 @@ from shipaw.models.pf_shipment import ShipmentRequest
 class BookingState(sqm.SQLModel):
     shipment_request: ShipmentRequest = sqm.Field(
         ...,
-        sa_column=sqm.Column(ship_types.PawdanticJSON(ShipmentRequest))
+        sa_column=sqm.Column(JSONColumn(ShipmentRequest))
     )
     response: CreateShipmentResponse | None = sqm.Field(
         None,
-        sa_column=sqm.Column(ship_types.PawdanticJSON(CreateShipmentResponse))
+        sa_column=sqm.Column(JSONColumn(CreateShipmentResponse))
     )
-    direction: ShipDirectionEnum = 'out'
+    direction: ShipDirectionEnum = ShipDirectionEnum.OUT
+    # label_path: str | None = None
+    # alerts: Alerts | None = sqm.Field(
+    #     None,
+    #     sa_column=sqm.Column(JSONColumn(Alerts))
+    # )
+    # alerts: AlertList = None
     label_downloaded: bool = False
     # label_path: str | None = None
     alerts: list[Alert] = sqm.Field(
@@ -32,7 +43,7 @@ class BookingState(sqm.SQLModel):
         sa_column=sqm.Column(sqm.JSON)
     )
     booked: bool = False
-    commence_updated: bool = False
+    tracking_logged: bool = False
 
     def completed(self):
         return self.booked or self.response.completed_shipment_info is not None
