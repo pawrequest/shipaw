@@ -216,7 +216,7 @@ class Alert(PFBaseModel):
 
     @classmethod
     def from_exception(cls, e: Exception):
-        return cls(message=str(e), type='ERROR')
+        return cls(message=str(e.args), type='ERROR')
 
 
 class NotificationType(str, Enum):
