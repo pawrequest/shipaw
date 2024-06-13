@@ -1,9 +1,12 @@
 # from __future__ import annotations
+import json
+from typing import Annotated
 
-import pydantic as pyd
-import sqlmodel as sqm
-from loguru import logger
+import sqlmodel
 from pawdantic.pawsql import JSONColumn
+from sqlalchemy.types import TEXT, TypeDecorator
+import pydantic as pyd
+from loguru import logger
 
 from shipaw.pf_config import pf_sett
 from .pf_lists import Alerts
@@ -32,12 +35,34 @@ class BaseRequest(pf_shared.PFBaseModel):
     #     return self.alias_dict(all_obs)
 
 
+class JSONEncodedList(TypeDecorator):
+    impl = TEXT
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        return json.dumps(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return json.loads(value)
+
+
+# AlertList = typing.Annotated[
+#     list[pf_shared.Alert], pyd.Field(default_factory=list, sa_column=sqm.Column(JSONEncodedList))]
+
+AlertList = Annotated[Alerts, pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))]
+
+
 class BaseResponse(pf_shared.PFBaseModel):
     # alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
-    alerts: Alerts | None = sqm.Field(
-        None,
-        sa_column=sqm.Column(JSONColumn(Alerts))
-    )
+    # alerts: Alerts | None = sqm.Field(
+    #     None,
+    #     sa_column=sqm.Column(JSONColumn(Alerts))
+    # )
+    # alerts: AlertList
+    alerts: Alerts = pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))
 
     # @pyd.field_validator('alerts', mode='before')
     # def check_alerts(cls, v, values) -> list[Alert]:
