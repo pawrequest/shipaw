@@ -2,9 +2,10 @@
 
 import pydantic as pyd
 import sqlmodel as sqm
+from loguru import logger
 from pawdantic.pawsql import JSONColumn
-from shipaw.pf_config import pf_sett
 
+from shipaw.pf_config import pf_sett
 from .pf_lists import Alerts
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
@@ -120,9 +121,10 @@ class CreateShipmentResponse(BaseResponse):
     def status(self):
         return self.completed_shipment_info.status
 
-
     def tracking_link(self):
-        return pf_sett().tracking_url_stem + self.shipment_num
+        tlink = pf_sett().tracking_url_stem + self.shipment_num
+        logger.info(f'Creating tracking link: {tlink}')
+        return tlink
 
 
 ################################################################
