@@ -2,7 +2,7 @@ import pydantic as _p
 import sqlmodel as sqm
 
 from . import pf_models, pf_shared
-from ..ship_types import PawdanticJSON
+from pawdantic.pawsql import JSONColumn
 
 
 class HazardousGoods(pf_shared.PFBaseModel):
