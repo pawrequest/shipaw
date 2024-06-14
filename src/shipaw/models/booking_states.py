@@ -3,18 +3,14 @@ from __future__ import annotations, annotations
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
-from sqlalchemy import Column
-from sqlmodel import Field
+from pawdantic.pawsql import JSONColumn
 
-from shipaw import ship_types
 from shipaw.models import pf_shared
-from shipaw.models.pf_lists import Alerts
 from shipaw.models.pf_shared import Alert
 from shipaw.pf_config import pf_sett
-from shipaw.ship_types import ShipDirectionEnum
-from shipaw.models.pf_msg import AlertList, CreateShipmentResponse
+from shipaw.ship_types import ShipDirection
+from shipaw.models.pf_msg import CreateShipmentResponse
 from shipaw.models.pf_shipment import ShipmentRequest
-from pawdantic.pawsql import JSONColumn
 
 
 # from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
@@ -29,7 +25,7 @@ class BookingState(sqm.SQLModel):
         None,
         sa_column=sqm.Column(JSONColumn(CreateShipmentResponse))
     )
-    direction: ShipDirectionEnum = ShipDirectionEnum.OUT
+    direction: ShipDirection = ShipDirection.OUT
     # label_path: str | None = None
     # alerts: Alerts | None = sqm.Field(
     #     None,
@@ -58,13 +54,13 @@ class BookingState(sqm.SQLModel):
 
     # @functools.lru_cache
     def label_path(self):
-        return (pf_sett().label_dir / self.pf_label_filestem()).with_suffix('.pdf')
+        return (pf_sett().label_dir / self.direction / self.pf_label_filestem()).with_suffix('.pdf')
 
     def pf_label_filestem(self):
         ln = (f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label '
-              f'{f'from {self.shipment_request.collection_info.collection_contact.business_name}' if self.shipment_request.collection_info else ''} '
-              f'to {self.shipment_request.recipient_contact.business_name} '
-              f'on {self.shipment_request.shipping_date}')
+              f'{f'from {self.shipment_request.collection_info.collection_contact.business_name}' if self.shipment_request.collection_info else ''}'
+              f'to {self.shipment_request.recipient_contact.business_name}'
+              f' on {self.shipment_request.shipping_date}')
         if not ln:
             logger.warning('pf_label_name not set')
         return ln

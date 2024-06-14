@@ -14,7 +14,7 @@ from loguru import logger
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
 ShipperScope = _t.Literal['SAND', 'LIVE']
-ShipDirection = _t.Literal['in', 'out', 'dropoff']
+# ShipDirection = _t.Literal['in', 'out', 'dropoff']
 
 PrintType = _t.Literal['ALL_PARCELS', 'SINGLE_PARCEL']
 # AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
@@ -27,7 +27,7 @@ class AlertType(StrEnum):
     WARNING = 'WARNING'
     NOTIFICATION = 'NOTIFICATION'
 
-class ShipDirectionEnum(StrEnum):
+class ShipDirection(StrEnum):
     IN = 'in'
     OUT = 'out'
     DROPOFF = 'dropoff'

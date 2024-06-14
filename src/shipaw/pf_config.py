@@ -3,13 +3,13 @@ from __future__ import annotations
 import functools
 import os
 from pathlib import Path
-from importlib import resources
 
 import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from shipaw import rsrc
+
 from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
+from shipaw.ship_types import ShipDirection
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -58,9 +58,19 @@ class PFSettings(BaseSettings):
 
     @_p.field_validator('label_dir', mode='after')
     def make_path(cls, v, values):
-        if not v.exists():
-            v.mkdir(parents=True, exist_ok=True)
+        for subdir in ShipDirection:
+            apath = v / subdir
+            if not apath.exists():
+                apath.mkdir(parents=True, exist_ok=True)
         return v
+
+    #
+    # @_p.field_validator('label_dir', mode='after')
+    # def make_path(cls, v, values):
+    #     for apath in [v / i for i in ['in', 'out', 'dropoff']]:
+    #         if not apath.exists():
+    #             v.mkdir(parents=True, exist_ok=True)
+    #         return v
 
     # @_p.field_validator('pf_wsdl', mode='after')
     # def get_wsdl(cls, v, values):

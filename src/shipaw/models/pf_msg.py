@@ -1,10 +1,8 @@
 # from __future__ import annotations
-import json
 from typing import Annotated
 
 import sqlmodel
 from pawdantic.pawsql import JSONColumn
-from sqlalchemy.types import TEXT, TypeDecorator
 import pydantic as pyd
 from loguru import logger
 
@@ -18,9 +16,6 @@ from ..models.pf_shipment import ShipmentRequest
 class BaseRequest(pf_shared.PFBaseModel):
     authentication: pf_shared.Authentication
 
-    # def req_dict(self):
-    #     return self.model_dump(by_alias=True)
-
     @property
     def authorised(self):
         return self.authentication is not None
@@ -28,29 +23,6 @@ class BaseRequest(pf_shared.PFBaseModel):
     def authorise(self, auth: pf_shared.Authentication):
         self.authentication = auth
 
-    # def auth_request_dict(self) -> dict:
-    #     if not self.authorised:
-    #         raise ValueError('Authentication is required')
-    #     all_obs = [self.authentication, *self.objs]
-    #     return self.alias_dict(all_obs)
-
-
-class JSONEncodedList(TypeDecorator):
-    impl = TEXT
-
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return None
-        return json.dumps(value)
-
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return None
-        return json.loads(value)
-
-
-# AlertList = typing.Annotated[
-#     list[pf_shared.Alert], pyd.Field(default_factory=list, sa_column=sqm.Column(JSONEncodedList))]
 
 AlertList = Annotated[Alerts, pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))]
 
