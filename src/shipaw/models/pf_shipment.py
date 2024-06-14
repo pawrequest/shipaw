@@ -35,7 +35,7 @@ class ShipmentRequest(ShipmentReferenceFields):
     # from user input
     recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(JSONColumn(Contact)))
     # recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(PawdanticJSON(Contact)))
-    recipient_address: pf_models.AddressRecipient = sqm.Field(
+    recipient_address: pf_models.AddressRecipient | pf_models.AddressCollection = sqm.Field(
         ...,
         sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient))
     )

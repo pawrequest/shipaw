@@ -7,12 +7,14 @@ from pathlib import Path
 
 import sqlmodel as sqm
 import pydantic as _p
+from pydantic import BaseModel
 from pydantic.alias_generators import to_pascal
 
 from .. import ship_types
 
 
-class PFBaseModel(sqm.SQLModel):
+# class PFBaseModel(sqm.SQLModel):
+class PFBaseModel(BaseModel):
     model_config = _p.ConfigDict(
         alias_generator=_p.AliasGenerator(
             alias=to_pascal,

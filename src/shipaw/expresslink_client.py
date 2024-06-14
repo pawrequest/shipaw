@@ -137,7 +137,6 @@ class ELClient(pydantic.BaseModel):
             Path - path to the downloaded label
 
         """
-        sett = pf_config.pf_sett()
         back = self.backend(PrintLabelService)
         req = pf_msg.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
         response: pf_msg.PrintLabelResponse = back.printlabel(request=req)

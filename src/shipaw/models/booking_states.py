@@ -58,7 +58,7 @@ class BookingState(sqm.SQLModel):
 
     def pf_label_filestem(self):
         ln = (f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label '
-              f'{f'from {self.shipment_request.collection_info.collection_contact.business_name}' if self.shipment_request.collection_info else ''}'
+              f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
               f'to {self.shipment_request.recipient_contact.business_name}'
               f' on {self.shipment_request.shipping_date}')
         if not ln:
@@ -85,14 +85,14 @@ class BookingState(sqm.SQLModel):
                 self.alerts.extend(self.response.alerts.alert)
         return self
 
-    @property
-    def shipment_num(self):
-        return (
-            self.response.completed_shipment_info.completed_shipments.completed_shipment[
-                0].shipment_number
-            if self.response.completed_shipment_info
-            else None
-        )
+    # @property
+    # def shipment_num(self):
+    #     return (
+    #         self.response.completed_shipment_info.completed_shipments.completed_shipment[
+    #             0].shipment_number
+    #         if self.response.completed_shipment_info
+    #         else None
+    #     )
 
     @property
     def status(self):
