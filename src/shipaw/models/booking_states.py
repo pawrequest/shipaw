@@ -1,5 +1,7 @@
 from __future__ import annotations, annotations
 
+from datetime import date
+
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
@@ -17,6 +19,7 @@ from shipaw.models.pf_shipment import ShipmentRequest
 
 
 class BookingState(sqm.SQLModel):
+
     shipment_request: ShipmentRequest = sqm.Field(
         ...,
         sa_column=sqm.Column(JSONColumn(ShipmentRequest))
@@ -26,23 +29,23 @@ class BookingState(sqm.SQLModel):
         sa_column=sqm.Column(JSONColumn(CreateShipmentResponse))
     )
     direction: ShipDirection = ShipDirection.OUT
-    # label_path: str | None = None
-    # alerts: Alerts | None = sqm.Field(
-    #     None,
-    #     sa_column=sqm.Column(JSONColumn(Alerts))
-    # )
-    # alerts: AlertList = None
     label_downloaded: bool = False
-    # label_path: str | None = None
     alerts: list[Alert] = sqm.Field(
         default_factory=list,
         sa_column=sqm.Column(sqm.JSON)
     )
     booked: bool = False
     tracking_logged: bool = False
+    booking_date: date = date.today()
 
-    def completed(self):
-        return self.booked or self.response.completed_shipment_info is not None
+    @_p.field_validator('booked', mode='after')
+    def completed(cls, v, values):
+        if v is False:
+            logger.warning('Booking.booked is False')
+            if values.data['response'] and values.data['response'].completed_shipment_info:
+                logger.warning('Booking has completed shipment data, setting booked to True')
+                v = True
+        return v
 
     @_p.model_validator(mode='after')
     def validate_collection_times(self):
@@ -53,9 +56,11 @@ class BookingState(sqm.SQLModel):
         return self
 
     # @functools.lru_cache
+    @property
     def label_path(self):
-        return (pf_sett().label_dir / self.direction / self.pf_label_filestem()).with_suffix('.pdf')
+        return (pf_sett().label_dir / self.direction / self.pf_label_filestem).with_suffix('.pdf')
 
+    @property
     def pf_label_filestem(self):
         ln = (f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label '
               f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
