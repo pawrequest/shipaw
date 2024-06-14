@@ -62,7 +62,7 @@ class BaseResponse(pf_shared.PFBaseModel):
     #     sa_column=sqm.Column(JSONColumn(Alerts))
     # )
     # alerts: AlertList
-    alerts: Alerts = pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))
+    alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))
 
     # @pyd.field_validator('alerts', mode='before')
     # def check_alerts(cls, v, values) -> list[Alert]:
