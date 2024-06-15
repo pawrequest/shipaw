@@ -6,34 +6,21 @@ from datetime import date
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
-from pawdantic.pawsql import JSONColumn
+from pawdantic.pawsql import optional_json_field, required_json_field
 
 from shipaw.models import pf_shared
-from shipaw.models.pf_shared import Alert
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection
-from shipaw.models.pf_msg import CreateShipmentResponse
+from shipaw.models.pf_msg import Alert, CreateShipmentResponse
 from shipaw.models.pf_shipment import ShipmentRequest
 
 
-# from ..models.pf_shipment import ShipmentReferenceFields, ShipmentRequest
-
-
 class BookingState(sqm.SQLModel):
-    shipment_request: ShipmentRequest = sqm.Field(
-        ...,
-        sa_column=sqm.Column(JSONColumn(ShipmentRequest))
-    )
-    response: CreateShipmentResponse | None = sqm.Field(
-        None,
-        sa_column=sqm.Column(JSONColumn(CreateShipmentResponse))
-    )
+    shipment_request: ShipmentRequest = required_json_field(ShipmentRequest)
+    response: CreateShipmentResponse | None = optional_json_field(CreateShipmentResponse)
     direction: ShipDirection = ShipDirection.OUT
     label_downloaded: bool = False
-    alerts: list[Alert] = sqm.Field(
-        default_factory=list,
-        sa_column=sqm.Column(sqm.JSON)
-    )
+    alerts: list[Alert] | None = optional_json_field(Alert)
     booked: bool = False
     tracking_logged: bool = False
     booking_date: date = date.today()
@@ -49,7 +36,6 @@ class BookingState(sqm.SQLModel):
     @_p.field_validator('booked', mode='after')
     def completed(cls, v, values):
         if v is False:
-            logger.warning('Booking.booked is False')
             if values.data['response'] and values.data['response'].completed_shipment_info:
                 logger.warning('Booking has completed shipment data, setting booked to True')
                 v = True
@@ -76,10 +62,11 @@ class BookingState(sqm.SQLModel):
 
     @property
     def pf_label_filestem(self):
-        ln = (f'Parcelforce {'DropOff' if self.direction == ShipDirection.DROPOFF else 'Collection'} Label '
-              f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
-              f'to {self.shipment_request.recipient_contact.business_name}'
-              f' on {self.shipment_request.shipping_date}')
+        ln = (
+            f'Parcelforce {'DropOff' if self.direction == ShipDirection.DROPOFF else 'Collection'} Label '
+            f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
+            f'to {self.shipment_request.recipient_contact.business_name}'
+            f' on {self.shipment_request.shipping_date}')
         if not ln:
             logger.warning('pf_label_name not set')
         return ln

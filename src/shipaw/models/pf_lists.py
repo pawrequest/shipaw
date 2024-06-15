@@ -2,7 +2,6 @@ import pydantic as _p
 import sqlmodel as sqm
 
 from . import pf_models, pf_shared
-from pawdantic.pawsql import JSONColumn
 
 
 class HazardousGoods(pf_shared.PFBaseModel):
@@ -39,14 +38,6 @@ class CompletedShipments(pf_shared.PFBaseModel):
 
 class CompletedCancel(pf_shared.PFBaseModel):
     completed_cancel_info: pf_shared.CompletedCancelInfo | None = None
-
-
-class Alerts(pf_shared.PFBaseModel):
-    alert: list[pf_shared.Alert] | None = sqm.Field(
-        default_factory=list,
-        sa_column=sqm.Column(JSONColumn(pf_shared.Alert)),
-        # alias='Alert',
-    )
 
 
 class CollectionNotifications(pf_shared.PFBaseModel):

@@ -5,12 +5,9 @@ import typing as _t
 from enum import Enum
 from pathlib import Path
 
-import sqlmodel as sqm
 import pydantic as _p
 from pydantic import BaseModel
 from pydantic.alias_generators import to_pascal
-
-from .. import ship_types
 
 
 # class PFBaseModel(sqm.SQLModel):
@@ -209,16 +206,6 @@ class Document(PFBaseModel):
 class Enhancement(PFBaseModel):
     enhanced_compensation: str | None = None
     saturday_delivery_required: bool | None = None
-
-
-class Alert(PFBaseModel):
-    code: int | None = None
-    message: str
-    type: ship_types.AlertType
-
-    @classmethod
-    def from_exception(cls, e: Exception):
-        return cls(message=str(e), type='ERROR')
 
 
 class NotificationType(str, Enum):

@@ -1,16 +1,31 @@
-# from __future__ import annotations
-from typing import Annotated
+from __future__ import annotations
 
-import sqlmodel
-from pawdantic.pawsql import JSONColumn
+from pawdantic.pawsql import optional_json_field
 import pydantic as pyd
 from loguru import logger
 
 from shipaw.pf_config import pf_sett
-from .pf_lists import Alerts
+from .pf_shared import PFBaseModel
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
 from ..models.pf_shipment import ShipmentRequest
+
+
+class Alert(PFBaseModel):
+    code: int | None = None
+    message: str
+    type: ship_types.AlertType = ship_types.AlertType.NOTIFICATION
+
+    @classmethod
+    def from_exception(cls, e: Exception):
+        return cls(message=str(e), type='ERROR')
+
+
+class Alerts(PFBaseModel):
+    alert: list[Alert] | None = optional_json_field(Alert)
+
+
+# AlertList = optional_json_field(Alert)
 
 
 class BaseRequest(pf_shared.PFBaseModel):
@@ -24,17 +39,14 @@ class BaseRequest(pf_shared.PFBaseModel):
         self.authentication = auth
 
 
-AlertList = Annotated[Alerts, pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))]
-
-
 class BaseResponse(pf_shared.PFBaseModel):
     # alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
     # alerts: Alerts | None = sqm.Field(
     #     None,
-    #     sa_column=sqm.Column(JSONColumn(Alerts))
+    #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
     # )
-    # alerts: AlertList
-    alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))
+    alerts: list[Alert] | None = optional_json_field(Alert)
+    # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
 
     # @pyd.field_validator('alerts', mode='before')
     # def check_alerts(cls, v, values) -> list[Alert]:

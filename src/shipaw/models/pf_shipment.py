@@ -1,30 +1,28 @@
 # from __future__ import annotations
 import datetime as dt
-from typing import Annotated
 
-import sqlmodel as sqm
-import pydantic as _p
-from pawdantic.pawsql import JSONColumn
+from pawdantic.pawsql import optional_json_field, required_json_field
+from pydantic import constr
 
 from shipaw import ship_types
-from shipaw.models import pf_lists, pf_models, pf_shared
-from shipaw.models.pf_shared import Alert
+from shipaw.models import pf_shared
+from shipaw.models.pf_lists import HazardousGoods
+from shipaw.models.pf_models import AddressCollection, AddressRecipient, DeliveryOptions
+from shipaw.models.pf_shared import Enhancement
 from shipaw.models.pf_top import CollectionInfo, Contact
 from shipaw.pf_config import pf_sett
-from shipaw.ship_types import limit_daterange_no_weekends
 
 
 class ShipmentReferenceFields(pf_shared.PFBaseModel):
-    ...
-    reference_number1: str | None = _p.Field(None, max_length=24)
-    reference_number2: str | None = _p.Field(None, max_length=24)
-    reference_number3: str | None = _p.Field(None, max_length=24)
-    reference_number4: str | None = _p.Field(None, max_length=24)
-    reference_number5: str | None = _p.Field(None, max_length=24)
-    special_instructions1: str | None = _p.Field(None, max_length=25)
-    special_instructions2: str | None = _p.Field(None, max_length=25)
-    special_instructions3: str | None = _p.Field(None, max_length=25)
-    special_instructions4: str | None = _p.Field(None, max_length=25)
+    reference_number1: constr(max_length=24) | None = None
+    reference_number2: constr(max_length=24) | None = None
+    reference_number3: constr(max_length=24) | None = None
+    reference_number4: constr(max_length=24) | None = None
+    reference_number5: constr(max_length=24) | None = None
+    special_instructions1: constr(max_length=25) | None = None
+    special_instructions2: constr(max_length=25) | None = None
+    special_instructions3: constr(max_length=25) | None = None
+    special_instructions4: constr(max_length=25) | None = None
 
 
 class ShipmentRequest(ShipmentReferenceFields):
@@ -33,12 +31,9 @@ class ShipmentRequest(ShipmentReferenceFields):
     department_id: int = pf_sett().department_id
 
     # from user input
-    recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(JSONColumn(Contact)))
+    recipient_contact: Contact = required_json_field(Contact)
     # recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(PawdanticJSON(Contact)))
-    recipient_address: pf_models.AddressRecipient | pf_models.AddressCollection = sqm.Field(
-        ...,
-        sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient))
-    )
+    recipient_address: AddressRecipient | AddressCollection = required_json_field(AddressRecipient)
     total_number_of_parcels: int = 1
     shipping_date: dt.date = dt.date.today()
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
@@ -46,42 +41,30 @@ class ShipmentRequest(ShipmentReferenceFields):
     # inputs for collections
     shipment_type: ship_types.DeliveryKindEnum = 'DELIVERY'
     print_own_label: bool | None = None
-    collection_info: CollectionInfo | None = sqm.Field(
-        default=None,
-        sa_column=sqm.Column(JSONColumn(CollectionInfo))
-    )
+    collection_info: CollectionInfo | None = optional_json_field(CollectionInfo)
     #
     # # extras
-    enhancement: pf_shared.Enhancement | None = sqm.Field(
-        default=None,
-        sa_column=sqm.Column(JSONColumn(pf_shared.Enhancement))
-    )
-    delivery_options: pf_models.DeliveryOptions | None = sqm.Field(
-        default=None,
-        sa_column=sqm.Column(JSONColumn(pf_models.DeliveryOptions))
-    )
-    hazardous_goods: pf_lists.HazardousGoods | None = sqm.Field(
-        default=None,
-        sa_column=sqm.Column(JSONColumn(pf_lists.HazardousGoods))
-    )
+    enhancement: Enhancement | None = optional_json_field(Enhancement)
+    delivery_options: DeliveryOptions | None = optional_json_field(DeliveryOptions)
+    hazardous_goods: HazardousGoods | None = optional_json_field(HazardousGoods)
     consignment_handling: bool | None = None
 
     drop_off_ind: ship_types.DropOffIndEnum | None = None
     # exchange_instructions1: _p.constr(max_length=25) | None = None
     # exchange_instructions2: paw_types.truncated_printable_str_type(25) | None = None
     # exchange_instructions3: paw_types.truncated_printable_str_type(25) | None = None
-    # exporter_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient)))
-    # exporter_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(Contact)))
-    # importer_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient)))
-    # importer_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(Contact)))
-    # in_bound_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.AddressRecipient)))
-    # in_bound_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(Contact)))
-    # in_bound_details: pf_models.InBoundDetails | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_models.InBoundDetails)))
-    # international_info: InternationalInfo | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(InternationalInfo)))
+    # exporter_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(pf_models.AddressRecipient)))
+    # exporter_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(Contact)))
+    # importer_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(pf_models.AddressRecipient)))
+    # importer_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(Contact)))
+    # in_bound_address: pf_models.AddressRecipient | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(pf_models.AddressRecipient)))
+    # in_bound_contact: Contact | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(Contact)))
+    # in_bound_details: pf_models.InBoundDetails | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(pf_models.InBoundDetails)))
+    # international_info: InternationalInfo | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(InternationalInfo)))
     # pre_printed: bool | None = None
     #
     # request_id: int | None = None
-    # returns: pf_shared.Returns | None = sqm.Field(default=None, sa_column=sqm.Column(JSONColumn(pf_shared.Returns)))
+    # returns: pf_shared.Returns | None = sqm.Field(default=None, sa_column=sqm.Column(PydanticJSONColumn(pf_shared.Returns)))
 
     # @_p.field_validator('shipping_date', mode='after')
     # def ship_date_validator(cls, v, values):

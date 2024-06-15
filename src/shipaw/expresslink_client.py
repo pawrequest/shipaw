@@ -12,11 +12,18 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from . import models, pf_config
-from .models import AddressChoice, pf_models, pf_msg
-from .models.pf_msg import CreateShipmentResponse
+from .models.pf_models import AddressChoice, AddressRecipient, AddTypes
+from .models.pf_msg import (
+    CreateShipmentResponse,
+    CreateRequest,
+    FindRequest,
+    PrintLabelRequest,
+    PrintLabelResponse,
+)
 from .models.pf_services import CreateShipmentService, FindService, PrintLabelService
 from .models.pf_shipment import ShipmentRequest
+from .models.pf_top import PAF
+from .pf_config import PFSettings, pf_sett
 
 SCORER = fuzz.token_sort_ratio
 
@@ -30,7 +37,7 @@ class ELClient(pydantic.BaseModel):
         service: ServiceProxy | None - Zeep ServiceProxy (generated from settings)
     """
 
-    settings: pf_config.PFSettings = pf_config.pf_sett()
+    settings: PFSettings = pf_sett()
     service: ServiceProxy | None = None
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True, validate_default=True)
@@ -61,7 +68,7 @@ class ELClient(pydantic.BaseModel):
         return ZeepBackend(self.service)[service_prot]
 
     def shipment_request_authenticated(self, shipment_request: ShipmentRequest):
-        return pf_msg.CreateRequest(
+        return CreateRequest(
             authentication=self.settings.auth,
             requested_shipment=shipment_request,
         )
@@ -69,18 +76,18 @@ class ELClient(pydantic.BaseModel):
     def send_shipment_request(
             self,
             requested_shipment: ShipmentRequest
-    ) -> pf_msg.CreateShipmentResponse:
+    ) -> CreateShipmentResponse:
         """Submit a CreateRequest to Parcelforce, booking carriage.
 
         Args:
             requested_shipment: ShipmentRequest - ShipmenmtRequest to book
 
         Returns:
-            .pf_msg.CreateShipmentResponse - response from Parcelforce
+            .CreateShipmentResponse - response from Parcelforce
 
         """
         back = self.backend(CreateShipmentService)
-        authorized_shipment = pf_msg.CreateRequest(
+        authorized_shipment = CreateRequest(
             authentication=self.settings.auth, requested_shipment=requested_shipment
         )
         resp: CreateShipmentResponse = back.createshipment(
@@ -103,9 +110,9 @@ class ELClient(pydantic.BaseModel):
                 f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}'
             )
         return resp
-        # return pf_msg.CreateShipmentResponse.model_validate(resp)
+        # return CreateShipmentResponse.model_validate(resp)
 
-    def get_candidates(self, postcode: str) -> list[models.AddressRecipient]:
+    def get_candidates(self, postcode: str) -> list[AddressRecipient]:
         """Get candidate addresses at a postcode.
 
         Args:
@@ -115,9 +122,9 @@ class ELClient(pydantic.BaseModel):
             list[.models.AddressRecipient] - list of candidate addresses
 
         """
-        req = pf_msg.FindRequest(
+        req = FindRequest(
             authentication=self.settings.auth,
-            paf=models.PAF(postcode=postcode)
+            paf=PAF(postcode=postcode)
         )
         back = self.backend(FindService)
         response = back.find(request=req.model_dump(by_alias=True))
@@ -138,8 +145,8 @@ class ELClient(pydantic.BaseModel):
 
         """
         back = self.backend(PrintLabelService)
-        req = pf_msg.PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
-        response: pf_msg.PrintLabelResponse = back.printlabel(request=req)
+        req = PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
+        response: PrintLabelResponse = back.printlabel(request=req)
         if response.alerts:
             for alt in response.alerts.alert:
                 if alt.type == 'ERROR':
@@ -150,7 +157,7 @@ class ELClient(pydantic.BaseModel):
         logger.info(f'Downloaded label to {out_path}')
         return out_path
 
-    def choose_address[T: pf_models.AddTypes](self, address: T) -> T:
+    def choose_address[T: AddTypes](self, address: T) -> T:
         # candidate_dict = self.candidates_dict(address.postcode)
         # chosen, score = process.extractOne(address.lines_str, list(candidate_dict.keys()), scorer=SCORER)
         candidates = self.get_candidates(address.postcode)
@@ -158,7 +165,7 @@ class ELClient(pydantic.BaseModel):
         return chosen
         # return candidate_dict[chosen]
 
-    def get_choices[T: pf_models.AddTypes](
+    def get_choices[T: AddTypes](
             self, postcode: str, address: T | None = None
     ) -> list[AddressChoice]:
         candidates = self.get_candidates(postcode)
