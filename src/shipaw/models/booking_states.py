@@ -1,5 +1,6 @@
 from __future__ import annotations, annotations
 
+import functools
 from datetime import date
 
 import pydantic as _p
@@ -19,7 +20,6 @@ from shipaw.models.pf_shipment import ShipmentRequest
 
 
 class BookingState(sqm.SQLModel):
-
     shipment_request: ShipmentRequest = sqm.Field(
         ...,
         sa_column=sqm.Column(JSONColumn(ShipmentRequest))
@@ -37,6 +37,14 @@ class BookingState(sqm.SQLModel):
     booked: bool = False
     tracking_logged: bool = False
     booking_date: date = date.today()
+
+    @property
+    def remote_contact(self):
+        return self.shipment_request.recipient_contact if self.direction == 'out' else self.shipment_request.collection_info.collection_contact
+
+    @property
+    def remote_address(self):
+        return self.shipment_request.recipient_address if self.direction == 'out' else self.shipment_request.collection_info.collection_address
 
     @_p.field_validator('booked', mode='after')
     def completed(cls, v, values):
@@ -56,13 +64,19 @@ class BookingState(sqm.SQLModel):
         return self
 
     # @functools.lru_cache
-    @property
+    @functools.cached_property
     def label_path(self):
-        return (pf_sett().label_dir / self.direction / self.pf_label_filestem).with_suffix('.pdf')
+        lpath = (pf_sett().label_dir / self.direction / self.pf_label_filestem).with_suffix('.pdf')
+        original_stem = lpath.stem
+        suffix = 2
+        while lpath.exists():
+            lpath = lpath.with_name(f'{original_stem}_{suffix}{lpath.suffix}')
+            suffix += 1
+        return lpath
 
     @property
     def pf_label_filestem(self):
-        ln = (f'Parcelforce {'DropOff' if self.direction == 'dropoff' else 'Collection'} Label '
+        ln = (f'Parcelforce {'DropOff' if self.direction == ShipDirection.DROPOFF else 'Collection'} Label '
               f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
               f'to {self.shipment_request.recipient_contact.business_name}'
               f' on {self.shipment_request.shipping_date}')
