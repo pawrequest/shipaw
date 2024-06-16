@@ -2,7 +2,7 @@
 import datetime as dt
 
 from pawdantic.pawsql import optional_json_field, required_json_field
-from pydantic import constr
+from pydantic import constr, field_validator
 
 from shipaw import ship_types
 from shipaw.models import pf_shared
@@ -72,11 +72,11 @@ class ShipmentRequest(ShipmentReferenceFields):
     #         logger.info(f'Shipping date {v} is in the past, using today')
     #         return dt.date.today()
 
-    # @_p.field_validator('reference_number1', mode='after')
-    # def ref_num_validator(cls, v, values):
-    #     if not v:
-    #         v = values.data.get('recipient_contact').business_name
-    #     return v
+    @field_validator('reference_number1', mode='after')
+    def ref_num_validator(cls, v, values):
+        if not v:
+            v = values.data.get('recipient_contact').business_name
+        return v
     #
     # @_p.model_validator(mode='after')
     # def check_collection_info(self):
