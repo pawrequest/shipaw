@@ -11,7 +11,7 @@ from pawdantic.pawsql import optional_json_field, required_json_field
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection
-from shipaw.models.pf_msg import Alert, CreateShipmentResponse
+from shipaw.models.pf_msg import Alerts, CreateShipmentResponse
 from shipaw.models.pf_shipment import ShipmentRequest
 
 
@@ -20,7 +20,7 @@ class BookingState(sqm.SQLModel):
     response: CreateShipmentResponse | None = optional_json_field(CreateShipmentResponse)
     direction: ShipDirection = ShipDirection.OUT
     label_downloaded: bool = False
-    alerts: list[Alert] | None = optional_json_field(Alert)
+    alerts: Alerts | None = optional_json_field(Alerts)
     booked: bool = False
     tracking_logged: bool = False
     booking_date: date = date.today()

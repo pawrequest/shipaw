@@ -45,7 +45,7 @@ class BaseResponse(pf_shared.PFBaseModel):
     #     None,
     #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
     # )
-    alerts: list[Alert] | None = optional_json_field(Alert)
+    alerts: Alerts | None = optional_json_field(Alerts)
     # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
 
     # @pyd.field_validator('alerts', mode='before')
