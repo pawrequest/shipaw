@@ -35,7 +35,7 @@ class ShipmentRequest(ShipmentReferenceFields):
     # recipient_contact: Contact = sqm.Field(..., sa_column=sqm.Column(PawdanticJSON(Contact)))
     recipient_address: AddressRecipient | AddressCollection = required_json_field(AddressRecipient)
     total_number_of_parcels: int = 1
-    shipping_date: dt.date = dt.date.today()
+    shipping_date: dt.date
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
 
     # inputs for collections

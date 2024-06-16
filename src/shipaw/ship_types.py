@@ -1,15 +1,11 @@
 from __future__ import annotations
 
-import datetime
-import datetime as dt
 import re
 import typing as _t
-from datetime import date, timedelta
-from enum import StrEnum, Enum
+from enum import Enum, StrEnum
+import datetime as dt
 
-import pydantic
 import pydantic as _p
-import sqlalchemy as sqa
 from loguru import logger
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
@@ -22,10 +18,12 @@ DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
+
 class AlertType(StrEnum):
     ERROR = 'ERROR'
     WARNING = 'WARNING'
     NOTIFICATION = 'NOTIFICATION'
+
 
 class ShipDirection(StrEnum):
     IN = 'in'
@@ -43,12 +41,12 @@ class DeliveryKindEnum(str, Enum):
     COLLECTION = 'COLLECTION'
 
 
-TOD = date.today()
-COLLECTION_CUTOFF = datetime.time(23, 59, 59)
+TOD = dt.date.today()
+COLLECTION_CUTOFF = dt.time(23, 59, 59)
 ADVANCE_BOOKING_DAYS = 28
 WEEKDAYS_IN_RANGE = [
-    TOD + timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
-    (TOD + timedelta(days=i)).weekday() < 5
+    TOD + dt.timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
+    (TOD + dt.timedelta(days=i)).weekday() < 5
 ]
 
 COLLECTION_WEEKDAYS = [i for i in WEEKDAYS_IN_RANGE if not i == TOD]
@@ -69,13 +67,14 @@ def is_valid_postcode(pc):
     return bool(re.match(POSTCODE_PATTERN, pc.strip().upper()))
 
 
-def limit_daterange_no_weekends(v: date) -> date:
+def limit_daterange_no_weekends(v: dt.date) -> dt.date:
+    logger.debug(f'Validating date: {v}')
     if v:
         if isinstance(v, str):
             logger.debug(f'Validating date string: {v}')
-            v = datetime.date.fromisoformat(v)
+            v = dt.date.fromisoformat(v)
 
-        if isinstance(v, date):
+        if isinstance(v, dt.date):
             if v < TOD or v.weekday() > 4:
                 logger.info(f'Date {v} is a weekend or in the past - using next weekday')
                 v = min(WEEKDAYS_IN_RANGE)
@@ -86,13 +85,10 @@ def limit_daterange_no_weekends(v: date) -> date:
                 )
                 v = max(WEEKDAYS_IN_RANGE)
 
-            logger.debug(f'Validated date: {v}')
             return v
 
 
 # SHIPPING_DATE = date
-
-
 
 
 class ExpressLinkError(Exception):

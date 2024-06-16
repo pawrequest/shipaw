@@ -1,12 +1,11 @@
 from __future__ import annotations, annotations
 
 import functools
-from datetime import date
-
+import datetime as dt
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
-from pawdantic.pawsql import optional_json_field, required_json_field
+from pawdantic.pawsql import optional_json_field, required_json_field, default_json_field
 
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
@@ -20,10 +19,12 @@ class BookingState(sqm.SQLModel):
     response: CreateShipmentResponse | None = optional_json_field(CreateShipmentResponse)
     direction: ShipDirection = ShipDirection.OUT
     label_downloaded: bool = False
-    alerts: Alerts | None = optional_json_field(Alerts)
+    # alerts: Alerts | None = optional_json_field(Alerts)
+    alerts: Alerts | None = default_json_field(Alerts, Alerts)
+
     booked: bool = False
     tracking_logged: bool = False
-    booking_date: date = date.today()
+    booking_date: dt.date = dt.date.today()
 
     @property
     def remote_contact(self):
@@ -88,7 +89,7 @@ class BookingState(sqm.SQLModel):
     def get_alerts(self):
         if self.response:
             if self.response.alerts:
-                self.alerts.extend(self.response.alerts.alert)
+                self.alerts.alert.extend(self.response.alerts.alert)
         return self
 
     # @property
