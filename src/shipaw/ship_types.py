@@ -5,7 +5,7 @@ import datetime as dt
 import re
 import typing as _t
 from datetime import date, timedelta
-from enum import StrEnum
+from enum import StrEnum, Enum
 
 import pydantic
 import pydantic as _p
@@ -38,7 +38,7 @@ class DropOffIndEnum(StrEnum):
     DEPOT = 'DEPOT'
 
 
-class DeliveryKindEnum(StrEnum):
+class DeliveryKindEnum(str, Enum):
     DELIVERY = 'DELIVERY'
     COLLECTION = 'COLLECTION'
 
@@ -72,6 +72,7 @@ def is_valid_postcode(pc):
 def limit_daterange_no_weekends(v: date) -> date:
     if v:
         if isinstance(v, str):
+            logger.debug(f'Validating date string: {v}')
             v = datetime.date.fromisoformat(v)
 
         if isinstance(v, date):
@@ -90,35 +91,8 @@ def limit_daterange_no_weekends(v: date) -> date:
 
 
 # SHIPPING_DATE = date
-SHIPPING_DATE = _t.Annotated[date, _p.AfterValidator(limit_daterange_no_weekends)]
 
 
-class PawdanticJSON(sqa.TypeDecorator):
-    """Stores a pydantic model as a JSON string in the database."""
-
-    impl = sqa.JSON
-
-    def __init__(self, model_class: type[pydantic.BaseModel], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.model_class = model_class
-
-    def process_bind_param(self, value, dialect):
-        """save the model as a JSON string"""
-        try:
-            return value.model_dump_json(round_trip=True) if value is not None else None
-        except pydantic.ValidationError:
-            logger.exception('Error saving JSON to db')
-            raise
-
-    def process_result_value(self, value, dialect):
-        """load the JSON string as a model"""
-        try:
-            # jsn = json.loads(value)
-            # return self.model_class.model_validate(jsn) if value else None
-            return self.model_class.model_validate_json(value) if value else None
-        except pydantic.ValidationError:
-            logger.exception('Error loading JSON from db')
-            raise
 
 
 class ExpressLinkError(Exception):
