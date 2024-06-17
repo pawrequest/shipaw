@@ -8,6 +8,7 @@ import datetime as dt
 import phonenumbers
 import pydantic as _p
 from loguru import logger
+from pydantic import BeforeValidator
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
 ShipperScope = _t.Literal['SAND', 'LIVE']
@@ -20,7 +21,7 @@ DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
 
 
-class DeliveryType(StrEnum):
+class ShipmentType(StrEnum):
     DELIVERY = 'DELIVERY'
     COLLECTION = 'COLLECTION'
 
@@ -51,8 +52,7 @@ TOD = dt.date.today()
 COLLECTION_CUTOFF = dt.time(23, 59, 59)
 ADVANCE_BOOKING_DAYS = 28
 WEEKDAYS_IN_RANGE = [
-    TOD + dt.timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if
-    (TOD + dt.timedelta(days=i)).weekday() < 5
+    TOD + dt.timedelta(days=i) for i in range(ADVANCE_BOOKING_DAYS) if (TOD + dt.timedelta(days=i)).weekday() < 5
 ]
 
 COLLECTION_WEEKDAYS = [i for i in WEEKDAYS_IN_RANGE if not i == TOD]
@@ -86,9 +86,7 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
                 v = min(WEEKDAYS_IN_RANGE)
 
             if v > max(WEEKDAYS_IN_RANGE):
-                logger.info(
-                    f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)'
-                )
+                logger.info(f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)')
                 v = max(WEEKDAYS_IN_RANGE)
 
             return v
@@ -101,17 +99,6 @@ class ExpressLinkError(Exception):
     ...
 
 
-# def validate_phone(v, values) -> str:
-#     phone = v.replace(' ', '')
-#     nummy = phonenumbers.parse(phone, 'GB')
-#     if not phonenumbers.is_valid_number(nummy):
-#         raise _p.ValidationError(f'Invalid phone number: {phone}')
-#     logger.debug(f'Phone number validated: {nummy}')
-#     logger.debug(f'numnber type is {type(nummy)}')
-#     return phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.E164)
-#
-#
-# UKPHONE = Annotated[str, Field(...), BeforeValidator(validate_phone)]
 def validate_phone(v: str, values) -> str:
     logger.warning(f'Validating phone: {v}')
     phone = v.replace(' ', '')
@@ -120,7 +107,25 @@ def validate_phone(v: str, values) -> str:
     return phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.E164)
 
 
+def prep_phone(v: str) -> str:
+    if isinstance(v, str):
+        # logger.debug(f'Prepping phone: {v}')
+        v = v.replace(' ', '')
+        try:
+            nummy = phonenumbers.parse(v, 'GB')
+            assert phonenumbers.is_valid_number(nummy)
+            # logger.debug(f'Validated Phone Number: {v}')
+            v = phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.NATIONAL).replace(' ', '')
+            # logger.debug(f'Storing phone number as: {v}')
+        except phonenumbers.phonenumberutil.NumberParseException:
+            logger.warning(f'Unable to parse phone number: {v}')
+        except AssertionError:
+            logger.warning(f'Invalid phone number: {v}')
+    return v
+
+
 # UKPHONE = Annotated[str, AfterValidator(validate_phone)]
+UKPHONE = _t.Annotated[str, BeforeValidator(prep_phone)]
 
 
-UKPHONE = str
+# UKPHONE = str

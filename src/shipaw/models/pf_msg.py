@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pawdantic.pawsql import default_json_field
+from pawdantic.pawsql import default_json_field, required_json_field
 import pydantic as pyd
 from loguru import logger
 
@@ -22,11 +22,12 @@ class Alert(PFBaseModel):
 
 
 class Alerts(PFBaseModel):
-    alert: list[Alert] | None = default_json_field(Alert, list)
+    alert: list[Alert] = default_json_field(Alert, list)
 
     @classmethod
     def empty(cls):
         return cls(alert=[])
+
     # alert: list[Alert] | None = optional_json_field(Alert)
 
 
@@ -50,7 +51,7 @@ class BaseResponse(pf_shared.PFBaseModel):
     #     None,
     #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
     # )
-    alerts: Alerts | None = default_json_field(Alerts, Alerts)
+    alerts: Alerts | None = default_json_field(Alerts, Alerts.empty)
     # alerts: Alerts | None = optional_json_field(Alerts)
     # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
 
@@ -129,8 +130,11 @@ class CreateShipmentResponse(BaseResponse):
 
     @property
     def shipment_num(self):
-        return self.completed_shipment_info.completed_shipments.completed_shipment[
-            0].shipment_number if self.completed_shipment_info else None
+        return (
+            self.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
+            if self.completed_shipment_info
+            else None
+        )
 
     @property
     def status(self):
@@ -138,7 +142,7 @@ class CreateShipmentResponse(BaseResponse):
 
     def tracking_link(self):
         tlink = pf_sett().tracking_url_stem + self.shipment_num
-        logger.info(f'Creating tracking link: {tlink}')
+        logger.info(f'Getting tracking link: {str(tlink)}')
         return tlink
 
 
@@ -242,5 +246,6 @@ class CreatePrintResponse(BaseResponse):
     label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
+
 
 ################################################################
