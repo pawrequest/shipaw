@@ -85,12 +85,13 @@ class BookingState(sqm.SQLModel):
     #         ),
     #     }
 
-    @_p.model_validator(mode='after')
-    def get_alerts(self):
-        if self.response:
-            if self.response.alerts:
-                self.alerts.alert.extend(self.response.alerts.alert)
-        return self
+    # @_p.model_validator(mode='after')
+    # def get_alerts(self):
+    #     if self.response:
+    #         if self.response.alerts:
+    #             self.alerts.alert.extend(self.response.alerts.alert)
+    #     return self
+
 
     # @property
     # def shipment_num(self):

@@ -6,6 +6,7 @@ from pawdantic import paw_types
 
 from .. import ship_types
 from . import pf_lists, pf_models, pf_shared
+from ..ship_types import UKPHONE
 
 
 class ContactMininmum(pf_shared.PFBaseModel):
@@ -14,14 +15,14 @@ class ContactMininmum(pf_shared.PFBaseModel):
         title='Business Name'
     )
 
-    mobile_phone: str = _p.Field(..., description='Mobile phone number')
-    email_address: _p.EmailStr = _p.Field(
+    mobile_phone: UKPHONE
+    email_address: str = _p.Field(
         title='Email Address',
     )
 
-    @_p.field_validator('mobile_phone', mode='after')
-    def space_in_phone(cls, v):
-        return v.replace(' ', '').strip()
+    # @_p.field_validator('mobile_phone', mode='after')
+    # def space_in_phone(cls, v):
+    #     return v.replace(' ', '').strip()
 
 
 class Contact(ContactMininmum):
@@ -29,7 +30,7 @@ class Contact(ContactMininmum):
         None,
         title='Contact Name'
     )
-    telephone: str | None = None
+    telephone: UKPHONE | None = None
     # fax: str | None = None
 
     senders_name: paw_types.optional_truncated_printable_str_type(25)
@@ -49,18 +50,18 @@ class CollectionContact(Contact):
 class ContactTemporary(Contact):
     business_name: str = ''
     contact_name: str = ''
-    mobile_phone: str = ''
+    mobile_phone: UKPHONE | None = None
     email_address: str = ''
-    telephone: str = ''
+    telephone: UKPHONE |None =None
     senders_name: str = ''
 
     @_p.model_validator(mode='after')
     def fake(self):
         for field, value in self.model_dump().items():
             if not value:
-                value = 'REPLACE_THIS_FAKE'
+                value = '========='
                 if field == 'email_address':
-                    value = f'{value}@Efakefakefake.com'
+                    value = f'{value}@f======f.com'
                 setattr(self, field, value)
         return self
 

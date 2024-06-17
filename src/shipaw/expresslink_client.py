@@ -157,13 +157,12 @@ class ELClient(pydantic.BaseModel):
         logger.info(f'Downloaded label to {out_path}')
         return out_path
 
-    def choose_address[T: AddTypes](self, address: T) -> T:
-        # candidate_dict = self.candidates_dict(address.postcode)
-        # chosen, score = process.extractOne(address.lines_str, list(candidate_dict.keys()), scorer=SCORER)
+    def choose_address[T: AddTypes](self, address: T) -> tuple[T, int]:
         candidates = self.get_candidates(address.postcode)
-        chosen, score = process.extractOne(address.lines_str, candidates, scorer=SCORER)
-        return chosen
-        # return candidate_dict[chosen]
+        candidate_strs = [c.lines_str for c in candidates]
+        chosen, score = process.extractOne(address.lines_str, candidate_strs, scorer=SCORER)
+        chosen_add = candidates[candidate_strs.index(chosen)]
+        return chosen_add, score
 
     def get_choices[T: AddTypes](
             self, postcode: str, address: T | None = None

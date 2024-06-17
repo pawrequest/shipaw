@@ -4,9 +4,13 @@ import re
 import typing as _t
 from enum import Enum, StrEnum
 import datetime as dt
+from typing import Annotated
 
+import phonenumbers
 import pydantic as _p
 from loguru import logger
+from pydantic import AfterValidator
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
 ShipperScope = _t.Literal['SAND', 'LIVE']
@@ -93,3 +97,29 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
 
 class ExpressLinkError(Exception):
     ...
+
+
+# def validate_phone(v, values) -> str:
+#     phone = v.replace(' ', '')
+#     nummy = phonenumbers.parse(phone, 'GB')
+#     if not phonenumbers.is_valid_number(nummy):
+#         raise _p.ValidationError(f'Invalid phone number: {phone}')
+#     logger.debug(f'Phone number validated: {nummy}')
+#     logger.debug(f'numnber type is {type(nummy)}')
+#     return phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.E164)
+#
+#
+# UKPHONE = Annotated[str, Field(...), BeforeValidator(validate_phone)]
+def validate_phone(v: str, values) -> str:
+    logger.warning(f'Validating phone: {v}')
+    phone = v.replace(' ', '')
+    nummy = phonenumbers.parse(phone, 'GB')
+    assert phonenumbers.is_valid_number(nummy)
+    return phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.E164)
+
+
+# UKPHONE = Annotated[str, AfterValidator(validate_phone)]
+
+
+UKPHONE = str
+

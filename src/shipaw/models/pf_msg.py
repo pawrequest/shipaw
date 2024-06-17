@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pawdantic.pawsql import optional_json_field
+from pawdantic.pawsql import optional_json_field, default_json_field
 import pydantic as pyd
 from loguru import logger
 
@@ -22,7 +22,8 @@ class Alert(PFBaseModel):
 
 
 class Alerts(PFBaseModel):
-    alert: list[Alert] | None = optional_json_field(Alert)
+    alert: list[Alert] | None = default_json_field(Alert, list)
+    # alert: list[Alert] | None = optional_json_field(Alert)
 
 
 # AlertList = optional_json_field(Alert)
@@ -45,7 +46,8 @@ class BaseResponse(pf_shared.PFBaseModel):
     #     None,
     #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
     # )
-    alerts: Alerts | None = optional_json_field(Alerts)
+    alerts: Alerts | None = default_json_field(Alerts, Alerts)
+    # alerts: Alerts | None = optional_json_field(Alerts)
     # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
 
     # @pyd.field_validator('alerts', mode='before')

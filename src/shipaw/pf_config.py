@@ -9,7 +9,7 @@ from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
-from shipaw.ship_types import ShipDirection
+from shipaw.ship_types import ShipDirection, UKPHONE
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -31,7 +31,7 @@ class PFSettings(BaseSettings):
     pf_expr_usr: str
     pf_expr_pwd: str
 
-    pf_wsdl: str = r"R:\paul_r\.internal\expresslink_api.wsdl"
+    pf_wsdl: str = r'R:\paul_r\.internal\expresslink_api.wsdl'
     pf_binding: str = r'{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     tracking_url_stem: str = r'https://www.parcelforce.com/track-trace?trackNumber='
     pf_endpoint: str
@@ -44,12 +44,11 @@ class PFSettings(BaseSettings):
     home_town: str
     home_postcode: str
     home_country: str = 'GB'
-
     home_business_name: str
     home_contact_name: str
     home_email: str
-    home_phone: str | None = None
-    home_mobile_phone: str
+    home_phone: UKPHONE | None = None
+    home_mobile_phone: UKPHONE
 
     home_address: pf_models.AddressCollection | None = None
     home_contact: pf_top.Contact | None = None
