@@ -6,10 +6,11 @@ from pathlib import Path
 
 import pydantic as _p
 from loguru import logger
+from pydantic_extra_types.phone_numbers import PhoneNumber
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
-from shipaw.ship_types import ShipDirection, UKPHONE
+from shipaw.ship_types import ShipDirection, MyPhone
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -47,8 +48,8 @@ class PFSettings(BaseSettings):
     home_business_name: str
     home_contact_name: str
     home_email: str
-    home_phone: UKPHONE | None = None
-    home_mobile_phone: UKPHONE
+    home_phone: MyPhone | None = None
+    home_mobile_phone: MyPhone
 
     home_address: pf_models.AddressCollection | None = None
     home_contact: pf_top.Contact | None = None

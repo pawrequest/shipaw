@@ -6,7 +6,7 @@ from pawdantic import paw_types
 
 from .. import ship_types
 from . import pf_lists, pf_models, pf_shared
-from ..ship_types import UKPHONE
+from ..ship_types import MyPhone
 
 
 class ContactMininmum(pf_shared.PFBaseModel):
@@ -15,7 +15,7 @@ class ContactMininmum(pf_shared.PFBaseModel):
         title='Business Name'
     )
 
-    mobile_phone: UKPHONE
+    mobile_phone: MyPhone
     email_address: str = _p.Field(
         title='Email Address',
     )
@@ -30,7 +30,7 @@ class Contact(ContactMininmum):
         None,
         title='Contact Name'
     )
-    telephone: UKPHONE | None = None
+    telephone: MyPhone | None = None
     # telephone: str | None = None
     # fax: str | None = None
 
@@ -51,9 +51,9 @@ class CollectionContact(Contact):
 class ContactTemporary(Contact):
     business_name: str = ''
     contact_name: str = ''
-    mobile_phone: UKPHONE | None = None
+    mobile_phone: MyPhone | None = None
     email_address: str = ''
-    telephone: UKPHONE |None =None
+    telephone: MyPhone | None = None
     senders_name: str = ''
 
     @_p.model_validator(mode='after')

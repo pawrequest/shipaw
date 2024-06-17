@@ -8,7 +8,6 @@ import datetime as dt
 import phonenumbers
 import pydantic as _p
 from loguru import logger
-from pydantic import BeforeValidator
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
 ShipperScope = _t.Literal['SAND', 'LIVE']
@@ -114,9 +113,7 @@ def prep_phone(v: str) -> str:
         try:
             nummy = phonenumbers.parse(v, 'GB')
             assert phonenumbers.is_valid_number(nummy)
-            # logger.debug(f'Validated Phone Number: {v}')
             v = phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.NATIONAL).replace(' ', '')
-            # logger.debug(f'Storing phone number as: {v}')
         except phonenumbers.phonenumberutil.NumberParseException:
             logger.warning(f'Unable to parse phone number: {v}')
         except AssertionError:
@@ -124,8 +121,4 @@ def prep_phone(v: str) -> str:
     return v
 
 
-# UKPHONE = Annotated[str, AfterValidator(validate_phone)]
-UKPHONE = _t.Annotated[str, BeforeValidator(prep_phone)]
-
-
-# UKPHONE = str
+MyPhone = str
