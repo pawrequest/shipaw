@@ -4,13 +4,10 @@ import re
 import typing as _t
 from enum import Enum, StrEnum
 import datetime as dt
-from typing import Annotated
 
 import phonenumbers
 import pydantic as _p
 from loguru import logger
-from pydantic import AfterValidator
-from pydantic_extra_types.phone_numbers import PhoneNumber
 
 FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
 ShipperScope = _t.Literal['SAND', 'LIVE']
@@ -21,6 +18,11 @@ PrintType = _t.Literal['ALL_PARCELS', 'SINGLE_PARCEL']
 DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
 DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
+
+
+class DeliveryType(StrEnum):
+    DELIVERY = 'DELIVERY'
+    COLLECTION = 'COLLECTION'
 
 
 class AlertType(StrEnum):
@@ -122,4 +124,3 @@ def validate_phone(v: str, values) -> str:
 
 
 UKPHONE = str
-

@@ -11,6 +11,7 @@ from shipaw.models.pf_models import AddressCollection, AddressRecipient, Deliver
 from shipaw.models.pf_shared import Enhancement
 from shipaw.models.pf_top import CollectionInfo, Contact
 from shipaw.pf_config import pf_sett
+from shipaw.ship_types import DeliveryType
 
 
 class ShipmentReferenceFields(pf_shared.PFBaseModel):
@@ -39,8 +40,9 @@ class ShipmentRequest(ShipmentReferenceFields):
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
 
     # inputs for collections
-    shipment_type: ship_types.DeliveryKindEnum = 'DELIVERY'
-    print_own_label: bool | None = None
+    shipment_type: DeliveryType
+    # shipment_type: ship_types.DeliveryKindEnum = 'DELIVERY'
+    print_own_label: bool | None = True
     collection_info: CollectionInfo | None = optional_json_field(CollectionInfo)
     #
     # # extras

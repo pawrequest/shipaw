@@ -31,6 +31,7 @@ class Contact(ContactMininmum):
         title='Contact Name'
     )
     telephone: UKPHONE | None = None
+    # telephone: str | None = None
     # fax: str | None = None
 
     senders_name: paw_types.optional_truncated_printable_str_type(25)

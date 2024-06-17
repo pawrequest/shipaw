@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pawdantic.pawsql import optional_json_field, default_json_field
+from pawdantic.pawsql import default_json_field
 import pydantic as pyd
 from loguru import logger
 
@@ -23,6 +23,10 @@ class Alert(PFBaseModel):
 
 class Alerts(PFBaseModel):
     alert: list[Alert] | None = default_json_field(Alert, list)
+
+    @classmethod
+    def empty(cls):
+        return cls(alert=[])
     # alert: list[Alert] | None = optional_json_field(Alert)
 
 
@@ -126,7 +130,7 @@ class CreateShipmentResponse(BaseResponse):
     @property
     def shipment_num(self):
         return self.completed_shipment_info.completed_shipments.completed_shipment[
-            0].shipment_number
+            0].shipment_number if self.completed_shipment_info else None
 
     @property
     def status(self):
