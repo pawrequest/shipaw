@@ -67,7 +67,10 @@ class BookingState(sqm.SQLModel):
 
     def get_label_path(self):
         logger.debug(f'Getting label path for {self.pf_label_filestem}')
-        lpath = (pf_sett().label_dir / self.direction / self.pf_label_filestem).with_suffix('.pdf')
+        sub_dir = pf_sett().label_dir
+        if self.direction != 'out':
+            sub_dir = sub_dir / self.direction
+        lpath = (sub_dir / self.pf_label_filestem).with_suffix('.pdf')
         original_stem = lpath.stem
         incremented = 2
         while lpath.exists():

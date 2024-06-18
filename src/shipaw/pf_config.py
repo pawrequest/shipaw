@@ -22,6 +22,7 @@ class PFSettings(BaseSettings):
 
     location of environment file is set by the environment variable SHIP_ENV.
     """
+
     pf_ac_num_1: str
     pf_contract_num_1: str
     pf_ac_num_2: str | None
@@ -58,7 +59,8 @@ class PFSettings(BaseSettings):
 
     @_p.field_validator('label_dir', mode='after')
     def make_path(cls, v, values):
-        for subdir in ShipDirection:
+        dirs = [_ for _ in ShipDirection if _ != ShipDirection.OUT]
+        for subdir in dirs:
             apath = v / subdir
             if not apath.exists():
                 apath.mkdir(parents=True, exist_ok=True)
