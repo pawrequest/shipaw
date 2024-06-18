@@ -28,7 +28,7 @@ from .pf_config import PFSettings, pf_sett
 SCORER = fuzz.token_sort_ratio
 
 
-@functools.lru_cache(maxsize=1)
+# @functools.lru_cache(maxsize=1)
 class ELClient(pydantic.BaseModel):
     """Client for Parcelforce ExpressLink API.
 
@@ -50,10 +50,7 @@ class ELClient(pydantic.BaseModel):
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
         client = zeep.Client(wsdl=self.settings.pf_wsdl)
-        return client.create_service(
-            binding_name=self.settings.pf_binding,
-            address=self.settings.pf_endpoint
-        )
+        return client.create_service(binding_name=self.settings.pf_binding, address=self.settings.pf_endpoint)
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
         """Get a Combadge backend for a service protocol.
@@ -73,10 +70,7 @@ class ELClient(pydantic.BaseModel):
             requested_shipment=shipment_request,
         )
 
-    def send_shipment_request(
-            self,
-            requested_shipment: ShipmentRequest
-    ) -> CreateShipmentResponse:
+    def send_shipment_request(self, requested_shipment: ShipmentRequest) -> CreateShipmentResponse:
         """Submit a CreateRequest to Parcelforce, booking carriage.
 
         Args:
@@ -87,12 +81,8 @@ class ELClient(pydantic.BaseModel):
 
         """
         back = self.backend(CreateShipmentService)
-        authorized_shipment = CreateRequest(
-            authentication=self.settings.auth, requested_shipment=requested_shipment
-        )
-        resp: CreateShipmentResponse = back.createshipment(
-            request=authorized_shipment.model_dump(by_alias=True)
-        )
+        authorized_shipment = CreateRequest(authentication=self.settings.auth, requested_shipment=requested_shipment)
+        resp: CreateShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
         # if resp.alerts:
         #     for alt in resp.alerts:
         #         if alt.type == 'ERROR':
@@ -106,9 +96,7 @@ class ELClient(pydantic.BaseModel):
         #                 # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
         #             )
         if resp.shipment_num:
-            logger.info(
-                f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}'
-            )
+            logger.info(f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}')
         return resp
         # return CreateShipmentResponse.model_validate(resp)
 
@@ -122,10 +110,7 @@ class ELClient(pydantic.BaseModel):
             list[.models.AddressRecipient] - list of candidate addresses
 
         """
-        req = FindRequest(
-            authentication=self.settings.auth,
-            paf=PAF(postcode=postcode)
-        )
+        req = FindRequest(authentication=self.settings.auth, paf=PAF(postcode=postcode))
         back = self.backend(FindService)
         response = back.find(request=req.model_dump(by_alias=True))
         if not response.paf:
@@ -164,9 +149,7 @@ class ELClient(pydantic.BaseModel):
         chosen_add = candidates[candidate_strs.index(chosen)]
         return chosen_add, score
 
-    def get_choices[T: AddTypes](
-            self, postcode: str, address: T | None = None
-    ) -> list[AddressChoice]:
+    def get_choices[T: AddTypes](self, postcode: str, address: T | None = None) -> list[AddressChoice]:
         candidates = self.get_candidates(postcode)
         if not address:
             return [AddressChoice(address=add, score=0) for add in candidates]
@@ -182,7 +165,7 @@ class ELClient(pydantic.BaseModel):
         return sorted(
             [AddressChoice(address=candidate_dict[add], score=score) for add, score in scored],
             key=lambda x: x.score,
-            reverse=True
+            reverse=True,
         )
 
     def candidates_json(self, postcode):

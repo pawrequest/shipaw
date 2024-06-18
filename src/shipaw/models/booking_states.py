@@ -79,10 +79,17 @@ class BookingState(sqm.SQLModel):
     @property
     def pf_label_filestem(self):
         ln = (
-            f'Parcelforce {'DropOff' if self.direction == ShipDirection.DROPOFF else 'Collection'} Label '
-            f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
-            f'to {self.shipment_request.recipient_contact.business_name}'
-            f' on {self.shipment_request.shipping_date}'
+            (
+                f'Parcelforce {'DropOff' if self.direction == ShipDirection.DROPOFF else 'Collection'} Label '
+                f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
+                f'to {self.shipment_request.recipient_contact.business_name}'
+                f' on {self.shipment_request.shipping_date}'
+            )
+            .replace(' ', '_')
+            .replace('/', '_')
+            .replace(':', '-')
+            .replace(',', '')
+            .replace('.', '_')
         )
         return ln
 
