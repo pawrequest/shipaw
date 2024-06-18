@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import functools
 from pathlib import Path
 
 import pydantic
@@ -12,15 +11,22 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from .models.pf_models import AddressChoice, AddressRecipient, AddTypes
+from .models.pf_models import AddTypes, AddressChoice, AddressRecipient
 from .models.pf_msg import (
-    CreateShipmentResponse,
+    CreateManifestRequest,
+    CreateManifestResponse,
     CreateRequest,
+    CreateShipmentResponse,
     FindRequest,
     PrintLabelRequest,
     PrintLabelResponse,
 )
-from .models.pf_services import CreateShipmentService, FindService, PrintLabelService
+from .models.pf_services import (
+    CreateManifestService,
+    CreateShipmentService,
+    FindService,
+    PrintLabelService,
+)
 from .models.pf_shipment import ShipmentRequest
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
@@ -83,18 +89,6 @@ class ELClient(pydantic.BaseModel):
         back = self.backend(CreateShipmentService)
         authorized_shipment = CreateRequest(authentication=self.settings.auth, requested_shipment=requested_shipment)
         resp: CreateShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
-        # if resp.alerts:
-        #     for alt in resp.alerts:
-        #         if alt.type == 'ERROR':
-        #             raise ValueError(
-        #                 f'ExpressLink Error: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
-        #                 # f'ExpressLink Error: {alt.message} for {req.requested_shipment.recipient_address.lines_str}'
-        #             )
-        #         if alt.type == 'WARNING':
-        #             logger.warning(
-        #                 f'ExpressLink Warning: {alt.message} for Shipment reference "{requested_shipment.reference_number1}" to {requested_shipment.recipient_address.lines_str}'
-        #                 # f'ExpressLink Warning: {alt.message} for shipment to {req.requested_shipment.recipient_address.lines_str}'
-        #             )
         if resp.shipment_num:
             logger.info(f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}')
         return resp
@@ -141,6 +135,12 @@ class ELClient(pydantic.BaseModel):
         out_path = response.label.download(Path(dl_path))
         logger.info(f'Downloaded label to {out_path}')
         return out_path
+
+    def get_manifest(self):
+        back = self.backend(CreateManifestService)
+        req = CreateManifestRequest(authentication=self.settings.auth)
+        response: CreateManifestResponse = back.createmanifest(request=req)
+        return response
 
     def choose_address[T: AddTypes](self, address: T) -> tuple[T, int]:
         candidates = self.get_candidates(address.postcode)
