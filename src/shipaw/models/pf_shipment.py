@@ -52,7 +52,7 @@ class ShipmentRequest(ShipmentReferenceFields):
 
     drop_off_ind: ship_types.DropOffIndEnum | None = None
 
-    def make_collection(self):
+    def make_collection(self, own_label: bool = True):
         logger.debug('Converting Shipment to Collection')
         self.shipment_type = ShipmentType.COLLECTION
         colcont = self.recipient_contact.model_dump()
@@ -64,7 +64,7 @@ class ShipmentRequest(ShipmentReferenceFields):
             collection_contact=colobj,
             collection_time=pf_shared.DateTimeRange.null_times_from_date(self.shipping_date),
         )
-        self.print_own_label = True
+        self.print_own_label = own_label
         self.make_inbound()
 
     def make_inbound(self):
