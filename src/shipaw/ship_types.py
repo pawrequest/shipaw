@@ -9,15 +9,12 @@ import phonenumbers
 import pydantic as _p
 from loguru import logger
 
-FormKind: _t.TypeAlias = _t.Literal['manual', 'select']  # fastui not support
-ShipperScope = _t.Literal['SAND', 'LIVE']
-# ShipDirection = _t.Literal['in', 'out', 'dropoff']
-
-PrintType = _t.Literal['ALL_PARCELS', 'SINGLE_PARCEL']
-# AlertType = _t.Literal['ERROR', 'WARNING', 'NOTIFICATION']
-DeliveryKind = _t.Literal['DELIVERY', 'COLLECTION']
-DropOffInd = _t.Literal['PO', 'DEPOT']
 DepartmentNum = 1
+
+
+class PrintType(StrEnum):
+    ALL_PARCELS = 'ALL_PARCELS'
+    SINGLE_PARCEL = 'SINGLE_PARCEL'
 
 
 class ShipmentType(StrEnum):
@@ -32,12 +29,12 @@ class AlertType(StrEnum):
 
 
 class ShipDirection(StrEnum):
-    IN = 'in'
-    OUT = 'out'
-    DROPOFF = 'dropoff'
+    Inbound = 'in'
+    Outbound = 'out'
+    Dropoff = 'dropoff'
 
 
-class DropOffIndEnum(StrEnum):
+class DropOffInd(StrEnum):
     PO = 'PO'
     DEPOT = 'DEPOT'
 

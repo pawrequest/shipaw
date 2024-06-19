@@ -50,7 +50,7 @@ class ShipmentRequest(ShipmentReferenceFields):
     hazardous_goods: HazardousGoods | None = optional_json_field(HazardousGoods)
     consignment_handling: bool | None = None
 
-    drop_off_ind: ship_types.DropOffIndEnum | None = None
+    drop_off_ind: ship_types.DropOffInd | None = None
 
     def make_collection(self, own_label: bool = True):
         logger.debug('Converting Shipment to Collection')

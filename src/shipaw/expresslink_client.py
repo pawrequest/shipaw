@@ -92,7 +92,6 @@ class ELClient(pydantic.BaseModel):
         if resp.shipment_num:
             logger.info(f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}')
         return resp
-        # return CreateShipmentResponse.model_validate(resp)
 
     def get_candidates(self, postcode: str) -> list[AddressRecipient]:
         """Get candidate addresses at a postcode.

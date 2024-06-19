@@ -164,7 +164,7 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     contract_number: str
     department_id: int = ship_types.DepartmentNum
 
-    shipment_type: ship_types.DeliveryKind = 'DELIVERY'
+    shipment_type: ship_types.ShipmentType = 'DELIVERY'
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
     reference_number1: paw_types.optional_truncated_printable_str_type(
         24
@@ -181,7 +181,7 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
 
 
 class CollectionMinimum(RequestedShipmentMinimum):
-    shipment_type: ship_types.DeliveryKind = 'COLLECTION'
+    shipment_type: ship_types.ShipmentType = 'COLLECTION'
     print_own_label: bool = True
     collection_info: CollectionInfo
 
