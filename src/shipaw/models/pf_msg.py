@@ -142,7 +142,7 @@ class CreateShipmentResponse(BaseResponse):
 
     def tracking_link(self):
         tlink = pf_sett().tracking_url_stem + self.shipment_num
-        logger.info(f'Getting tracking link: {str(tlink)}')
+        # logger.info(f'Getting tracking link: {str(tlink)}')
         return tlink
 
 
