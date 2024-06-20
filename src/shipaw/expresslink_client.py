@@ -142,11 +142,16 @@ class ELClient(pydantic.BaseModel):
         return response
 
     def choose_address[T: AddTypes](self, address: T) -> tuple[T, int]:
+        """Takes a potentially invalid address, and returns the closest match from ExpressLink with fuzzy score."""
         candidates = self.get_candidates(address.postcode)
         candidate_strs = [c.lines_str for c in candidates]
         chosen, score = process.extractOne(address.lines_str, candidate_strs, scorer=SCORER)
         chosen_add = candidates[candidate_strs.index(chosen)]
         return chosen_add, score
+
+    def address_choice[T: AddTypes](self, address: T) -> AddressChoice:
+        chosen, score = self.choose_address(address)
+        return AddressChoice(address=chosen, score=score)
 
     def get_choices[T: AddTypes](self, postcode: str, address: T | None = None) -> list[AddressChoice]:
         candidates = self.get_candidates(postcode)
