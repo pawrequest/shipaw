@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pydantic as _p
 from loguru import logger
-from pydantic_extra_types.phone_numbers import PhoneNumber
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
-from shipaw.ship_types import ShipDirection, MyPhone
+from shipaw.ship_types import MyPhone, ShipDirection
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -30,8 +30,8 @@ class PFSettings(BaseSettings):
     department_id: int = 1
 
     ship_live: bool = False
-    pf_expr_usr: str
-    pf_expr_pwd: str
+    pf_expr_usr: SecretStr
+    pf_expr_pwd: SecretStr
 
     pf_wsdl: str = r'R:\paul_r\.internal\expresslink_api.wsdl'
     pf_binding: str = r'{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
@@ -87,9 +87,10 @@ class PFSettings(BaseSettings):
     #                 v = str(wsdl_path)
     #     return v
 
-    @property
     def auth(self):
-        return pf_shared.Authentication(user_name=self.pf_expr_usr, password=self.pf_expr_pwd)
+        return pf_shared.Authentication(
+            user_name=self.pf_expr_usr.get_secret_value(), password=self.pf_expr_pwd.get_secret_value()
+        )
 
     @_p.field_validator('ship_live', mode='after')
     def check_setting_scope(cls, v):

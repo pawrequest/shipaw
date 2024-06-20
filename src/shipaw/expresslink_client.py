@@ -15,19 +15,19 @@ from .models.pf_models import AddTypes, AddressChoice, AddressRecipient
 from .models.pf_msg import (
     CreateManifestRequest,
     CreateManifestResponse,
-    CreateRequest,
-    CreateShipmentResponse,
+    ShipmentRequest,
+    ShipmentResponse,
     FindRequest,
     PrintLabelRequest,
     PrintLabelResponse,
 )
-from .models.pf_services import (
+from .models.pf_combadge import (
     CreateManifestService,
     CreateShipmentService,
     FindService,
     PrintLabelService,
 )
-from .models.pf_shipment import ShipmentRequest
+from .models.pf_shipment import Shipment
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
 
@@ -70,27 +70,22 @@ class ELClient(pydantic.BaseModel):
         """
         return ZeepBackend(self.service)[service_prot]
 
-    def shipment_request_authenticated(self, shipment_request: ShipmentRequest):
-        return CreateRequest(
-            authentication=self.settings.auth,
-            requested_shipment=shipment_request,
-        )
-
-    def send_shipment_request(self, requested_shipment: ShipmentRequest) -> CreateShipmentResponse:
-        """Submit a CreateRequest to Parcelforce, booking carriage.
+    def request_shipment(self, shipment: Shipment) -> ShipmentResponse:
+        """Submit a ShipmentRequest to Parcelforce, booking carriage.
 
         Args:
-            requested_shipment: ShipmentRequest - ShipmenmtRequest to book
+            shipment: Shipment - ShipmenmtRequest to book
 
         Returns:
-            .CreateShipmentResponse - response from Parcelforce
+            .ShipmentResponse - response from Parcelforce
 
         """
         back = self.backend(CreateShipmentService)
-        authorized_shipment = CreateRequest(authentication=self.settings.auth, requested_shipment=requested_shipment)
-        resp: CreateShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
+        shipment_request = ShipmentRequest(requested_shipment=shipment)
+        authorized_shipment = shipment_request.authenticated(self.settings.auth())
+        resp: ShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
         if resp.shipment_num:
-            logger.info(f'BOOKED shipment# {resp.shipment_num} to {requested_shipment.recipient_address.lines_str}')
+            logger.info(f'BOOKED shipment# {resp.shipment_num} to {shipment.recipient_address.lines_str}')
         return resp
 
     def get_candidates(self, postcode: str) -> list[AddressRecipient]:
@@ -103,7 +98,7 @@ class ELClient(pydantic.BaseModel):
             list[.models.AddressRecipient] - list of candidate addresses
 
         """
-        req = FindRequest(authentication=self.settings.auth, paf=PAF(postcode=postcode))
+        req = FindRequest(paf=PAF(postcode=postcode)).authenticated(self.settings.auth())
         back = self.backend(FindService)
         response = back.find(request=req.model_dump(by_alias=True))
         if not response.paf:
@@ -123,7 +118,7 @@ class ELClient(pydantic.BaseModel):
 
         """
         back = self.backend(PrintLabelService)
-        req = PrintLabelRequest(authentication=self.settings.auth, shipment_number=ship_num)
+        req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num)
         response: PrintLabelResponse = back.printlabel(request=req)
         if response.alerts:
             for alt in response.alerts.alert:
@@ -137,7 +132,7 @@ class ELClient(pydantic.BaseModel):
 
     def get_manifest(self):
         back = self.backend(CreateManifestService)
-        req = CreateManifestRequest(authentication=self.settings.auth)
+        req = CreateManifestRequest(authentication=self.settings.auth())
         response: CreateManifestResponse = back.createmanifest(request=req)
         return response
 

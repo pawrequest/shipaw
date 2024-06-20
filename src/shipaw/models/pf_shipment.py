@@ -27,7 +27,7 @@ class ShipmentReferenceFields(pf_shared.PFBaseModel):
     special_instructions4: constr(max_length=25) | None = None
 
 
-class ShipmentRequest(ShipmentReferenceFields):
+class Shipment(ShipmentReferenceFields):
     # from settings
     contract_number: str = pf_sett().pf_contract_num_1
     department_id: int = pf_sett().department_id
@@ -51,6 +51,10 @@ class ShipmentRequest(ShipmentReferenceFields):
     consignment_handling: bool | None = None
 
     drop_off_ind: ship_types.DropOffInd | None = None
+
+    @property
+    def is_collection(self):
+        return self.collection_info is not None
 
     def make_collection(self, own_label: bool = True):
         logger.debug('Converting Shipment to Collection')

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pawdantic.pawsql import optional_json_field
 import pydantic as pyd
 from loguru import logger
 
@@ -8,7 +7,7 @@ from shipaw.pf_config import pf_sett
 from .pf_shared import PFBaseModel
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
-from ..models.pf_shipment import ShipmentRequest
+from ..models.pf_shipment import Shipment
 from ..ship_types import ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 
@@ -55,14 +54,11 @@ class Alerts(PFBaseModel):
 
 
 class BaseRequest(pf_shared.PFBaseModel):
-    authentication: pf_shared.Authentication
+    authentication: pf_shared.Authentication | None = None
 
-    @property
-    def authorised(self):
-        return self.authentication is not None
-
-    def authorise(self, auth: pf_shared.Authentication):
+    def authenticated(self, auth):
         self.authentication = auth
+        return self
 
 
 class BaseResponse(pf_shared.PFBaseModel):
@@ -133,20 +129,20 @@ class FindResponse(FindMessage, BaseResponse):
 
 
 #
-# class CreateRequest(BaseRequest):
-#     requested_shipment: pf_top.RequestedShipmentMinimum
+# class ShipmentRequest(BaseRequest):
+#     shipment: pf_top.RequestedShipmentMinimum
 
 
 #
-# class CreateCollectionRequest(CreateRequest):
-#     requested_shipment: pf_top.CollectionMinimum
+# class CreateCollectionRequest(ShipmentRequest):
+#     shipment: pf_top.CollectionMinimum
 
 
-class CreateRequest(BaseRequest):
-    requested_shipment: ShipmentRequest
+class ShipmentRequest(BaseRequest):
+    requested_shipment: Shipment
 
 
-class CreateShipmentResponse(BaseResponse):
+class ShipmentResponse(BaseResponse):
     completed_shipment_info: pf_top.CompletedShipmentInfo | None = None
 
     @property
@@ -267,5 +263,6 @@ class CreatePrintResponse(BaseResponse):
     label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
+
 
 ################################################################
