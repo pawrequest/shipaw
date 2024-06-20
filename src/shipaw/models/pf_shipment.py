@@ -53,6 +53,20 @@ class Shipment(ShipmentReferenceFields):
     drop_off_ind: ship_types.DropOffInd | None = None
 
     @property
+    def notifications_str(self) -> str:
+        msg = (
+            f'Recip Notifications = {self.recipient_contact.email_address}'
+            f' + {self.recipient_contact.mobile_phone} '
+            f'{self.recipient_contact.notifications}\n'
+        )
+        if self.collection_info:
+            msg += (
+                f'Collection Notifications = {self.collection_info.collection_contact.email_address} '
+                f'+ {self.collection_info.collection_contact.mobile_phone}'
+            )
+        return msg
+
+    @property
     def is_collection(self):
         return self.collection_info is not None
 
