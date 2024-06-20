@@ -65,6 +65,7 @@ class ShipmentRequest(ShipmentReferenceFields):
             collection_time=pf_shared.DateTimeRange.null_times_from_date(self.shipping_date),
         )
         self.print_own_label = own_label
+        self.collection_info.collection_contact.senders_name = self.recipient_contact.contact_name
         self.make_inbound()
 
     def make_inbound(self):
