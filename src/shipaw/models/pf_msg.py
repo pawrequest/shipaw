@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pawdantic.pawsql import default_json_field, required_json_field
+from pawdantic.pawsql import optional_json_field
 import pydantic as pyd
 from loguru import logger
 
@@ -9,6 +9,7 @@ from .pf_shared import PFBaseModel
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
 from ..models.pf_shipment import ShipmentRequest
+from ..ship_types import ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 
 class Alert(PFBaseModel):
@@ -20,9 +21,28 @@ class Alert(PFBaseModel):
     def from_exception(cls, e: Exception):
         return cls(message=str(e), type='ERROR')
 
+    def raise_exception(self):
+        match self.type:
+            case 'ERROR':
+                logger.error({self.message})
+                raise ExpressLinkError(self.message)
+            case 'WARNING':
+                logger.warning({self.message})
+                raise ExpressLinkWarning(self.message)
+            case 'NOTIFICATION':
+                logger.info({self.message})
+                raise ExpressLinkNotification(self.message)
+
 
 class Alerts(PFBaseModel):
-    alert: list[Alert] = default_json_field(Alert, list)
+    alert: list[Alert]
+
+    # alert: list[Alert] = required_json_field(Alert)
+    # alert: list[Alert] = default_json_field(Alert, list)
+
+    def raise_exceptions(self):
+        for alert in self.alert:
+            alert.raise_exception()
 
     @classmethod
     def empty(cls):
@@ -51,7 +71,8 @@ class BaseResponse(pf_shared.PFBaseModel):
     #     None,
     #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
     # )
-    alerts: Alerts | None = default_json_field(Alerts, Alerts.empty)
+    # alerts: Alerts | None = default_json_field(Alerts, Alerts.empty)
+    alerts: Alerts | None = None
     # alerts: Alerts | None = optional_json_field(Alerts)
     # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
 
@@ -246,6 +267,5 @@ class CreatePrintResponse(BaseResponse):
     label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
-
 
 ################################################################
