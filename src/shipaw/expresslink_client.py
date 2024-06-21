@@ -59,10 +59,10 @@ class ELClient(pydantic.BaseModel):
         return client.create_service(binding_name=self.settings.pf_binding, address=self.settings.pf_endpoint)
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
-        """Get a Combadge backend for a service protocol.
+        """Get a Combadge backend for a service_code protocol.
 
         Args:
-            service_prot: type[ServiceProtocolT] - service protocol to get backend for
+            service_prot: type[ServiceProtocolT] - service_code protocol to get backend for
 
         Returns:
             ServiceProxy - Zeep Proxy

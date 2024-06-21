@@ -81,7 +81,7 @@ class ServiceCodes(pf_shared.PFBaseModel):
 
 
 class SpecifiedNeighbour(pf_shared.PFBaseModel):
-    address: list[pf_models.AddressRecipient] = _p.Field(default_factory=list)
+    address: list[pf_models.AddressTemporary] = _p.Field(default_factory=list)
 
     @_p.field_validator('address', mode='after')
     def check_add_type(cls, v, values):
@@ -93,3 +93,19 @@ class SpecifiedNeighbour(pf_shared.PFBaseModel):
                 addr = pf_models.AddressCollection.model_validate(add.model_dump(by_alias=True))
             outaddrs.append(addr)
         return outaddrs
+
+
+#
+# class SpecifiedNeighbour(pf_shared.PFBaseModel):
+#     address: list[pf_models.AddressRecipient] = _p.Field(default_factory=list)
+#
+#     @_p.field_validator('address', mode='after')
+#     def check_add_type(cls, v, values):
+#         outaddrs = []
+#         for add in v:
+#             try:
+#                 addr = pf_models.AddressRecipient.model_validate(add.model_dump(by_alias=True))
+#             except _p.ValidationError:
+#                 addr = pf_models.AddressCollection.model_validate(add.model_dump(by_alias=True))
+#             outaddrs.append(addr)
+#         return outaddrs
