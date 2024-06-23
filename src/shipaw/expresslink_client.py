@@ -15,11 +15,11 @@ from .models.pf_models import AddTypes, AddressChoice, AddressRecipient
 from .models.pf_msg import (
     CreateManifestRequest,
     CreateManifestResponse,
-    ShipmentRequest,
-    ShipmentResponse,
     FindRequest,
     PrintLabelRequest,
     PrintLabelResponse,
+    ShipmentRequest,
+    ShipmentResponse,
 )
 from .models.pf_combadge import (
     CreateManifestService,
@@ -45,6 +45,7 @@ class ELClient(pydantic.BaseModel):
 
     settings: PFSettings = pf_sett()
     service: ServiceProxy | None = None
+    strict: bool = True
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True, validate_default=True)
 
@@ -55,7 +56,10 @@ class ELClient(pydantic.BaseModel):
         return self
 
     def new_service(self) -> zeep.proxy.ServiceProxy:
-        client = zeep.Client(wsdl=self.settings.pf_wsdl)
+        client = zeep.Client(
+            wsdl=self.settings.pf_wsdl,
+            settings=zeep.settings.Settings(strict=self.strict),
+        )
         return client.create_service(binding_name=self.settings.pf_binding, address=self.settings.pf_endpoint)
 
     def backend(self, service_prot: type[ServiceProtocolT]) -> zeep.proxy.ServiceProxy:
@@ -145,6 +149,7 @@ class ELClient(pydantic.BaseModel):
         return chosen_add, score
 
     def address_choice[T: AddTypes](self, address: T) -> AddressChoice:
+        logger.info(f'Choosing address for {address.lines_str} @ {address.postcode}')
         chosen, score = self.choose_address(address)
         return AddressChoice(address=chosen, score=score)
 

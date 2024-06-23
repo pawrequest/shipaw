@@ -70,7 +70,7 @@ class ContactTemporary(Contact):
 class PAF(pf_shared.PFBaseModel):
     postcode: str | None = None
     count: int | None = _p.Field(None)
-    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description='')
+    specified_neighbour: list[pf_lists.SpecifiedNeighbour] = _p.Field(default_factory=list, description='')
 
 
 class Department(pf_shared.PFBaseModel):
