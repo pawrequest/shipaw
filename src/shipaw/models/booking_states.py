@@ -6,7 +6,6 @@ import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
 from pawdantic.pawsql import default_json_field, optional_json_field, required_json_field
-from pydantic import field_validator
 
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
@@ -27,11 +26,6 @@ class BookingState(sqm.SQLModel):
     tracking_logged: bool = False
     booking_date: dt.date = dt.date.today()
     label_path: str | None = None
-
-    # @field_validator('label_path', mode='before')
-    # def label_path_is_str(cls, v):
-    #     if v:
-    #         return str(v)
 
     @property
     def remote_contact(self):
@@ -60,6 +54,7 @@ class BookingState(sqm.SQLModel):
     @_p.model_validator(mode='after')
     def validate_collection_times(self):
         if self.direction == 'in' and self.shipment_request.collection_info.collection_time is None:
+            logger.debug('Setting collection times to null times from shipping date')
             self.shipment_request.collection_info.collection_time = pf_shared.DateTimeRange.null_times_from_date(
                 self.shipment_request.shipping_date
             )
