@@ -29,6 +29,12 @@ class ContactCollection(Contact):
             v = values.data.get('mobile_phone')
         return v
 
+    # @classmethod
+    # def from_contact(cls, contact: Contact):
+    #     return cls(
+    #         **contact.model_dump(exclude={'notifications'}),
+    #         senders_name=contact.contact_name,
+
 
 class ContactSender(Contact):
     business_name: constr(max_length=25)
