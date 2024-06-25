@@ -58,10 +58,6 @@ class Shipment(ShipmentReferenceFields):
         )
         return msg
 
-    @property
-    def is_collection(self):
-        return self.collection_info is not None
-
     def make_inbound(self):
         """OverWrites the recipient contact and address with the home contact and address"""
         logger.debug('Converting Shipment to Inbound')

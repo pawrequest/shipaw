@@ -79,7 +79,7 @@ class BookingState(sqm.SQLModel):
         ln = (
             (
                 f'Parcelforce {'DropOff' if self.direction == ShipDirection.Dropoff else 'Collection'} Label '
-                f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
+                f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.direction == 'in' else ''}'
                 f'to {self.shipment_request.recipient_contact.business_name}'
                 f' on {self.shipment_request.shipping_date}'
             )
