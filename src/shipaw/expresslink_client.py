@@ -27,7 +27,7 @@ from .models.pf_combadge import (
     FindService,
     PrintLabelService,
 )
-from .models.pf_shipment import Shipment
+from .models.pf_shipment import AnyShipment, Shipment
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
 
@@ -74,7 +74,7 @@ class ELClient(pydantic.BaseModel):
         """
         return ZeepBackend(self.service)[service_prot]
 
-    def request_shipment(self, shipment: Shipment) -> ShipmentResponse:
+    def request_shipment(self, shipment: AnyShipment) -> ShipmentResponse:
         """Submit a ShipmentRequest to Parcelforce, booking carriage.
 
         Args:

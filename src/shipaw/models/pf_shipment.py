@@ -3,7 +3,7 @@ import datetime as dt
 
 from loguru import logger
 from pawdantic.pawsql import optional_json_field, required_json_field
-from pydantic import ValidationError, constr, field_validator
+from pydantic import ValidationError, constr, field_validator, model_validator
 
 from shipaw import ship_types
 from shipaw.models import pf_shared
@@ -64,11 +64,10 @@ class Shipment(ShipmentReferenceFields):
         self.recipient_contact = pf_sett().home_contact
         self.recipient_address = pf_sett().home_address
 
-    @field_validator('reference_number1', mode='after')
-    def ref_num_validator(cls, v, values):
-        if not v:
-            v = values.data.get('recipient_contact').business_name
-        return v
+    @model_validator(mode='after')
+    def ref_num_validator(self):
+        self.reference_number1 = self.reference_number1 or self.recipient_contact.business_name[:24]
+        return self
 
 
 class ShipmentAwayCollection(Shipment):
@@ -89,14 +88,16 @@ class ShipmentAwayCollection(Shipment):
     def from_shipment(cls, shipment: Shipment, own_label=True):
         logger.debug('Converting Shipment to Collection')
         try:
-            collection_contact = ContactCollection(**shipment.recipient_contact.model_dump(exclude={'notifications'}))
-            collection_adddress = AddressCollection(**shipment.recipient_address.model_dump())
-            collection_info = CollectionInfo(
-                collection_address=collection_adddress,
-                collection_contact=collection_contact,
-                collection_time=pf_shared.DateTimeRange.null_times_from_date(shipment.shipping_date),
+            colly = cls(
+                **shipment.model_dump(),
+                collection_info=CollectionInfo(
+                    collection_address=AddressCollection(**shipment.recipient_address.model_dump()),
+                    collection_contact=ContactCollection(
+                        **shipment.recipient_contact.model_dump(exclude={'notifications'})
+                    ),
+                    collection_time=pf_shared.DateTimeRange.null_times_from_date(shipment.shipping_date),
+                ),
             )
-            colly = cls(**shipment.model_dump(), collection_info=collection_info)
 
             colly.recipient_contact = pf_sett().home_contact
             colly.recipient_address = pf_sett().home_address
@@ -130,3 +131,6 @@ class ShipmentAwayDropoff(Shipment):
         except ValidationError as e:
             logger.error(f'Error converting Shipment to Dropoff: {e}')
             raise e
+
+
+AnyShipment = Shipment | ShipmentAwayCollection | ShipmentAwayDropoff

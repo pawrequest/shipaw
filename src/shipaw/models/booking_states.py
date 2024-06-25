@@ -1,4 +1,4 @@
-from __future__ import annotations, annotations
+# from __future__ import annotations, annotations
 
 import datetime as dt
 
@@ -6,16 +6,18 @@ import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
 from pawdantic.pawsql import default_json_field, optional_json_field, required_json_field
+from pydantic import Field
 
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection
 from shipaw.models.pf_msg import Alerts, ShipmentResponse
-from shipaw.models.pf_shipment import Shipment
+from shipaw.models.pf_shipment import AnyShipment, Shipment
 
 
 class BookingState(sqm.SQLModel):
-    shipment_request: Shipment = required_json_field(Shipment)
+    # shipment_request: AnyShipment = Field(..., sa_column=sqm.Column(sqm.JSON))
+    shipment_request: AnyShipment = required_json_field(AnyShipment)
     response: ShipmentResponse | None = optional_json_field(ShipmentResponse)
     direction: ShipDirection = ShipDirection.Outbound
     label_downloaded: bool = False
