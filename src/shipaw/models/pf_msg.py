@@ -7,7 +7,7 @@ from shipaw.pf_config import pf_sett
 from .pf_shared import PFBaseModel
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
-from ..models.pf_shipment import AnyShipment, Shipment
+from ..models.pf_shipment import Shipment, Shipment
 from ..ship_types import ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 
@@ -139,7 +139,7 @@ class FindResponse(FindMessage, BaseResponse):
 
 
 class ShipmentRequest(BaseRequest):
-    requested_shipment: AnyShipment
+    requested_shipment: Shipment
 
 
 class ShipmentResponse(BaseResponse):

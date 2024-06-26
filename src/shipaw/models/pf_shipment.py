@@ -3,7 +3,7 @@ import datetime as dt
 
 from loguru import logger
 from pawdantic.pawsql import optional_json_field, required_json_field
-from pydantic import ValidationError, constr, field_validator, model_validator
+from pydantic import ValidationError, constr, model_validator
 
 from shipaw import ship_types
 from shipaw.models import pf_shared
@@ -48,6 +48,13 @@ class Shipment(ShipmentReferenceFields):
     consignment_handling: bool | None = None
 
     drop_off_ind: ship_types.DropOffInd | None = None
+
+    # unused
+    print_own_label: bool | None = None
+    collection_info: CollectionInfo | None = None
+    sender_contact: ContactSender | None = None
+    sender_address: AddressSender | None = None
+
 
     @property
     def notifications_str(self) -> str:
@@ -133,4 +140,7 @@ class ShipmentAwayDropoff(Shipment):
             raise e
 
 
-AnyShipment = Shipment | ShipmentAwayCollection | ShipmentAwayDropoff
+# class AllShipments(Shipment, ShipmentAwayDropoff, ShipmentAwayCollection):
+#     pass
+
+
