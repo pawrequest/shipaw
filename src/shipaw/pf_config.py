@@ -121,7 +121,6 @@ class PFSettings(BaseSettings):
                 contact_name=self.home_contact_name,
                 email_address=self.home_email,
                 mobile_phone=self.home_mobile_phone,
-                telephone=self.home_phone,
                 notifications=pf_lists.RecipientNotifications(
                     notification_type=[
                         pf_shared.NotificationType.DELIVERY,

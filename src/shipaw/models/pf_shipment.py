@@ -50,11 +50,10 @@ class Shipment(ShipmentReferenceFields):
     drop_off_ind: ship_types.DropOffInd | None = None
 
     # unused
-    print_own_label: bool | None = None
-    collection_info: CollectionInfo | None = None
-    sender_contact: ContactSender | None = None
-    sender_address: AddressSender | None = None
-
+    print_own_label: None = None
+    collection_info: None = None
+    sender_contact: None = None
+    sender_address: None = None
 
     @property
     def notifications_str(self) -> str:
@@ -79,7 +78,7 @@ class Shipment(ShipmentReferenceFields):
 
 class ShipmentAwayCollection(Shipment):
     shipment_type: ShipmentType = ShipmentType.COLLECTION
-    print_own_label: bool | None = None
+    print_own_label: bool = True
     collection_info: CollectionInfo
 
     @property
@@ -91,56 +90,48 @@ class ShipmentAwayCollection(Shipment):
         )
         return msg
 
-    @classmethod
-    def from_shipment(cls, shipment: Shipment, own_label=True):
-        logger.debug('Converting Shipment to Collection')
-        try:
-            colly = cls(
-                **shipment.model_dump(),
-                collection_info=CollectionInfo(
-                    collection_address=AddressCollection(**shipment.recipient_address.model_dump()),
-                    collection_contact=ContactCollection(
-                        **shipment.recipient_contact.model_dump(exclude={'notifications'})
-                    ),
-                    collection_time=pf_shared.DateTimeRange.null_times_from_date(shipment.shipping_date),
-                ),
-            )
-
-            colly.recipient_contact = pf_sett().home_contact
-            colly.recipient_address = pf_sett().home_address
-            colly.print_own_label = own_label
-
-            return colly
-
-        except ValidationError as e:
-            logger.error(f'Error converting Shipment to Collection: {e}')
-            raise e
-
 
 class ShipmentAwayDropoff(Shipment):
     sender_contact: ContactSender
     sender_address: AddressSender
 
-    @classmethod
-    def from_shipment(cls, shipment: Shipment):
-        logger.debug('Converting Shipment to Dropoff')
-        try:
-            sender_address = AddressSender(**shipment.recipient_address.model_dump())
-            sender_contact = ContactSender(**shipment.recipient_contact.model_dump(exclude={'notifications'}))
-            dropoff = cls(
-                **shipment.model_dump(),
-                sender_address=sender_address,
-                sender_contact=sender_contact,
-            )
-            dropoff.recipient_contact = pf_sett().home_contact
-            dropoff.recipient_address = pf_sett().home_address
-            return dropoff
-        except ValidationError as e:
-            logger.error(f'Error converting Shipment to Dropoff: {e}')
-            raise e
+
+def to_collection(shipment: Shipment, own_label=True) -> ShipmentAwayCollection:
+    try:
+        return ShipmentAwayCollection.model_validate(
+            shipment.model_copy(
+                update={
+                    'shipment_type': ShipmentType.COLLECTION,
+                    'print_own_label': own_label,
+                    'collection_info': CollectionInfo(
+                        collection_address=AddressCollection(**shipment.recipient_address.model_dump()),
+                        collection_contact=ContactCollection(
+                            **shipment.recipient_contact.model_dump(exclude={'notifications'})
+                        ),
+                        collection_time=pf_shared.DateTimeRange.null_times_from_date(shipment.shipping_date),
+                    ),
+                    'recipient_contact': pf_sett().home_contact,
+                    'recipient_address': pf_sett().home_address,
+                }
+            ), from_attributes=True
+        )
+    except ValidationError as e:
+        logger.error(f'Error converting Shipment to Collection: {e}')
+        raise e
 
 
-# class AllShipments(Shipment, ShipmentAwayDropoff, ShipmentAwayCollection):
-#     pass
-
-
+def to_dropoff(shipment: Shipment) -> ShipmentAwayDropoff:
+    try:
+        return ShipmentAwayDropoff.model_validate(
+            shipment.model_copy(
+                update={
+                    'recipient_contact': pf_sett().home_contact,
+                    'recipient_address': pf_sett().home_address,
+                    'sender_contact': ContactSender(**shipment.recipient_contact.model_dump(exclude={'notifications'})),
+                    'sender_address': AddressSender(**shipment.recipient_address.model_dump()),
+                }
+            ), from_attributes=True
+        )
+    except ValidationError as e:
+        logger.error(f'Error converting Shipment to Dropoff: {e}')
+        raise e
