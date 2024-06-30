@@ -94,11 +94,14 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
 class ExpressLinkError(Exception):
     ...
 
+
 class ExpressLinkWarning(Exception):
     ...
 
+
 class ExpressLinkNotification(Exception):
     ...
+
 
 def validate_phone(v: str, values) -> str:
     logger.warning(f'Validating phone: {v}')
