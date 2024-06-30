@@ -5,7 +5,7 @@ import datetime as dt
 import pydantic as _p
 import sqlmodel as sqm
 from loguru import logger
-from pawdantic.pawsql import default_json_field, optional_json_field, pydantic_json_column, required_json_field
+from pawdantic.pawsql import default_json_field, optional_json_field, required_json_field
 
 from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
@@ -14,16 +14,12 @@ from shipaw.models.pf_msg import Alerts, ShipmentResponse
 from shipaw.models.pf_shipment import Shipment
 
 
-
-
 class BookingState(sqm.SQLModel):
     shipment_request: Shipment = required_json_field(Shipment)
     response: ShipmentResponse | None = optional_json_field(ShipmentResponse)
-    # shipment_request: AnyShipment = Field(..., sa_column=sqm.Column(sqm.JSON))
     direction: ShipDirection = ShipDirection.Outbound
     label_downloaded: bool = False
     alerts: Alerts = default_json_field(Alerts, Alerts.empty)
-    # alerts: Alerts | None = default_json_field(Alerts, Alerts)
 
     booked: bool = False
     tracking_logged: bool = False
@@ -69,20 +65,21 @@ class BookingState(sqm.SQLModel):
         if self.direction != 'out':
             sub_dir = sub_dir / self.direction
         lpath = (sub_dir / self.pf_label_filestem).with_suffix('.pdf')
-        original_stem = lpath.stem
         incremented = 2
         while lpath.exists():
-            logger.warning(f'Label path {lpath} already exists, trying {original_stem}_{incremented}{lpath.suffix}')
-            lpath = lpath.with_name(f'{original_stem}_{incremented}{lpath.suffix}')
+            logger.warning(f'Label path {lpath} already exists')
+            lpath = lpath.with_name(f'{lpath.stem}_{incremented}{lpath.suffix}')
             incremented += 1
+        logger.debug(f'Using label path={lpath}')
         return lpath
 
     @property
     def pf_label_filestem(self):
         ln = (
             (
-                f'Parcelforce {'DropOff' if self.direction == ShipDirection.Dropoff else 'Collection'} Label '
-                f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.direction == 'in' else ''}'
+                f'Parcelforce {self.shipment_request.shipment_type.title()} Label '
+                f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.shipment_request.collection_info else ''}'
+                # f'{f'from {self.shipment_request.collection_info.collection_contact.business_name} ' if self.direction == 'in' else ''}'
                 f'to {self.shipment_request.recipient_contact.business_name}'
                 f' on {self.shipment_request.shipping_date}'
             )

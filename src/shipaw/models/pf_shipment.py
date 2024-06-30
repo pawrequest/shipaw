@@ -57,23 +57,29 @@ class Shipment(ShipmentReferenceFields):
 
     @property
     def notifications_str(self) -> str:
-        msg = (
-            f'Recip Notifications = {self.recipient_contact.email_address}'
-            f' + {self.recipient_contact.mobile_phone} '
-            f'{self.recipient_contact.notifications}\n'
-        )
-        return msg
-
-    def make_inbound(self):
-        """OverWrites the recipient contact and address with the home contact and address"""
-        logger.debug('Converting Shipment to Inbound')
-        self.recipient_contact = pf_sett().home_contact
-        self.recipient_address = pf_sett().home_address
+        return self.recipient_contact.notifications_str
 
     @model_validator(mode='after')
     def ref_num_validator(self):
         self.reference_number1 = self.reference_number1 or self.recipient_contact.business_name[:24]
         return self
+
+    @property
+    def pf_label_filestem(self):
+        ln = (
+            (
+                f'Parcelforce {self.shipment_type.title()} Label '
+                f'{f'from {self.collection_info.collection_contact.business_name} ' if self.collection_info else ''}'
+                f'to {self.recipient_contact.business_name}'
+                f' on {self.shipping_date}'
+            )
+            .replace(' ', '_')
+            .replace('/', '_')
+            .replace(':', '-')
+            .replace(',', '')
+            .replace('.', '_')
+        )
+        return ln
 
 
 class ShipmentAwayCollection(Shipment):
@@ -83,12 +89,7 @@ class ShipmentAwayCollection(Shipment):
 
     @property
     def notifications_str(self) -> str:
-        msg = super().notifications_str
-        msg += (
-            f'Collection Notifications = {self.collection_info.collection_contact.email_address} '
-            f'+ {self.collection_info.collection_contact.mobile_phone}'
-        )
-        return msg
+        return self.recipient_contact.notifications_str + self.collection_info.collection_contact.notifications_str
 
 
 class ShipmentAwayDropoff(Shipment):

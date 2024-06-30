@@ -17,11 +17,23 @@ class Contact(pf_shared.PFBaseModel):
     contact_name: constr(max_length=30)
     notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
 
+    @property
+    def notifications_str(self) -> str:
+        msg = f'Recip Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
+        return msg
+
+
 
 class ContactCollection(Contact):
     senders_name: constr(max_length=25) | None = None
     telephone: MyPhone | None = None
     notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
+
+    @property
+    def notifications_str(self) -> str:
+        msg = f'Collecton Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
+        return msg
+
 
     @_p.field_validator('telephone', mode='after')
     def tel_is_none(cls, v, values):

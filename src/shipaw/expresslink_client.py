@@ -27,7 +27,7 @@ from .models.pf_combadge import (
     FindService,
     PrintLabelService,
 )
-from .models.pf_shipment import Shipment, Shipment
+from .models.pf_shipment import Shipment
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
 
@@ -90,6 +90,7 @@ class ELClient(pydantic.BaseModel):
         resp: ShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
         if resp.shipment_num:
             logger.info(f'BOOKED shipment# {resp.shipment_num} to {shipment.recipient_address.lines_str}')
+            logger.debug(f'Notifications: {shipment.notifications_str}')
         return resp
 
     def get_candidates(self, postcode: str) -> list[AddressRecipient]:
