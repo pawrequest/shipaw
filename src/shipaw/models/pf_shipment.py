@@ -32,7 +32,6 @@ class Shipment(ShipmentReferenceFields):
     contract_number: str = pf_sett().pf_contract_num_1
     department_id: int = pf_sett().department_id
 
-    # from user input
     recipient_contact: Contact = required_json_field(Contact)
     recipient_address: AddressRecipient | AddressCollection = required_json_field(AddressRecipient)
     total_number_of_parcels: int = 1
@@ -41,19 +40,22 @@ class Shipment(ShipmentReferenceFields):
 
     shipment_type: ShipmentType = ShipmentType.DELIVERY
 
-    # # extras
+    # subclasses
+    print_own_label: bool | None = None
+    collection_info: CollectionInfo | None = None
+    sender_contact: ContactSender | None = None
+    sender_address: AddressSender | None = None
+
+    # unused
     enhancement: Enhancement | None = optional_json_field(Enhancement)
     delivery_options: DeliveryOptions | None = optional_json_field(DeliveryOptions)
     hazardous_goods: HazardousGoods | None = optional_json_field(HazardousGoods)
     consignment_handling: bool | None = None
-
     drop_off_ind: ship_types.DropOffInd | None = None
 
-    # unused
-    print_own_label: None = None
-    collection_info: None = None
-    sender_contact: None = None
-    sender_address: None = None
+
+    def __str__(self):
+        return f'{self.shipment_type} {f'from {self.collection_info.collection_address.address_line1} ' if self.collection_info else ''}to {self.recipient_address.address_line1}'
 
     @property
     def notifications_str(self) -> str:
@@ -106,8 +108,8 @@ def to_collection(shipment: Shipment, own_label=True) -> ShipmentAwayCollection:
                     'print_own_label': own_label,
                     'collection_info': CollectionInfo(
                         collection_address=AddressCollection(**shipment.recipient_address.model_dump()),
-                        collection_contact=ContactCollection(
-                            **shipment.recipient_contact.model_dump(exclude={'notifications'})
+                        collection_contact=ContactCollection.model_validate(
+                            shipment.recipient_contact.model_dump(exclude={'notifications'})
                         ),
                         collection_time=pf_shared.DateTimeRange.null_times_from_date(shipment.shipping_date),
                     ),
@@ -129,7 +131,7 @@ def to_dropoff(shipment: Shipment) -> ShipmentAwayDropoff:
                     'recipient_contact': pf_sett().home_contact,
                     'recipient_address': pf_sett().home_address,
                     'sender_contact': ContactSender(**shipment.recipient_contact.model_dump(exclude={'notifications'})),
-                    'sender_address': AddressSender(**shipment.recipient_address.model_dump()),
+                    'sender_address': AddressSender(**shipment.recipient_address.model_dump(exclude_none=True)),
                 }
             ), from_attributes=True
         )

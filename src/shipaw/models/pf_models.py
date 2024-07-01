@@ -23,12 +23,9 @@ addr_lines_fields_set = {'address_line1', 'address_line2', 'address_line3'}
 
 
 class AddressSender(pf_shared.PFBaseModel):
-    address_line1: constr(max_length=24)
-    address_line2: constr(max_length=24) = ''
-    address_line3: constr(max_length=24) = ''
-    # address_line1: str
-    # address_line2: str = ""
-    # address_line3: str = ""
+    address_line1: paw_types.truncated_printable_str_type(24)
+    address_line2: paw_types.optional_truncated_printable_str_type(24)
+    address_line3: paw_types.optional_truncated_printable_str_type(24)
     town: constr(max_length=25)
     postcode: constr(max_length=16)
     country: str = 'GB'

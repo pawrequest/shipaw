@@ -23,7 +23,6 @@ class Contact(pf_shared.PFBaseModel):
         return msg
 
 
-
 class ContactCollection(Contact):
     senders_name: constr(max_length=25) | None = None
     telephone: MyPhone | None = None
@@ -34,12 +33,11 @@ class ContactCollection(Contact):
         msg = f'Collecton Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
         return msg
 
-
-    @_p.field_validator('telephone', mode='after')
-    def tel_is_none(cls, v, values):
-        if not v:
-            v = values.data.get('mobile_phone')
-        return v
+    @_p.model_validator(mode='after')
+    def tel_is_none(self):
+        if not self.telephone:
+            self.telephone = self.mobile_phone
+        return self
 
     # @classmethod
     # def from_contact(cls, contact: Contact):
@@ -49,13 +47,15 @@ class ContactCollection(Contact):
 
 
 class ContactSender(Contact):
-    business_name: constr(max_length=25)
+
+    business_name: paw_types.optional_truncated_printable_str_type(25)
+    # business_name: constr(max_length=25)
     mobile_phone: MyPhone
     email_address: constr(max_length=50)
-    contact_name: constr(max_length=25)
+    contact_name: paw_types.optional_truncated_printable_str_type(25)
 
     telephone: MyPhone | None = None
-    senders_name: constr(max_length=25) | None = None
+    senders_name: paw_types.optional_truncated_printable_str_type(25) | None = None
     notifications: None = None
 
 
