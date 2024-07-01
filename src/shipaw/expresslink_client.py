@@ -11,8 +11,17 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
+from .models.pf_combadge import (
+    CancelShipmentService,
+    CreateManifestService,
+    CreateShipmentService,
+    FindService,
+    PrintLabelService,
+)
 from .models.pf_models import AddTypes, AddressChoice, AddressRecipient
 from .models.pf_msg import (
+    CancelShipmentRequest,
+    CancelShipmentResponse,
     CreateManifestRequest,
     CreateManifestResponse,
     FindRequest,
@@ -20,12 +29,6 @@ from .models.pf_msg import (
     PrintLabelResponse,
     ShipmentRequest,
     ShipmentResponse,
-)
-from .models.pf_combadge import (
-    CreateManifestService,
-    CreateShipmentService,
-    FindService,
-    PrintLabelService,
 )
 from .models.pf_shipment import Shipment
 from .models.pf_top import PAF
@@ -92,6 +95,12 @@ class ELClient(pydantic.BaseModel):
             logger.info(f'BOOKED shipment# {resp.shipment_num} to {shipment.recipient_address.lines_str}')
             logger.debug(f'Notifications: {shipment.notifications_str}')
         return resp
+
+    def cancel_shipment(self, shipment_number):
+        req = CancelShipmentRequest(shipment_number=shipment_number).authenticated(self.settings.auth())
+        back = self.backend(CancelShipmentService)
+        response: CancelShipmentResponse = back.cancelshipment(request=req.model_dump(by_alias=True))
+        return response
 
     def get_candidates(self, postcode: str) -> list[AddressRecipient]:
         """Get candidate addresses at a postcode.
