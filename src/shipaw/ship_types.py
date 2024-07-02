@@ -78,11 +78,11 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
 
         if isinstance(v, dt.date):
             if v < TOD or v.weekday() > 4:
-                logger.info(f'Date {v} is a weekend or in the past - using next weekday')
+                logger.debug(f'Date {v} is a weekend or in the past - using next weekday')
                 v = min(WEEKDAYS_IN_RANGE)
 
             if v > max(WEEKDAYS_IN_RANGE):
-                logger.info(f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)')
+                logger.debug(f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)')
                 v = max(WEEKDAYS_IN_RANGE)
 
             return v
