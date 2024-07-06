@@ -11,11 +11,11 @@ from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection
 from shipaw.models.pf_msg import Alerts, ShipmentResponse
-from shipaw.models.pf_shipment import Shipment
+from shipaw.models.pf_shipment import ShipmentConfigured
 
 
 class BookingState(sqm.SQLModel):
-    shipment_request: Shipment = required_json_field(Shipment)
+    shipment_request: ShipmentConfigured = required_json_field(ShipmentConfigured)
     response: ShipmentResponse | None = optional_json_field(ShipmentResponse)
     direction: ShipDirection = ShipDirection.Outbound
     label_downloaded: bool = False

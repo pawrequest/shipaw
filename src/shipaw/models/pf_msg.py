@@ -5,9 +5,9 @@ from loguru import logger
 
 from shipaw.pf_config import pf_sett
 from .pf_shared import PFBaseModel
+from .pf_shipment_blank import Shipment
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
-from ..models.pf_shipment import Shipment, Shipment
 from ..ship_types import ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 
@@ -263,6 +263,5 @@ class CreatePrintResponse(BaseResponse):
     label: pf_shared.Document | None = None
     label_data: pf_top.ShipmentLabelData | None = None
     partner_code: str | None
-
 
 ################################################################

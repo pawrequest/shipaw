@@ -1,90 +1,22 @@
 # from __future__ import annotations
-import datetime as dt
 
 from loguru import logger
-from pawdantic.pawsql import optional_json_field, required_json_field
-from pydantic import ValidationError, constr, model_validator
+from pydantic import ValidationError
 
-from shipaw import ship_types
 from shipaw.models import pf_shared
-from shipaw.models.pf_lists import HazardousGoods
-from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions
-from shipaw.models.pf_shared import Enhancement
-from shipaw.models.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
+from shipaw.models.pf_models import AddressCollection, AddressSender
+from shipaw.models.pf_shipment_blank import Shipment
+from shipaw.models.pf_top import CollectionInfo, ContactCollection, ContactSender
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipmentType
 
 
-class ShipmentReferenceFields(pf_shared.PFBaseModel):
-    reference_number1: constr(max_length=24) | None = None
-    reference_number2: constr(max_length=24) | None = None
-    reference_number3: constr(max_length=24) | None = None
-    reference_number4: constr(max_length=24) | None = None
-    reference_number5: constr(max_length=24) | None = None
-    special_instructions1: constr(max_length=25) | None = None
-    special_instructions2: constr(max_length=25) | None = None
-    special_instructions3: constr(max_length=25) | None = None
-    special_instructions4: constr(max_length=25) | None = None
-
-
-class Shipment(ShipmentReferenceFields):
-    # from settings
+class ShipmentConfigured(Shipment):
     contract_number: str = pf_sett().pf_contract_num_1
     department_id: int = pf_sett().department_id
 
-    recipient_contact: Contact = required_json_field(Contact)
-    recipient_address: AddressRecipient | AddressCollection = required_json_field(AddressRecipient)
-    total_number_of_parcels: int = 1
-    shipping_date: dt.date
-    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
 
-    shipment_type: ShipmentType = ShipmentType.DELIVERY
-
-    # subclasses
-    print_own_label: bool | None = None
-    collection_info: CollectionInfo | None = None
-    sender_contact: ContactSender | None = None
-    sender_address: AddressSender | None = None
-
-    # unused
-    enhancement: Enhancement | None = optional_json_field(Enhancement)
-    delivery_options: DeliveryOptions | None = optional_json_field(DeliveryOptions)
-    hazardous_goods: HazardousGoods | None = optional_json_field(HazardousGoods)
-    consignment_handling: bool | None = None
-    drop_off_ind: ship_types.DropOffInd | None = None
-
-
-    def __str__(self):
-        return f'{self.shipment_type} {f'from {self.collection_info.collection_address.address_line1} ' if self.collection_info else ''}to {self.recipient_address.address_line1}'
-
-    @property
-    def notifications_str(self) -> str:
-        return self.recipient_contact.notifications_str
-
-    @model_validator(mode='after')
-    def ref_num_validator(self):
-        self.reference_number1 = self.reference_number1 or self.recipient_contact.business_name[:24]
-        return self
-
-    @property
-    def pf_label_filestem(self):
-        ln = (
-            (
-                f'Parcelforce {self.shipment_type.title()} Label '
-                f'{f'from {self.collection_info.collection_contact.business_name} ' if self.collection_info else ''}'
-                f'to {self.recipient_contact.business_name}'
-                f' on {self.shipping_date}'
-            )
-            .replace(' ', '_')
-            .replace('/', '_')
-            .replace(':', '-')
-            .replace(',', '')
-            .replace('.', '_')
-        )
-        return ln
-
-
-class ShipmentAwayCollection(Shipment):
+class ShipmentAwayCollectionConfigured(ShipmentConfigured):
     shipment_type: ShipmentType = ShipmentType.COLLECTION
     print_own_label: bool = True
     collection_info: CollectionInfo
@@ -94,14 +26,14 @@ class ShipmentAwayCollection(Shipment):
         return self.recipient_contact.notifications_str + self.collection_info.collection_contact.notifications_str
 
 
-class ShipmentAwayDropoff(Shipment):
+class ShipmentAwayDropoffConfigured(ShipmentConfigured):
     sender_contact: ContactSender
     sender_address: AddressSender
 
 
-def to_collection(shipment: Shipment, own_label=True) -> ShipmentAwayCollection:
+def to_collection(shipment: ShipmentConfigured, own_label=True) -> ShipmentAwayCollectionConfigured:
     try:
-        return ShipmentAwayCollection.model_validate(
+        return ShipmentAwayCollectionConfigured.model_validate(
             shipment.model_copy(
                 update={
                     'shipment_type': ShipmentType.COLLECTION,
@@ -123,9 +55,9 @@ def to_collection(shipment: Shipment, own_label=True) -> ShipmentAwayCollection:
         raise e
 
 
-def to_dropoff(shipment: Shipment) -> ShipmentAwayDropoff:
+def to_dropoff(shipment: ShipmentConfigured) -> ShipmentAwayDropoffConfigured:
     try:
-        return ShipmentAwayDropoff.model_validate(
+        return ShipmentAwayDropoffConfigured.model_validate(
             shipment.model_copy(
                 update={
                     'recipient_contact': pf_sett().home_contact,
