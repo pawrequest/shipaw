@@ -157,6 +157,14 @@ class ShipmentResponse(BaseResponse):
     def status(self):
         return self.completed_shipment_info.status
 
+
+    @property
+    def success(self):
+        if self.completed_shipment_info:
+            return self.completed_shipment_info.status.lower() == 'allocated'
+        return False
+
+
     def tracking_link(self):
         tlink = pf_sett().tracking_url_stem + self.shipment_num
         # logger.info(f'Getting tracking link: {str(tlink)}')
