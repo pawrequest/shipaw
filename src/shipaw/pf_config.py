@@ -3,13 +3,14 @@ from __future__ import annotations
 import functools
 import os
 from pathlib import Path
-from importlib import resources
 
 import pydantic as _p
 from loguru import logger
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from shipaw import rsrc
+
 from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
+from shipaw.ship_types import MyPhone, ShipDirection
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -21,6 +22,7 @@ class PFSettings(BaseSettings):
 
     location of environment file is set by the environment variable SHIP_ENV.
     """
+
     pf_ac_num_1: str
     pf_contract_num_1: str
     pf_ac_num_2: str | None
@@ -28,10 +30,10 @@ class PFSettings(BaseSettings):
     department_id: int = 1
 
     ship_live: bool = False
-    pf_expr_usr: str
-    pf_expr_pwd: str
+    pf_expr_usr: SecretStr
+    pf_expr_pwd: SecretStr
 
-    pf_wsdl: str = r"R:\paul_r\.internal\expresslink_api.wsdl"
+    pf_wsdl: str = r'R:\paul_r\.internal\expresslink_api.wsdl'
     pf_binding: str = r'{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     tracking_url_stem: str = r'https://www.parcelforce.com/track-trace?trackNumber='
     pf_endpoint: str
@@ -44,12 +46,11 @@ class PFSettings(BaseSettings):
     home_town: str
     home_postcode: str
     home_country: str = 'GB'
-
     home_business_name: str
     home_contact_name: str
     home_email: str
-    home_phone: str | None = None
-    home_mobile_phone: str
+    home_phone: MyPhone | None = None
+    home_mobile_phone: MyPhone
 
     home_address: pf_models.AddressCollection | None = None
     home_contact: pf_top.Contact | None = None
@@ -58,9 +59,20 @@ class PFSettings(BaseSettings):
 
     @_p.field_validator('label_dir', mode='after')
     def make_path(cls, v, values):
-        if not v.exists():
-            v.mkdir(parents=True, exist_ok=True)
+        dirs = [_ for _ in ShipDirection if _ != ShipDirection.Outbound]
+        for subdir in dirs:
+            apath = v / subdir
+            if not apath.exists():
+                apath.mkdir(parents=True, exist_ok=True)
         return v
+
+    #
+    # @_p.field_validator('label_dir', mode='after')
+    # def make_path(cls, v, values):
+    #     for apath in [v / i for i in ['in', 'out', 'dropoff']]:
+    #         if not apath.exists():
+    #             v.mkdir(parents=True, exist_ok=True)
+    #         return v
 
     # @_p.field_validator('pf_wsdl', mode='after')
     # def get_wsdl(cls, v, values):
@@ -75,9 +87,10 @@ class PFSettings(BaseSettings):
     #                 v = str(wsdl_path)
     #     return v
 
-    @property
     def auth(self):
-        return pf_shared.Authentication(user_name=self.pf_expr_usr, password=self.pf_expr_pwd)
+        return pf_shared.Authentication(
+            user_name=self.pf_expr_usr.get_secret_value(), password=self.pf_expr_pwd.get_secret_value()
+        )
 
     @_p.field_validator('ship_live', mode='after')
     def check_setting_scope(cls, v):
@@ -108,7 +121,6 @@ class PFSettings(BaseSettings):
                 contact_name=self.home_contact_name,
                 email_address=self.home_email,
                 mobile_phone=self.home_mobile_phone,
-                telephone=self.home_phone,
                 notifications=pf_lists.RecipientNotifications(
                     notification_type=[
                         pf_shared.NotificationType.DELIVERY,

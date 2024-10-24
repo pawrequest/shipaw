@@ -5,14 +5,13 @@ import typing as _t
 from enum import Enum
 from pathlib import Path
 
-import sqlmodel as sqm
 import pydantic as _p
+from pydantic import BaseModel
 from pydantic.alias_generators import to_pascal
 
-from .. import ship_types
 
-
-class PFBaseModel(sqm.SQLModel):
+# class PFBaseModel(sqm.SQLModel):
+class PFBaseModel(BaseModel):
     model_config = _p.ConfigDict(
         alias_generator=_p.AliasGenerator(
             alias=to_pascal,
@@ -216,7 +215,7 @@ class Alert(PFBaseModel):
 
     @classmethod
     def from_exception(cls, e: Exception):
-        return cls(message=str(e.args), type='ERROR')
+        return cls(message=str(e), type='ERROR')
 
 
 class NotificationType(str, Enum):

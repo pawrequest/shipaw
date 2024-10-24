@@ -3,64 +3,77 @@ import typing as _t
 
 import pydantic as _p
 from pawdantic import paw_types
+from pydantic import constr
 
 from .. import ship_types
 from . import pf_lists, pf_models, pf_shared
+from ..ship_types import MyPhone
 
 
-class ContactMininmum(pf_shared.PFBaseModel):
-    business_name: paw_types.truncated_printable_str_type(40) = _p.Field(
-        ...,
-        title='Business Name'
-    )
-
-    mobile_phone: str = _p.Field(..., description='Mobile phone number')
-    email_address: _p.EmailStr = _p.Field(
-        title='Email Address',
-    )
-
-    @_p.field_validator('mobile_phone', mode='after')
-    def space_in_phone(cls, v):
-        return v.replace(' ', '').strip()
-
-
-class Contact(ContactMininmum):
-    contact_name: paw_types.optional_truncated_printable_str_type(30) = _p.Field(
-        None,
-        title='Contact Name'
-    )
-    telephone: str | None = None
-    # fax: str | None = None
-
-    senders_name: paw_types.optional_truncated_printable_str_type(25)
+class Contact(pf_shared.PFBaseModel):
+    business_name: constr(max_length=40)
+    mobile_phone: MyPhone
+    email_address: constr(max_length=50)
+    contact_name: constr(max_length=30)
     notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
 
+    @property
+    def notifications_str(self) -> str:
+        msg = f'Recip Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
+        return msg
 
-class CollectionContact(Contact):
+
+class ContactCollection(Contact):
+    senders_name: constr(max_length=25) | None = None
+    telephone: MyPhone | None = None
     notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
 
-    @_p.field_validator('telephone', mode='after')
-    def tel_is_none(cls, v, values):
-        if not v:
-            v = values.data.get('mobile_phone')
-        return v
+    @property
+    def notifications_str(self) -> str:
+        msg = f'Collecton Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
+        return msg
+
+    @_p.model_validator(mode='after')
+    def tel_is_none(self):
+        if not self.telephone:
+            self.telephone = self.mobile_phone
+        return self
+
+    # @classmethod
+    # def from_contact(cls, contact: Contact):
+    #     return cls(
+    #         **contact.model_dump(exclude={'notifications'}),
+    #         senders_name=contact.contact_name,
+
+
+class ContactSender(Contact):
+
+    business_name: paw_types.optional_truncated_printable_str_type(25)
+    # business_name: constr(max_length=25)
+    mobile_phone: MyPhone
+    email_address: constr(max_length=50)
+    contact_name: paw_types.optional_truncated_printable_str_type(25)
+
+    telephone: MyPhone | None = None
+    senders_name: paw_types.optional_truncated_printable_str_type(25) | None = None
+    notifications: None = None
 
 
 class ContactTemporary(Contact):
     business_name: str = ''
     contact_name: str = ''
-    mobile_phone: str = ''
+    mobile_phone: MyPhone | None = None
     email_address: str = ''
-    telephone: str = ''
+    telephone: MyPhone | None = None
     senders_name: str = ''
 
     @_p.model_validator(mode='after')
     def fake(self):
         for field, value in self.model_dump().items():
             if not value:
-                value = 'REPLACE_THIS_FAKE'
+                value = '========='
                 if field == 'email_address':
-                    value = f'{value}@Efakefakefake.com'
+                    value = f'{value}@f======f.com'
                 setattr(self, field, value)
         return self
 
@@ -68,7 +81,7 @@ class ContactTemporary(Contact):
 class PAF(pf_shared.PFBaseModel):
     postcode: str | None = None
     count: int | None = _p.Field(None)
-    specified_neighbour: list[pf_lists.SpecifiedNeighbour | None] = _p.Field(None, description='')
+    specified_neighbour: list[pf_lists.SpecifiedNeighbour] = _p.Field(default_factory=list, description='')
 
 
 class Department(pf_shared.PFBaseModel):
@@ -124,7 +137,7 @@ class CompletedShipmentInfo(pf_shared.PFBaseModel):
 
 
 class CollectionInfo(pf_shared.PFBaseModel):
-    collection_contact: CollectionContact
+    collection_contact: ContactCollection
     collection_address: pf_models.AddressCollection
     collection_time: pf_shared.DateTimeRange
 
@@ -136,7 +149,7 @@ class CollectionStateProtocol(_t.Protocol):
 
 
 # def collection_info_from_state(state: CollectionStateProtocol):
-#     col_contact_ = CollectionContact(**state.contact.model_dump(exclude={'notifications'}))
+#     col_contact_ = ContactCollection(**state.contact.model_dump(exclude={'notifications'}))
 #     col_contact = col_contact_.model_validate(col_contact_)
 #     info = CollectionInfo(
 #         collection_contact=col_contact,
@@ -150,7 +163,7 @@ class CollectionStateProtocol(_t.Protocol):
 
 
 class RequestedShipmentZero(pf_shared.PFBaseModel):
-    recipient_contact: ContactMininmum
+    recipient_contact: Contact
     recipient_address: pf_models.AddTypes
     total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
     shipping_date: dt.date
@@ -162,11 +175,9 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     contract_number: str
     department_id: int = ship_types.DepartmentNum
 
-    shipment_type: ship_types.DeliveryKind = 'DELIVERY'
+    shipment_type: ship_types.ShipmentType = 'DELIVERY'
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-    reference_number1: paw_types.optional_truncated_printable_str_type(
-        24
-    )  # first 14 visible on label
+    reference_number1: paw_types.optional_truncated_printable_str_type(24)  # first 14 visible on label
 
     special_instructions1: _p.constr(max_length=25) | None = None
     special_instructions2: _p.constr(max_length=25) | None = None
@@ -179,7 +190,7 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
 
 
 class CollectionMinimum(RequestedShipmentMinimum):
-    shipment_type: ship_types.DeliveryKind = 'COLLECTION'
+    shipment_type: ship_types.ShipmentType = 'COLLECTION'
     print_own_label: bool = True
     collection_info: CollectionInfo
 

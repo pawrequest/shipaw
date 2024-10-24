@@ -1,6 +1,7 @@
 # from __future__ import annotations
 
 from pawdantic import paw_types
+from pydantic import constr
 
 from . import pf_shared
 
@@ -25,17 +26,13 @@ class AddressSender(pf_shared.PFBaseModel):
     address_line1: paw_types.truncated_printable_str_type(24)
     address_line2: paw_types.optional_truncated_printable_str_type(24)
     address_line3: paw_types.optional_truncated_printable_str_type(24)
-    # address_line1: str
-    # address_line2: str = ""
-    # address_line3: str = ""
-    town: str
-    postcode: str
+    town: constr(max_length=25)
+    postcode: constr(max_length=16)
     country: str = 'GB'
 
     @property
     def lines_dict(self):
-        return {line_field: getattr(self, line_field) for line_field in
-                sorted(self.lines_fields_set)}
+        return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
 
     @property
     def lines_fields_set(self):

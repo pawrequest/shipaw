@@ -11,10 +11,7 @@ from shipaw.models import pf_msg
 
 class FindService(SupportsService, Protocol):
     @operation_name('Find')
-    def find(
-            self,
-            request: Annotated[pf_msg.FindRequest, Payload(by_alias=True)]
-    ) -> pf_msg.FindResponse:
+    def find(self, request: Annotated[pf_msg.FindRequest, Payload(by_alias=True)]) -> pf_msg.FindResponse:
         ...
 
 
@@ -22,8 +19,8 @@ class CreateShipmentService(SupportsService, Protocol):
     @operation_name('createShipment')
     def createshipment(
             self,
-            request: Annotated[pf_msg.CreateRequest, Payload(by_alias=True)],
-    ) -> pf_msg.CreateShipmentResponse:
+            request: Annotated[pf_msg.ShipmentRequest, Payload(by_alias=True)],
+    ) -> pf_msg.ShipmentResponse:
         ...
 
 

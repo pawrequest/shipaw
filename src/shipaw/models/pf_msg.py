@@ -1,68 +1,76 @@
-# from __future__ import annotations
-import json
-from typing import Annotated
+from __future__ import annotations
 
-import sqlmodel
-from pawdantic.pawsql import JSONColumn
-from sqlalchemy.types import TEXT, TypeDecorator
 import pydantic as pyd
 from loguru import logger
 
 from shipaw.pf_config import pf_sett
-from .pf_lists import Alerts
+from .pf_shared import PFBaseModel
+from .pf_shipment_blank import Shipment
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
-from ..models.pf_shipment import ShipmentRequest
+from ..ship_types import ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
+
+
+class Alert(PFBaseModel):
+    code: int | None = None
+    message: str
+    type: ship_types.AlertType = ship_types.AlertType.NOTIFICATION
+
+    @classmethod
+    def from_exception(cls, e: Exception):
+        return cls(message=str(e), type='ERROR')
+
+    def raise_exception(self):
+        match self.type:
+            case 'ERROR':
+                logger.error({self.message})
+                raise ExpressLinkError(self.message)
+            case 'WARNING':
+                logger.warning({self.message})
+                raise ExpressLinkWarning(self.message)
+            case 'NOTIFICATION':
+                logger.info({self.message})
+                raise ExpressLinkNotification(self.message)
+
+
+class Alerts(PFBaseModel):
+    alert: list[Alert]
+
+    # alert: list[Alert] = required_json_field(Alert)
+    # alert: list[Alert] = default_json_field(Alert, list)
+
+    def raise_exceptions(self):
+        for alert in self.alert:
+            alert.raise_exception()
+
+    @classmethod
+    def empty(cls):
+        return cls(alert=[])
+
+    # alert: list[Alert] | None = optional_json_field(Alert)
+
+
+# AlertList = optional_json_field(Alert)
 
 
 class BaseRequest(pf_shared.PFBaseModel):
-    authentication: pf_shared.Authentication
+    authentication: pf_shared.Authentication | None = None
 
-    # def req_dict(self):
-    #     return self.model_dump(by_alias=True)
-
-    @property
-    def authorised(self):
-        return self.authentication is not None
-
-    def authorise(self, auth: pf_shared.Authentication):
+    def authenticated(self, auth):
         self.authentication = auth
-
-    # def auth_request_dict(self) -> dict:
-    #     if not self.authorised:
-    #         raise ValueError('Authentication is required')
-    #     all_obs = [self.authentication, *self.objs]
-    #     return self.alias_dict(all_obs)
-
-
-class JSONEncodedList(TypeDecorator):
-    impl = TEXT
-
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return None
-        return json.dumps(value)
-
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return None
-        return json.loads(value)
-
-
-# AlertList = typing.Annotated[
-#     list[pf_shared.Alert], pyd.Field(default_factory=list, sa_column=sqm.Column(JSONEncodedList))]
-
-AlertList = Annotated[Alerts, pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))]
+        return self
 
 
 class BaseResponse(pf_shared.PFBaseModel):
     # alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
     # alerts: Alerts | None = sqm.Field(
     #     None,
-    #     sa_column=sqm.Column(JSONColumn(Alerts))
+    #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
     # )
-    # alerts: AlertList
-    alerts: Alerts = pyd.Field(None, sa_column=sqlmodel.Column(JSONColumn(Alerts)))
+    # alerts: Alerts | None = default_json_field(Alerts, Alerts.empty)
+    alerts: Alerts | None = None
+    # alerts: Alerts | None = optional_json_field(Alerts)
+    # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
 
     # @pyd.field_validator('alerts', mode='before')
     # def check_alerts(cls, v, values) -> list[Alert]:
@@ -121,34 +129,45 @@ class FindResponse(FindMessage, BaseResponse):
 
 
 #
-# class CreateRequest(BaseRequest):
-#     requested_shipment: pf_top.RequestedShipmentMinimum
+# class ShipmentRequest(BaseRequest):
+#     shipment: pf_top.RequestedShipmentMinimum
 
 
 #
-# class CreateCollectionRequest(CreateRequest):
-#     requested_shipment: pf_top.CollectionMinimum
+# class CreateCollectionRequest(ShipmentRequest):
+#     shipment: pf_top.CollectionMinimum
 
 
-class CreateRequest(BaseRequest):
-    requested_shipment: ShipmentRequest
+class ShipmentRequest(BaseRequest):
+    requested_shipment: Shipment
 
 
-class CreateShipmentResponse(BaseResponse):
+class ShipmentResponse(BaseResponse):
     completed_shipment_info: pf_top.CompletedShipmentInfo | None = None
 
     @property
     def shipment_num(self):
-        return self.completed_shipment_info.completed_shipments.completed_shipment[
-            0].shipment_number
+        return (
+            self.completed_shipment_info.completed_shipments.completed_shipment[0].shipment_number
+            if self.completed_shipment_info
+            else None
+        )
 
     @property
     def status(self):
         return self.completed_shipment_info.status
 
+
+    @property
+    def success(self):
+        if self.completed_shipment_info:
+            return self.completed_shipment_info.status.lower() == 'allocated'
+        return False
+
+
     def tracking_link(self):
         tlink = pf_sett().tracking_url_stem + self.shipment_num
-        logger.info(f'Creating tracking link: {tlink}')
+        # logger.info(f'Getting tracking link: {str(tlink)}')
         return tlink
 
 
