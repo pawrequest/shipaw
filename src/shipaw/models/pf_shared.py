@@ -9,6 +9,8 @@ import pydantic as _p
 from pydantic import BaseModel
 from pydantic.alias_generators import to_pascal
 
+from shipaw.ship_types import AlertType
+
 
 # class PFBaseModel(sqm.SQLModel):
 class PFBaseModel(BaseModel):
@@ -211,7 +213,8 @@ class Enhancement(PFBaseModel):
 class Alert(PFBaseModel):
     code: int | None = None
     message: str
-    type: ship_types.AlertType
+    type: AlertType
+
 
     @classmethod
     def from_exception(cls, e: Exception):

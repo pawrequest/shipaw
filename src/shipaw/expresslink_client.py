@@ -30,7 +30,7 @@ from .models.pf_msg import (
     ShipmentRequest,
     ShipmentResponse,
 )
-from .models.pf_shipment import ShipmentConfigured
+from .models.pf_shipment_configured import ShipmentConfigured
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
 

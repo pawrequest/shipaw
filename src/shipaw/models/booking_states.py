@@ -11,7 +11,7 @@ from shipaw.models import pf_shared
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection
 from shipaw.models.pf_msg import Alerts, ShipmentResponse
-from shipaw.models.pf_shipment import ShipmentConfigured
+from shipaw.models.pf_shipment_configured import ShipmentConfigured
 
 
 class BookingState(sqm.SQLModel):
