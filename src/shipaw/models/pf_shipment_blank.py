@@ -1,4 +1,5 @@
 import datetime as dt
+from functools import partial
 
 from loguru import logger
 from pydantic import ValidationError, constr, model_validator
@@ -9,6 +10,7 @@ from shipaw.models.pf_lists import HazardousGoods
 from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions
 from shipaw.models.pf_shared import Enhancement
 from shipaw.models.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
+from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipmentType
 
 
@@ -95,7 +97,7 @@ class ShipmentAwayDropoff(Shipment):
     sender_address: AddressSender
 
 
-def to_collection(shipment: Shipment, home_contact, home_address, own_label=True) -> ShipmentAwayCollection:
+def to_collection_blank(shipment: Shipment, home_contact, home_address, own_label=True) -> ShipmentAwayCollection:
     try:
         return ShipmentAwayCollection.model_validate(
             shipment.model_copy(
@@ -119,7 +121,7 @@ def to_collection(shipment: Shipment, home_contact, home_address, own_label=True
         raise e
 
 
-def to_dropoff(shipment: Shipment, home_contact, home_address) -> ShipmentAwayDropoff:
+def to_dropoff_blank(shipment: Shipment, home_contact, home_address) -> ShipmentAwayDropoff:
     try:
         return ShipmentAwayDropoff.model_validate(
             shipment.model_copy(
@@ -134,3 +136,7 @@ def to_dropoff(shipment: Shipment, home_contact, home_address) -> ShipmentAwayDr
     except ValidationError as e:
         logger.error(f'Error converting Shipment to Dropoff: {e}')
         raise e
+
+
+to_dropoff = partial(to_dropoff_blank, home_address=pf_sett().home_address, home_contact=pf_sett().home_contact)
+to_collection = partial(to_collection_blank, home_address=pf_sett().home_address, home_contact=pf_sett().home_contact)
