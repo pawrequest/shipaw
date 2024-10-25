@@ -59,7 +59,7 @@ class PFSettings(BaseSettings):
 
     @_p.field_validator('label_dir', mode='after')
     def make_path(cls, v, values):
-        dirs = [_ for _ in ShipDirection if _ != ShipDirection.Outbound]
+        dirs = [_ for _ in ShipDirection]
         for subdir in dirs:
             apath = v / subdir
             if not apath.exists():

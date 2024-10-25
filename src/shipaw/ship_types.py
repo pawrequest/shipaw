@@ -29,9 +29,9 @@ class AlertType(StrEnum):
 
 
 class ShipDirection(StrEnum):
-    Inbound = 'in'
-    Outbound = 'out'
-    Dropoff = 'dropoff'
+    INBOUND = 'in'
+    OUTBOUND = 'out'
+    DROPOFF = 'dropoff'
 
 
 class DropOffInd(StrEnum):

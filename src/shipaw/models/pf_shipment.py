@@ -11,7 +11,7 @@ from shipaw.models.pf_models import AddressCollection, AddressRecipient, Address
 from shipaw.models.pf_shared import Enhancement
 from shipaw.models.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
 from shipaw.pf_config import pf_sett
-from shipaw.ship_types import ShipmentType
+from shipaw.ship_types import ShipDirection, ShipmentType
 
 
 class ShipmentReferenceFields(pf_shared.PFBaseModel):
@@ -67,6 +67,15 @@ class Shipment(ShipmentReferenceFields):
         return self
 
     @property
+    def direction(self):
+        if self.shipment_type == ShipmentType.COLLECTION:
+            return ShipDirection.INBOUND
+        elif self.shipment_type == ShipmentType.DELIVERY:
+            if self.recipient_address == pf_sett().home_address:
+                return ShipDirection.DROPOFF
+            return ShipDirection.OUTBOUND
+
+    @property
     def pf_label_filestem(self):
         ln = (
             (
@@ -83,11 +92,13 @@ class Shipment(ShipmentReferenceFields):
         )
         return ln
 
+    @property
     def label_path(self):
-        return pf_sett().label_dir / self.pf_label_filestem
+        return pf_sett().label_dir / self.direction
 
+    @property
     def label_file(self):
-        return self.label_path().with_suffix('.pdf')
+        return (self.label_path / self.pf_label_filestem).with_suffix('.pdf')
 
 
 class ShipmentAwayCollection(Shipment):
