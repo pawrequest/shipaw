@@ -28,8 +28,10 @@ class ShipmentReferenceFields(pf_shared.PFBaseModel):
 
 class Shipment(ShipmentReferenceFields):
     # from settings
-    contract_number: str
-    department_id: int
+    department_id: int = pf_sett().department_id
+    contract_number: str = pf_sett().pf_contract_num_1
+    # contract_number: str
+    # department_id: int
 
     recipient_contact: Contact
     recipient_address: AddressRecipient | AddressCollection
@@ -80,6 +82,12 @@ class Shipment(ShipmentReferenceFields):
             .replace('.', '_')
         )
         return ln
+
+    def label_path(self):
+        return pf_sett().label_dir / self.pf_label_filestem
+
+    def label_file(self):
+        return self.label_path().with_suffix('.pdf')
 
 
 class ShipmentAwayCollection(Shipment):

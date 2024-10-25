@@ -8,14 +8,14 @@ from loguru import logger
 from pawdantic.pawsql import default_json_field, optional_json_field, required_json_field
 
 from shipaw.models import pf_shared
+from shipaw.models.pf_shipment_blank import Shipment
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection
 from shipaw.models.pf_msg import Alerts, ShipmentResponse
-from shipaw.models.pf_shipment_configured import ShipmentConfigured
 
 
 class BookingState(sqm.SQLModel):
-    shipment_request: ShipmentConfigured = required_json_field(ShipmentConfigured)
+    shipment_request: Shipment = required_json_field(Shipment)
     response: ShipmentResponse | None = optional_json_field(ShipmentResponse)
     direction: ShipDirection = ShipDirection.Outbound
     label_downloaded: bool = False

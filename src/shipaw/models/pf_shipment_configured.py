@@ -1,50 +1,28 @@
 # from __future__ import annotations
 
-from shipaw.models.pf_models import AddressSender
-from shipaw.models.pf_shipment_blank import (
-    Shipment,
-    ShipmentAwayCollection,
-    ShipmentAwayDropoff,
-    to_collection_blank,
-    to_dropoff_blank,
-)
-from shipaw.models.pf_top import CollectionInfo, ContactSender
-from shipaw.pf_config import pf_sett
-from shipaw.ship_types import ShipDirection, ShipmentType
+# class Shipment(Shipment):
+#     pass
+
+# @classmethod
+# def upgrade_shipment(cls, shipment: Shipment):
+#     shipment.contract_number = pf_sett().pf_contract_num_1
+#     shipment.department_id = pf_sett().department_id
+#     return cls.model_validate(shipment.model_dump(), from_attributes=True)
 
 
-class ShipmentConfigured(Shipment):
-    contract_number: str = pf_sett().pf_contract_num_1
-    department_id: int = pf_sett().department_id
+# class ShipmentAwayCollectionConfigured(ShipmentConfigured):
+#     shipment_type: ShipmentType = ShipmentType.COLLECTION
+#     print_own_label: bool = True
+#     collection_info: CollectionInfo
+#
+#     @property
+#     def notifications_str(self) -> str:
+#         return self.recipient_contact.notifications_str + self.collection_info.collection_contact.notifications_str
 
 
-
-    def label_path(self):
-        return pf_sett().label_dir / self.pf_label_filestem
-
-    def label_file(self):
-        return self.label_path().with_suffix('.pdf')
-
-    @classmethod
-    def upgrade_shipment(cls, shipment: Shipment):
-        shipment.contract_number = pf_sett().pf_contract_num_1
-        shipment.department_id = pf_sett().department_id
-        return cls.model_validate(shipment.model_dump(), from_attributes=True)
-
-
-class ShipmentAwayCollectionConfigured(ShipmentConfigured):
-    shipment_type: ShipmentType = ShipmentType.COLLECTION
-    print_own_label: bool = True
-    collection_info: CollectionInfo
-
-    @property
-    def notifications_str(self) -> str:
-        return self.recipient_contact.notifications_str + self.collection_info.collection_contact.notifications_str
-
-
-class ShipmentAwayDropoffConfigured(ShipmentConfigured):
-    sender_contact: ContactSender
-    sender_address: AddressSender
+# class ShipmentAwayDropoffConfigured(ShipmentConfigured):
+#     sender_contact: ContactSender
+#     sender_address: AddressSender
 
 
 # def to_collection(shipment: ShipmentConfigured, own_label=True) -> ShipmentAwayCollectionConfigured:
