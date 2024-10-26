@@ -7,7 +7,6 @@ from pydantic import ValidationError, constr, model_validator
 
 from shipaw import ship_types
 from shipaw.models import pf_shared
-from shipaw.models.lab2 import unused_path
 from shipaw.models.pf_lists import HazardousGoods
 from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions
 from shipaw.models.pf_shared import Enhancement
@@ -108,36 +107,11 @@ class Shipment(ShipmentReferenceFields):
     def label_file(self):
         return self._label_file
 
-    # def numbered_label_stem(self, number: int = 1):
-    #     return f'{self.pf_label_filestem}_{number}'
-    #
-    # def numbered_label_path(self, number: int = 1):
-    #     return (self.label_dir / self.numbered_label_stem(number)).with_suffix('.pdf')
-
-    # @property
-    # def label_file_unused(self):
-    #     logger.debug(f'Getting unused label path for {self.recipient_contact.business_name}')
-    #     incremented = 1
-    #     lpath = self.numbered_label_path(incremented)
-    #     while lpath.exists():
-    #         incremented += 1
-    #         logger.warning(f'Label path {lpath} already exists')
-    #         lpath = self.numbered_label_path(incremented)
-    #     logger.debug(f'Using label path={lpath}')
-    #     return lpath
-
     @model_validator(mode='after')
     def validate_label_file(self):
         if self._label_file is None:
             self._label_file = unused_path(self.label_path)
-            # self._label_file = self.label_file_unused
         return self
-    #
-    # @model_validator(mode='after')
-    # def validate_label_file(self):
-    #     if self._label_file is None:
-    #         self._label_file = self.label_file_unused
-    #     return self
 
 
 class ShipmentAwayCollection(Shipment):
@@ -198,3 +172,17 @@ def to_dropoff_blank(shipment: Shipment, home_contact, home_address) -> Shipment
 
 to_dropoff = partial(to_dropoff_blank, home_address=pf_sett().home_address, home_contact=pf_sett().home_contact)
 to_collection = partial(to_collection_blank, home_address=pf_sett().home_address, home_contact=pf_sett().home_contact)
+
+
+def unused_path(filepath: Path):
+    def numbered_filepath(number: int):
+        return filepath if not number else filepath.with_stem(f"{filepath.stem}_{number}")
+
+    incremented = 0
+    lpath = numbered_filepath(incremented)
+    while lpath.exists():
+        incremented += 1
+        logger.warning(f'FilePath {lpath} already exists')
+        lpath = numbered_filepath(incremented)
+    logger.debug(f'Using FilePath={lpath}')
+    return lpath
