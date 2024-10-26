@@ -1,11 +1,13 @@
 import datetime as dt
 from functools import partial
+from pathlib import Path
 
 from loguru import logger
 from pydantic import ValidationError, constr, model_validator
 
 from shipaw import ship_types
 from shipaw.models import pf_shared
+from shipaw.models.lab2 import unused_path
 from shipaw.models.pf_lists import HazardousGoods
 from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions
 from shipaw.models.pf_shared import Enhancement
@@ -47,7 +49,9 @@ class Shipment(ShipmentReferenceFields):
     sender_contact: ContactSender | None = None
     sender_address: AddressSender | None = None
 
-    # unused
+    _label_file: Path | None = None  # must be private for xml serialization to exclude / expresslink to work
+
+    # currently unused (byut required by expresslink)
     enhancement: Enhancement | None = None
     delivery_options: DeliveryOptions | None = None
     hazardous_goods: HazardousGoods | None = None
@@ -76,7 +80,11 @@ class Shipment(ShipmentReferenceFields):
             return ShipDirection.OUTBOUND
 
     @property
-    def pf_label_filestem(self):
+    def label_dir(self):
+        return pf_sett().label_dir / self.direction
+
+    @property
+    def label_stem(self):
         ln = (
             (
                 f'Parcelforce {self.shipment_type.title()} Label '
@@ -94,11 +102,42 @@ class Shipment(ShipmentReferenceFields):
 
     @property
     def label_path(self):
-        return pf_sett().label_dir / self.direction
+        return (self.label_dir / self.label_stem).with_suffix('.pdf')
 
     @property
     def label_file(self):
-        return (self.label_path / self.pf_label_filestem).with_suffix('.pdf')
+        return self._label_file
+
+    # def numbered_label_stem(self, number: int = 1):
+    #     return f'{self.pf_label_filestem}_{number}'
+    #
+    # def numbered_label_path(self, number: int = 1):
+    #     return (self.label_dir / self.numbered_label_stem(number)).with_suffix('.pdf')
+
+    # @property
+    # def label_file_unused(self):
+    #     logger.debug(f'Getting unused label path for {self.recipient_contact.business_name}')
+    #     incremented = 1
+    #     lpath = self.numbered_label_path(incremented)
+    #     while lpath.exists():
+    #         incremented += 1
+    #         logger.warning(f'Label path {lpath} already exists')
+    #         lpath = self.numbered_label_path(incremented)
+    #     logger.debug(f'Using label path={lpath}')
+    #     return lpath
+
+    @model_validator(mode='after')
+    def validate_label_file(self):
+        if self._label_file is None:
+            self._label_file = unused_path(self.label_path)
+            # self._label_file = self.label_file_unused
+        return self
+    #
+    # @model_validator(mode='after')
+    # def validate_label_file(self):
+    #     if self._label_file is None:
+    #         self._label_file = self.label_file_unused
+    #     return self
 
 
 class ShipmentAwayCollection(Shipment):
