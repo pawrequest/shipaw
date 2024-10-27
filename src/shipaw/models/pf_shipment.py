@@ -31,8 +31,6 @@ class Shipment(ShipmentReferenceFields):
     # from settings
     department_id: int = pf_sett().department_id
     contract_number: str = pf_sett().pf_contract_num_1
-    # contract_number: str
-    # department_id: int
 
     recipient_contact: Contact
     recipient_address: AddressRecipient | AddressCollection
