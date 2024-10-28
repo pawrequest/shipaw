@@ -48,7 +48,7 @@ class Shipment(ShipmentReferenceFields):
 
     _label_file: Path | None = None  # must be private for xml serialization to exclude / expresslink to work
 
-    # currently unused (byut required by expresslink)
+    # currently unused (but required by expresslink)
     enhancement: Enhancement | None = None
     delivery_options: DeliveryOptions | None = None
     hazardous_goods: HazardousGoods | None = None
