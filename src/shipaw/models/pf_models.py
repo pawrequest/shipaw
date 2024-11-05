@@ -21,15 +21,13 @@ def address_string_to_dict(address_str: str) -> dict[str, str]:
 
 addr_lines_fields_set = {'address_line1', 'address_line2', 'address_line3'}
 
-
-class AddressSender(pf_shared.PFBaseModel):
+class AddressBase(pf_shared.PFBaseModel):
     address_line1: paw_types.truncated_printable_str_type(24)
     address_line2: paw_types.optional_truncated_printable_str_type(24)
     address_line3: paw_types.optional_truncated_printable_str_type(24)
     town: constr(max_length=25)
     postcode: constr(max_length=16)
     country: str = 'GB'
-
     @property
     def lines_dict(self):
         return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
@@ -45,6 +43,9 @@ class AddressSender(pf_shared.PFBaseModel):
     @property
     def lines_str_oneline(self):
         return ', '.join(self.lines_dict.values())
+
+class AddressSender(AddressBase):
+    ...
 
     # def address_lines_dict(self):
     #     return {
@@ -76,7 +77,7 @@ class AddressTemporary(AddressRecipient):
     postcode: str | None = None
 
 
-AddTypes = AddressCollection | AddressRecipient
+AddTypes = AddressRecipient | AddressCollection
 
 
 class PostOffice(pf_shared.PFBaseModel):
