@@ -167,17 +167,17 @@ class ELClient(pydantic.BaseModel):
         candidates = self.get_candidates(postcode)
         if not address:
             return [AddressChoice(address=add, score=0) for add in candidates]
-
+        logger.warning('These scores are often misleading')
         candidate_dict = {add.lines_str: add for add in candidates}
-
         scored = process.extract(
             address.lines_str,
             candidate_dict.keys(),
             scorer=SCORER,
             limit=None,
         )
+        choices = [AddressChoice(address=candidate_dict[add], score=score) for add, score in scored]
         return sorted(
-            [AddressChoice(address=candidate_dict[add], score=score) for add, score in scored],
+            choices,
             key=lambda x: x.score,
             reverse=True,
         )
