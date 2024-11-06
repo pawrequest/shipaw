@@ -33,6 +33,7 @@ from .models.pf_msg import (
 from .models.pf_shipment import Shipment
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
+from .ship_types import VALID_POSTCODE
 
 SCORER = fuzz.token_sort_ratio
 
@@ -112,6 +113,7 @@ class ELClient(pydantic.BaseModel):
             list[.models.AddressRecipient] - list of candidate addresses
 
         """
+        postcode = clean_up_postcode(postcode)
         req = FindRequest(paf=PAF(postcode=postcode)).authenticated(self.settings.auth())
         back = self.backend(FindService)
         response = back.find(request=req.model_dump(by_alias=True))
@@ -163,7 +165,7 @@ class ELClient(pydantic.BaseModel):
         chosen, score = self.choose_address(address)
         return AddressChoice(address=chosen, score=score)
 
-    def get_choices[T: AddTypes](self, postcode: str, address: T | None = None) -> list[AddressChoice]:
+    def get_choices[T: AddTypes](self, postcode: VALID_POSTCODE, address: T | None = None) -> list[AddressChoice]:
         candidates = self.get_candidates(postcode)
         if not address:
             return [AddressChoice(address=add, score=0) for add in candidates]
@@ -184,3 +186,8 @@ class ELClient(pydantic.BaseModel):
 
     def candidates_json(self, postcode):
         return {add.lines_str: add.model_dump_json() for add in self.get_candidates(postcode)}
+
+
+def clean_up_postcode(postcode: str):
+    postcode = postcode.upper()
+    return postcode
