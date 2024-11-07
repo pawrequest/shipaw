@@ -155,7 +155,9 @@ class ShipmentResponse(BaseResponse):
 
     @property
     def status(self):
-        return self.completed_shipment_info.status
+        if self.completed_shipment_info:
+            return self.completed_shipment_info.status
+        return 'No Completed Shipment Info'
 
     @property
     def success(self):

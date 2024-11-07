@@ -75,6 +75,28 @@ class Shipment(ShipmentReferenceFields):
             if self.recipient_address == pf_sett().home_address:
                 return ShipDirection.DROPOFF
             return ShipDirection.OUTBOUND
+        else:
+            raise ValueError(f'Invalid ShipmentType: {self.shipment_type}')
+
+    @property
+    def remote_contact(self):
+        match self.direction:
+            case ShipDirection.OUTBOUND:
+                return self.recipient_contact
+            case ShipDirection.INBOUND:
+                return self.collection_info.collection_contact
+            case ShipDirection.DROPOFF:
+                return self.sender_contact
+
+    @property
+    def remote_address(self):
+        match self.direction:
+            case ShipDirection.OUTBOUND:
+                return self.recipient_address
+            case ShipDirection.INBOUND:
+                return self.collection_info.collection_address
+            case ShipDirection.DROPOFF:
+                return self.sender_address
 
     @property
     def label_dir(self):
@@ -144,7 +166,8 @@ def to_collection_blank(shipment: Shipment, home_contact, home_address, own_labe
                     'recipient_contact': home_contact,
                     'recipient_address': home_address,
                 }
-            ), from_attributes=True
+            ),
+            from_attributes=True,
         )
     except ValidationError as e:
         logger.error(f'Error converting Shipment to Collection: {e}')
@@ -161,7 +184,8 @@ def to_dropoff_blank(shipment: Shipment, home_contact, home_address) -> Shipment
                     'sender_contact': ContactSender(**shipment.recipient_contact.model_dump(exclude={'notifications'})),
                     'sender_address': AddressSender(**shipment.recipient_address.model_dump(exclude_none=True)),
                 }
-            ), from_attributes=True
+            ),
+            from_attributes=True,
         )
     except ValidationError as e:
         logger.error(f'Error converting Shipment to Dropoff: {e}')
@@ -174,7 +198,7 @@ to_collection = partial(to_collection_blank, home_address=pf_sett().home_address
 
 def unused_path(filepath: Path):
     def numbered_filepath(number: int):
-        return filepath if not number else filepath.with_stem(f"{filepath.stem}_{number}")
+        return filepath if not number else filepath.with_stem(f'{filepath.stem}_{number}')
 
     incremented = 0
     lpath = numbered_filepath(incremented)
