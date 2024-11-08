@@ -97,7 +97,7 @@ class PFSettings(BaseSettings):
         if v:
             logger.warning('Creating Shipper with Live Creds')
         else:
-            logger.info('Creating Shipper with Sandbox Creds')
+            logger.warning('Creating Shipper with Sandbox Creds')
         return v
 
     @_p.model_validator(mode='after')

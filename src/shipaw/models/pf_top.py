@@ -11,10 +11,12 @@ from ..ship_types import MyPhone
 
 
 class Contact(pf_shared.PFBaseModel):
-    business_name: constr(max_length=40)
+    business_name: paw_types.truncated_printable_str_type(40)
+    # business_name: constr(max_length=40)
     mobile_phone: MyPhone
     email_address: constr(max_length=50)
-    contact_name: constr(max_length=30)
+    contact_name: paw_types.truncated_printable_str_type(30)
+    # contact_name: constr(max_length=30)
     notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
 
     @property
@@ -24,7 +26,8 @@ class Contact(pf_shared.PFBaseModel):
 
 
 class ContactCollection(Contact):
-    senders_name: constr(max_length=25) | None = None
+    senders_name: paw_types.optional_truncated_printable_str_type(25)
+    # senders_name: constr(max_length=25) | None = None
     telephone: MyPhone | None = None
     notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
 
