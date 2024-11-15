@@ -128,13 +128,6 @@ class Shipment(ShipmentReferenceFields):
         if self._label_file is None:
             self._label_file = unused_path(self.label_path)
         return self._label_file
-        # return self._label_file
-
-    # @model_validator(mode='after')
-    # def validate_label_file(self):
-    #     if self._label_file is None:
-    #         self._label_file = unused_path(self.label_path)
-    #     return self
 
 
 class ShipmentAwayCollection(Shipment):
