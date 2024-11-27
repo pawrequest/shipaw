@@ -73,7 +73,7 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
     logger.debug(f'Validating date: {v}')
     if v:
         if isinstance(v, str):
-            logger.debug(f'Validating date string: {v}')
+            logger.debug(f'parsing date string assuming isoformat: {v}')
             v = dt.date.fromisoformat(v)
 
         if isinstance(v, dt.date):
