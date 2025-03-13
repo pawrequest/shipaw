@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
 from shipaw.ship_types import MyPhone, ShipDirection
 
-SHIP_ENV = os.getenv('SHIP_ENV2')
+SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
     raise ValueError('SHIP_ENV not set')
 
