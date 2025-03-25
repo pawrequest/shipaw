@@ -33,7 +33,7 @@ class PFSettings(BaseSettings):
     pf_expr_usr: SecretStr
     pf_expr_pwd: SecretStr
 
-    pf_wsdl: str = r'R:\paul_r\.internal\expresslink_api.wsdl'
+    pf_wsdl: str
     pf_binding: str = r'{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     tracking_url_stem: str = r'https://www.parcelforce.com/track-trace?trackNumber='
     pf_endpoint: str
