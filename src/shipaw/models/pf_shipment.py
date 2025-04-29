@@ -87,6 +87,8 @@ class Shipment(ShipmentReferenceFields):
                 return self.collection_info.collection_contact
             case ShipDirection.DROPOFF:
                 return self.sender_contact
+            case _:
+                raise ValueError('Bad ShipDirection')
 
     @property
     def remote_address(self):
@@ -97,6 +99,8 @@ class Shipment(ShipmentReferenceFields):
                 return self.collection_info.collection_address
             case ShipDirection.DROPOFF:
                 return self.sender_address
+            case _:
+                raise ValueError('Bad ShipDirection')
 
     @property
     def label_dir(self):
