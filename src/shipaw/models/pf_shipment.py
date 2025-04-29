@@ -12,7 +12,7 @@ from shipaw.models.pf_models import AddressCollection, AddressRecipient, Address
 from shipaw.models.pf_shared import Enhancement
 from shipaw.models.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
 from shipaw.pf_config import pf_sett
-from shipaw.ship_types import ShipDirection, ShipmentType
+from shipaw.ship_types import ShipDirection, ShipmentType, get_ship_direction
 
 
 class ShipmentReferenceFields(pf_shared.PFBaseModel):
@@ -69,14 +69,16 @@ class Shipment(ShipmentReferenceFields):
 
     @property
     def direction(self):
-        if self.shipment_type == ShipmentType.COLLECTION:
-            return ShipDirection.INBOUND
-        elif self.shipment_type == ShipmentType.DELIVERY:
-            if self.recipient_address == pf_sett().home_address:
-                return ShipDirection.DROPOFF
-            return ShipDirection.OUTBOUND
-        else:
-            raise ValueError(f'Invalid ShipmentType: {self.shipment_type}')
+        return get_ship_direction(self.model_dump())
+
+        # if self.shipment_type == ShipmentType.COLLECTION:
+        #     return ShipDirection.INBOUND
+        # elif self.shipment_type == ShipmentType.DELIVERY:
+        #     if self.recipient_address == pf_sett().home_address:
+        #         return ShipDirection.DROPOFF
+        #     return ShipDirection.OUTBOUND
+        # else:
+        #     raise ValueError(f'Invalid ShipmentType: {self.shipment_type}')
 
     @property
     def remote_contact(self):

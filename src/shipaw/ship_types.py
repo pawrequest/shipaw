@@ -44,6 +44,18 @@ class DeliveryKindEnum(str, Enum):
     COLLECTION = 'COLLECTION'
 
 
+def get_ship_direction(ship_dict: dict) -> ShipDirection:
+    if ship_dict['shipment_type'] == ShipmentType.DELIVERY:
+        if ship_dict['sender_address'] is None:
+            return ShipDirection.OUTBOUND
+        else:
+            return ShipDirection.DROPOFF
+    elif ship_dict['shipment_type'] == ShipmentType.COLLECTION:
+        return ShipDirection.INBOUND
+    else:
+        raise ValueError()
+
+
 TOD = dt.date.today()
 COLLECTION_CUTOFF = dt.time(23, 59, 59)
 ADVANCE_BOOKING_DAYS = 28
@@ -91,16 +103,13 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
 # SHIPPING_DATE = date
 
 
-class ExpressLinkError(Exception):
-    ...
+class ExpressLinkError(Exception): ...
 
 
-class ExpressLinkWarning(Exception):
-    ...
+class ExpressLinkWarning(Exception): ...
 
 
-class ExpressLinkNotification(Exception):
-    ...
+class ExpressLinkNotification(Exception): ...
 
 
 def validate_phone(v: str, values) -> str:
