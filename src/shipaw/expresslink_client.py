@@ -122,12 +122,19 @@ class ELClient(pydantic.BaseModel):
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
-    def get_label(self, ship_num, dl_path: str, print_format: str | None = None) -> Path:
+    def get_label(self, ship_num, dl_path: str, print_format: str | None = None, barcode_format:str | None = None ) -> Path:
         """Get the label for a shipment number.
 
         Args:
             ship_num: str - shipment number
             dl_path: str - path to download the label to, defaults to './temp_label.pdf'
+            print_format: str | None (default = PDF)
+            PDF - to return a PDF image of the Label.
+            XML - to return a data stream in order to create own label.
+            PDF-XML - to return the Parcelforce label as PDF and the Partner label as XML.
+            XML-PDF – to return the Parcelforce label as XML and the Partner label as PDF
+
+            barcode_format: Set to PNG to return image of Barcode in Base64 code
 
         Returns:
             Path - path to the downloaded label
@@ -135,7 +142,7 @@ class ELClient(pydantic.BaseModel):
         """
         back = self.backend(PrintLabelService)
         # req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num)
-        req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num, print_format=print_format)
+        req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num, print_format=print_format, barcode_format=barcode_format)
         response: PrintLabelResponse = back.printlabel(request=req)
         if response.alerts:
             for alt in response.alerts.alert:
