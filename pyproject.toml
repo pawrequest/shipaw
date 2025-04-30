@@ -1,6 +1,6 @@
 [project]
 name = "shipaw"
-version = "0.1.5"
+version = "0.1.6"
 description = "Add your description here"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -11,50 +11,22 @@ dependencies = [
     'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
     'suppawt @ git+https://github.com/pawrequest/suppawt',
     'pawdantic @ git+https://github.com/pawrequest/pawdantic',
-    'fastapi',
-    'sqlmodel',
-    "aiohttp",
     'combadge[zeep]',
     'thefuzz',
     'loguru',
     'python-multipart',
-    'pydantic-extra-types',
     'pydantic-settings',
-]
-
-[project.optional-dependencies]
-from-git = [
-    'suppawt @ git+https://github.com/pawrequest/suppawt',
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
-]
-dev = [
-    "pytest",
-    "pytest-asyncio",
-]
-rebuild = [
-    "datamodel-code-generator",
-]
-docs = [
-    "sphinx",
-    "sphinx-autodoc-typehints",
-    "sphinx-rtd-theme",
-    "myst-parser",
-    "sphinx-readme",
-    "sphinx_rtd_dark_mode",
-    'autodoc_pydantic',
+#    'fastapi',
+#    'sqlmodel',
+#    "aiohttp",
+#    'pydantic-extra-types',
 ]
 
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+#[build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = [
-    "pytest",
-    "pytest-asyncio",
-]
 
 [tool.hatch.metadata]
 allow-direct-references = true
