@@ -122,7 +122,7 @@ class ELClient(pydantic.BaseModel):
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
-    def get_label(self, ship_num, dl_path: str) -> Path:
+    def get_label(self, ship_num, dl_path: str, print_format: str | None = None) -> Path:
         """Get the label for a shipment number.
 
         Args:
@@ -134,7 +134,8 @@ class ELClient(pydantic.BaseModel):
 
         """
         back = self.backend(PrintLabelService)
-        req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num)
+        # req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num)
+        req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num, print_format=print_format)
         response: PrintLabelResponse = back.printlabel(request=req)
         if response.alerts:
             for alt in response.alerts.alert:
