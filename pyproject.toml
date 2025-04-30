@@ -1,6 +1,6 @@
 [project]
 name = "shipaw"
-version = "0.1.7"
+version = "0.1.8"
 description = "Add your description here"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -8,18 +8,18 @@ authors = [
 readme = "README.md"
 requires-python = ">= 3.12"
 dependencies = [
-    'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
+#    'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
+#    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
     'suppawt @ git+https://github.com/pawrequest/suppawt',
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
     'combadge[zeep]',
     'thefuzz',
     'loguru',
     'python-multipart',
     'pydantic-settings',
+    'pydantic-extra-types',
 #    'fastapi',
 #    'sqlmodel',
 #    "aiohttp",
-    'pydantic-extra-types',
 ]
 
 
