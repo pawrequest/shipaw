@@ -19,7 +19,7 @@ dependencies = [
 #    'fastapi',
 #    'sqlmodel',
 #    "aiohttp",
-#    'pydantic-extra-types',
+    'pydantic-extra-types',
 ]
 
 
