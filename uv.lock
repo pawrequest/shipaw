@@ -92,15 +92,6 @@ zeep = [
 ]
 
 [[package]]
-name = "comtypes"
-version = "1.4.10"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/07/7e/34f4941ab5ec7d1d4c496282b1944a5119fc52641c5770a78e6fa0ca32ec/comtypes-1.4.10.zip", hash = "sha256:b92372e76299836177b41aeda784225e18c5071c6bacdab88a7433224a4dc912", size = 267293 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4c/44/72009bb0a0d8286f6408c9cb70552350e21e9c280bfa1ef30784b30dfc0f/comtypes-1.4.10-py3-none-any.whl", hash = "sha256:e078555721ee7ab40648a3363697d420b845b323e5944b55846e96aff97d2534", size = 241481 },
-]
-
-[[package]]
 name = "idna"
 version = "3.10"
 source = { registry = "https://pypi.org/simple" }
@@ -180,6 +171,15 @@ source = { git = "https://github.com/pawrequest/pawdantic#67a6a3fd85d7786988ff22
 dependencies = [
     { name = "pydantic" },
     { name = "pydantic-extra-types" },
+]
+
+[[package]]
+name = "phonenumbers"
+version = "9.0.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/49/3f/3c0ae68353f4cd58ef2d683c2d3f343e1804118c27216495f80c7e4eb6b3/phonenumbers-9.0.5.tar.gz", hash = "sha256:70fde168a92dd9c73f57872359515181d6cde6bb8e7ec5660e94c4ca45692c50", size = 2296916 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/43/b2/1fba8f2aa0a54450a53e88f59e39d58a611438919e3a7623641558bc77f9/phonenumbers-9.0.5-py2.py3-none-any.whl", hash = "sha256:7acef19817868a6f9cbc0d628dc5ad447b3768137e3d53c70dd6827a1ac040ba", size = 2582730 },
 ]
 
 [[package]]
@@ -285,15 +285,6 @@ wheels = [
 ]
 
 [[package]]
-name = "python-multipart"
-version = "0.0.20"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f3/87/f44d7c9f274c7ee665a29b885ec97089ec5dc034c7f3fafa03da9e39a09e/python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13", size = 37158 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/58/38b5afbc1a800eeea951b9285d3912613f2603bdf897a4ab0f4bd7f405fc/python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104", size = 24546 },
-]
-
-[[package]]
 name = "pytz"
 version = "2025.2"
 source = { registry = "https://pypi.org/simple" }
@@ -381,16 +372,14 @@ wheels = [
 
 [[package]]
 name = "shipaw"
-version = "0.1.8"
+version = "0.1.10"
 source = { virtual = "." }
 dependencies = [
     { name = "combadge", extra = ["zeep"] },
     { name = "loguru" },
     { name = "pawdantic" },
-    { name = "pydantic-extra-types" },
+    { name = "phonenumbers" },
     { name = "pydantic-settings" },
-    { name = "python-multipart" },
-    { name = "suppawt" },
     { name = "thefuzz" },
 ]
 
@@ -399,20 +388,9 @@ requires-dist = [
     { name = "combadge", extras = ["zeep"] },
     { name = "loguru" },
     { name = "pawdantic", git = "https://github.com/pawrequest/pawdantic" },
-    { name = "pydantic-extra-types" },
+    { name = "phonenumbers" },
     { name = "pydantic-settings" },
-    { name = "python-multipart" },
-    { name = "suppawt", git = "https://github.com/pawrequest/suppawt" },
     { name = "thefuzz" },
-]
-
-[[package]]
-name = "suppawt"
-version = "0.2"
-source = { git = "https://github.com/pawrequest/suppawt#8981b7af852697a52ae07d9805beb3b144516c7d" }
-dependencies = [
-    { name = "comtypes" },
-    { name = "loguru" },
 ]
 
 [[package]]
