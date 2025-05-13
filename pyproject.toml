@@ -9,14 +9,14 @@ readme = "README.md"
 requires-python = ">= 3.12"
 dependencies = [
 #    'flaskwebgui @git+https://github.com/pawrequest/flaskwebgui',
-#    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
-    'suppawt @ git+https://github.com/pawrequest/suppawt',
+    'pawdantic @ git+https://github.com/pawrequest/pawdantic',
+#    'suppawt @ git+https://github.com/pawrequest/suppawt',
     'combadge[zeep]',
     'thefuzz',
     'loguru',
-    'python-multipart',
+#    'python-multipart',
     'pydantic-settings',
-    'pydantic-extra-types',
+#    'pydantic-extra-types',
 #    'fastapi',
 #    'sqlmodel',
 #    "aiohttp",
