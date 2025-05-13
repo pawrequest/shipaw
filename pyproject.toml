@@ -1,6 +1,6 @@
 [project]
 name = "shipaw"
-version = "0.1.9"
+version = "0.1.10"
 description = "Add your description here"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -14,6 +14,7 @@ dependencies = [
     'combadge[zeep]',
     'thefuzz',
     'loguru',
+    'phonenumbers',
 #    'python-multipart',
     'pydantic-settings',
 #    'pydantic-extra-types',
