@@ -1,5 +1,4 @@
 import pydantic as _p
-import sqlmodel as sqm
 
 from . import pf_models, pf_shared
 
@@ -33,7 +32,7 @@ class ManifestShipments(pf_shared.PFBaseModel):
 
 
 class CompletedShipments(pf_shared.PFBaseModel):
-    completed_shipment: list[pf_shared.CompletedShipment] = sqm.Field(default_factory=list)
+    completed_shipment: list[pf_shared.CompletedShipment] = _p.Field(default_factory=list)
 
 
 class CompletedCancel(pf_shared.PFBaseModel):
