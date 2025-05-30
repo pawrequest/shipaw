@@ -11,6 +11,7 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
+from docs.source.resources.expresslink_pydantic_generated import AlertType
 from .models.pf_combadge import (
     CancelShipmentService,
     CreateManifestService,
@@ -99,7 +100,12 @@ class ELClient(pydantic.BaseModel):
             msg = resp.Error.message if hasattr(resp.Error, 'message') else str(resp.Error)
             raise ValueError(f'ExpressLink Error: {msg}')
         if hasattr(resp, 'alerts') and hasattr(resp.alerts, 'alert'):
-            logger.warning('ExpressLink Warning: '+', '.join([_.message for _ in resp.alerts.alert]))
+            for _ in resp.alerts.alert:
+                match _.type:
+                    case AlertType.ERROR:
+                        logger.error("ExpressLinkl Error, booking failed: " + _.message)
+                    case _:
+                        logger.warning("Expresslink Warning: " + _.message)
         return resp
 
     def cancel_shipment(self, shipment_number):
