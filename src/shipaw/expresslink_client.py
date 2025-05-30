@@ -11,7 +11,6 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from docs.source.resources.expresslink_pydantic_generated import AlertType
 from .models.pf_combadge import (
     CancelShipmentService,
     CreateManifestService,
@@ -34,7 +33,7 @@ from .models.pf_msg import (
 from .models.pf_shipment import Shipment
 from .models.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
-from .ship_types import VALID_POSTCODE
+from .ship_types import AlertType, VALID_POSTCODE
 
 SCORER = fuzz.token_sort_ratio
 
