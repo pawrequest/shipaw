@@ -92,9 +92,14 @@ class ELClient(pydantic.BaseModel):
         shipment_request = ShipmentRequest(requested_shipment=shipment)
         authorized_shipment = shipment_request.authenticated(self.settings.auth())
         resp: ShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
-        if resp.shipment_num:
+        if hasattr(resp, 'shipment_num') and resp.shipment_num:
             logger.info(f'BOOKED shipment# {resp.shipment_num} to {shipment.recipient_address.lines_str}')
             logger.debug(f'Notifications: {shipment.notifications_str}')
+        if hasattr(resp, 'Error'):
+            msg = resp.Error.message if hasattr(resp.Error, 'message') else str(resp.Error)
+            raise ValueError(f'ExpressLink Error: {msg}')
+        if hasattr(resp, 'alerts') and hasattr(resp.alerts, 'alert'):
+            logger.warning('ExpressLink Warning: '+', '.join([_.message for _ in resp.alerts.alert]))
         return resp
 
     def cancel_shipment(self, shipment_number):
