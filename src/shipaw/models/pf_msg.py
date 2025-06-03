@@ -8,7 +8,7 @@ from .pf_shared import PFBaseModel
 from .pf_shipment import Shipment
 from .. import ship_types
 from ..models import pf_lists, pf_models, pf_shared, pf_top
-from ..ship_types import ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
+from ..ship_types import AlertType, ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 
 class Alert(PFBaseModel):
@@ -18,7 +18,7 @@ class Alert(PFBaseModel):
 
     @classmethod
     def from_exception(cls, e: Exception):
-        return cls(message=str(e), type='ERROR')
+        return cls(message=str(e), type=AlertType.ERROR)
 
     def raise_exception(self):
         match self.type:

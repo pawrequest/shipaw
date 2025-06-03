@@ -210,15 +210,16 @@ class Enhancement(PFBaseModel):
     saturday_delivery_required: bool | None = None
 
 
-class Alert(PFBaseModel):
-    code: int | None = None
-    message: str
-    type: AlertType
-
-
-    @classmethod
-    def from_exception(cls, e: Exception):
-        return cls(message=str(e), type='ERROR')
+#     ALSO IN MSG?!
+# class Alert(PFBaseModel):
+#     code: int | None = None
+#     message: str
+#     type: AlertType
+#
+#
+#     @classmethod
+#     def from_exception(cls, e: Exception):
+#         return cls(message=str(e), type='ERROR')
 
 
 class NotificationType(str, Enum):
