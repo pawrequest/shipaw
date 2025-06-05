@@ -268,3 +268,5 @@ class CollectionNotificationType(str, Enum):
     EMAIL = 'EMAIL'
     EMAIL_RECIEVED = 'EMAILCOLLRECEIVED'
     SMS_RECIEVED = 'SMSCOLLRECEIVED'
+
+
