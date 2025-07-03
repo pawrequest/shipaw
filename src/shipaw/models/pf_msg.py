@@ -34,6 +34,19 @@ class Alert(PFBaseModel):
 
 
 class Alerts(PFBaseModel):
+    def add_content(self, content: str, type_: AlertType = AlertType.NOTIFICATION):
+        if not isinstance(content, str):
+            raise TypeError(f'Expected str, got {type(content)}')
+        alert = Alert(message=content, type=type_)
+        self.alert.append(alert)
+        return self
+
+    def add(self, other: Alert):
+        if not isinstance(other, Alert):
+            raise TypeError(f'Expected Alert instance, got {type(other)}')
+        self.alert.append(other)
+        return self
+
     def __add__(self, other: Alerts):
         return Alerts(alert=self.alert + other.alert)
 
