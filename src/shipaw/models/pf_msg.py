@@ -34,6 +34,19 @@ class Alert(PFBaseModel):
 
 
 class Alerts(PFBaseModel):
+    def __add__(self, other: Alerts):
+        return Alerts(alert=self.alert + other.alert)
+
+    def __iadd__(self, other: Alerts):
+        self.alert.extend(other.alert)
+        return self
+
+    def __sub__(self, other: Alerts):
+        return Alerts(alert=[alert for alert in self.alert if alert not in other.alert])
+
+    def __contains__(self, other: Alert):
+        return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
+
     alert: list[Alert]
 
     # alert: list[Alert] = required_json_field(Alert)
@@ -109,8 +122,7 @@ class FindMessage(pf_shared.PFBaseModel):
     postcode_exclusion: pf_top.PostcodeExclusion | None = None
 
 
-class FindRequest(FindMessage, BaseRequest):
-    ...
+class FindRequest(FindMessage, BaseRequest): ...
 
 
 class FindResponse(FindMessage, BaseResponse):
