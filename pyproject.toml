@@ -1,4 +1,5 @@
 [project]
+license = "MIT"
 name = "shipaw"
 version = "0.1.16"
 description = "Add your description here"
@@ -14,6 +15,7 @@ dependencies = [
     'loguru', # logging
     'phonenumbers',
     'pydantic-settings',
+    "royal-mail-click-and-drop",
 ]
 
 
@@ -30,3 +32,6 @@ line-length = 120
 extend-select = ["Q", "RUF100", "UP"]
 flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
 format.quote-style="single"
+
+[tool.uv.sources]
+royal-mail-click-and-drop = { path = "../royal_mail_click_and_drop" }
