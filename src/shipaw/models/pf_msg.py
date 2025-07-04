@@ -34,6 +34,8 @@ class Alert(PFBaseModel):
 
 
 class Alerts(PFBaseModel):
+    alert: list[Alert]
+
     def add_content(self, content: str, type_: AlertType = AlertType.NOTIFICATION):
         if not isinstance(content, str):
             raise TypeError(f'Expected str, got {type(content)}')
@@ -46,6 +48,9 @@ class Alerts(PFBaseModel):
             raise TypeError(f'Expected Alert instance, got {type(other)}')
         self.alert.append(other)
         return self
+
+    def __bool__(self):
+        return bool(self.alert)
 
     def __add__(self, other: Alerts):
         return Alerts(alert=self.alert + other.alert)
@@ -60,7 +65,6 @@ class Alerts(PFBaseModel):
     def __contains__(self, other: Alert):
         return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
 
-    alert: list[Alert]
 
     # alert: list[Alert] = required_json_field(Alert)
     # alert: list[Alert] = default_json_field(Alert, list)
