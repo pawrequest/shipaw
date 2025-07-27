@@ -164,6 +164,25 @@ class ShipmentResponse(BaseResponse):
         # logger.info(f'Getting tracking link: {str(tlink)}')
         return tlink
 
+    def handle_errors(self):
+        if hasattr(self, 'Error'):
+            msg = self.Error.message if hasattr(self.Error, 'message') else str(self.Error)
+            raise ExpressLinkError(msg)
+        if hasattr(self, 'alerts') and hasattr(self.alerts, 'alert'):
+            for _ in self.alerts.alert:
+                match _.type:
+                    case AlertType.ERROR:
+                        logger.error('ExpressLinkl Error, booking failed?: ' + _.message)
+                    case _:
+                        logger.warning('Expresslink Warning: ' + _.message)
+
+
+def log_booked_shipment(request: ShipmentRequest, response: ShipmentResponse):
+    if hasattr(response, 'shipment_num') and response.shipment_num:
+        logger.info(
+            f'BOOKED {request.requested_shipment.direction.name.title()} shipment# {response.shipment_num} for {request.requested_shipment.remote_address.lines_str}'
+        )
+
 
 ################################################################
 

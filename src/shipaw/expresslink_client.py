@@ -8,6 +8,7 @@ from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
 from loguru import logger
 from pydantic import model_validator
+from shipaw.ship_types import ExpressLinkError
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
@@ -29,6 +30,7 @@ from .models.pf_msg import (
     PrintLabelResponse,
     ShipmentRequest,
     ShipmentResponse,
+    log_booked_shipment,
 )
 from .models.pf_shipment import Shipment
 from .models.pf_top import PAF
@@ -92,20 +94,21 @@ class ELClient(pydantic.BaseModel):
         shipment_request = ShipmentRequest(requested_shipment=shipment)
         authorized_shipment = shipment_request.authenticated(self.settings.auth())
         resp: ShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
-        if hasattr(resp, 'shipment_num') and resp.shipment_num:
-            logger.info(f'BOOKED shipment# {resp.shipment_num} to {shipment.recipient_address.lines_str}')
-            logger.debug(f'Notifications: {shipment.notifications_str}')
-        if hasattr(resp, 'Error'):
-            msg = resp.Error.message if hasattr(resp.Error, 'message') else str(resp.Error)
-            raise ValueError(f'ExpressLink Error: {msg}')
-        if hasattr(resp, 'alerts') and hasattr(resp.alerts, 'alert'):
-            for _ in resp.alerts.alert:
-                match _.type:
-                    case AlertType.ERROR:
-                        logger.error("ExpressLinkl Error, booking failed: " + _.message)
-                    case _:
-                        logger.warning("Expresslink Warning: " + _.message)
+        log_booked_shipment(shipment_request, resp)
+        resp.handle_errors()
         return resp
+    #
+    # def handle_response_errors(self, resp):
+    #     if hasattr(resp, 'Error'):
+    #         msg = resp.Error.message if hasattr(resp.Error, 'message') else str(resp.Error)
+    #         raise ExpressLinkError(msg)
+    #     if hasattr(resp, 'alerts') and hasattr(resp.alerts, 'alert'):
+    #         for _ in resp.alerts.alert:
+    #             match _.type:
+    #                 case AlertType.ERROR:
+    #                     logger.error('ExpressLinkl Error, booking failed: ' + _.message)
+    #                 case _:
+    #                     logger.warning('Expresslink Warning: ' + _.message)
 
     def cancel_shipment(self, shipment_number):
         req = CancelShipmentRequest(shipment_number=shipment_number).authenticated(self.settings.auth())
@@ -132,7 +135,9 @@ class ELClient(pydantic.BaseModel):
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
-    def get_label(self, ship_num, dl_path: str, print_format: str | None = None, barcode_format:str | None = None ) -> Path:
+    def get_label(
+        self, ship_num, dl_path: str, print_format: str | None = None, barcode_format: str | None = None
+    ) -> Path:
         """Get the label for a shipment number.
 
         Args:
@@ -152,7 +157,12 @@ class ELClient(pydantic.BaseModel):
         """
         back = self.backend(PrintLabelService)
         # req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num)
-        req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num, print_format=print_format, barcode_format=barcode_format)
+        req = PrintLabelRequest(
+            authentication=self.settings.auth(),
+            shipment_number=ship_num,
+            print_format=print_format,
+            barcode_format=barcode_format,
+        )
         response: PrintLabelResponse = back.printlabel(request=req)
         if response.alerts:
             for alt in response.alerts.alert:
