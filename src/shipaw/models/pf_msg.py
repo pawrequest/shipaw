@@ -17,6 +17,14 @@ class Alert(PFBaseModel):
     message: str
     type: ship_types.AlertType = ship_types.AlertType.NOTIFICATION
 
+    def __eq__(self, other):
+        if not isinstance(other, Alert):
+            return NotImplemented
+        return (self.code, self.message, self.type) == (other.code, other.message, other.type)
+
+    def __hash__(self):
+        return hash((self.code, self.message, self.type))
+
     @classmethod
     def from_exception(cls, e: Exception):
         return cls(message=str(e), type=AlertType.ERROR)
@@ -37,36 +45,34 @@ class Alert(PFBaseModel):
 class Alerts(PFBaseModel):
     alert: list[Alert]
 
-    def add_content(self, content: str, type_: AlertType = AlertType.NOTIFICATION):
-        if not isinstance(content, str):
-            raise TypeError(f'Expected str, got {type(content)}')
-        alert = Alert(message=content, type=type_)
-        self.alert.append(alert)
-        return self
-
-    def add(self, other: Alert):
-        if not isinstance(other, Alert):
-            raise TypeError(f'Expected Alert instance, got {type(other)}')
-        self.alert.append(other)
-        return self
-
     def __bool__(self):
         return bool(self.alert)
 
-    def __add__(self, other: Alerts):
-        als = [alert for alert in self.alert if alert not in other.alert]
-        als.extend(other.alert)
-        return Alerts(alert=als)
+    def __add__(self, other: Alerts | Alert):
+        if not isinstance(other, Alerts) and not isinstance(other, Alert):
+            raise TypeError(f'Expected Alerts or Alert instance, got {type(other)}')
+        if isinstance(other, Alert):
+            other = Alerts(alert=[other])
+        combined = set(self.alert) | set(other.alert)
+        return Alerts(alert=list(combined))
 
-    def __iadd__(self, other: Alerts):
-        self.alert.extend(other.alert)
+    def __iadd__(self, other: Alerts | Alert):
+        if not isinstance(other, Alerts) and not isinstance(other, Alert):
+            raise TypeError(f'Expected Alerts or Alert instance, got {type(other)}')
+        if isinstance(other, Alert):
+            other = Alerts(alert=[other])
+        self.alert = list(set(self.alert) | set(other.alert))
         return self
 
     def __sub__(self, other: Alerts):
-        return Alerts(alert=[alert for alert in self.alert if alert not in other.alert])
+        if not isinstance(other, Alerts):
+            raise TypeError(f'Expected Alerts instance, got {type(other)}')
+        diff = set(self.alert) - set(other.alert)
+        return Alerts(alert=list(diff))
 
-    def __contains__(self, other: Alert):
-        return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
+    def __contains__(self, alert: Alert):
+        return alert in set(self.alert)
+        # return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
 
     def raise_exceptions(self):
         for alert in self.alert:
