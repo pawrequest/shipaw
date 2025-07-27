@@ -1,4 +1,5 @@
 import datetime
+from typing import Any, Generator
 
 import pytest
 
@@ -18,7 +19,7 @@ def sett():
 
 
 @pytest.fixture
-def el_client(sett):
+def el_client(sett) -> Generator[ELClient, Any, None]:
     yield ELClient(settings=sett)
 
 
