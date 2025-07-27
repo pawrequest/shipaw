@@ -97,7 +97,7 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
                 logger.debug(f'Date {v} is too far in the future - using latest weekday (max 28 days in advance)')
                 v = max(WEEKDAYS_IN_RANGE)
 
-            return v
+    return v
 
 
 # SHIPPING_DATE = date

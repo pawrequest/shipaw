@@ -68,7 +68,7 @@ class Shipment(ShipmentReferenceFields):
         return self
 
     @property
-    def direction(self):
+    def direction(self) -> ShipDirection:
         return get_ship_direction(self.model_dump())
 
         # if self.shipment_type == ShipmentType.COLLECTION:
