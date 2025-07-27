@@ -5,11 +5,11 @@ from loguru import logger
 from pydantic import Field, field_validator
 
 from shipaw.pf_config import pf_sett
-from .pf_shared import PFBaseModel
-from .pf_shipment import Shipment
-from .. import ship_types
-from ..models import pf_lists, pf_models, pf_shared, pf_top
-from ..ship_types import AlertType, ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
+from shipaw.models.pf_shared import PFBaseModel
+from shipaw.models.pf_shipment import Shipment
+from shipaw import ship_types
+from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
+from shipaw.ship_types import AlertType, ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 
 class Alert(PFBaseModel):
@@ -66,9 +66,6 @@ class Alerts(PFBaseModel):
     def __contains__(self, other: Alert):
         return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
 
-    # alert: list[Alert] = required_json_field(Alert)
-    # alert: list[Alert] = default_json_field(Alert, list)
-
     def raise_exceptions(self):
         for alert in self.alert:
             alert.raise_exception()
@@ -76,11 +73,6 @@ class Alerts(PFBaseModel):
     @classmethod
     def empty(cls):
         return cls(alert=[])
-
-    # alert: list[Alert] | None = optional_json_field(Alert)
-
-
-# AlertList = optional_json_field(Alert)
 
 
 class BaseRequest(pf_shared.PFBaseModel):
