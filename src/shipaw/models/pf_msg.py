@@ -54,7 +54,9 @@ class Alerts(PFBaseModel):
         return bool(self.alert)
 
     def __add__(self, other: Alerts):
-        return Alerts(alert=self.alert + other.alert)
+        als = [alert for alert in self.alert if alert not in other.alert]
+        als.extend(other.alert)
+        return Alerts(alert=als)
 
     def __iadd__(self, other: Alerts):
         self.alert.extend(other.alert)
@@ -173,6 +175,7 @@ class ShipmentResponse(BaseResponse):
                 match _.type:
                     case AlertType.ERROR:
                         logger.error('ExpressLinkl Error, booking failed?: ' + _.message)
+                        raise ExpressLinkError(_.message)
                     case _:
                         logger.warning('Expresslink Warning: ' + _.message)
 
