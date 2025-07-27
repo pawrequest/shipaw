@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pydantic as pyd
 from loguru import logger
+from pydantic import Field, field_validator
 
 from shipaw.pf_config import pf_sett
 from .pf_shared import PFBaseModel
@@ -65,7 +66,6 @@ class Alerts(PFBaseModel):
     def __contains__(self, other: Alert):
         return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
 
-
     # alert: list[Alert] = required_json_field(Alert)
     # alert: list[Alert] = default_json_field(Alert, list)
 
@@ -92,42 +92,15 @@ class BaseRequest(pf_shared.PFBaseModel):
 
 
 class BaseResponse(pf_shared.PFBaseModel):
-    # alerts: list[Alert] | None = pyd.Field(default_factory=list, sa_column=sqm.Column(sqm.JSON))
-    # alerts: Alerts | None = sqm.Field(
-    #     None,
-    #     sa_column=sqm.Column(PydanticJSONColumn(Alerts))
-    # )
-    # alerts: Alerts | None = default_json_field(Alerts, Alerts.empty)
-    alerts: Alerts | None = None
-    # alerts: Alerts | None = optional_json_field(Alerts)
-    # alerts: Alerts | None = pyd.Field(None, sa_column=sqlmodel.Column(PydanticJSONColumn(Alerts)))
+    alerts: Alerts | None = Field(default_factory=Alerts.empty)
 
-    # @pyd.field_validator('alerts', mode='before')
-    # def check_alerts(cls, v, values) -> list[Alert]:
-    #     if not v:
-    #         return set()
-    #     if isinstance(v, dict):
-    #         if 'Alert' in v:
-    #             return [Alert(**alert) for alert in v['Alert']]
-    #     elif isinstance(v, list):
-    #         return [Alert(**alert) for alert in v]
-    #     return v
-    # @pyd.model_validator(mode='after')
-    # def check_alerts(self):
-    #     if isinstance(self.alerts, dict):
-    #         if alt_ds := self.alerts.get('Alert'):
-    #             alts = {Alert(**alt) for alt in alt_ds}
-    #             self.alerts = self.alerts | alts
-    #             for alt in alts:
-    #                 if alt.type == 'WARNING':
-    #                     logger.warning(f'ExpressLink Warning: {alt.message} in {self.__class__.__name__}')
-    #                 elif alt.type == 'ERROR':
-    #                     logger.error(
-    #                         f'ExpressLink Error: {alt.message} in {self.__class__.__name__} - {"; ".join(f"{k}: {v}" for k, v in info.data)}'
-    #                     )
-    #                 else:
-    #                     logger.info(f'ExpressLink {alt.type}: {alt.message} in {self.__class__.__name__}')
-    #     return v
+    @field_validator('alerts', mode='after')
+    def empty_alerts(cls, v):
+        if v is None:
+            return Alerts.empty()
+        if isinstance(v, Alerts):
+            return v
+        raise TypeError(f'Expected Alerts instance, got {type(v)}')
 
 
 class FindMessage(pf_shared.PFBaseModel):
