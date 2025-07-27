@@ -29,18 +29,6 @@ class Alert(PFBaseModel):
     def from_exception(cls, e: Exception):
         return cls(message=str(e), type=AlertType.ERROR)
 
-    def raise_exception(self):
-        match self.type:
-            case 'ERROR':
-                logger.error({self.message})
-                raise ExpressLinkError(self.message)
-            case 'WARNING':
-                logger.warning({self.message})
-                raise ExpressLinkWarning(self.message)
-            case 'NOTIFICATION':
-                logger.info({self.message})
-                raise ExpressLinkNotification(self.message)
-
 
 class Alerts(PFBaseModel):
     alert: list[Alert]
@@ -64,19 +52,16 @@ class Alerts(PFBaseModel):
         self.alert = list(set(self.alert) | set(other.alert))
         return self
 
-    def __sub__(self, other: Alerts):
-        if not isinstance(other, Alerts):
-            raise TypeError(f'Expected Alerts instance, got {type(other)}')
+    def __sub__(self, other: Alerts | Alert):
+        if not isinstance(other, Alerts) and not isinstance(other, Alert):
+            raise TypeError(f'Expected Alerts or Alert instance, got {type(other)}')
+        if isinstance(other, Alert):
+            other = Alerts(alert=[other])
         diff = set(self.alert) - set(other.alert)
         return Alerts(alert=list(diff))
 
     def __contains__(self, alert: Alert):
         return alert in set(self.alert)
-        # return any(alert.code == other.code and alert.message == other.message for alert in self.alert)
-
-    def raise_exceptions(self):
-        for alert in self.alert:
-            alert.raise_exception()
 
     @classmethod
     def empty(cls):
