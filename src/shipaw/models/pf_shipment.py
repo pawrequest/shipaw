@@ -1,6 +1,7 @@
 import datetime as dt
 from functools import partial
 from pathlib import Path
+from typing import Self
 
 from loguru import logger
 from pydantic import ValidationError, constr, model_validator
@@ -8,7 +9,7 @@ from pydantic import ValidationError, constr, model_validator
 from shipaw import ship_types
 from shipaw.models import pf_shared
 from shipaw.models.pf_lists import HazardousGoods
-from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions
+from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions, AddressBase
 from shipaw.models.pf_shared import Enhancement
 from shipaw.models.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
 from shipaw.pf_config import pf_sett
@@ -71,14 +72,6 @@ class Shipment(ShipmentReferenceFields):
     def direction(self) -> ShipDirection:
         return get_ship_direction(self.model_dump())
 
-        # if self.shipment_type == ShipmentType.COLLECTION:
-        #     return ShipDirection.INBOUND
-        # elif self.shipment_type == ShipmentType.DELIVERY:
-        #     if self.recipient_address == pf_sett().home_address:
-        #         return ShipDirection.DROPOFF
-        #     return ShipDirection.OUTBOUND
-        # else:
-        #     raise ValueError(f'Invalid ShipmentType: {self.shipment_type}')
 
     @property
     def remote_contact(self):
@@ -135,6 +128,51 @@ class Shipment(ShipmentReferenceFields):
             self._label_file = unused_path(self.label_path)
         return self._label_file
 
+    def to_dropoff(
+        self, home_contact=pf_sett().home_contact, home_address=pf_sett().home_address
+    ) -> 'ShipmentAwayDropoff':
+        try:
+            return ShipmentAwayDropoff.model_validate(
+                self.model_copy(
+                    update={
+                        'recipient_contact': home_contact,
+                        'recipient_address': home_address,
+                        'sender_contact': ContactSender(**self.remote_contact.model_dump(exclude={'notifications'})),
+                        'sender_address': AddressSender(**self.remote_address.model_dump(exclude_none=True)),
+                    }
+                ),
+                from_attributes=True,
+            )
+        except ValidationError as e:
+            logger.error(f'Error converting Shipment to Dropoff: {e}')
+            raise e
+
+    def to_collection(
+        self, home_contact=pf_sett().home_contact, home_address=pf_sett().home_address, own_label=True
+    ) -> 'ShipmentAwayCollection':
+        try:
+            return ShipmentAwayCollection.model_validate(
+                self.model_copy(
+                    update={
+                        'shipment_type': ShipmentType.COLLECTION,
+                        'print_own_label': own_label,
+                        'collection_info': CollectionInfo(
+                            collection_address=AddressCollection(**self.remote_address.model_dump()),
+                            collection_contact=ContactCollection.model_validate(
+                                self.remote_contact.model_dump(exclude={'notifications'})
+                            ),
+                            collection_time=pf_shared.DateTimeRange.null_times_from_date(self.shipping_date),
+                        ),
+                        'recipient_contact': home_contact,
+                        'recipient_address': home_address,
+                    }
+                ),
+                from_attributes=True,
+            )
+        except ValidationError as e:
+            logger.error(f'Error converting Shipment to Collection: {e}')
+            raise e
+
 
 class ShipmentAwayCollection(Shipment):
     shipment_type: ShipmentType = ShipmentType.COLLECTION
@@ -149,53 +187,6 @@ class ShipmentAwayCollection(Shipment):
 class ShipmentAwayDropoff(Shipment):
     sender_contact: ContactSender
     sender_address: AddressSender
-
-
-def to_collection_blank(shipment: Shipment, home_contact, home_address, own_label=True) -> ShipmentAwayCollection:
-    try:
-        return ShipmentAwayCollection.model_validate(
-            shipment.model_copy(
-                update={
-                    'shipment_type': ShipmentType.COLLECTION,
-                    'print_own_label': own_label,
-                    'collection_info': CollectionInfo(
-                        collection_address=AddressCollection(**shipment.recipient_address.model_dump()),
-                        collection_contact=ContactCollection.model_validate(
-                            shipment.recipient_contact.model_dump(exclude={'notifications'})
-                        ),
-                        collection_time=pf_shared.DateTimeRange.null_times_from_date(shipment.shipping_date),
-                    ),
-                    'recipient_contact': home_contact,
-                    'recipient_address': home_address,
-                }
-            ),
-            from_attributes=True,
-        )
-    except ValidationError as e:
-        logger.error(f'Error converting Shipment to Collection: {e}')
-        raise e
-
-
-def to_dropoff_blank(shipment: Shipment, home_contact, home_address) -> ShipmentAwayDropoff:
-    try:
-        return ShipmentAwayDropoff.model_validate(
-            shipment.model_copy(
-                update={
-                    'recipient_contact': home_contact,
-                    'recipient_address': home_address,
-                    'sender_contact': ContactSender(**shipment.recipient_contact.model_dump(exclude={'notifications'})),
-                    'sender_address': AddressSender(**shipment.recipient_address.model_dump(exclude_none=True)),
-                }
-            ),
-            from_attributes=True,
-        )
-    except ValidationError as e:
-        logger.error(f'Error converting Shipment to Dropoff: {e}')
-        raise e
-
-
-to_dropoff = partial(to_dropoff_blank, home_address=pf_sett().home_address, home_contact=pf_sett().home_contact)
-to_collection = partial(to_collection_blank, home_address=pf_sett().home_address, home_contact=pf_sett().home_contact)
 
 
 def unused_path(filepath: Path):
