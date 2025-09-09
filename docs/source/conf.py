@@ -36,7 +36,7 @@ html_context = {
     'conf_py_path': '/docs/source/',
 }
 html_baseurl = 'https://pawrequest.github.io/shipaw/'
-readme_src_files = 'index.rst'
+readme_src_files = ['index.rst']
 readme_docs_url_type = 'code'
 add_module_names = False
 autodoc_default_options = {
