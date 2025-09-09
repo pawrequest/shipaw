@@ -1,0 +1,57 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Build Sphinx Documentation
+        run: |
+          sphinx-build -b html ./docs/source/ ./docs/build/html
+
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html
+#
+#      - name: Build Sphinx Documentation
+#        run: |
+#          sphinx-build -b html ./docs/_source/ ./docs/_build/html
+#
+##      - name: Rename README.html to index.html
+##        run: |
+##          cp ./build/html/README.html ./build/html/index.html
+#
+#      - name: Deploy to GitHub Pages
+#        uses: peaceiris/actions-gh-pages@v4
+#        if: github.ref == 'refs/heads/main'
+#        with:
+##          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+#          publish_dir: ./build/html
+
+

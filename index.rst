@@ -12,7 +12,7 @@ Users need only instantiate the client and relevant pydantic models to book ship
 
 **Contents:**
 
-* `some text <https://pawrequest.github.io/shipaw/client.html>`_
+* `ExpressLinkClient <https://pawrequest.github.io/shipaw/client.html>`_
 
   |
 
