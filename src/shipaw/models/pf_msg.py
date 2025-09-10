@@ -163,7 +163,7 @@ class ShipmentResponse(BaseResponse):
         return tlink
 
     def handle_errors(self):
-        if hasattr(self, 'Error'):
+        if hasattr(self, 'Error'): # Combadge adds this? or PF? not in WSDL but appears sometimes
             msg = self.Error.message if hasattr(self.Error, 'message') else str(self.Error)
             raise ExpressLinkError(msg)
         if hasattr(self, 'alerts') and hasattr(self.alerts, 'alert'):
