@@ -36,6 +36,7 @@ class PFSettings(BaseSettings):
     pf_wsdl: str
     pf_binding: str = r'{http://www.parcelforce.net/ws/ship/v14}ShipServiceSoapBinding'
     tracking_url_stem: str = r'https://www.parcelforce.com/track-trace?trackNumber='
+    tracking_url_stem_rm: str = r'https://www.royalmail.com/track-your-item#/tracking-results/'
     pf_endpoint: str
 
     label_dir: Path

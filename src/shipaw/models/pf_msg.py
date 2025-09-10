@@ -157,6 +157,11 @@ class ShipmentResponse(BaseResponse):
         # logger.info(f'Getting tracking link: {str(tlink)}')
         return tlink
 
+    def tracking_link_rm(self):
+        stem = pf_sett().tracking_url_stem_rm
+        tlink = f'{stem}PB{self.shipment_num}001'
+        return tlink
+
     def handle_errors(self):
         if hasattr(self, 'Error'):
             msg = self.Error.message if hasattr(self.Error, 'message') else str(self.Error)
