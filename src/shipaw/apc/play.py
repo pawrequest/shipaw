@@ -1,8 +1,12 @@
 import base64
 import os
+from datetime import date, time, timedelta
+
 import httpx
 from enum import StrEnum
 import dotenv
+
+from shipaw.apc.available_services.avail_request import ServiceRequest
 
 dotenv.load_dotenv(r'C:\prdev\repos\amdev\shipaw\apc.env')
 # class TrainingEndPoint(StrEnum):
@@ -40,6 +44,14 @@ req = {
     }
 }
 
+req2 = ServiceRequest(
+    collection_date=date.today() + timedelta(days=1),
+    ready_at=time(hour=9),
+    closed_at=time(hour=17),
+
+
+
+)
 if __name__ == '__main__':
     res = httpx.post(EPT, headers=headers, json=req, timeout=30)
     # res.raise_for_status()
