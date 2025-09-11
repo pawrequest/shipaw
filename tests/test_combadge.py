@@ -5,16 +5,16 @@ from shipaw.models import pf_ext
 
 
 def test_client_gets_candidates(el_client, address_r):
-    addresses = el_client.get_candidates(address_r.postcode)
+    addresses = el_client.get_candidates(address_r.postal_code)
     assert isinstance(addresses, list)
     assert isinstance(addresses[0], pf_ext.AddressRecipient)
-    assert addresses[0].postcode == address_r.postcode
+    assert addresses[0].postal_code == address_r.postal_code
 
 
 def test_client_sends_outbound(shipment, el_client, tmp_path):
     # req = el_client.outbound_shipment_request(shipment)
     shipment.direction = 'out'
-    req = el_client.shipment_request_authenticated(shipment)
+    req = shipment.authenticated(shipment)
     assert isinstance(req, msgs.CreateRequest)
     resp = el_client.send_shipment_request(req)
     assert isinstance(resp, msgs.CreateShipmentResponse)
