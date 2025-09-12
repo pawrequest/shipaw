@@ -41,3 +41,7 @@ class Order(APCBaseModel):
 
 class Orders(APCBaseModel):
     order: Order
+
+
+class OrderCollection(APCBaseModel):
+    orders: Orders
