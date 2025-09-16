@@ -33,7 +33,6 @@ class EndPoints(StrEnum):
     SERVICES = BASE + 'ServiceAvailability.json'
     ORDERS = BASE + 'Orders.json'
 
-
 def encode_b64_str(s: str) -> str:
     return base64.b64encode(s.encode('utf8')).decode('utf8')
     # bytes_64 = s.encode('utf8')
@@ -49,3 +48,10 @@ def get_headers() -> dict:
     usr = os.environ.get('EMAIL')
     pwd = os.environ.get('PASSWORD')
     return {'Content-Type': 'application/json', 'remote-user': get_remote_user(usr, pwd)}
+
+
+
+
+#
+def apc_date(d: date) -> str:
+    return d.strftime('%d/%m/%Y')

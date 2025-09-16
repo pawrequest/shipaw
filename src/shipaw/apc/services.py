@@ -1,6 +1,23 @@
+from enum import StrEnum
+from typing import Literal, Self
+
 from pydantic import ConfigDict
 
+from shipaw.agnostic.agnost import ShippingService
 from shipaw.apc.shared import APCBaseModel
+
+
+class ProductCode(StrEnum):
+    NEXT_DAY16 = 'ND16'
+# ProductCode = Literal['ND16']
+
+
+class APCService(ShippingService):
+    code: ProductCode
+
+    @classmethod
+    def next_day_16(cls) -> Self:
+        return cls(name='Next Day 16', code=ProductCode.NEXT_DAY16)
 
 
 class ServiceSpec(APCBaseModel):

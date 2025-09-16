@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from shipaw import msgs
-from shipaw.models import pf_ext
+from shipaw.parcelforce import pf_ext
 
 
 def test_client_gets_candidates(el_client, address_r):
