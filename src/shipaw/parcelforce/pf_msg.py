@@ -5,10 +5,10 @@ from loguru import logger
 from pydantic import Field, field_validator
 
 from shipaw.pf_config import pf_sett
-from shipaw.models.pf_shared import PFBaseModel
-from shipaw.models.pf_shipment import Shipment
+from shipaw.parcelforce.pf_shared import PFBaseModel
+from shipaw.parcelforce.pf_shipment import Shipment
 from shipaw import ship_types
-from shipaw.models import pf_lists, pf_models, pf_shared, pf_top
+from shipaw.parcelforce import pf_lists, pf_models, pf_shared, pf_top
 from shipaw.ship_types import AlertType, ExpressLinkError, ExpressLinkNotification, ExpressLinkWarning
 
 

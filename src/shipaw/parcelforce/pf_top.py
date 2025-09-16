@@ -5,9 +5,13 @@ import pydantic as _p
 from pawdantic import paw_types
 from pydantic import constr
 
+from .pf_models import AddressRecipient as PFAddress
+from .pf_shared import ServiceCode
+from .pf_shipment import Shipment as PFShipment
 from .. import ship_types
 from . import pf_lists, pf_models, pf_shared
-from ..ship_types import MyPhone
+from ..agnostic.agnost import Address, Contact, Shipment
+from ..ship_types import MyPhone, ShipDirection
 
 
 class Contact(pf_shared.PFBaseModel):
@@ -280,3 +284,45 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     # total_shipment_weight: float | None = None
     # enhancement: pf_shared.Enhancement | None = None
     # delivery_options: pf_models.DeliveryOptions | None = None
+
+
+def parcelforce_contact(contact: Contact) -> PFContact:
+    return PFContact(
+        business_name=contact.business_name,
+        mobile_phone=contact.mobile_phone,
+        email_address=contact.contact_name,
+        contact_name=contact.contact_name,
+    )
+
+
+def parcelforce_address(address: Address) -> PFAddress:
+    return PFAddress(
+        address_line1=address.address_lines[0],
+        address_line2=address.address_lines[1],
+        address_line3=address.address_lines[2],
+        town=address.town,
+        postcode=address.postcode,
+    )
+
+
+def parcelforce_shipment(shipment: Shipment):
+    ref_nums = {'reference_number' + i: ref for ref, i in enumerate(shipment.references)}
+    service_code = shipment.service
+    if service_code not in ServiceCode.__members__:
+        raise ValueError(f'Invalid Service Code {service_code}')
+    ship = PFShipment(
+        **ref_nums,
+        recipient_contact=parcelforce_contact(shipment.recipient_contact),
+        recipient_address=parcelforce_address(shipment.recipient_address),
+        total_number_of_parcels=shipment.boxes,
+        shipping_date=shipment.shipping_date,
+    )
+    match shipment.direction:
+        case ShipDirection.OUTBOUND:
+            return PFShipment.model_validate(ship)
+        case ShipDirection.INBOUND:
+            return ship.to_collection()
+        case ShipDirection.DROPOFF:
+            return ship.to_dropoff()
+        case _:
+            raise ValueError('Invalid Ship Direction')

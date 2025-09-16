@@ -12,15 +12,15 @@ from shipaw.ship_types import ExpressLinkError
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from .models.pf_combadge import (
+from .parcelforce.pf_combadge import (
     CancelShipmentService,
     CreateManifestService,
     CreateShipmentService,
     FindService,
     PrintLabelService,
 )
-from .models.pf_models import AddTypes, AddressChoice, AddressRecipient
-from .models.pf_msg import (
+from .parcelforce.pf_models import AddTypes, AddressChoice, AddressRecipient
+from .parcelforce.pf_msg import (
     CancelShipmentRequest,
     CancelShipmentResponse,
     CreateManifestRequest,
@@ -32,8 +32,8 @@ from .models.pf_msg import (
     ShipmentResponse,
     log_booked_shipment,
 )
-from .models.pf_shipment import Shipment
-from .models.pf_top import PAF
+from .parcelforce.pf_shipment import Shipment
+from .parcelforce.pf_top import PAF
 from .pf_config import PFSettings, pf_sett
 from .ship_types import AlertType, VALID_POSTCODE
 

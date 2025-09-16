@@ -7,11 +7,11 @@ from loguru import logger
 from pydantic import ValidationError, constr, model_validator
 
 from shipaw import ship_types
-from shipaw.models import pf_shared
-from shipaw.models.pf_lists import HazardousGoods
-from shipaw.models.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions, AddressBase
-from shipaw.models.pf_shared import Enhancement
-from shipaw.models.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
+from shipaw.parcelforce import pf_shared
+from shipaw.parcelforce.pf_lists import HazardousGoods
+from shipaw.parcelforce.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions, AddressBase
+from shipaw.parcelforce.pf_shared import Enhancement
+from shipaw.parcelforce.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
 from shipaw.pf_config import pf_sett
 from shipaw.ship_types import ShipDirection, ShipmentType, get_ship_direction
 
@@ -29,6 +29,7 @@ class ShipmentReferenceFields(pf_shared.PFBaseModel):
 
 
 class Shipment(ShipmentReferenceFields):
+    shipment_type: ShipmentType = ShipmentType.DELIVERY
     # from settings
     department_id: int = pf_sett().department_id
     contract_number: str = pf_sett().pf_contract_num_1
@@ -38,8 +39,6 @@ class Shipment(ShipmentReferenceFields):
     total_number_of_parcels: int = 1
     shipping_date: dt.date
     service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
-
-    shipment_type: ShipmentType = ShipmentType.DELIVERY
 
     # subclasses
     print_own_label: bool | None = None
