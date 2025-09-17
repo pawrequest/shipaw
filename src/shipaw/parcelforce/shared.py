@@ -1,27 +1,16 @@
 # from __future__ import annotations
 import datetime as dt
 import enum
-import typing as _t
 from enum import Enum
 from pathlib import Path
 
 import pydantic as _p
-from pydantic import BaseModel
-from pydantic.alias_generators import to_pascal
 
-from shipaw.ship_types import AlertType
+from shipaw.agnostic.base import ShipawBaseModel
+from shipaw.agnostic.responses import AlertType
 
 
-# class PFBaseModel(sqm.SQLModel):
-class PFBaseModel(BaseModel):
-    model_config = _p.ConfigDict(
-        alias_generator=_p.AliasGenerator(
-            alias=to_pascal,
-        ),
-        use_enum_values=True,
-        populate_by_name=True,
-
-    )
+class PFBaseModel(ShipawBaseModel): ...
 
 
 class ServiceCode(enum.StrEnum):
@@ -81,11 +70,6 @@ class ServiceCodeFull(enum.StrEnum):
     IRELANDEXPRESS = 'I24'
 
 
-class Authentication(PFBaseModel):
-    user_name: _t.Annotated[str, _p.StringConstraints(max_length=80)]
-    password: _t.Annotated[str, _p.StringConstraints(max_length=80)]
-
-
 class Hours(PFBaseModel):
     open: str | None = None
     close: str | None = None
@@ -141,17 +125,12 @@ class DateTimeRange(PFBaseModel):
 
     @classmethod
     def null_times_from_date(cls, null_date: dt.date):
-        null_isodatetime = dt.datetime.combine(null_date, dt.time(0, 0)).isoformat(
-            timespec='seconds'
-        )
+        null_isodatetime = dt.datetime.combine(null_date, dt.time(0, 0)).isoformat(timespec='seconds')
         return cls(from_=null_isodatetime, to=null_isodatetime)
 
     @classmethod
     def from_datetimes(cls, from_dt: dt.datetime, to_dt: dt.datetime):
-        return cls(
-            from_=from_dt.isoformat(timespec='seconds'),
-            to=to_dt.isoformat(timespec='seconds')
-        )
+        return cls(from_=from_dt.isoformat(timespec='seconds'), to=to_dt.isoformat(timespec='seconds'))
 
 
 class ContentData(PFBaseModel):

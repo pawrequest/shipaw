@@ -1,48 +1,56 @@
-import datetime
-from typing import Any, Generator
+import os
+
+import dotenv
+
+APC_ENV = r'C:\prdev\repos\amdev\shipaw\apc_sandbox.env'
+
+os.environ['SHIP_ENV'] = r'C:\ProgramData\AmherstPR\pf_sandbox.env'
+dotenv.load_dotenv(APC_ENV)
+
+from datetime import date, timedelta
 
 import pytest
 
-# from shipaw.expresslink_client import ELClient
-# from shipaw.models.pf_models import AddressRecipient
-# from shipaw.models.pf_top import Contact
-# from shipaw.pf_config import pf_sandbox_sett, PFSandboxSettings
+from shipaw.agnostic.shipment import Shipment
+from shipaw.agnostic.address import Address, Contact
+from shipaw.agnostic.services import ServiceType
+from shipaw.agnostic.ship_types import ShipDirection
 
-#
-#
-# @pytest.fixture
-# def sett():
-#     settings = pf_sandbox_sett()
-#     PFSandboxSettings.model_validate(settings, from_attributes=True)
-#     yield settings
-#
-#
-# @pytest.fixture
-# def el_client(sett) -> Generator[ELClient, Any, None]:
-#     yield ELClient(settings=sett)
-#
-#
-# @pytest.fixture
-# def address_r() -> AddressRecipient:
-#     return AddressRecipient(
-#         address_line1='30 Bennet Close',
-#         town='East Wickham',
-#         postcode='DA16 3HU',
-#     )
-#
-#
-# @pytest.fixture
-# def contact_r() -> Contact:
-#     return Contact(
-#         business_name='Test Business',
-#         email_address='notreal@fake.com',
-#         mobile_phone='1234567890',
-#     )
-#
-#
-# @pytest.fixture
-# def contact_collection(contact_r):
-#     contact_r.contact_name = 'Test Contact'
-#     return contact_r
-#
-#
+
+TEST_DATE = date.today() + timedelta(days=2)
+if TEST_DATE.weekday() in (5, 6):
+    TEST_DATE += timedelta(days=7 - TEST_DATE.weekday())
+
+
+@pytest.fixture(scope='session')
+def sample_contact():
+    yield Contact(
+        contact_name='Test Contact name',
+        mobile_phone='07666666666',
+        email_address='dsvkndslvn@dzv.com',
+        business_name='Test Company',
+    )
+
+
+@pytest.fixture(scope='session')
+def sample_address():
+    yield Address(
+        postcode='DA16 3HU',
+        address_lines=['25 Bennet Close'],
+        town='Welling',
+        country='GB',
+    )
+
+
+@pytest.fixture(scope='session')
+def sample_shipment(sample_contact, sample_address):
+    yield Shipment(
+        recipient_contact=sample_contact,
+        recipient_address=sample_address,
+        boxes=2,
+        shipping_date=TEST_DATE,
+        direction=ShipDirection.OUTBOUND,
+        reference='Test Reference',
+        service='NEXT_DAY',
+    )
+

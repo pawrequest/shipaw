@@ -1,22 +1,28 @@
 import datetime as dt
-from functools import partial
 from pathlib import Path
-from typing import Self
 
 from loguru import logger
 from pydantic import ValidationError, constr, model_validator
 
-from shipaw import ship_types
-from shipaw.parcelforce import pf_shared
-from shipaw.parcelforce.pf_lists import HazardousGoods
-from shipaw.parcelforce.pf_models import AddressCollection, AddressRecipient, AddressSender, DeliveryOptions, AddressBase
-from shipaw.parcelforce.pf_shared import Enhancement
-from shipaw.parcelforce.pf_top import CollectionInfo, Contact, ContactCollection, ContactSender
-from shipaw.pf_config import pf_sett
-from shipaw.ship_types import ShipDirection, ShipmentType, get_ship_direction
+from shipaw.agnostic import ship_types
+from shipaw.agnostic.shipment import Shipment as _Shipment
+from shipaw.agnostic.address import Address as _Address
+from shipaw.parcelforce.lists import HazardousGoods
+from shipaw.parcelforce.models import (
+    AddressCollection,
+    AddressRecipient,
+    AddressRecipient as PFAddress,
+    AddressSender,
+    DeliveryOptions,
+)
+from shipaw.parcelforce.services import ParcelforceServiceDict, ParcelforceServices
+from shipaw.parcelforce.shared import DateTimeRange, Enhancement, PFBaseModel, ServiceCode
+from shipaw.parcelforce.top import CollectionInfo, Contact, ContactCollection, ContactSender
+from shipaw.parcelforce.pf_config import pf_sett
+from shipaw.agnostic.ship_types import ShipDirection, ShipmentType, get_ship_direction
 
 
-class ShipmentReferenceFields(pf_shared.PFBaseModel):
+class ShipmentReferenceFields(PFBaseModel):
     reference_number1: constr(max_length=24) | None = None
     reference_number2: constr(max_length=24) | None = None
     reference_number3: constr(max_length=24) | None = None
@@ -38,7 +44,7 @@ class Shipment(ShipmentReferenceFields):
     recipient_address: AddressRecipient | AddressCollection
     total_number_of_parcels: int = 1
     shipping_date: dt.date
-    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+    service_code: ServiceCode = ServiceCode.EXPRESS24
 
     # subclasses
     print_own_label: bool | None = None
@@ -70,7 +76,6 @@ class Shipment(ShipmentReferenceFields):
     @property
     def direction(self) -> ShipDirection:
         return get_ship_direction(self.model_dump())
-
 
     @property
     def remote_contact(self):
@@ -160,7 +165,7 @@ class Shipment(ShipmentReferenceFields):
                             collection_contact=ContactCollection.model_validate(
                                 self.remote_contact.model_dump(exclude={'notifications'})
                             ),
-                            collection_time=pf_shared.DateTimeRange.null_times_from_date(self.shipping_date),
+                            collection_time=DateTimeRange.null_times_from_date(self.shipping_date),
                         ),
                         'recipient_contact': home_contact,
                         'recipient_address': home_address,
@@ -200,3 +205,49 @@ def unused_path(filepath: Path):
         lpath = numbered_filepath(incremented)
     logger.debug(f'Using FilePath={lpath}')
     return lpath
+
+
+def parcelforce_contact(contact: Contact) -> Contact:
+    return Contact(
+        business_name=contact.business_name,
+        mobile_phone=contact.mobile_phone,
+        email_address=contact.email_address,
+        contact_name=contact.contact_name,
+    )
+
+
+def parcelforce_address(address: _Address) -> PFAddress:
+    return PFAddress(
+        address_line1=address.address_lines[0],
+        address_line2=address.address_lines[1],
+        address_line3=address.address_lines[2],
+        town=address.town,
+        postcode=address.postcode,
+    )
+
+
+def parcelforce_shipment(shipment: _Shipment):
+    ref_nums = {'reference_number' + i: ref for ref, i in enumerate(shipment.references)}
+    service_code = ParcelforceServiceDict[shipment.service.upper()]
+    ship = Shipment(
+        **ref_nums,
+        recipient_contact=parcelforce_contact(shipment.recipient_contact),
+        recipient_address=parcelforce_address(shipment.recipient_address),
+        total_number_of_parcels=shipment.boxes,
+        shipping_date=shipment.shipping_date,
+        service_code=service_code,
+    )
+    match shipment.direction:
+        case ShipDirection.OUTBOUND:
+            return Shipment.model_validate(ship)
+        case ShipDirection.INBOUND:
+            return ship.to_collection()
+        case ShipDirection.DROPOFF:
+            return ship.to_dropoff()
+        case _:
+            raise ValueError('Invalid Ship Direction')
+
+
+def parcelforce_shipment_dict(shipment:_Shipment) -> dict:
+    ship = parcelforce_shipment(shipment)
+    return ship.model_dump(mode='json')

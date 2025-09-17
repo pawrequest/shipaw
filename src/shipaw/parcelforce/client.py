@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 import pydantic
@@ -8,19 +9,18 @@ from combadge.core.typevars import ServiceProtocolT
 from combadge.support.zeep.backends.sync import ZeepBackend
 from loguru import logger
 from pydantic import model_validator
-from shipaw.ship_types import ExpressLinkError
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
-from .parcelforce.pf_combadge import (
+from shipaw.parcelforce.combadge import (
     CancelShipmentService,
     CreateManifestService,
     CreateShipmentService,
     FindService,
     PrintLabelService,
 )
-from .parcelforce.pf_models import AddTypes, AddressChoice, AddressRecipient
-from .parcelforce.pf_msg import (
+from shipaw.parcelforce.models import AddTypes, AddressChoice, AddressRecipient
+from shipaw.parcelforce.msg import (
     CancelShipmentRequest,
     CancelShipmentResponse,
     CreateManifestRequest,
@@ -32,10 +32,10 @@ from .parcelforce.pf_msg import (
     ShipmentResponse,
     log_booked_shipment,
 )
-from .parcelforce.pf_shipment import Shipment
-from .parcelforce.pf_top import PAF
-from .pf_config import PFSettings, pf_sett
-from .ship_types import AlertType, VALID_POSTCODE
+from shipaw.parcelforce.shipment import Shipment
+from shipaw.parcelforce.top import PAF
+from shipaw.parcelforce.pf_config import PFSettings, pf_sett
+from shipaw.agnostic.ship_types import VALID_POSTCODE
 
 SCORER = fuzz.token_sort_ratio
 
@@ -218,3 +218,17 @@ class ELClient(pydantic.BaseModel):
 def clean_up_postcode(postcode: str):
     postcode = postcode.upper()
     return postcode
+
+
+def wait_label(shipment_num, dl_path: str, el_client: ELClient) -> pathlib.Path:
+    label_path = el_client.get_label(ship_num=shipment_num, dl_path=dl_path).resolve()
+    for i in range(20):
+        if label_path:
+            return label_path
+        else:
+            print('waiting for file to be created')
+            time.sleep(1)
+    else:
+        raise ValueError(f'file not created after 20 seconds {label_path=}')
+
+

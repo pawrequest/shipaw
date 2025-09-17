@@ -9,8 +9,12 @@ from loguru import logger
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from shipaw.parcelforce import pf_lists, pf_models, pf_shared, pf_top
-from shipaw.ship_types import MyPhone, ShipDirection
+from shipaw.agnostic.ship_types import MyPhone, ShipDirection
+from shipaw.parcelforce.lists import RecipientNotifications
+from shipaw.parcelforce.models import AddressCollection
+from shipaw.parcelforce.shared import NotificationType
+from shipaw.agnostic.requests import Authentication
+from shipaw.parcelforce.top import Contact
 
 SHIP_ENV = os.getenv('SHIP_ENV')
 if not Path(SHIP_ENV).exists():
@@ -53,8 +57,8 @@ class PFSettings(BaseSettings):
     home_phone: MyPhone | None = None
     home_mobile_phone: MyPhone
 
-    home_address: pf_models.AddressCollection | None = None
-    home_contact: pf_top.Contact | None = None
+    home_address: AddressCollection | None = None
+    home_contact: Contact | None = None
 
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=SHIP_ENV)
 
@@ -89,7 +93,7 @@ class PFSettings(BaseSettings):
     #     return v
 
     def auth(self):
-        return pf_shared.Authentication(
+        return Authentication(
             user_name=self.pf_expr_usr.get_secret_value(), password=self.pf_expr_pwd.get_secret_value()
         )
 
@@ -104,7 +108,7 @@ class PFSettings(BaseSettings):
     @_p.model_validator(mode='after')
     def home_address_validator(self):
         if self.home_address is None:
-            self.home_address = pf_models.AddressCollection(
+            self.home_address = AddressCollection(
                 address_line1=self.home_address_line1,
                 address_line2=self.home_address_line2,
                 address_line3=self.home_address_line3,
@@ -117,15 +121,15 @@ class PFSettings(BaseSettings):
     @_p.model_validator(mode='after')
     def home_contact_validator(self):
         if self.home_contact is None:
-            self.home_contact = pf_top.Contact(
+            self.home_contact = Contact(
                 business_name=self.home_business_name,
                 contact_name=self.home_contact_name,
                 email_address=self.home_email,
                 mobile_phone=self.home_mobile_phone,
-                notifications=pf_lists.RecipientNotifications(
+                notifications=RecipientNotifications(
                     notification_type=[
-                        pf_shared.NotificationType.DELIVERY,
-                        pf_shared.NotificationType.EMAIL,
+                        NotificationType.DELIVERY,
+                        NotificationType.EMAIL,
                     ]
                 ),
             )

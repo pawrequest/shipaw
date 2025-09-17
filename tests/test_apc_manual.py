@@ -1,8 +1,8 @@
 import httpx
 import pytest
 
+from conftest import TEST_DATE
 from shipaw.apc.shared import EndPoints, get_headers
-from test_apc import TEST_DATE
 
 
 @pytest.fixture

@@ -1,27 +1,40 @@
 import datetime as dt
 import typing as _t
 
-import pydantic as _p
+import pydantic
 from pawdantic import paw_types
 from pydantic import constr
 
-from .pf_models import AddressRecipient as PFAddress
-from .pf_shared import ServiceCode
-from .pf_shipment import Shipment as PFShipment
-from .. import ship_types
-from . import pf_lists, pf_models, pf_shared
-from ..agnostic.agnost import Address, Contact, Shipment
-from ..ship_types import MyPhone, ShipDirection
+# from shipaw.parcelforce.pf_shipment import Shipment as PFShipment
+from shipaw.agnostic import ship_types
+from shipaw.agnostic.ship_types import MyPhone
+from shipaw.parcelforce.lists import (
+    Barcodes,
+    CollectionNotifications,
+    CompletedShipments,
+    ContentDetails,
+    HazardousGoods,
+    Images,
+    LabelData,
+    ManifestShipments,
+    NominatedDeliveryDatelist,
+    ParcelContents,
+    RecipientNotifications,
+    ServiceCodes,
+    SpecifiedNeighbour,
+)
+from shipaw.parcelforce.models import AddTypes, AddressCollection, AddressRecipient, DeliveryOptions, InBoundDetails
+from shipaw.parcelforce.shared import DateTimeRange, Enhancement, PFBaseModel, Returns, ServiceCode
 
 
-class Contact(pf_shared.PFBaseModel):
+class Contact(PFBaseModel):
     business_name: paw_types.truncated_printable_str_type(40)
     # business_name: constr(max_length=40)
     mobile_phone: MyPhone
     email_address: constr(max_length=50)
     contact_name: paw_types.truncated_printable_str_type(30)
     # contact_name: constr(max_length=30)
-    notifications: pf_lists.RecipientNotifications | None = pf_lists.RecipientNotifications.standard_recip()
+    notifications: RecipientNotifications | None = RecipientNotifications.standard_recip()
 
     @property
     def notifications_str(self) -> str:
@@ -33,14 +46,14 @@ class ContactCollection(Contact):
     senders_name: paw_types.optional_truncated_printable_str_type(25)
     # senders_name: constr(max_length=25) | None = None
     telephone: MyPhone | None = None
-    notifications: pf_lists.CollectionNotifications | None = pf_lists.CollectionNotifications.standard_coll()
+    notifications: CollectionNotifications | None = CollectionNotifications.standard_coll()
 
     @property
     def notifications_str(self) -> str:
         msg = f'Collecton Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
         return msg
 
-    @_p.model_validator(mode='after')
+    @pydantic.model_validator(mode='after')
     def tel_is_none(self):
         if not self.telephone:
             self.telephone = self.mobile_phone
@@ -54,7 +67,6 @@ class ContactCollection(Contact):
 
 
 class ContactSender(Contact):
-
     business_name: paw_types.optional_truncated_printable_str_type(25)
     # business_name: constr(max_length=25)
     mobile_phone: MyPhone
@@ -74,7 +86,7 @@ class ContactTemporary(Contact):
     telephone: MyPhone | None = None
     senders_name: str = ''
 
-    @_p.model_validator(mode='after')
+    @pydantic.model_validator(mode='after')
     def fake(self):
         for field, value in self.model_dump().items():
             if not value:
@@ -85,19 +97,19 @@ class ContactTemporary(Contact):
         return self
 
 
-class PAF(pf_shared.PFBaseModel):
+class PAF(PFBaseModel):
     postcode: str | None = None
-    count: int | None = _p.Field(None)
-    specified_neighbour: list[pf_lists.SpecifiedNeighbour] = _p.Field(default_factory=list, description='')
+    count: int | None = pydantic.Field(None)
+    specified_neighbour: list[SpecifiedNeighbour] = pydantic.Field(default_factory=list, description='')
 
 
-class Department(pf_shared.PFBaseModel):
-    department_id: list[int | None] = _p.Field(None, description='')
-    service_codes: list[pf_lists.ServiceCodes | None] = _p.Field(None, description='')
-    nominated_delivery_date_list: pf_lists.NominatedDeliveryDatelist | None = None
+class Department(PFBaseModel):
+    department_id: list[int | None] = pydantic.Field(None, description='')
+    service_codes: list[ServiceCodes | None] = pydantic.Field(None, description='')
+    nominated_delivery_date_list: NominatedDeliveryDatelist | None = None
 
 
-class Parcel(pf_shared.PFBaseModel):
+class Parcel(PFBaseModel):
     weight: float | None = None
     length: int | None = None
     height: int | None = None
@@ -106,52 +118,52 @@ class Parcel(pf_shared.PFBaseModel):
     invoice_number: str | None = None
     export_license_number: str | None = None
     certificate_number: str | None = None
-    content_details: pf_lists.ContentDetails | None = None
+    content_details: ContentDetails | None = None
     shipping_cost: float | None = None
 
 
-class ParcelLabelData(pf_shared.PFBaseModel):
+class ParcelLabelData(PFBaseModel):
     parcel_number: str | None = None
     shipment_number: str | None = None
     journey_leg: str | None = None
-    label_data: pf_lists.LabelData | None = None
-    barcodes: pf_lists.Barcodes | None = None
-    images: pf_lists.Images | None = None
-    parcel_contents: list[pf_lists.ParcelContents | None] = _p.Field(None, description='')
+    label_data: LabelData | None = None
+    barcodes: Barcodes | None = None
+    images: Images | None = None
+    parcel_contents: list[ParcelContents | None] = pydantic.Field(None, description='')
 
 
-class CompletedManifestInfo(pf_shared.PFBaseModel):
+class CompletedManifestInfo(PFBaseModel):
     department_id: int
     manifest_number: str
     manifest_type: str
     total_shipment_count: int
-    manifest_shipments: pf_lists.ManifestShipments
+    manifest_shipments: ManifestShipments
 
 
-class CompletedShipmentInfoCreatePrint(pf_shared.PFBaseModel):
+class CompletedShipmentInfoCreatePrint(PFBaseModel):
     lead_shipment_number: str | None = None
     shipment_number: str | None = None
     delivery_date: str | None = None
     status: str
-    completed_shipments: pf_lists.CompletedShipments
+    completed_shipments: CompletedShipments
 
 
-class CompletedShipmentInfo(pf_shared.PFBaseModel):
+class CompletedShipmentInfo(PFBaseModel):
     lead_shipment_number: str | None = None
     delivery_date: dt.date | None = None
     status: str | None = None
-    completed_shipments: pf_lists.CompletedShipments | None = None
+    completed_shipments: CompletedShipments | None = None
 
 
-class CollectionInfo(pf_shared.PFBaseModel):
+class CollectionInfo(PFBaseModel):
     collection_contact: ContactCollection
-    collection_address: pf_models.AddressCollection
-    collection_time: pf_shared.DateTimeRange
+    collection_address: AddressCollection
+    collection_time: DateTimeRange
 
 
 class CollectionStateProtocol(_t.Protocol):
     contact: Contact
-    address: pf_models.AddressCollection
+    address: AddressCollection
     ship_date: dt.date
 
 
@@ -161,7 +173,7 @@ class CollectionStateProtocol(_t.Protocol):
 #     info = CollectionInfo(
 #         collection_contact=col_contact,
 #         collection_address=state.address,
-#         collection_time=pf_shared.DateTimeRange.from_datetimes(
+#         collection_time=DateTimeRange.from_datetimes(
 #             dt.datetime.combine(state.ship_date, COLLECTION_TIME_FROM),
 #             dt.datetime.combine(state.ship_date, COLLECTION_TIME_TO)
 #         )
@@ -169,10 +181,10 @@ class CollectionStateProtocol(_t.Protocol):
 #     return info.model_validate(info)
 
 
-class RequestedShipmentZero(pf_shared.PFBaseModel):
+class RequestedShipmentZero(PFBaseModel):
     recipient_contact: Contact
-    recipient_address: pf_models.AddTypes
-    total_number_of_parcels: int = _p.Field(..., description='Number of parcels in the shipment')
+    recipient_address: AddTypes
+    total_number_of_parcels: int = pydantic.Field(..., description='Number of parcels in the shipment')
     shipping_date: dt.date
 
 
@@ -183,13 +195,13 @@ class RequestedShipmentMinimum(RequestedShipmentZero):
     department_id: int = ship_types.DepartmentNum
 
     shipment_type: ship_types.ShipmentType = 'DELIVERY'
-    service_code: pf_shared.ServiceCode = pf_shared.ServiceCode.EXPRESS24
+    service_code: ServiceCode = ServiceCode.EXPRESS24
     reference_number1: paw_types.optional_truncated_printable_str_type(24)  # first 14 visible on label
 
-    special_instructions1: _p.constr(max_length=25) | None = None
-    special_instructions2: _p.constr(max_length=25) | None = None
+    special_instructions1: pydantic.constr(max_length=25) | None = None
+    special_instructions2: pydantic.constr(max_length=25) | None = None
 
-    @_p.field_validator('reference_number1', mode='after')
+    @pydantic.field_validator('reference_number1', mode='after')
     def ref_num_validator(cls, v, values):
         if not v:
             v = values.data.get('recipient_contact').delivery_contact_business
@@ -203,38 +215,38 @@ class CollectionMinimum(RequestedShipmentMinimum):
 
 
 class RequestedShipmentSimple(RequestedShipmentMinimum):
-    enhancement: pf_shared.Enhancement | None = None
-    delivery_options: pf_models.DeliveryOptions | None = None
+    enhancement: Enhancement | None = None
+    delivery_options: DeliveryOptions | None = None
 
 
-class Parcels(pf_shared.PFBaseModel):
+class Parcels(PFBaseModel):
     parcel: list[Parcel]
 
 
-class ShipmentLabelData(pf_shared.PFBaseModel):
+class ShipmentLabelData(PFBaseModel):
     parcel_label_data: list[ParcelLabelData]
 
 
-class CompletedManifests(pf_shared.PFBaseModel):
+class CompletedManifests(PFBaseModel):
     completed_manifest_info: list[CompletedManifestInfo]
 
 
-class Departments(pf_shared.PFBaseModel):
-    department: list[Department] = _p.Field(default_factory=list)
+class Departments(PFBaseModel):
+    department: list[Department] = pydantic.Field(default_factory=list)
 
 
-class NominatedDeliveryDates(pf_shared.PFBaseModel):
+class NominatedDeliveryDates(PFBaseModel):
     service_code: str | None = None
     departments: Departments | None = None
 
 
-class PostcodeExclusion(pf_shared.PFBaseModel):
+class PostcodeExclusion(PFBaseModel):
     delivery_postcode: str | None = None
     collection_postcode: str | None = None
     departments: Departments | None = None
 
 
-class InternationalInfo(pf_shared.PFBaseModel):
+class InternationalInfo(PFBaseModel):
     parcels: Parcels | None = None
     exporter_customs_reference: str | None = None
     recipient_importer_vat_no: str | None = None
@@ -250,79 +262,39 @@ class InternationalInfo(pf_shared.PFBaseModel):
 
 
 class RequestedShipmentComplex(RequestedShipmentSimple):
-    hazardous_goods: pf_lists.HazardousGoods | None = None
+    hazardous_goods: HazardousGoods | None = None
     consignment_handling: bool | None = None
     drop_off_ind: ship_types.DropOffInd | None = None
-    exchange_instructions1: _p.constr(max_length=25) | None = None
-    exchange_instructions2: _p.constr(max_length=25) | None = None
-    exchange_instructions3: _p.constr(max_length=25) | None = None
-    exporter_address: pf_models.AddressRecipient | None = None
+    exchange_instructions1: pydantic.constr(max_length=25) | None = None
+    exchange_instructions2: pydantic.constr(max_length=25) | None = None
+    exchange_instructions3: pydantic.constr(max_length=25) | None = None
+    exporter_address: AddressRecipient | None = None
     exporter_contact: Contact | None = None
-    importer_address: pf_models.AddressRecipient | None = None
+    importer_address: AddressRecipient | None = None
     importer_contact: Contact | None = None
-    in_bound_address: pf_models.AddressRecipient | None = None
+    in_bound_address: AddressRecipient | None = None
     in_bound_contact: Contact | None = None
-    in_bound_details: pf_models.InBoundDetails | None = None
+    in_bound_details: InBoundDetails | None = None
     international_info: InternationalInfo | None = None
     pre_printed: bool | None = None
     print_own_label: bool | None = None
-    reference_number1: _p.constr(max_length=24) | None = None
-    reference_number2: _p.constr(max_length=24) | None = None
-    reference_number3: _p.constr(max_length=24) | None = None
-    reference_number4: _p.constr(max_length=24) | None = None
-    reference_number5: _p.constr(max_length=24) | None = None
+    reference_number1: pydantic.constr(max_length=24) | None = None
+    reference_number2: pydantic.constr(max_length=24) | None = None
+    reference_number3: pydantic.constr(max_length=24) | None = None
+    reference_number4: pydantic.constr(max_length=24) | None = None
+    reference_number5: pydantic.constr(max_length=24) | None = None
     request_id: int | None = None
-    returns: pf_shared.Returns | None = None
-    special_instructions1: _p.constr(max_length=25) | None = None
-    special_instructions2: _p.constr(max_length=25) | None = None
-    special_instructions3: _p.constr(max_length=25) | None = None
-    special_instructions4: _p.constr(max_length=25) | None = None
+    returns: Returns | None = None
+    special_instructions1: pydantic.constr(max_length=25) | None = None
+    special_instructions2: pydantic.constr(max_length=25) | None = None
+    special_instructions3: pydantic.constr(max_length=25) | None = None
+    special_instructions4: pydantic.constr(max_length=25) | None = None
 
     # job_reference: str | None = None  # not required for domestic
     # sender_contact: Contact | None = None
-    # sender_address: pf_models.AddressSender | None = None
+    # sender_address: AddressSender | None = None
     # total_shipment_weight: float | None = None
-    # enhancement: pf_shared.Enhancement | None = None
-    # delivery_options: pf_models.DeliveryOptions | None = None
+    # enhancement: Enhancement | None = None
+    # delivery_options: DeliveryOptions | None = None
 
 
-def parcelforce_contact(contact: Contact) -> PFContact:
-    return PFContact(
-        business_name=contact.business_name,
-        mobile_phone=contact.mobile_phone,
-        email_address=contact.contact_name,
-        contact_name=contact.contact_name,
-    )
-
-
-def parcelforce_address(address: Address) -> PFAddress:
-    return PFAddress(
-        address_line1=address.address_lines[0],
-        address_line2=address.address_lines[1],
-        address_line3=address.address_lines[2],
-        town=address.town,
-        postcode=address.postcode,
-    )
-
-
-def parcelforce_shipment(shipment: Shipment):
-    ref_nums = {'reference_number' + i: ref for ref, i in enumerate(shipment.references)}
-    service_code = shipment.service
-    if service_code not in ServiceCode.__members__:
-        raise ValueError(f'Invalid Service Code {service_code}')
-    ship = PFShipment(
-        **ref_nums,
-        recipient_contact=parcelforce_contact(shipment.recipient_contact),
-        recipient_address=parcelforce_address(shipment.recipient_address),
-        total_number_of_parcels=shipment.boxes,
-        shipping_date=shipment.shipping_date,
-    )
-    match shipment.direction:
-        case ShipDirection.OUTBOUND:
-            return PFShipment.model_validate(ship)
-        case ShipDirection.INBOUND:
-            return ship.to_collection()
-        case ShipDirection.DROPOFF:
-            return ship.to_dropoff()
-        case _:
-            raise ValueError('Invalid Ship Direction')

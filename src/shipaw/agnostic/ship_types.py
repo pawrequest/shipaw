@@ -22,12 +22,6 @@ class ShipmentType(StrEnum):
     COLLECTION = 'COLLECTION'
 
 
-class AlertType(StrEnum):
-    ERROR = 'ERROR'
-    WARNING = 'WARNING'
-    NOTIFICATION = 'NOTIFICATION'
-
-
 class ShipDirection(StrEnum):
     INBOUND = 'in'
     OUTBOUND = 'out'

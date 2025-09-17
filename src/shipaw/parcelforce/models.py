@@ -3,7 +3,7 @@
 from pawdantic import paw_types
 from pydantic import constr
 
-from . import pf_shared
+from .shared import DateTimeRange, Enhancement, OpeningHours, PFBaseModel, Position
 
 
 def address_string_to_dict(address_str: str) -> dict[str, str]:
@@ -22,7 +22,7 @@ def address_string_to_dict(address_str: str) -> dict[str, str]:
 addr_lines_fields_set = {'address_line1', 'address_line2', 'address_line3'}
 
 
-class AddressBase(pf_shared.PFBaseModel):
+class AddressBase(PFBaseModel):
     address_line1: paw_types.truncated_printable_str_type(24)
     address_line2: paw_types.optional_truncated_printable_str_type(24)
     address_line3: paw_types.optional_truncated_printable_str_type(24)
@@ -83,48 +83,48 @@ class AddressTemporary(AddressRecipient):
 AddTypes = AddressRecipient | AddressCollection
 
 
-class PostOffice(pf_shared.PFBaseModel):
+class PostOffice(PFBaseModel):
     post_office_id: str | None = None
     business: str | None = None
     address: AddressRecipient | None = None
-    opening_hours: pf_shared.OpeningHours | None = None
+    opening_hours: OpeningHours | None = None
     distance: float | None = None
     availability: bool | None = None
-    position: pf_shared.Position | None = None
+    position: Position | None = None
     booking_reference: str | None = None
 
 
-class AddressChoice[T: AddressCollection | AddressRecipient](pf_shared.PFBaseModel):
+class AddressChoice[T: AddressCollection | AddressRecipient](PFBaseModel):
     address: T
     # address: T = sqm.Field(sa_column=sqm.Column(sqm.JSON))
     score: int
 
 
-class ConvenientCollect(pf_shared.PFBaseModel):
+class ConvenientCollect(PFBaseModel):
     postcode: str | None = None
     post_office: list[PostOffice] | None = None
     count: int | None = None
     post_office_id: str | None = None
 
 
-class SpecifiedPostOffice(pf_shared.PFBaseModel):
+class SpecifiedPostOffice(PFBaseModel):
     postcode: str | None = None
     post_office: list[PostOffice | None]
     count: int | None = None
     post_office_id: str | None = None
 
 
-class CompletedReturnInfo(pf_shared.PFBaseModel):
+class CompletedReturnInfo(PFBaseModel):
     status: str
     shipment_number: str
-    collection_time: pf_shared.DateTimeRange
+    collection_time: DateTimeRange
 
 
-class InBoundDetails(pf_shared.PFBaseModel):
+class InBoundDetails(PFBaseModel):
     contract_number: str
     service_code: str
     total_shipment_weight: str | None = None
-    enhancement: pf_shared.Enhancement | None = None
+    enhancement: Enhancement | None = None
     reference_number1: str | None = None
     reference_number2: str | None = None
     reference_number3: str | None = None
@@ -136,7 +136,7 @@ class InBoundDetails(pf_shared.PFBaseModel):
     special_instructions4: str | None = None
 
 
-class DeliveryOptions(pf_shared.PFBaseModel):
+class DeliveryOptions(PFBaseModel):
     convenient_collect: ConvenientCollect | None = None
     irts: bool | None = None
     letterbox: bool | None = None

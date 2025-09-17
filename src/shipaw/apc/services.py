@@ -1,23 +1,22 @@
-from enum import StrEnum
-from typing import Literal, Self
+from typing import TypedDict
 
 from pydantic import ConfigDict
 
-from shipaw.agnostic.agnost import ShippingService
+from shipaw.agnostic.services import ServiceDict, ServiceType, Services
 from shipaw.apc.shared import APCBaseModel
 
+APCServiceDict: ServiceDict = {
+    'NEXT_DAY': 'ND16',
+    'NEXT_DAY_12': 'ND12',
+    'NEXT_DAY_9': 'ND09',
+}
 
-class ProductCode(StrEnum):
-    NEXT_DAY16 = 'ND16'
-# ProductCode = Literal['ND16']
 
-
-class APCService(ShippingService):
-    code: ProductCode
-
-    @classmethod
-    def next_day_16(cls) -> Self:
-        return cls(name='Next Day 16', code=ProductCode.NEXT_DAY16)
+APCServices = Services(
+    NEXT_DAY='ND16',
+    NEXT_DAY_12='ND12',
+    NEXT_DAY_9='ND09',
+)
 
 
 class ServiceSpec(APCBaseModel):
@@ -49,13 +48,3 @@ class ServiceSpec(APCBaseModel):
     WeightUnit: str
 
 
-#
-# class ServiceRequest(APCBaseModel):
-#     collection_date: datetime.date
-#     ready_at: datetime.time = time(hour=9)
-#     closed_at: datetime.time = time(hour=17)
-#     collection: AddressRough
-#     delivery: AddressRough
-#     goods_info: GoodsInfo
-#     shipment_details: ShipmentDetails
-#     delivery_group: str | None = None

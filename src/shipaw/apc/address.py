@@ -4,7 +4,7 @@ from pydantic import StringConstraints, constr
 
 
 from .shared import APCBaseModel
-from ..agnostic.agnost import Address as _Address, Contact as _Contact
+from ..agnostic.address import Address as _Address, Contact as _Contact
 
 STR_64 = Annotated[
     str,
@@ -19,19 +19,28 @@ class Contact(APCBaseModel):
     email: str | None
 
 
-class AddressRough(APCBaseModel):
-    postal_code: str
-    country_code: str = 'GB'
-
-
-class Address(AddressRough):
+class Address(APCBaseModel):
     company_name: str = constr(max_length=34)
     address_line_1: str = constr(max_length=64)
     address_line_1: STR_64
     address_line_2: STR_64 | None = None
     city: str
     county: str | None = None
+    postal_code: str
+    country_code: str = 'GB'
+
     contact: Contact
+
+    @classmethod
+    def from_generic(cls, address:_Address, contact:_Contact):
+        return Address(
+            postal_code=address.postcode,
+            address_line_1=address.address_lines[0],
+            address_line_2=', '.join(address.address_lines[1:]),
+            city=address.town,
+            contact=apc_contact(contact),
+            company_name=contact.business_name,
+        )
 
 
 class AddressDelivery(Address):
