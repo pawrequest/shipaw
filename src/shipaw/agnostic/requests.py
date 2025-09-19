@@ -7,8 +7,9 @@ from shipaw.agnostic.base import ShipawBaseModel
 
 
 class Authentication(ShipawBaseModel):
-    user_name: Annotated[SecretStr, StringConstraints(max_length=80)]
-    password: Annotated[SecretStr, StringConstraints(max_length=80)]
+    # todo SecretStr!!!!
+    user_name: Annotated[str, StringConstraints(max_length=80)]
+    password: Annotated[str, StringConstraints(max_length=80)]
 
 
 class BaseRequest(ShipawBaseModel):

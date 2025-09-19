@@ -226,7 +226,9 @@ def parcelforce_address(address: _Address) -> PFAddress:
     )
 
 
-def parcelforce_shipment(shipment: _Shipment):
+def parcelforce_shipment(shipment: _Shipment | dict):
+    if isinstance(shipment, dict):
+        shipment = _Shipment.model_validate(shipment)
     ref_nums = {'reference_number' + i: ref for ref, i in enumerate(shipment.references)}
     service_code = ParcelforceServiceDict[shipment.service.upper()]
     ship = Shipment(
@@ -247,7 +249,3 @@ def parcelforce_shipment(shipment: _Shipment):
         case _:
             raise ValueError('Invalid Ship Direction')
 
-
-def parcelforce_shipment_dict(shipment:_Shipment) -> dict:
-    ship = parcelforce_shipment(shipment)
-    return ship.model_dump(mode='json')

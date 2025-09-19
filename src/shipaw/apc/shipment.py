@@ -62,20 +62,10 @@ class Order(APCBaseModel):
     # def export_dict(self) -> dict:
     #     return {'Orders': {'Order': self.model_dump(mode='json', by_alias=True)}}
 
-    # def model_dump(self, *args, **kwargs) -> dict:
-    #     return {'Orders': {'Order': super().model_dump(*args, **kwargs)}}
+
+class Orders(APCBaseModel):
+    order: Order
 
 
-#
-# def serial_ship(v):
-#     return {'Orders': {'Order': v.model_dump(mode='json')}}
-
-#
-# class APCShipment(APCBaseModel):
-#     model_config = ConfigDict(json_encoders={Order: serial_ship})
-#     order: Order
-#
-#     def export_dict(self) -> dict:
-#         return {'Orders': {'Order': self.order.model_dump(mode='json')}}
-
-
+class ShipmentAPC(APCBaseModel):
+    orders: Orders

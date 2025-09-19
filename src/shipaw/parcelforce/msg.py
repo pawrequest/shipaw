@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pydantic as pyd
 from loguru import logger
+from pydantic import Field
+from pygments.lexer import default
 
 from shipaw.agnostic.base import ShipawBaseModel
 from shipaw.agnostic.responses import AlertType, Alerts
@@ -47,7 +49,7 @@ class FindRequest(FindMessage, BaseRequest): ...
 
 
 class BaseResponse(ShipawBaseModel):
-    alerts: Alerts = Alerts()
+    alerts: Alerts | None = Field(default_factory=Alerts.empty)
 
 
 class FindResponse(FindMessage, BaseResponse):

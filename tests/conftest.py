@@ -2,10 +2,15 @@ import os
 
 import dotenv
 
+from shipaw.agnostic.providers import ShippingProvider
+
 APC_ENV = r'C:\prdev\repos\amdev\shipaw\apc_sandbox.env'
 
 os.environ['SHIP_ENV'] = r'C:\ProgramData\AmherstPR\pf_sandbox.env'
 dotenv.load_dotenv(APC_ENV)
+
+from shipaw.apc.provider import APCProvider
+from shipaw.parcelforce.provider import ParcelforceProvider
 
 from datetime import date, timedelta
 
@@ -54,3 +59,8 @@ def sample_shipment(sample_contact, sample_address):
         service='NEXT_DAY',
     )
 
+
+@pytest.fixture(params=[ParcelforceProvider(), APCProvider()], ids=['ParcelforceProvider', 'APCProvider'])
+def sample_shipment_dicts(sample_shipment, request):
+    provider: ShippingProvider = request.param
+    return provider.make_shipment_dict(sample_shipment), provider
