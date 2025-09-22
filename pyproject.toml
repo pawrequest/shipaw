@@ -1,6 +1,6 @@
 [project]
 name = "shipaw"
-version = "0.1.17"
+version = "0.2.1"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -15,6 +15,7 @@ dependencies = [
     'phonenumbers',
     'pydantic-settings',
     "httpx>=0.28.1",
+    "pygments>=2.19.2",
 ]
 
 [project.optional-dependencies]

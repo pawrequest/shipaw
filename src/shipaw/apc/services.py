@@ -5,18 +5,11 @@ from pydantic import ConfigDict
 from shipaw.agnostic.services import ServiceDict, ServiceType, Services
 from shipaw.apc.shared import APCBaseModel
 
-APCServiceDict: ServiceDict = {
+APCServiceDict = {
     'NEXT_DAY': 'ND16',
     'NEXT_DAY_12': 'ND12',
     'NEXT_DAY_9': 'ND09',
 }
-
-
-APCServices = Services(
-    NEXT_DAY='ND16',
-    NEXT_DAY_12='ND12',
-    NEXT_DAY_9='ND09',
-)
 
 
 class ServiceSpec(APCBaseModel):

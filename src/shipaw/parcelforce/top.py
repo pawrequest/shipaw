@@ -3,14 +3,12 @@ import typing as _t
 
 import pydantic
 from pawdantic import paw_types
-from pydantic import constr
 
 # from shipaw.parcelforce.pf_shipment import Shipment as PFShipment
 from shipaw.agnostic import ship_types
-from shipaw.agnostic.ship_types import MyPhone
+from shipaw.parcelforce.address import AddTypes, AddressCollection, AddressRecipient, Contact, ContactCollection
 from shipaw.parcelforce.lists import (
     Barcodes,
-    CollectionNotifications,
     CompletedShipments,
     ContentDetails,
     HazardousGoods,
@@ -19,82 +17,11 @@ from shipaw.parcelforce.lists import (
     ManifestShipments,
     NominatedDeliveryDatelist,
     ParcelContents,
-    RecipientNotifications,
     ServiceCodes,
     SpecifiedNeighbour,
 )
-from shipaw.parcelforce.models import AddTypes, AddressCollection, AddressRecipient, DeliveryOptions, InBoundDetails
+from shipaw.parcelforce.models import DeliveryOptions, InBoundDetails
 from shipaw.parcelforce.shared import DateTimeRange, Enhancement, PFBaseModel, Returns, ServiceCode
-
-
-class Contact(PFBaseModel):
-    business_name: paw_types.truncated_printable_str_type(40)
-    # business_name: constr(max_length=40)
-    mobile_phone: MyPhone
-    email_address: constr(max_length=50)
-    contact_name: paw_types.truncated_printable_str_type(30)
-    # contact_name: constr(max_length=30)
-    notifications: RecipientNotifications | None = RecipientNotifications.standard_recip()
-
-    @property
-    def notifications_str(self) -> str:
-        msg = f'Recip Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
-        return msg
-
-
-class ContactCollection(Contact):
-    senders_name: paw_types.optional_truncated_printable_str_type(25)
-    # senders_name: constr(max_length=25) | None = None
-    telephone: MyPhone | None = None
-    notifications: CollectionNotifications | None = CollectionNotifications.standard_coll()
-
-    @property
-    def notifications_str(self) -> str:
-        msg = f'Collecton Notifications = {self.notifications} ({self.email_address} + {self.mobile_phone})'
-        return msg
-
-    @pydantic.model_validator(mode='after')
-    def tel_is_none(self):
-        if not self.telephone:
-            self.telephone = self.mobile_phone
-        return self
-
-    # @classmethod
-    # def from_contact(cls, contact: Contact):
-    #     return cls(
-    #         **contact.model_dump(exclude={'notifications'}),
-    #         senders_name=contact.contact_name,
-
-
-class ContactSender(Contact):
-    business_name: paw_types.optional_truncated_printable_str_type(25)
-    # business_name: constr(max_length=25)
-    mobile_phone: MyPhone
-    email_address: constr(max_length=50)
-    contact_name: paw_types.optional_truncated_printable_str_type(25)
-
-    telephone: MyPhone | None = None
-    senders_name: paw_types.optional_truncated_printable_str_type(25) | None = None
-    notifications: None = None
-
-
-class ContactTemporary(Contact):
-    business_name: str = ''
-    contact_name: str = ''
-    mobile_phone: MyPhone | None = None
-    email_address: str = ''
-    telephone: MyPhone | None = None
-    senders_name: str = ''
-
-    @pydantic.model_validator(mode='after')
-    def fake(self):
-        for field, value in self.model_dump().items():
-            if not value:
-                value = '========='
-                if field == 'email_address':
-                    value = f'{value}@f======f.com'
-                setattr(self, field, value)
-        return self
 
 
 class PAF(PFBaseModel):

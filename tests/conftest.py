@@ -1,14 +1,13 @@
+# from setup import load_sandbox_envs
+# load_sandbox_envs()
 import os
 
-import dotenv
+from amherst.set_env import set_amherstpr_env
+
+os.environ['AMHERSTPR'] = r'C:\prdev\envs\sandbox'
+set_amherstpr_env(sandbox=True)
 
 from shipaw.agnostic.providers import ShippingProvider
-
-APC_ENV = r'C:\prdev\repos\amdev\shipaw\apc_sandbox.env'
-
-os.environ['SHIP_ENV'] = r'C:\ProgramData\AmherstPR\pf_sandbox.env'
-dotenv.load_dotenv(APC_ENV)
-
 from shipaw.apc.provider import APCProvider
 from shipaw.parcelforce.provider import ParcelforceProvider
 
@@ -17,8 +16,7 @@ from datetime import date, timedelta
 import pytest
 
 from shipaw.agnostic.shipment import Shipment
-from shipaw.agnostic.address import Address, Contact
-from shipaw.agnostic.services import ServiceType
+from shipaw.agnostic.address import Address, Contact, FullContact
 from shipaw.agnostic.ship_types import ShipDirection
 
 
@@ -48,10 +46,17 @@ def sample_address():
 
 
 @pytest.fixture(scope='session')
-def sample_shipment(sample_contact, sample_address):
+def sample_full_contact(sample_contact, sample_address):
+    yield FullContact(
+        contact=sample_contact,
+        address=sample_address,
+    )
+
+
+@pytest.fixture(scope='session')
+def sample_shipment(sample_full_contact):
     yield Shipment(
-        recipient_contact=sample_contact,
-        recipient_address=sample_address,
+        recipient=sample_full_contact,
         boxes=2,
         shipping_date=TEST_DATE,
         direction=ShipDirection.OUTBOUND,
@@ -63,4 +68,4 @@ def sample_shipment(sample_contact, sample_address):
 @pytest.fixture(params=[ParcelforceProvider(), APCProvider()], ids=['ParcelforceProvider', 'APCProvider'])
 def sample_shipment_dicts(sample_shipment, request):
     provider: ShippingProvider = request.param
-    return provider.make_shipment_dict(sample_shipment), provider
+    return provider.provider_shipment(sample_shipment, mode='python'), provider

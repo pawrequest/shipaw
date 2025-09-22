@@ -6,7 +6,7 @@ from pydantic import ConfigDict
 
 from shipaw.agnostic.base import ShipawBaseModel
 from shipaw.agnostic.requests import Authentication, encode_b64_str
-
+from shipaw.apc.config import apc_settings
 
 
 class APCBaseModel(ShipawBaseModel):
@@ -35,17 +35,18 @@ def get_remote_user(login, password) -> str:
 
 
 def get_headers() -> dict:
-    usr = os.environ.get('EMAIL')
-    pwd = os.environ.get('PASSWORD')
+    sett = apc_settings()
+    usr = sett.apc_email.get_secret_value()
+    pwd = sett.apc_password.get_secret_value()
     return {'Content-Type': 'application/json', 'remote-user': get_remote_user(usr, pwd)}
 
 
-class APCAuthentication(Authentication):
-    def auth_str(self):
-        return {
-            'Content-Type': 'application/json',
-            'remote-user': get_remote_user(self.user_name.get_secret_value(), self.password.get_secret_value()),
-        }
+# class APCAuthentication(Authentication):
+#     def auth_str(self):
+#         return {
+#             'Content-Type': 'application/json',
+#             'remote-user': get_remote_user(self.user_name.get_secret_value(), self.password.get_secret_value()),
+#         }
 
 
 #

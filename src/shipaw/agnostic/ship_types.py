@@ -1,13 +1,16 @@
 # from __future__ import annotations
+from __future__ import annotations
 
 import re
 import typing as _t
 from enum import Enum, StrEnum
 import datetime as dt
+from typing import Literal
 
 import phonenumbers
 import pydantic as _p
 from loguru import logger
+from pydantic import BaseModel
 
 DepartmentNum = 1
 
@@ -70,6 +73,8 @@ VALID_POSTCODE = _t.Annotated[
     _p.Field(description='A valid UK postcode'),
 ]
 
+ProviderName = _t.Literal['PARCELFORCE', 'APC']
+
 
 def is_valid_postcode(pc):
     return bool(re.match(POSTCODE_PATTERN, pc.strip().upper()))
@@ -130,3 +135,22 @@ def prep_phone(v: str) -> str:
 
 
 MyPhone = _t.Annotated[str, _p.BeforeValidator(prep_phone)]
+
+ConvertMode = Literal['pydantic', 'python', 'python-alias', 'json', 'json-alias']
+ConvertOutput = Literal['generic', 'provider']
+
+
+def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | object:
+    match mode:
+        case 'pydantic':
+            return obj
+        case 'python':
+            return obj.model_dump(mode='json', by_alias=False)
+        case 'python-alias':
+            return obj.model_dump(mode='json', by_alias=True)
+        case 'json':
+            return obj.model_dump_json(by_alias=False)
+        case 'json-alias':
+            return obj.model_dump_json(by_alias=True)
+        case _:
+            raise ValueError(f'Invalid ConvertMode: {mode}')

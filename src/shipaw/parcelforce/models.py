@@ -1,86 +1,6 @@
-# from __future__ import annotations
-
-from pawdantic import paw_types
-from pydantic import constr
-
 from .shared import DateTimeRange, Enhancement, OpeningHours, PFBaseModel, Position
 
-
-def address_string_to_dict(address_str: str) -> dict[str, str]:
-    addr_lines = address_str.splitlines()
-    if len(addr_lines) < 3:
-        addr_lines.extend([''] * (3 - len(addr_lines)))
-    elif len(addr_lines) > 3:
-        addr_lines[2] = ','.join(addr_lines[2:])
-    return {
-        'address_line1': addr_lines[0],
-        'address_line2': addr_lines[1],
-        'address_line3': addr_lines[2],
-    }
-
-
-addr_lines_fields_set = {'address_line1', 'address_line2', 'address_line3'}
-
-
-class AddressBase(PFBaseModel):
-    address_line1: paw_types.truncated_printable_str_type(24)
-    address_line2: paw_types.optional_truncated_printable_str_type(24)
-    address_line3: paw_types.optional_truncated_printable_str_type(24)
-    town: constr(max_length=25)
-    postcode: constr(max_length=16)
-    country: str = 'GB'
-
-    @property
-    def lines_dict(self):
-        return {line_field: getattr(self, line_field) for line_field in sorted(self.lines_fields_set)}
-
-    @property
-    def lines_fields_set(self):
-        return {_ for _ in addr_lines_fields_set if getattr(self, _)}
-
-    @property
-    def lines_str(self):
-        return '\n'.join(self.lines_dict.values())
-
-    @property
-    def lines_str_oneline(self):
-        return ', '.join(self.lines_dict.values())
-
-
-class AddressSender(AddressBase):
-    ...
-
-    # def address_lines_dict(self):
-    #     return {
-    #         "address_line1": self.address_line1,
-    #         "address_line2": self.address_line2,
-    #         "address_line3": self.address_line3,
-    #     }
-
-
-class AddressCollection(AddressSender):
-    address_line1: paw_types.truncated_printable_str_type(40)
-    address_line2: paw_types.optional_truncated_printable_str_type(40)
-    address_line3: paw_types.optional_truncated_printable_str_type(40)
-    town: paw_types.truncated_printable_str_type(30)
-
-
-class AddressRecipient(AddressCollection):
-    address_line1: paw_types.truncated_printable_str_type(40)
-    address_line2: paw_types.optional_truncated_printable_str_type(50)
-    address_line3: paw_types.optional_truncated_printable_str_type(60)
-    town: paw_types.truncated_printable_str_type(30)
-
-
-class AddressTemporary(AddressRecipient):
-    address_line1: str | None = None
-    address_line2: str | None = None
-    address_line3: str | None = None
-    town: str | None = None
-    postcode: str | None = None
-
-
-AddTypes = AddressRecipient | AddressCollection
+from .address import AddressRecipient
 
 
 class PostOffice(PFBaseModel):
@@ -92,12 +12,6 @@ class PostOffice(PFBaseModel):
     availability: bool | None = None
     position: Position | None = None
     booking_reference: str | None = None
-
-
-class AddressChoice[T: AddressCollection | AddressRecipient](PFBaseModel):
-    address: T
-    # address: T = sqm.Field(sa_column=sqm.Column(sqm.JSON))
-    score: int
 
 
 class ConvenientCollect(PFBaseModel):

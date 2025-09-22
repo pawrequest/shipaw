@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import time
-from pathlib import Path
-
 import pydantic
 import zeep
 from combadge.core.typevars import ServiceProtocolT
@@ -12,6 +9,7 @@ from pydantic import model_validator
 from thefuzz import fuzz, process
 from zeep.proxy import ServiceProxy
 
+from shipaw.agnostic.ship_types import VALID_POSTCODE
 from shipaw.parcelforce.combadge import (
     CancelShipmentService,
     CreateManifestService,
@@ -19,8 +17,8 @@ from shipaw.parcelforce.combadge import (
     FindService,
     PrintLabelService,
 )
-from shipaw.parcelforce.models import AddTypes, AddressChoice, AddressRecipient
-from shipaw.parcelforce.msg import (
+from shipaw.parcelforce.address import AddTypes, AddressChoice, AddressRecipient
+from shipaw.parcelforce.request_response import (
     CancelShipmentRequest,
     CancelShipmentResponse,
     CreateManifestRequest,
@@ -30,18 +28,16 @@ from shipaw.parcelforce.msg import (
     PrintLabelResponse,
     ShipmentRequest,
     ShipmentResponse,
-    log_booked_shipment,
 )
+from shipaw.parcelforce.config import PFSettings, pf_settings
 from shipaw.parcelforce.shipment import Shipment
 from shipaw.parcelforce.top import PAF
-from shipaw.parcelforce.pf_config import PFSettings, pf_sett
-from shipaw.agnostic.ship_types import VALID_POSTCODE
 
 SCORER = fuzz.token_sort_ratio
 
 
 # @functools.lru_cache(maxsize=1)
-class ELClient(pydantic.BaseModel):
+class ParcelforceClient(pydantic.BaseModel):
     """Client for Parcelforce ExpressLink API.
 
     Attributes:
@@ -49,7 +45,7 @@ class ELClient(pydantic.BaseModel):
         service: ServiceProxy | None - Zeep ServiceProxy (generated from settings)
     """
 
-    settings: PFSettings = pf_sett()
+    settings: PFSettings = pf_settings()
     service: ServiceProxy | None = None
     strict: bool = True
 
@@ -94,21 +90,9 @@ class ELClient(pydantic.BaseModel):
         shipment_request = ShipmentRequest(requested_shipment=shipment)
         authorized_shipment = shipment_request.authenticated(self.settings.auth())
         resp: ShipmentResponse = back.createshipment(request=authorized_shipment.model_dump(by_alias=True))
-        log_booked_shipment(shipment_request, resp)
         resp.handle_errors()
         return resp
-    #
-    # def handle_response_errors(self, resp):
-    #     if hasattr(resp, 'Error'):
-    #         msg = resp.Error.message if hasattr(resp.Error, 'message') else str(resp.Error)
-    #         raise ExpressLinkError(msg)
-    #     if hasattr(resp, 'alerts') and hasattr(resp.alerts, 'alert'):
-    #         for _ in resp.alerts.alert:
-    #             match _.type:
-    #                 case AlertType.ERROR:
-    #                     logger.error('ExpressLinkl Error, booking failed: ' + _.message)
-    #                 case _:
-    #                     logger.warning('Expresslink Warning: ' + _.message)
+
 
     def cancel_shipment(self, shipment_number):
         req = CancelShipmentRequest(shipment_number=shipment_number).authenticated(self.settings.auth())
@@ -135,26 +119,11 @@ class ELClient(pydantic.BaseModel):
             return []
         return [neighbour.address[0] for neighbour in response.paf.specified_neighbour]
 
-    def get_label(
-        self, ship_num, dl_path: str, print_format: str | None = None, barcode_format: str | None = None
-    ) -> Path:
-        """Get the label for a shipment number.
+    def get_label_content(self, ship_num, print_format: str | None = None, barcode_format: str | None = None) -> bytes:
+        response = self.get_label_response(ship_num, barcode_format, print_format)
+        return response.label.data
 
-        Args:
-            ship_num: str - shipment number
-            dl_path: str - path to download the label to, defaults to './temp_label.pdf'
-            print_format: str | None (default = PDF)
-            PDF - to return a PDF image of the Label.
-            XML - to return a data stream in order to create own label.
-            PDF-XML - to return the Parcelforce label as PDF and the Partner label as XML.
-            XML-PDF – to return the Parcelforce label as XML and the Partner label as PDF
-
-            barcode_format: Set to PNG to return image of Barcode in Base64 code
-
-        Returns:
-            Path - path to the downloaded label
-
-        """
+    def get_label_response(self, ship_num: str, barcode_format: str | None = None, print_format: str | None = None):
         back = self.backend(PrintLabelService)
         # req = PrintLabelRequest(authentication=self.settings.auth(), shipment_number=ship_num)
         req = PrintLabelRequest(
@@ -169,10 +138,33 @@ class ELClient(pydantic.BaseModel):
                 if alt.type == 'ERROR':
                     raise ValueError(f'ExpressLink Error: {alt.message}')
                 logger.warning(f'ExpressLink Warning: {alt.message}')
+        return response
 
-        out_path = response.label.download(Path(dl_path))
-        logger.info(f'Downloaded label to {out_path}')
-        return out_path
+    # def get_label(
+    #     self, ship_num, dl_path: str, print_format: str | None = None, barcode_format: str | None = None
+    # ) -> Path:
+    #     """Get the label for a shipment number.
+    #
+    #     Args:
+    #         ship_num: str - shipment number
+    #         dl_path: str - path to download the label to, defaults to './temp_label.pdf'
+    #         print_format: str | None (default = PDF)
+    #         PDF - to return a PDF image of the Label.
+    #         XML - to return a data stream in order to create own label.
+    #         PDF-XML - to return the Parcelforce label as PDF and the Partner label as XML.
+    #         XML-PDF – to return the Parcelforce label as XML and the Partner label as PDF
+    #
+    #         barcode_format: Set to PNG to return image of Barcode in Base64 code
+    #
+    #     Returns:
+    #         Path - path to the downloaded label
+    #
+    #     """
+    #     response = self.get_label_response(ship_num, barcode_format, print_format)
+    #
+    #     out_path = response.label.download(Path(dl_path))
+    #     logger.info(f'Downloaded label to {out_path}')
+    #     return out_path
 
     def get_manifest(self):
         back = self.backend(CreateManifestService)
@@ -211,6 +203,24 @@ class ELClient(pydantic.BaseModel):
             reverse=True,
         )
 
+    # def get_choices_agnost(self, postcode: VALID_POSTCODE, address: AddressAgnost | None = None) -> list[AddressChoice]:
+    #     candidates = self.get_candidates_agnost(postcode)
+    #     if not address:
+    #         return [AddressChoice(address=add, score=0) for add in candidates]
+    #     candidate_dict = {add.lines_str: add for add in candidates}
+    #     scored = process.extract(
+    #         address.lines_str,
+    #         candidate_dict.keys(),
+    #         scorer=SCORER,
+    #         limit=None,
+    #     )
+    #     choices = [AddressChoice(address=candidate_dict[add], score=score) for add, score in scored]
+    #     return sorted(
+    #         choices,
+    #         key=lambda x: x.score,
+    #         reverse=True,
+    #     )
+
     def candidates_json(self, postcode):
         return {add.lines_str: add.model_dump_json() for add in self.get_candidates(postcode)}
 
@@ -220,15 +230,16 @@ def clean_up_postcode(postcode: str):
     return postcode
 
 
-def wait_label(shipment_num, dl_path: str, el_client: ELClient) -> pathlib.Path:
-    label_path = el_client.get_label(ship_num=shipment_num, dl_path=dl_path).resolve()
-    for i in range(20):
-        if label_path:
-            return label_path
-        else:
-            print('waiting for file to be created')
-            time.sleep(1)
-    else:
-        raise ValueError(f'file not created after 20 seconds {label_path=}')
+#
+# def wait_label(shipment_num, dl_path: str, el_client: ParcelforceClient) -> Path:
+#     label_path = el_client.get_label(ship_num=shipment_num, dl_path=dl_path).resolve()
+#     for i in range(20):
+#         if label_path:
+#             return label_path
+#         else:
+#             print('waiting for file to be created')
+#             time.sleep(1)
+#     else:
+#         raise ValueError(f'file not created after 20 seconds {label_path=}')
 
 

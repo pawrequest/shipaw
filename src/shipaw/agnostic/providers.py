@@ -2,74 +2,70 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Literal
+from functools import lru_cache
+from typing import ClassVar
 
 from pydantic import BaseModel
 
-from shipaw.agnostic.address import Address, Contact
-from shipaw.agnostic.responses import ShipmentBookingResponseAgnost
-from shipaw.agnostic.services import ServiceDict, Services
-from shipaw.agnostic.shipment import FullContact, Shipment
-
-ConvertMode = Literal['dict', 'pydantic']
-
-# @dataclass
-# class ShippingProvider:
-#     name: str
-#     service_dict: ServiceDict
-#     shipment_dict: Callable[[Shipment], dict]
-#     send_request: Callable[[dict], ShipmentBookingResponseAgnost]
-#     # handle_response: ClassVar[Callable[[BookingResponse], None]]
-#
+from shipaw.agnostic.services import ServiceDict
+from shipaw.agnostic.ship_log import log_booked_shipment
+from shipaw.agnostic.ship_types import ConvertMode, ProviderName
+from shipaw.agnostic.shipment import Shipment
+from shipaw.agnostic.address import FullContact
 
 
-# class ShippingProvider(ABC):
-#     service_dict: ServiceDict
-#
-#     @abstractmethod
-#     def make_shipment_dict(self, shipment: Shipment) -> dict:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     def send_request(self, ship_dict: dict | Shipment) -> ShipmentBookingResponseAgnost:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     def handle_response(self, response: ShipmentBookingResponseAgnost) -> bool:
-#         raise NotImplementedError
-
-
+@dataclass
 class ShippingProvider(ABC):
-    service_dict: ServiceDict
+    name: ClassVar[ProviderName]
+    service_dict: ClassVar[ServiceDict]
+    shipment_type: ClassVar[type[BaseModel]]
+
+    # Convert to provider-specific objects
+    @staticmethod
+    @abstractmethod
+    def provider_contact(full_contact: FullContact, mode: ConvertMode = 'pydantic') -> dict | BaseModel:
+        raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def convert_contact(full_contact: FullContact, mode: ConvertMode = 'dict') -> dict | BaseModel:
+    def provider_address(full_contact: FullContact, mode: ConvertMode = 'pydantic') -> dict | BaseModel:
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def convert_address(full_contact: FullContact, mode: ConvertMode = 'dict') -> dict | BaseModel:
+    def provider_shipment(shipment: Shipment, mode: ConvertMode = 'pydantic') -> dict | BaseModel:
+        raise NotImplementedError
+
+    # Convert to generic
+    @staticmethod
+    def generic_full_contact(
+        contact: BaseModel, address: BaseModel, mode: ConvertMode = 'pydantic'
+    ) -> FullContact | dict:
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def convert_shipment(shipment: Shipment, mode: ConvertMode = 'dict') -> dict | BaseModel:
+    def generic_shipment(shipment: BaseModel, mode: ConvertMode = 'pydantic') -> dict | Shipment:
         raise NotImplementedError
 
+    # Request/Response
+    @staticmethod
     @abstractmethod
-    def send_request(self, ship_dict: dict | Shipment) -> ShipmentBookingResponseAgnost:
+    def book_shipment(shipment: dict | Shipment) -> 'ShipmentBookingResponseAgnost':
         raise NotImplementedError
 
+    @staticmethod
+    def handle_response(request: 'ShipmentRequestAgnost', response: 'ShipmentBookingResponseAgnost'):
+        log_booked_shipment(request, response)
+        return True
+
+    @staticmethod
     @abstractmethod
-    def handle_response(self, response: ShipmentBookingResponseAgnost) -> bool:
+    def get_label_content(shipment_num: str) -> bytes:
         raise NotImplementedError
 
 
-def maybe_dict(obj: BaseModel, mode: ConvertMode) -> dict | object:
-    if mode == 'pydantic':
-        return obj
-    elif mode == 'dict':
-        return obj.model_dump(mode='json')
-    else:
-        raise ValueError(f'Invalid mode: {mode}')
+@lru_cache
+def service_lookup_agnost(service_dict: dict, service: str):
+    reverse_map = {v: k for k, v in service_dict.items()}
+    return reverse_map[service]

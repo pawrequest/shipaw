@@ -1,9 +1,12 @@
 import base64
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import SecretStr, StringConstraints
 
 from shipaw.agnostic.base import ShipawBaseModel
+from shipaw.agnostic.providers import ShippingProvider
+from shipaw.agnostic.ship_types import ProviderName
+from shipaw.agnostic.shipment import Shipment
 
 
 class Authentication(ShipawBaseModel):
@@ -20,3 +23,22 @@ def encode_b64_str(s: str) -> str:
     return base64.b64encode(s.encode('utf8')).decode('utf8')
     # bytes_64 = s.encode('utf8')
     # return base64.b64encode(bytes_64).decode('utf8')
+
+
+class ShipmentRequestAgnost(ShipawBaseModel):
+    shipment: Shipment
+    provider_name: ProviderName
+
+    @property
+    def provider(self) -> type[ShippingProvider]:
+        match self.provider_name:
+            case 'PARCELFORCE':
+                from shipaw.parcelforce.provider import ParcelforceProvider
+
+                return ParcelforceProvider
+            case 'APC':
+                from shipaw.apc.provider import APCProvider
+
+                return APCProvider
+            case _:
+                raise ValueError(f'Unknown provider: {self.provider_name}')

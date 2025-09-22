@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from functools import cached_property
+from pathlib import Path
 
+from loguru import logger
+from pawdf.array_pdf.array_p import on_a4
 from pydantic import Field
 
 from shipaw.agnostic.base import ShipawBaseModel
+from shipaw.agnostic.label_file import get_label_folder, get_label_stem, unused_path
+from shipaw.agnostic.shipment import Shipment
 
 
 class AlertType(StrEnum):
@@ -77,7 +83,29 @@ class BaseResponseAgnost(ShipawBaseModel):
     status: str | None = None
 
 
-#
 class ShipmentBookingResponseAgnost(BaseResponseAgnost):
+    shipment: Shipment
     shipment_num: str | None = None
+    tracking_link: str | None = None
+    label_data: bytes | None = None
+
+    @cached_property
+    def label_path(self) -> Path:
+        folder = get_label_folder(self.shipment.direction)
+        label_stem = get_label_stem(self.shipment)
+        label_filepath = (folder / label_stem).with_suffix('.pdf')
+        label_filepath = unused_path(label_filepath)
+        return label_filepath
+
+    async def write_label_file(self):
+        label_content = self.label_data
+        label_path = self.label_path
+        unsize = label_path.parent / 'original_size' / label_path.name
+        unsize.parent.mkdir(parents=True, exist_ok=True)
+        unsize.write_bytes(label_content)
+        on_a4(input_file=unsize, output_file=label_path)
+        logger.info(f'Wrote label to {label_path}')
+
+
+
 

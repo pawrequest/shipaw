@@ -3,19 +3,17 @@ from __future__ import annotations
 import pydantic as pyd
 from loguru import logger
 from pydantic import Field
-from pygments.lexer import default
 
+from shipaw.agnostic import ship_types
 from shipaw.agnostic.base import ShipawBaseModel
+from shipaw.agnostic.requests import Authentication
 from shipaw.agnostic.responses import AlertType, Alerts
-
+from shipaw.agnostic.ship_types import ExpressLinkError
+from shipaw.parcelforce.config import pf_settings
 from shipaw.parcelforce.lists import CompletedCancel, SafePlacelist
 from shipaw.parcelforce.models import CompletedReturnInfo, ConvenientCollect, PostOffice, SpecifiedPostOffice
-from shipaw.parcelforce.pf_config import pf_sett
 from shipaw.parcelforce.shared import DateTimeRange, Document, PFBaseModel
-from shipaw.agnostic.requests import Authentication
 from shipaw.parcelforce.shipment import Shipment
-from shipaw.agnostic import ship_types
-from shipaw.agnostic.ship_types import ExpressLinkError
 from shipaw.parcelforce.top import (
     CompletedManifests,
     CompletedShipmentInfo,
@@ -104,13 +102,13 @@ class ShipmentResponse(BaseResponse):
             return self.completed_shipment_info.status.lower() == 'allocated'
         return False
 
-    def tracking_link(self):
-        tlink = pf_sett().tracking_url_stem + self.shipment_num
-        # logger.info(f'Getting tracking link: {str(tlink)}')
-        return tlink
+    # def tracking_link_pf_old(self):
+    #     tlink = pf_sett().tracking_url_stem_old_pf + self.shipment_num
+    #     # logger.info(f'Getting tracking link: {str(tlink)}')
+    #     return tlink
 
-    def tracking_link_rm(self):
-        stem = pf_sett().tracking_url_stem_rm
+    def tracking_link(self):
+        stem = pf_settings().tracking_url_stem
         tlink = f'{stem}PB{self.shipment_num}001'
         return tlink
 
@@ -126,15 +124,6 @@ class ShipmentResponse(BaseResponse):
                         raise ExpressLinkError(_.message)
                     case _:
                         logger.warning('Expresslink Warning: ' + _.message)
-
-
-def log_booked_shipment(request: ShipmentRequest, response: ShipmentResponse):
-    if hasattr(response, 'shipment_num') and response.shipment_num:
-        logger.info(
-            f'BOOKED {request.requested_shipment.direction.name.title()} shipment# {response.shipment_num} for {request.requested_shipment.remote_address.lines_str}'
-        )
-    else:
-        logger.warning('Something Wrong with booking, no shipment number returned?')
 
 
 ################################################################

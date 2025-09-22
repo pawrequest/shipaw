@@ -1,9 +1,7 @@
 import pydantic as _p
-
-from .models import AddressTemporary
+from .address import AddressTemporary
 from .shared import (
     Barcode,
-    CollectionNotificationType,
     CompletedCancelInfo,
     CompletedShipment,
     ContentData,
@@ -12,7 +10,6 @@ from .shared import (
     Image,
     LabelItem,
     ManifestShipment,
-    NotificationType,
     PFBaseModel,
 )
 
@@ -51,34 +48,6 @@ class CompletedShipments(PFBaseModel):
 
 class CompletedCancel(PFBaseModel):
     completed_cancel_info: CompletedCancelInfo | None = None
-
-
-class CollectionNotifications(PFBaseModel):
-    notification_type: list[CollectionNotificationType] = _p.Field(default_factory=list)
-
-    @classmethod
-    def standard_coll(cls):
-        return cls(
-            notification_type=[
-                CollectionNotificationType.EMAIL,
-                # CollectionNotificationType.SMS_RECIEVED,
-                # CollectionNotificationType.EMAIL_RECIEVED,
-            ]
-        )
-
-
-class RecipientNotifications(PFBaseModel):
-    notification_type: list[NotificationType] = _p.Field(default_factory=list)
-
-    @classmethod
-    def standard_recip(cls):
-        return cls(
-            notification_type=[
-                NotificationType.EMAIL,
-                NotificationType.SMS_DOD,
-                NotificationType.DELIVERY,
-            ]
-        )
 
 
 class NominatedDeliveryDatelist(PFBaseModel):
