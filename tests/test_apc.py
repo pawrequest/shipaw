@@ -3,11 +3,12 @@ import pytest
 
 from conftest import TEST_DATE
 from shipaw.agnostic.responses import ShipmentBookingResponseAgnost
-from shipaw.apc.address import Address as APCAddress, Contact as APCContact, apc_contact
-from shipaw.apc.provider import APCProvider, apc_shipment
+from shipaw.agnostic.ship_types import pydantic_export
+from shipaw.apc.address import Address as APCAddress, Contact as APCContact
+from shipaw.apc.provider import APCProvider
 from shipaw.apc.services import ServiceSpec
 from shipaw.apc.shared import EndPoints, apc_date, get_headers
-from shipaw.apc.shipment import Order
+from shipaw.apc.shipment import Shipment
 
 TEST_DATE_STR = apc_date(TEST_DATE)
 PROVIDER = APCProvider
@@ -15,7 +16,8 @@ PROVIDER = APCProvider
 
 @pytest.fixture(scope='session')
 def sample_shipment_dict_apc(sample_shipment):
-    res = PROVIDER.provider_shipment(sample_shipment, mode='python-alias')
+    res = PROVIDER.shipment_type.from_generic(sample_shipment)
+    res = pydantic_export(res, mode='python-alias')
     yield res
     ...
 
@@ -39,9 +41,9 @@ def test_convert_address(sample_address, sample_contact):
 
 
 def test_convert_shipment(sample_shipment):
-    shipment: Order = apc_shipment(sample_shipment)
-    assert isinstance(shipment, Order)
-    assert shipment.delivery.postal_code == 'DA16 3HU'
+    shipment: Shipment = Shipment.from_generic(sample_shipment)
+    assert isinstance(shipment, Shipment)
+    assert shipment.orders.order.delivery.postal_code == 'DA16 3HU'
 
 
 def test_service_available(sample_shipment_dict_apc):

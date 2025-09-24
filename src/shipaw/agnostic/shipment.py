@@ -1,5 +1,4 @@
 import datetime as dt
-from pathlib import Path
 
 from shipaw.agnostic.address import FullContact
 from shipaw.agnostic.base import ShipawBaseModel
@@ -30,7 +29,3 @@ class Shipment(ShipawBaseModel):
                 return self.sender
             case _:
                 raise ValueError('Bad ShipDirection')
-
-
-
-ShipmentOrDict = Shipment | dict

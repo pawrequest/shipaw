@@ -45,16 +45,7 @@ class GoodsInfo(APCBaseModel):
     increased_liability: bool = False
 
 
-# def boxes_to_details_dict(boxes: int):
-#     items = Items.basic(boxes)
-#     res = ShipmentDetails(number_of_pieces=boxes, items=items)
-#     return res
-
-
 class Order(APCBaseModel):
-    # model_config = ConfigDict(
-    # json_encoders=
-    # )
     collection_date: date
     ready_at: time = time(hour=9)
     closed_at: time = time(hour=17)
@@ -64,24 +55,21 @@ class Order(APCBaseModel):
     delivery: Address
     goods_info: GoodsInfo
     shipment_details: ShipmentDetails
-    #
-    # def export_dict(self) -> dict:
-    #     return {'Orders': {'Order': self.model_dump(mode='json', by_alias=True)}}
 
 
 class Orders(APCBaseModel):
     order: Order
 
 
-class ShipmentAPC(APCBaseModel):
+class Shipment(APCBaseModel):
     orders: Orders
 
-    def to_generic(self, mode: ConvertMode = 'pydantic') -> ShipmentAgnost | dict:
+    def to_generic(self) -> ShipmentAgnost:
         order = self.orders.order
         contact = order.delivery.contact.to_generic()
         address = order.delivery.to_generic()
 
-        ship = ShipmentAgnost(
+        return ShipmentAgnost(
             service=APCServiceDict[order.product_code],
             shipping_date=order.collection_date,
             reference=order.reference,
@@ -89,10 +77,9 @@ class ShipmentAPC(APCBaseModel):
             boxes=order.shipment_details.number_of_pieces,
             direction=ShipDirection.INBOUND if order.collection is not None else ShipDirection.OUTBOUND,
         )
-        return pydantic_export(ship, mode)
 
     @classmethod
-    def from_generic(cls, shipment: ShipmentAgnost, mode: ConvertMode = 'Pydantic') -> Self:
+    def from_generic(cls, shipment: ShipmentAgnost) -> Self:
         # todo handle direction
         if shipment.direction not in [ShipDirection.INBOUND, ShipDirection.OUTBOUND]:
             raise NotImplementedError('APCProvider does not support DROPOFF shipments')
@@ -111,6 +98,5 @@ class ShipmentAPC(APCBaseModel):
             goods_info=GoodsInfo(),
             shipment_details=ship_deets,
         )
-        shipment_out = ShipmentAPC(orders=Orders(order=order))
+        return Shipment(orders=Orders(order=order))
 
-        return pydantic_export(shipment_out, mode)

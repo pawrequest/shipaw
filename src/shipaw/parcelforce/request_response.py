@@ -54,27 +54,6 @@ class FindResponse(FindMessage, BaseResponse):
     safe_place_list: SafePlacelist | None = pyd.Field(default_factory=list)
 
 
-# class FindMessenger(BaseMessenger):
-
-
-#     name = 'Find'
-#     request_type = type[FindRequest]
-#     response_type = type[FindResponse]
-#
-
-################################################################
-
-
-#
-# class ShipmentRequest(BaseRequest):
-#     shipment: RequestedShipmentMinimum
-
-
-#
-# class CreateCollectionRequest(ShipmentRequest):
-#     shipment: CollectionMinimum
-
-
 class ShipmentRequest(BaseRequest):
     requested_shipment: Shipment
 

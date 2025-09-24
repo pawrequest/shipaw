@@ -1,10 +1,9 @@
-from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from loguru import logger
 
-from shipaw.agnostic.config import shipaw_settings
+from shipaw.config import shipaw_settings
 import re
 
 from shipaw.agnostic.ship_types import ShipDirection
@@ -22,10 +21,10 @@ def get_label_folder(direction: ShipDirection):
 
 def get_label_stem(shipment: 'Shipment'):
     label_name = (
-        f'Shipping Label '
-        f'{f'FROM {shipment.sender.contact.business_name} | ' if shipment.sender else ''}'
-        f'TO {shipment.recipient.contact.business_name} | '
-        f'ON {shipment.shipping_date}'
+        f'Shipping Label'
+        f'{f'-FROM {shipment.sender.address.business_name} | ' if shipment.sender else ''}'
+        f'-TO {shipment.recipient.address.business_name} | '
+        f'-ON {shipment.shipping_date}'
     )
     return make_filename_safe(label_name)
 
@@ -44,9 +43,9 @@ def unused_path(filepath: Path):
     return lpath
 
 
-def get_shipment_label_path(shipment: 'Shipment') -> Path:
-    folder = get_label_folder(shipment.direction)
-    label_stem = get_label_stem(shipment)
-    label_filepath = (folder / label_stem).with_suffix('.pdf')
-    label_filepath = unused_path(label_filepath)
-    return label_filepath
+# def get_shipment_label_path(shipment: 'Shipment') -> Path:
+#     folder = get_label_folder(shipment.direction)
+#     label_stem = get_label_stem(shipment)
+#     label_filepath = (folder / label_stem).with_suffix('.pdf')
+#     label_filepath = unused_path(label_filepath)
+#     return label_filepath

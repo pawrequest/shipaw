@@ -5,12 +5,12 @@ import re
 import typing as _t
 from enum import Enum, StrEnum
 import datetime as dt
-from typing import Literal
+from typing import Annotated, Literal, Protocol
 
 import phonenumbers
 import pydantic as _p
 from loguru import logger
-from pydantic import BaseModel
+from pydantic import BaseModel, StringConstraints
 
 DepartmentNum = 1
 
@@ -41,16 +41,16 @@ class DeliveryKindEnum(str, Enum):
     COLLECTION = 'COLLECTION'
 
 
-def get_ship_direction(ship_dict: dict) -> ShipDirection:
-    if ship_dict['shipment_type'] == ShipmentType.DELIVERY:
-        if ship_dict['sender_address'] is None:
-            return ShipDirection.OUTBOUND
-        else:
-            return ShipDirection.DROPOFF
-    elif ship_dict['shipment_type'] == ShipmentType.COLLECTION:
-        return ShipDirection.INBOUND
-    else:
-        raise ValueError()
+# def get_ship_direction(ship_dict: dict) -> ShipDirection:
+#     if ship_dict['shipment_type'] == ShipmentType.DELIVERY:
+#         if ship_dict['sender_address'] is None:
+#             return ShipDirection.OUTBOUND
+#         else:
+#             return ShipDirection.DROPOFF
+#     elif ship_dict['shipment_type'] == ShipmentType.COLLECTION:
+#         return ShipDirection.INBOUND
+#     else:
+#         raise ValueError()
 
 
 TOD = dt.date.today()
@@ -99,9 +99,6 @@ def limit_daterange_no_weekends(v: dt.date) -> dt.date:
     return v
 
 
-# SHIPPING_DATE = date
-
-
 class ExpressLinkError(Exception): ...
 
 
@@ -140,7 +137,7 @@ ConvertMode = Literal['pydantic', 'python', 'python-alias', 'json', 'json-alias'
 ConvertOutput = Literal['generic', 'provider']
 
 
-def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | object:
+def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | BaseModel | str:
     match mode:
         case 'pydantic':
             return obj
@@ -154,3 +151,15 @@ def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | object:
             return obj.model_dump_json(by_alias=True)
         case _:
             raise ValueError(f'Invalid ConvertMode: {mode}')
+
+
+class Convertable(Protocol):
+    def to_generic(self) -> dict | BaseModel: ...
+    @classmethod
+    def from_generic(cls, obj: BaseModel) -> BaseModel: ...
+
+
+STR_64 = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, max_length=64),
+]

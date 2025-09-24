@@ -8,7 +8,7 @@ import pydantic as _p
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from shipaw.agnostic.address import Address, Contact, FullContact
+from shipaw.agnostic.address import Address, Address, Contact, Contact, FullContact, FullContact
 from shipaw.agnostic.ship_types import MyPhone, ShipDirection
 
 
@@ -23,6 +23,7 @@ def load_env():
 
 class ShipawSettings(BaseSettings):
     label_dir: Path
+    shipper_live: bool = False
 
     address_line1: str
     address_line2: str | None = None
@@ -36,45 +37,41 @@ class ShipawSettings(BaseSettings):
     phone: MyPhone | None = None
     mobile_phone: MyPhone
 
-    full_contact: FullContact | None = None
-
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=load_env())
 
     @_p.field_validator('label_dir', mode='after')
-    def make_path(cls, v, values):
-        dirs = [_ for _ in ShipDirection]
-        for subdir in dirs:
+    def make_label_dirs(cls, v, values):
+        directions = [_ for _ in ShipDirection]
+        for subdir in directions:
             apath = v / subdir
             if not apath.exists():
                 apath.mkdir(parents=True, exist_ok=True)
         return v
 
-    @_p.model_validator(mode='after')
-    def home_full_contact_validator(self):
-        if self.full_contact is None:
-            self.full_contact = FullContact(
-                address=Address(
-                    address_lines=[
-                        _
-                        for _ in [
-                            self.address_line1,
-                            self.address_line2,
-                            self.address_line3,
-                        ]
-                        if _
-                    ],
-                    town=self.town,
-                    postcode=self.postcode,
-                    country=self.country,
-                ),
-                contact=Contact(
-                    business_name=self.business_name,
-                    contact_name=self.contact_name,
-                    email_address=self.email,
-                    mobile_phone=self.mobile_phone,
-                ),
-            )
-        return self
+    @property
+    def contact(self):
+        return Contact(
+            contact_name=self.contact_name,
+            email_address=self.email,
+            mobile_phone=self.mobile_phone,
+        )
+
+    @property
+    def address(self):
+        return Address(
+            address_lines=[_ for _ in [self.address_line1, self.address_line2, self.address_line3] if _],
+            town=self.town,
+            postcode=self.postcode,
+            country=self.country,
+            business_name=self.business_name,
+        )
+
+    @property
+    def full_contact(self) -> FullContact:
+        return FullContact(
+            address=self.address,
+            contact=self.contact,
+        )
 
 
 @functools.lru_cache

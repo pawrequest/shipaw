@@ -16,6 +16,7 @@ dependencies = [
     'pydantic-settings',
     "httpx>=0.28.1",
     "pygments>=2.19.2",
+    "ndjson>=0.3.1",
 ]
 
 [project.optional-dependencies]

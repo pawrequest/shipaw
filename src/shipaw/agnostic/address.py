@@ -1,4 +1,4 @@
-from pydantic import conlist, constr, field_validator, EmailStr
+from pydantic import conlist, constr, field_validator, EmailStr, model_validator
 
 from shipaw.agnostic.base import ShipawBaseModel
 
@@ -7,17 +7,24 @@ class Contact(ShipawBaseModel):
     contact_name: str
     email_address: str | EmailStr
     mobile_phone: str
-    business_name: str
+    phone_number: str | None = None
+
+    @model_validator(mode='after')
+    def phone_is_none(self):
+        if not self.phone_number:
+            self.phone_number = self.mobile_phone
+        return self
 
 
 class Address(ShipawBaseModel):
+    business_name: str
     address_lines: list[str] = conlist(item_type=str, max_length=3, min_length=1)
     town: constr(max_length=25)
     postcode: constr(max_length=16)
     country: str = 'GB'
 
-    def get_address_lines_dict(self) -> dict[str, str]:
-        return {f'address_line{i+1}': line for i, line in enumerate(self.address_lines) if line}
+    def get_address_lines_dict(self, prefix='address_line') -> dict[str, str]:
+        return {f'{prefix}{i+1}': line for i, line in enumerate(self.address_lines) if line}
 
     @field_validator('address_lines', mode='after')
     def check_address_lines(cls, v):
@@ -35,6 +42,6 @@ class FullContact(ShipawBaseModel):
     address: Address
 
 
-class AddressChoiceAgnost(ShipawBaseModel):
+class AddressChoice(ShipawBaseModel):
     address: Address
     score: int

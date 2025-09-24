@@ -4,7 +4,6 @@ import typing as _t
 import pydantic
 from pawdantic import paw_types
 
-# from shipaw.parcelforce.pf_shipment import Shipment as PFShipment
 from shipaw.agnostic import ship_types
 from shipaw.parcelforce.address import AddTypes, AddressCollection, AddressRecipient, Contact, ContactCollection
 from shipaw.parcelforce.lists import (
@@ -21,7 +20,8 @@ from shipaw.parcelforce.lists import (
     SpecifiedNeighbour,
 )
 from shipaw.parcelforce.models import DeliveryOptions, InBoundDetails
-from shipaw.parcelforce.shared import DateTimeRange, Enhancement, PFBaseModel, Returns, ServiceCode
+from shipaw.parcelforce.shared import DateTimeRange, Enhancement, PFBaseModel, Returns
+from shipaw.parcelforce.services import ServiceCode
 
 
 class PAF(PFBaseModel):
@@ -223,5 +223,3 @@ class RequestedShipmentComplex(RequestedShipmentSimple):
     # total_shipment_weight: float | None = None
     # enhancement: Enhancement | None = None
     # delivery_options: DeliveryOptions | None = None
-
-

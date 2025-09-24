@@ -4,7 +4,7 @@ import pydantic
 from pawdantic import paw_types
 from pydantic import constr
 
-from shipaw.agnostic.address import Address, Contact as ContactAgnost
+from shipaw.agnostic.address import Address as AddressAgnost, Contact as ContactAgnost
 from shipaw.agnostic.ship_types import MyPhone
 from shipaw.parcelforce.notifications import CollectionNotifications, RecipientNotifications
 from shipaw.parcelforce.shared import PFBaseModel
@@ -12,25 +12,22 @@ from shipaw.parcelforce.shared import PFBaseModel
 
 class Contact(PFBaseModel):
     business_name: paw_types.truncated_printable_str_type(40)
-    # business_name: constr(max_length=40)
     mobile_phone: MyPhone
     email_address: constr(max_length=50)
     contact_name: paw_types.truncated_printable_str_type(30)
-    # contact_name: constr(max_length=30)
     notifications: RecipientNotifications | None = RecipientNotifications.standard_recip()
 
     def to_generic(self) -> ContactAgnost:
         return ContactAgnost(
-            business_name=self.business_name,
             contact_name=self.contact_name,
             email_address=self.email_address,
             mobile_phone=self.mobile_phone,
         )
 
     @classmethod
-    def from_generic(cls, contact: ContactAgnost) -> 'Contact':
+    def from_generic(cls, contact: ContactAgnost, business_name: str) -> Self:
         return cls(
-            business_name=contact.business_name,
+            business_name=business_name,
             contact_name=contact.contact_name,
             email_address=contact.email_address,
             mobile_phone=contact.mobile_phone,
@@ -118,16 +115,17 @@ class AddressBase(PFBaseModel):
     postcode: constr(max_length=16)
     country: str = 'GB'
 
-    def to_generic(self) -> Address:
-        return Address(
+    def to_generic(self, business_name) -> AddressAgnost:
+        return AddressAgnost(
             address_lines=[line for line in [self.address_line1, self.address_line2, self.address_line3] if line],
             town=self.town,
             postcode=self.postcode,
             country=self.country,
+            business_name=business_name,
         )
 
     @classmethod
-    def from_generic(cls, address: Address) -> Self:
+    def from_generic(cls, address: AddressAgnost) -> Self:
         return cls(
             address_line1=address.address_lines[0],
             address_line2=address.address_lines[1] if len(address.address_lines) > 1 else None,
