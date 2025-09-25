@@ -1,16 +1,17 @@
+import json
 from base64 import b64decode
 from typing import ClassVar
 
 import httpx
 
 from shipaw.agnostic.providers import ShippingProvider
-from shipaw.agnostic.responses import ShipmentBookingResponseAgnost
+from shipaw.agnostic.responses import Alert, Alerts, ShipmentBookingResponseAgnost
 from shipaw.agnostic.services import ServiceDict
 from shipaw.agnostic.ship_types import ProviderName, pydantic_export
 from shipaw.agnostic.shipment import Shipment as ShipmentAgnost
 from shipaw.apc.address import Address as AddressAPC, Contact as ContactAPC
+from shipaw.apc.config import apc_settings
 from shipaw.apc.services import APCServiceDict
-from shipaw.apc.shared import EndPoints, get_headers, order_endpoint
 from shipaw.apc.shipment import Shipment
 
 
@@ -22,17 +23,33 @@ class APCProvider(ShippingProvider):
     contact_type: ClassVar[type[ContactAPC]] = ContactAPC
 
     @staticmethod
-    def book_shipment(shipment: dict | ShipmentAgnost) -> ShipmentBookingResponseAgnost:
+    def book_shipment(shipment: dict | ShipmentAgnost, settings=apc_settings()) -> ShipmentBookingResponseAgnost:
         """Takes provider ShipmnentDict, or ShipmentAgnost object"""
         shipment = ShipmentAgnost.model_validate(shipment)
         shipment_apc = Shipment.from_generic(shipment)
         shipment_apc = pydantic_export(shipment_apc, mode='python-alias')
 
-        res = httpx.post(EndPoints.ORDERS, headers=get_headers(), json=shipment_apc)
+        res = httpx.post(settings.orders_endpoint, headers=settings.headers, json=shipment_apc)
         res.raise_for_status()
         res_json = res.json()
+        messages = json.loads(res.text).get('Orders').get('Order').get('Messages')
+        if 'ErrorFields' in messages.keys():
+            fieldname = messages['ErrorFields']['ErrorField']['FieldName']
+            message = messages['ErrorFields']['ErrorField']['ErrorMessage']
+            alerts = Alerts(alert=[Alert(message=f'Error booking shipment: {fieldname}: {message}')])
+            return ShipmentBookingResponseAgnost(
+                alerts=alerts,
+                shipment=shipment,
+                shipment_num='FAILED TO BOOK',
+                tracking_link='NOT IMPLEMENTED',
+                data=res_json,
+                status=str(res.status_code),
+                success=False,
+                label_data=b'',
+            )
         order = res_json['Orders']['Order']
         order_number = order['OrderNumber']
+
         return ShipmentBookingResponseAgnost(
             shipment=shipment,
             shipment_num=order_number,
@@ -46,7 +63,8 @@ class APCProvider(ShippingProvider):
     @staticmethod
     def get_label_content(shipment_num: str) -> bytes:
         params = {'labelformat': 'PDF'}
-        label = httpx.get(order_endpoint(shipment_num), headers=get_headers(), params=params)
+        settings = apc_settings()
+        label = httpx.get(settings.one_order_endpoint(shipment_num), headers=settings.headers, params=params)
         content = label.json()['Orders']['Order']['Label']['Content']
         return b64decode(content)
 

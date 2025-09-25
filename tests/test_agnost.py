@@ -12,7 +12,7 @@ from shipaw.agnostic.ship_types import ShipDirection, pydantic_export
 from shipaw.agnostic.shipment import Shipment
 from shipaw.apc.address import Address as AddressAPC, Contact as ContactAPC
 from shipaw.apc.provider import APCProvider
-from shipaw.apc.shared import apc_date
+from shipaw.apc.config import apc_date
 from shipaw.parcelforce.address import AddressBase as AddressPF, Contact as ContactPF
 from shipaw.parcelforce.provider import ParcelforceProvider
 

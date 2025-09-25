@@ -14,7 +14,7 @@ from loguru import logger
 
 class Item(APCBaseModel):
     type: Literal['ALL'] = 'ALL'
-    weight: float | None = 1
+    weight: float | None = 5
     length: float | None = None
     width: float | None = None
     height: float | None = None

@@ -5,9 +5,9 @@ from conftest import TEST_DATE
 from shipaw.agnostic.responses import ShipmentBookingResponseAgnost
 from shipaw.agnostic.ship_types import pydantic_export
 from shipaw.apc.address import Address as APCAddress, Contact as APCContact
+from shipaw.apc.config import apc_date, apc_settings
 from shipaw.apc.provider import APCProvider
 from shipaw.apc.services import ServiceSpec
-from shipaw.apc.shared import EndPoints, apc_date, get_headers
 from shipaw.apc.shipment import Shipment
 
 TEST_DATE_STR = apc_date(TEST_DATE)
@@ -47,7 +47,8 @@ def test_convert_shipment(sample_shipment):
 
 
 def test_service_available(sample_shipment_dict_apc):
-    res = httpx.post(EndPoints.SERVICES, headers=get_headers(), json=sample_shipment_dict_apc, timeout=30)
+    settings = apc_settings()
+    res = httpx.post(settings.services_endpoint, headers=settings.headers, json=sample_shipment_dict_apc, timeout=30)
     res.raise_for_status()
     res_json = res.json()
     avail = res_json['ServiceAvailability']['Services']['Service']
