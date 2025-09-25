@@ -1,6 +1,7 @@
 [project]
+license = "MIT"
 name = "shipaw"
-version = "0.2.1"
+version = "0.2.2"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -14,9 +15,9 @@ dependencies = [
     'loguru', # logging
     'phonenumbers',
     'pydantic-settings',
+    "royal-mail-click-and-drop",
     "httpx>=0.28.1",
     "pygments>=2.19.2",
-    "ndjson>=0.3.1",
 ]
 
 [project.optional-dependencies]
@@ -43,3 +44,6 @@ line-length = 120
 extend-select = ["Q", "RUF100", "UP"]
 flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
 format.quote-style="single"
+
+[tool.uv.sources]
+royal-mail-click-and-drop = { path = "../royal_mail_click_and_drop" }
