@@ -52,8 +52,8 @@ def test_provider_books_shipment(sample_shipment, provider: ShippingProvider):
 def test_address_conversions_pf(sample_full_contact):
     parcelforce_addr = AddressPF.from_generic(sample_full_contact.address)
     parcelforce_cont = ContactPF.from_generic(sample_full_contact.contact, sample_full_contact.address.business_name)
-    generic_addr = parcelforce_addr.to_generic(business_name=parcelforce_cont.business_name)
-    generic_cont = parcelforce_cont.to_generic()
+    generic_addr = parcelforce_addr.to_agnostic(business_name=parcelforce_cont.business_name)
+    generic_cont = parcelforce_cont.to_agnostic()
     assert sample_full_contact == FullContact(address=generic_addr, contact=generic_cont)
 
 

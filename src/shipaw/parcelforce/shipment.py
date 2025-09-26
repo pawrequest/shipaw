@@ -10,7 +10,6 @@ from shipaw.agnostic.ship_types import (
     ShipDirection,
     ShipmentType,
 )
-from shipaw.agnostic.shipment import Shipment as ShipmentAgnost
 from shipaw.parcelforce.address import (
     AddressCollection,
     AddressRecipient as PFAddress,
@@ -22,7 +21,7 @@ from shipaw.parcelforce.address import (
 from shipaw.parcelforce.config import pf_settings
 from shipaw.parcelforce.lists import HazardousGoods
 from shipaw.parcelforce.models import AddressRecipient, DeliveryOptions
-from shipaw.parcelforce.services import ParcelforceServiceDict, ServiceCode
+from shipaw.parcelforce.services import ServiceCode
 from shipaw.parcelforce.shared import DateTimeRange, Enhancement, PFBaseModel
 from shipaw.parcelforce.top import CollectionInfo
 
@@ -39,21 +38,6 @@ class ShipmentReferenceFields(PFBaseModel):
     special_instructions4: constr(max_length=25) | None = None
 
 
-def split_string_into_chunks(s, chunk_size):
-    return [s[i : i + chunk_size] for i in range(0, len(s), chunk_size)]
-
-
-def ref_dict_from_str(ref_string: str) -> dict[str, str]:
-    refs = split_string_into_chunks(ref_string, 24)
-    if len(refs) > 5:
-        raise ValueError('Reference too long, maximum 120 characters allowed')
-    ref_nums = {f'reference_number{i}': ref for i, ref in enumerate(refs, start=1)}
-    return ref_nums
-
-
-def join_refs(refs: dict[str, str]) -> str:
-    refs = [refs.get(f'reference_number{i+1}', '') for i in range(len(refs))]
-    return ''.join(refs).strip()
 
 
 class Shipment(ShipmentReferenceFields):
@@ -83,56 +67,37 @@ class Shipment(ShipmentReferenceFields):
     consignment_handling: bool | None = None
     drop_off_ind: DropOffInd | None = None
 
-    @classmethod
-    def from_generic(
-        cls,
-        shipment: ShipmentAgnost | dict,
-    ) -> Self | dict:
-        shipment = ShipmentAgnost.model_validate(shipment)
-        refs = ref_dict_from_str(shipment.reference)
-        ref_nums = {'reference_number' + i: ref for ref, i in enumerate(refs)}
-        service_code = ParcelforceServiceDict[shipment.service.upper()]
-        ship_pf = cls(
-            **ref_nums,
-            recipient_contact=Contact.from_generic(
-                shipment.recipient.contact, business_name=shipment.recipient.address.business_name
-            ),
-            recipient_address=AddressRecipient.from_generic(shipment.recipient.address),
-            total_number_of_parcels=shipment.boxes,
-            shipping_date=shipment.shipping_date,
-            service_code=service_code,
-        )
+    @property
+    def direction(self) -> ShipDirection:
+        if self.shipment_type == ShipmentType.DELIVERY:
+            if self.sender_address is None:
+                return ShipDirection.OUTBOUND
+            else:
+                return ShipDirection.DROPOFF
+        elif self.shipment_type == ShipmentType.COLLECTION:
+            return ShipDirection.INBOUND
+        else:
+            raise ValueError()
 
-        if shipment.sender:
-            ship_pf = cls.to_inbound(ship_pf, shipment)
-
-        return ship_pf
-
-    @classmethod
-    def to_inbound(cls, ship_pf: Self, shipment: ShipmentAgnost) -> Self:
+    def to_inbound(self) -> Self:
         """Modify ship_pf in place to be an inbound shipment / dropoff"""
-        if shipment.direction not in [ShipDirection.INBOUND, ShipDirection.DROPOFF]:
+        if self.direction not in [ShipDirection.INBOUND, ShipDirection.DROPOFF]:
             raise ValueError('Inbound shipment must be INBOUND or DROPOFF')
 
-        contact = Contact.from_generic(shipment.sender.contact, business_name=shipment.sender.address.business_name)
-        sender_address = AddressRecipient.from_generic(shipment.sender.address)
-        if shipment.direction == ShipDirection.INBOUND:
-            ship_pf.shipment_type = ShipmentType.COLLECTION
-            ship_pf.print_own_label = True
-            ship_pf.collection_info = CollectionInfo(
-                collection_contact=ContactCollection(**contact.model_dump(exclude={'notifications'})),
-                collection_address=sender_address,
-                collection_time=DateTimeRange.null_times_from_date(ship_pf.shipping_date),
+        if self.direction == ShipDirection.INBOUND:
+            self.shipment_type = ShipmentType.COLLECTION
+            self.print_own_label = True
+            self.collection_info = CollectionInfo(
+                collection_contact=ContactCollection(**self.sender_contact.model_dump(exclude={'notifications'})),
+                collection_address=AddressCollection(**self.sender_address.model_dump()),
+                collection_time=DateTimeRange.null_times_from_date(self.shipping_date),
             )
-        elif shipment.direction == ShipDirection.DROPOFF:
-            ship_pf.sender_contact = ContactSender(
-                **contact.model_dump(exclude={'notifications'}),
+        elif self.direction == ShipDirection.DROPOFF:
+            self.sender_contact = ContactSender(
+                **self.sender_contact.model_dump(exclude={'notifications'}),
             )
-            ship_pf.sender_address = sender_address
-        return ship_pf
-
-    def to_generic(self) -> ShipmentAgnost:
-        raise NotImplementedError('to_generic not implemented for Parcelforce Shipment')
+            self.sender_address = self.sender_address
+        return self
 
     def __str__(self):
         return f'{self.shipment_type} {f'from {self.collection_info.collection_address.address_line1} ' if self.collection_info else ''}to {self.recipient_address.address_line1}'
@@ -274,4 +239,3 @@ def parcelforce_address(address: AddressAgnost) -> PFAddress:
 #     except ValidationError as e:
 #         logger.error(f'Error converting Shipment to Collection: {e}')
 #         raise e
-

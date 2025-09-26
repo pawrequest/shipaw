@@ -1,13 +1,22 @@
-from typing import Self
-
 import pydantic
 from pawdantic import paw_types
 from pydantic import constr
 
-from shipaw.agnostic.address import Address as AddressAgnost, Contact as ContactAgnost
-from shipaw.agnostic.ship_types import MyPhone
+from shipaw.agnostic.ship_types import MyPhone, ShipDirection, ShipmentType
 from shipaw.parcelforce.notifications import CollectionNotifications, RecipientNotifications
 from shipaw.parcelforce.shared import PFBaseModel
+
+
+def get_ship_direction_dict(ship_dict: dict) -> ShipDirection:
+    if ship_dict['shipment_type'] == ShipmentType.DELIVERY:
+        if ship_dict['sender_address'] is None:
+            return ShipDirection.OUTBOUND
+        else:
+            return ShipDirection.DROPOFF
+    elif ship_dict['shipment_type'] == ShipmentType.COLLECTION:
+        return ShipDirection.INBOUND
+    else:
+        raise ValueError()
 
 
 class Contact(PFBaseModel):
@@ -16,22 +25,6 @@ class Contact(PFBaseModel):
     email_address: constr(max_length=50)
     contact_name: paw_types.truncated_printable_str_type(30)
     notifications: RecipientNotifications | None = RecipientNotifications.standard_recip()
-
-    def to_generic(self) -> ContactAgnost:
-        return ContactAgnost(
-            contact_name=self.contact_name,
-            email_address=self.email_address,
-            mobile_phone=self.mobile_phone,
-        )
-
-    @classmethod
-    def from_generic(cls, contact: ContactAgnost, business_name: str) -> Self:
-        return cls(
-            business_name=business_name,
-            contact_name=contact.contact_name,
-            email_address=contact.email_address,
-            mobile_phone=contact.mobile_phone,
-        )
 
     @property
     def notifications_str(self) -> str:
@@ -114,26 +107,6 @@ class AddressBase(PFBaseModel):
     town: constr(max_length=25)
     postcode: constr(max_length=16)
     country: str = 'GB'
-
-    def to_generic(self, business_name) -> AddressAgnost:
-        return AddressAgnost(
-            address_lines=[line for line in [self.address_line1, self.address_line2, self.address_line3] if line],
-            town=self.town,
-            postcode=self.postcode,
-            country=self.country,
-            business_name=business_name,
-        )
-
-    @classmethod
-    def from_generic(cls, address: AddressAgnost) -> Self:
-        return cls(
-            address_line1=address.address_lines[0],
-            address_line2=address.address_lines[1] if len(address.address_lines) > 1 else None,
-            address_line3=address.address_lines[2] if len(address.address_lines) > 2 else None,
-            town=address.town,
-            postcode=address.postcode,
-            country=address.country,
-        )
 
     @property
     def lines_dict(self):

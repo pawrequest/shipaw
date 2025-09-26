@@ -6,11 +6,12 @@ import typing as _t
 from enum import Enum, StrEnum
 import datetime as dt
 from typing import Annotated, Literal, Protocol
+from typing_extensions import Annotated
 
 import phonenumbers
 import pydantic as _p
 from loguru import logger
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints
 
 DepartmentNum = 1
 
@@ -40,17 +41,6 @@ class DeliveryKindEnum(str, Enum):
     DELIVERY = 'DELIVERY'
     COLLECTION = 'COLLECTION'
 
-
-# def get_ship_direction(ship_dict: dict) -> ShipDirection:
-#     if ship_dict['shipment_type'] == ShipmentType.DELIVERY:
-#         if ship_dict['sender_address'] is None:
-#             return ShipDirection.OUTBOUND
-#         else:
-#             return ShipDirection.DROPOFF
-#     elif ship_dict['shipment_type'] == ShipmentType.COLLECTION:
-#         return ShipDirection.INBOUND
-#     else:
-#         raise ValueError()
 
 
 TOD = dt.date.today()
@@ -163,3 +153,8 @@ STR_64 = Annotated[
     str,
     StringConstraints(strip_whitespace=True, max_length=64),
 ]
+str100 = Annotated[str, Field(strict=True, max_length=100)]
+
+
+def str_type(length: int):
+    return Annotated[str, Field(strict=True, max_length=length)]

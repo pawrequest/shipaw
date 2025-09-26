@@ -1,3 +1,6 @@
+from datetime import date
+
+import dateutil.utils
 import httpx
 import pytest
 
@@ -8,7 +11,7 @@ from shipaw.apc.address import Address as APCAddress, Contact as APCContact
 from shipaw.apc.config import apc_date, apc_settings
 from shipaw.apc.provider import APCProvider
 from shipaw.apc.services import ServiceSpec
-from shipaw.apc.shipment import Shipment
+from shipaw.apc.shipment import Order, Orders, Shipment
 
 TEST_DATE_STR = apc_date(TEST_DATE)
 PROVIDER = APCProvider
@@ -72,3 +75,16 @@ def test_download_label(booking_response, tmp_path):
     label_file.write_bytes(booking_response.label_data)
     assert label_file.exists()
     assert label_file.stat().st_size > 1000
+
+
+def test_model():
+    athing = APCAddress(
+        company_name='sdfgdsagf',
+        address_line_1='sdgsdg',
+        address_line_2=None,
+        city='sdgfdsg',
+        county=None,
+        postal_code='sdgsdg',
+        country_code='GB',
+        contact=APCContact(person_name='sdgdsg', phone_number='sdgsdg', email='sdgsdg'),
+    )
