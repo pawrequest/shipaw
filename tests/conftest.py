@@ -1,25 +1,26 @@
-from pathlib import Path
-from amherst.set_env import set_env_files
+from shipaw.config import shipaw_settings # FIRST!
+from shipaw.providers.apc_provider import APCShippingProvider  # noqa
+from shipaw.providers.parcelforce_provider import ParcelforceShippingProvider  # noqa
 
-ENV_DIR = Path(r'C:\prdev\envs\sandbox')
-set_env_files(ENV_DIR)
-assert ENV_DIR.name == 'sandbox'
 
-from shipaw.agnostic.providers import ShippingProvider
-from shipaw.apc.provider import APCProvider
-from shipaw.parcelforce.provider import ParcelforceProvider
+from shipaw.models.provider import PROVIDER_REGISTER, ShippingProvider
 
 from datetime import date, timedelta
 
 import pytest
 
-from shipaw.agnostic.shipment import Shipment
-from shipaw.agnostic.address import Address, Contact, FullContact
-from shipaw.agnostic.ship_types import ShipDirection, pydantic_export
+from shipaw.models.shipment import Shipment
+from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.ship_types import ShipDirection
 
 TEST_DATE = date.today() + timedelta(days=2)
 if TEST_DATE.weekday() in (5, 6):
     TEST_DATE += timedelta(days=7 - TEST_DATE.weekday())
+
+
+@pytest.fixture(scope='session')
+def settings():
+    return shipaw_settings()
 
 
 @pytest.fixture(scope='session')
@@ -62,9 +63,18 @@ def sample_shipment(sample_full_contact):
     )
 
 
-@pytest.fixture(params=[ParcelforceProvider(), APCProvider()], ids=['ParcelforceProvider', 'APCProvider'])
-def sample_shipment_dicts(sample_shipment, request):
-    provider: ShippingProvider = request.param
-    res = provider.shipment_type.from_generic(sample_shipment)
-    res = pydantic_export(res, mode='python')
+@pytest.fixture(params=[_ for _ in PROVIDER_REGISTER.values()], ids=[_ for _ in PROVIDER_REGISTER.keys()])
+def provider_type(request) -> type[ShippingProvider]:
+    return request.param
+
+
+@pytest.fixture
+def provider(provider_type) -> ShippingProvider:
+    return provider_type()
+
+
+@pytest.fixture
+def sample_shipment_dicts(sample_shipment, request, provider):
+    res = provider.provider_shipment(sample_shipment)
+    res = res.model_dump()
     return res, provider

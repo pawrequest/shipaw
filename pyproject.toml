@@ -7,9 +7,9 @@ authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
 ]
 readme = "README.md"
-requires-python = ">= 3.12"
+requires-python = ">= 3.13"
 dependencies = [
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic', # special pydantic types eg truncated strings
+    'pawdantic', # special pydantic types eg truncated strings
     'combadge[zeep]', # xml client
     'thefuzz', # fuzzy search to match addresses
     'loguru', # logging
@@ -17,7 +17,14 @@ dependencies = [
     'pydantic-settings',
     "httpx>=0.28.1",
     "pygments>=2.19.2",
-#    "royal-mail-click-and-drop",
+    #    "royal-mail-click-and-drop",
+    "parcelforce-expresslink",
+    "apc-hypaship",
+    "pydantic[email]>=2.11.9",
+    "pytest>=8.4.2",
+    "fastapi[standard]>=0.117.1",
+    "pawdf",
+    "jinja2>=3.1.6",
 ]
 
 [project.optional-dependencies]
@@ -42,8 +49,13 @@ allow-direct-references = true
 [tool.ruff]
 line-length = 120
 extend-select = ["Q", "RUF100", "UP"]
-flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
-format.quote-style="single"
+flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
+format.quote-style = "single"
 
-#[tool.uv.sources]
-#royal-mail-click-and-drop = { path = "../royal_mail_click_and_drop", editable = true }
+[tool.uv.sources]
+pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
+pawdf = { git = 'https://github.com/pawrequest/pawdf' }
+#pawdantic = { path = 'C:\prdev\pawdantic', editable = true }
+royal-mail-click-and-drop = { path = "../royal-mail-click-and-drop", editable = true }
+parcelforce-expresslink = { path = "../parcelforce_expresslink", editable = true }
+apc-hypaship = { path = "../apc-hypaship", editable = true }
