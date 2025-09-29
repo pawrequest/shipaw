@@ -43,6 +43,7 @@
  * @typedef {Object} ShipmentRequest
  * @property {Shipment} Shipment
  * @property {string} Provider
+ * @property {string} [Redirect]
  */
 
 

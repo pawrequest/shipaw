@@ -1,10 +1,12 @@
 from pathlib import Path
+from typing import Annotated
 
 from combadge.core.errors import BackendError
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
+from pydantic import Field
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
 from parcelforce_expresslink.client import ParcelforceClient
 from parcelforce_expresslink.address import AddressChoice as AddressChoicePF, Contact as ContactPF
@@ -24,7 +26,9 @@ router = APIRouter()
 
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
-async def ship_form(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
+async def ship_form(
+    request: Request, shipment: Shipment = Body(...), context: dict | None = None
+) -> ShipawTemplateResponse:
     log_obj(shipment, 'Shipment received at /ship_form:')
     alerts: Alerts = request.app.alerts
 
@@ -59,13 +63,18 @@ async def order_summary(
 async def order_results(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_from_json),
-) -> ShipawTemplateResponse:
+) -> ShipawTemplateResponse | RedirectResponse:
     shipment_response = await try_book_shipment(shipment_request)
     shipment_request.provider.handle_response(shipment_request, shipment_response)
     # if shipment_request.handler:
     #     await shipment_request.handler(shipment_request, shipment_response)
     conversation = ShipmentConversation(request=shipment_request, response=shipment_response)
     log_obj(conversation, 'ShipmentConversation at /order_confirm:')
+    # redirect to URL provided in shipment_request
+    if redirec := shipment_request.shipment.context.get('redirect') is not None:
+        logger.info(f'Redirecting to {redirec} as per shipment_request context')
+        return RedirectResponse(url=redirec)
+
     return ShipawTemplateResponse(
         template_path='/order_results.html',
         context={'shipment_response': shipment_response},
