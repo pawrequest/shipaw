@@ -1,4 +1,4 @@
-<!-- templates/order_review.html -->
+<!-- templates/order_summary.html -->
 {#context = {shipment_request}#}
 {% block head %}
     <script src="{{ url_for('static', path='ship.js') }}"></script>
@@ -21,11 +21,12 @@
     {% include "alerts.html" with context %}
 {% endif %}
 
+<div> SHIPPY!!!! </div>
 
 <div id=requested_shipment class="wrapper wrapper__requested">
     <section class="requested requested__head">
         <h3 class="requested-title">{{ ship_dir }} {{ shipment_request.provider_name }} Shipment:</h3>
-        <form hx-post="/order_confirm"
+        <form hx-post="order_results"
               hx-target=#content_main
               hx-swap="innerHTML"
         >

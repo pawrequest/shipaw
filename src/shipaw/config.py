@@ -12,7 +12,6 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
-from pawdantic.paw_types import MyPhone
 
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
@@ -33,6 +32,7 @@ def load_envs() -> Path:
     os.environ['PARCELFORCE_ENV'] = str(pf)
     os.environ['SHIPAW_ENV'] = str(shipaw_env)
     return shipaw_env
+
 
 #
 # def load_env():
@@ -83,8 +83,8 @@ class ShipawSettings(BaseSettings):
     business_name: str
     contact_name: str
     email: str
-    phone: MyPhone | None = None
-    mobile_phone: MyPhone
+    phone: str | None = None
+    mobile_phone: str
 
     model_config = SettingsConfigDict(env_ignore_empty=True, env_file=load_envs())
 
@@ -156,4 +156,5 @@ class ShipawSettings(BaseSettings):
 
 @functools.lru_cache
 def shipaw_settings() -> ShipawSettings:
-    return ShipawSettings()
+    return ShipawSettings.model_validate({})
+

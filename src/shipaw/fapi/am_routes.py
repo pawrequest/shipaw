@@ -26,7 +26,7 @@
 # # ) -> HTMLResponse:
 # #     alerts = await maybe_alert_phone_number(shipment)
 # #     logger.info('Shipment Form Posted')
-# #     template = 'ship/order_review.html'
+# #     template = 'ship/order_summary.html'
 # #     ship_req = ShipmentRequestAgnost(shipment=shipment, provider_name=provider_name)
 # #     return amherst_settings().templates.TemplateResponse(
 # #         template, {'request': request, 'shipment_request': ship_req, 'record': record, 'alerts': alerts}
@@ -77,7 +77,7 @@
 #     await try_update_cmc(record, shipment_req.shipment, shipment_response)
 #
 #     return amherst_settings().templates.TemplateResponse(
-#         'ship/order_confirmed.html',
+#         'ship/order_results.html',
 #         {
 #             'request': request,
 #             'shipment': shipment_req.shipment,

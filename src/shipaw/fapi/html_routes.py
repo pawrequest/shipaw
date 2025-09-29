@@ -14,8 +14,8 @@ from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment, sample_shipment
 from shipaw.fapi.json_routes import (
     ship_form as ship_form_json,
-    order_review as order_review_json,
-    order_confirm as order_confirm_json,
+    order_summary as order_review_json,
+    order_results as order_confirm_json,
 )
 
 router = APIRouter()
@@ -47,25 +47,25 @@ def html_from_json(json_endpoint):
     return wrapper
 
 
-@router.post('/ship_form', response_class=HTMLResponse)
+@router.post('/shipping_form', response_class=HTMLResponse)
 @html_from_json
-async def ship_form(request: Request, shipment: Shipment = Body(...)) -> HTMLResponse:
+async def shipping_form(request: Request, shipment: Shipment = Body(...)) -> HTMLResponse:
     res = await ship_form_json(request, shipment)
     return cast(HTMLResponse, res)
 
 
-@router.post('/order_review', response_class=HTMLResponse)
+@router.post('/order_summary', response_class=HTMLResponse)
 @html_from_json
-async def order_review(
+async def order_summary(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_from_form),
 ) -> HTMLResponse:
     return cast(HTMLResponse, await order_review_json(request, shipment_request))
 
 
-@router.post('/order_confirm', response_class=HTMLResponse)
+@router.post('/order_results', response_class=HTMLResponse)
 @html_from_json
-async def order_confirm(
+async def order_results(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_from_json),
 ) -> HTMLResponse:

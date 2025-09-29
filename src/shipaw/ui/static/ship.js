@@ -53,15 +53,15 @@
  */
 async function initShipForm(shipment) {
     console.log('Initializing ship form with shipment:', shipment);
-    context = JSON.stringify(shipment.Context);
-    setHiddenInputs(context);
-
     populateShipment(shipment);
+
+    const contextStr = JSON.stringify(shipment.Context);
+    await setContextStr(contextStr);
     await loadAddrChoices();
     toggleOwnLabel();
 }
 
-function setHiddenInputs(contextStr) {
+async function setContextStr(contextStr) {
     const contextStrInput = document.querySelector('input[name="context_str"]');
     contextStrInput.value = contextStr;
     console.log('contextStrInput.value', contextStrInput.value);

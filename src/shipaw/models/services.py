@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from parcelforce_expresslink.services import ServiceCode
 
 
 @dataclass
@@ -16,7 +15,7 @@ class Services:
             raise ValueError(f'Invalid service code: {service_code}')
         return res
 
-    def lookup(self, service_name: str) -> ServiceCode:
+    def lookup(self, service_name: str) -> str:
         res = self.__dict__.get(service_name)
         if not res:
             raise ValueError(f'Invalid service name: {service_name}')

@@ -1,4 +1,4 @@
-<!-- templates/form_content.html -->
+<!-- templates/shipping_form.html -->
 {#context = {shipment }#}
 {% block head %}
     <script src="{{ url_for('static', path='ship.js') }}"></script>
@@ -6,10 +6,13 @@
 {% endblock %}
 <!--suppress HtmlFormInputWithoutLabel -->
 <form id="main-form"
-      hx-post="/order_review/"
+      hx-post="order_summary/"
       hx-target=#content_top
       hx-swap="innerHTML"
 >
+    <input type="hidden" name="context_str" value="">
+    <div> SHIPAW SHIPAW SHIPAW </div>
+
     <div class="wrapper wrapper__booking">
         <section class="inputs inputs__ship">
             <h1>Shipment</h1>
@@ -116,16 +119,6 @@
     shipment = {{ shipment.model_dump(mode='json', by_alias=True) | tojson }};
     console.log('shipment', shipment);
     initShipForm(shipment);
-
-
-     console.log('record', record);
-     shipment = {{ record.shipment().model_dump(mode='json', by_alias=True) | tojson }};
-     console.log('shipment', shipment);
-     cont_str = shipment.context | jsonable | tojson;
-     contextStr = JSON.stringify(shipment.context);
-     recordStr = JSON.stringify(record);
-
-    {#document.getElementById('go-do-it').addEventListener('click', subForm);#}
 
 
 </script>

@@ -23,7 +23,7 @@ from shipaw.providers.parcelforce_provider import address_from_agnostic, full_co
 router = APIRouter()
 
 
-@router.post('/ship_form', response_model=ShipawTemplateResponse)
+@router.post('/shipping_form', response_model=ShipawTemplateResponse)
 async def ship_form(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
     log_obj(shipment, 'Shipment received at /ship_form:')
     alerts: Alerts = request.app.alerts
@@ -41,22 +41,22 @@ async def ship_form(request: Request, shipment: Shipment = Body(...)) -> ShipawT
     alerts += Alert(message=msg, type=AlertType.NOTIFICATION)
 
     ctx = {'shipment': shipment}
-    return ShipawTemplateResponse(template_path='form_shape.html', context=ctx, alerts=alerts)
+    return ShipawTemplateResponse(template_path='shipping_form_container.html', context=ctx, alerts=alerts)
 
 
-@router.post('/order_review', response_model=ShipawTemplateResponse)
-async def order_review(
+@router.post('/order_summary', response_model=ShipawTemplateResponse)
+async def order_summary(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_from_form),
 ) -> ShipawTemplateResponse:
     log_obj(shipment_request, 'ShipmentRequest received at /order_review:')
     alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
     context = {'shipment_request': shipment_request}
-    return ShipawTemplateResponse(template_path='/order_review.html', context=context, alerts=alerts)
+    return ShipawTemplateResponse(template_path='/order_summary.html', context=context, alerts=alerts)
 
 
-@router.post('/order_confirm', response_model=ShipawTemplateResponse)
-async def order_confirm(
+@router.post('/order_results', response_model=ShipawTemplateResponse)
+async def order_results(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_from_json),
 ) -> ShipawTemplateResponse:
@@ -67,13 +67,13 @@ async def order_confirm(
     conversation = ShipmentConversation(request=shipment_request, response=shipment_response)
     log_obj(conversation, 'ShipmentConversation at /order_confirm:')
     return ShipawTemplateResponse(
-        template_path='/order_confirmed.html',
+        template_path='/order_results.html',
         context={'shipment_response': shipment_response},
         alerts=request.app.alerts,
     )
 
 
-@router.post('/cand', response_model=list[AddressChoiceAgnost], response_class=JSONResponse)
+@router.post('/addr_choices', response_model=list[AddressChoiceAgnost], response_class=JSONResponse)
 async def get_addr_choices(
     request: Request,
     body: AddressRequest = Body(...),

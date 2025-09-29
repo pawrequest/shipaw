@@ -14,7 +14,7 @@ def test_form_route_json(test_client, sample_shipment):
     response = test_client.post('/api/ship_form', json=body)
     cont = response.json()
     respy = ShipawTemplateResponse(**cont)
-    assert respy.template_path == 'form_shape.html'
+    assert respy.template_path == 'shipping_form_container.html'
     assert 'shipment' in respy.context
     assert response.status_code == 200
 
