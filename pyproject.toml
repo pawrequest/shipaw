@@ -27,10 +27,6 @@ dependencies = [
     "jinja2>=3.1.6",
     "hatchling>=1.27.0",
 ]
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 
 [project.optional-dependencies]
 dev = [
@@ -43,10 +39,6 @@ dev = [
     "sphinx-readme",
     "sphinx_rtd_dark_mode",
 ]
-#[build-system]
-#requires = ["hatchling"]
-#build-backend = "hatchling.build"
-
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -64,11 +56,20 @@ royal-mail-click-and-drop = { git = "https://github.com/pawrequest/royal-mail-cl
 parcelforce-expresslink = { git = "https://github.com/pawrequest/parcelforce_expresslink" }
 apc-hypaship = { git = "https://github.com/pawrequest/apc-hypaship" }
 #
+
 #[tool.uv.build-backend]
 #source-include = ["src/shipaw/ui/**"]
+[tool.uv.build-backend.data]
+["src/shipaw/ui"]
 
-[tool.hatch.build.targets.sdist]
-include = [
-    "src/",
-    "ui/,
-]
+
+#[build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
+
+
+#[tool.hatch.build.targets.sdist]
+#include = [
+#    "src/",
+#    "ui/,
+#]
