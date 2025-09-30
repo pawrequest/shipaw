@@ -69,8 +69,11 @@ def ordinal_dt(dt: datetime | date) -> str:
     return dt.strftime(f'%a {date_int_w_ordinal(dt.day)} %b %Y')
 
 
-def get_ui():
-    res = files('shipaw').joinpath('ui')
+def get_ui() -> Path:
+    res = Path(files('shipaw'))
+    res = res / 'ui'
+    if not res.exists():
+        raise FileNotFoundError(f'UI directory {res} does not exist')
     return res
 
 
