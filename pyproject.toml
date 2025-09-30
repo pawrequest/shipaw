@@ -9,23 +9,25 @@ authors = [
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
-    'pawdantic', # special pydantic types eg truncated strings
-    'combadge[zeep]', # xml client
-    'thefuzz', # fuzzy search to match addresses
-    'loguru', # logging
-    'phonenumbers',
-    'pydantic-settings',
+    #    'phonenumbers',
     "httpx>=0.28.1",
     "pygments>=2.19.2",
-    #    "royal-mail-click-and-drop",
     "parcelforce-expresslink",
-    "apc-hypaship",
     "pydantic[email]>=2.11.9",
     "pytest>=8.4.2",
     "fastapi[standard]>=0.117.1",
-    "pawdf",
     "jinja2>=3.1.6",
     "hatchling>=1.27.0",
+    "combadge[zeep]>=4.8.2",
+    "loguru>=0.7.3",
+    "thefuzz>=0.22.1",
+    "pydantic-extra-types>=2.10.5",
+    "pydantic-settings>=2.11.0",
+#    custom:
+    #    "royal-mail-click-and-drop",
+    "apc-hypaship",
+    'pawdantic', # special pydantic types eg truncated strings
+    "pawdf",
 ]
 
 [project.optional-dependencies]
