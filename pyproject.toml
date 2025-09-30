@@ -58,3 +58,6 @@ pawdf = { git = 'https://github.com/pawrequest/pawdf' }
 royal-mail-click-and-drop = { git = "https://github.com/pawrequest/royal-mail-click-and-drop"}
 parcelforce-expresslink = { git = "https://github.com/pawrequest/parcelforce_expresslink"}
 apc-hypaship = { git = "https://github.com/pawrequest/apc-hypaship"}
+
+[tool.uv.build-backend]
+source-include = ["ui/**"]
