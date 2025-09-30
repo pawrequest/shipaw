@@ -1,4 +1,5 @@
 from __future__ import annotations
+from importlib.resources import files
 
 import functools
 import os
@@ -61,6 +62,8 @@ def ordinal_dt(dt: datetime | date) -> str:
     return dt.strftime(f'%a {date_int_w_ordinal(dt.day)} %b %Y')
 
 
+
+
 class ShipawSettings(BaseSettings):
     # toggles
     shipper_live: bool = False
@@ -69,7 +72,7 @@ class ShipawSettings(BaseSettings):
     # dirs
     label_dir: Path
     log_dir: Path
-    ui_dir: Path
+    ui_dir: Path = files('shipaw').joinpath('ui')
 
     # auto dirs
     static_dir: Path | None = None
