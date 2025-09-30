@@ -56,6 +56,6 @@ format.quote-style = "single"
 pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
 pawdf = { git = 'https://github.com/pawrequest/pawdf' }
 #pawdantic = { path = 'C:\prdev\pawdantic', editable = true }
-royal-mail-click-and-drop = { path = "../royal-mail-click-and-drop", editable = true }
-parcelforce-expresslink = { path = "../parcelforce_expresslink", editable = true }
-apc-hypaship = { path = "../apc-hypaship", editable = true }
+royal-mail-click-and-drop = { git = "https://github.com/pawrequest/royal-mail-click-and-drop", editable = true }
+parcelforce-expresslink = { path = "https://github.com/pawrequest/parcelforce_expresslink", editable = true }
+apc-hypaship = { path = "https://github.com/pawrequest/apc-hypaship", editable = true }
