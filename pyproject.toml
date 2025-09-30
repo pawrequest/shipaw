@@ -52,9 +52,9 @@ flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
 format.quote-style = "single"
 
 [tool.uv.sources]
+# GIT
 pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
 pawdf = { git = 'https://github.com/pawrequest/pawdf' }
-
 royal-mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-click-and-drop' }
 parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
 apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
