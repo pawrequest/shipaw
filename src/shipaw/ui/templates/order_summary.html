@@ -20,12 +20,13 @@
 {% if alerts %}
     {% include "alerts.html" with context %}
 {% endif %}
-
-<div> SHIPPY!!!! </div>
+<script>
+    console.log('SHIP DIR: {{ shipdir }}');
+</script>
 
 <div id=requested_shipment class="wrapper wrapper__requested">
     <section class="requested requested__head">
-        <h3 class="requested-title">{{ ship_dir }} {{ shipment_request.provider_name }} Shipment:</h3>
+        <h3 class="requested-title">{{ shipdir }} {{ shipment_request.provider_name }} Shipment:</h3>
         <form hx-post="order_results"
               hx-target=#content_main
               hx-swap="innerHTML"
@@ -37,19 +38,29 @@
         </form>
     </section>
 
+    {% if shipment.sender %}
+        <section class="requested requested__contact">
+            {% set send_contact = shipment.sender.contact %}
+            {% set send_address = shipment.sender.address %}
+            <h4>Sender</h4>
+            <p>{{ send_contact.contact_name }}</p>
+            <p>{{ send_address.business_name }}</p>
+            {% for line in send_address.address_lines %}
+                <p>{{ line }}</p>
+            {% endfor %}
+            <p>{{ send_address.town }}</p>
+            <p>{{ send_address.postcode }}</p>
+        </section>
 
+    {% endif %}
     <section class="requested requested__contact">
-        {% set contact = shipment.remote_full_contact.contact %}
-        <h4>Remote Contact</h4>
-        <p>{{ contact.contact_name }}</p>
-        <p><strong>Email:</strong> {{ contact.email_address }}</p>
-        <p><strong>Phone:</strong> {{ contact.mobile_phone }}</p>
+        {#        {% set contact = shipment.remote_full_contact.contact %}#}
     </section>
 
     <section class="requested requested__address">
-        {% set address = shipment.remote_full_contact.address %}
-        <h4>Remote Address</h4>
-        <p><strong>Business:</strong> {{ address.business_name }}</p>
+        {% set address = shipment.recipient.address %}
+        <h4>Recipient Address</h4>
+        <p>{{ address.business_name }}</p>
         {% for line in address.address_lines %}
             <p>{{ line }}</p>
         {% endfor %}

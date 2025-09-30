@@ -27,10 +27,9 @@
 /**
  * @typedef {Object} Shipment
  * @property {FullContact} Recipient
- * @property {FullContact | null} [Sender=null]
+ * @property {FullContact} [Sender]
  * @property {number} Boxes
  * @property {string} ShippingDate
- *
  * @property {string} Reference
  * @property {string} SpecialInstructions1
  * @property {string} SpecialInstructions2
@@ -43,7 +42,6 @@
  * @typedef {Object} ShipmentRequest
  * @property {Shipment} Shipment
  * @property {string} Provider
- * @property {string} [Redirect]
  */
 
 
@@ -68,36 +66,6 @@ async function setContextStr(contextStr) {
     console.log('contextStrInput.value', contextStrInput.value);
 
 }
-
-// SUBMIT FORM
-
-// /**
-//  * Submit form
-//  * @param {Event} event - The form submission event.
-//  * @return {Promise<Object>} - The server response.
-//  */
-// async function subForm(event) {
-//     event.preventDefault();
-//     return await subForm2();
-// }
-//
-// /**
-//  * Submit form
-//  * @return {Promise<Object>} - The server response.
-//  */
-// async function subForm2() {
-//     const shipmentRequest = shipmentRequestFromForm();
-//     console.log('Submitting form with shipmentRequest:', shipmentRequest);
-//     const requestBody = shipmentRequestFromForm();
-//     try {
-//         const response = await fetch('/api/go', {
-//             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(requestBody)
-//         });
-//         return await response.json();
-//     } catch (error) {
-//         console.error('Error submitting form:', error);
-//     }
-// }
 
 
 /**
@@ -197,7 +165,7 @@ async function fetchAddrChoices(Postcode, Address) {
         postcode: Postcode, address: Address
     };
     try {
-        const response = await fetch('/api/cand', {
+        const response = await fetch('/api/shipaw/addr_choices', {
             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(requestBody)
         });
         return await response.json();

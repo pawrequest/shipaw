@@ -48,6 +48,38 @@ async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentBookin
     return shipment_response
 
 
+async def try_get_label_data(request: ShipmentRequest, response: ShipmentBookingResponse) -> bytes | None:
+    try:
+        if response.label_data is None and response.shipment_num:
+            response.label_data = request.provider.get_label_content(response.shipment_num)
+        return response.label_data
+
+    except HTTPStatusError as e:
+        for alert in await http_status_alerts(e):
+            response.alerts += alert
+        logger.exception(f'HTTP error getting label data')
+
+    except Exception as e:
+        logger.exception(f'Error getting label data')
+        response.alerts += Alert.from_exception(e)
+
+    return None
+
+
+async def try_write_label(response: ShipmentBookingResponse):
+    try:
+        await response.write_label_file()
+    except Exception as e:
+        logger.exception(f'Error writing label file: {e}')
+        response.alerts += Alert.from_exception(e)
+
+
+async def try_get_write_label(request: ShipmentRequest, response: ShipmentBookingResponse):
+    if not response.label_data:
+        await try_get_label_data(request, response)
+    await try_write_label(response)
+
+
 def get_el_client() -> ParcelforceClient:
     try:
         return ParcelforceClient()

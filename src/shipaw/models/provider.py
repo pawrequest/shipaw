@@ -32,30 +32,30 @@ ProviderShipmentFn = Callable[[Shipment], BaseModel]
 AgnosticShipmentFn = Callable[[BaseModel], Shipment]
 BookingFn = Callable[[dict | Shipment], 'ShipmentBookingResponseAgnost']
 
-
-class ShipProv:
-    name: str
-    services: Services
-    provider_shipment: ProviderShipmentFn
-    agnostic_shipment: AgnosticShipmentFn
-    book_shipment: BookingFn
-    get_label_content: Callable[[str], bytes]
-
-    def __init__(
-        self,
-        name: str,
-        services: Services,
-        provider_shipment: ProviderShipmentFn,
-        agnostic_shipment: AgnosticShipmentFn,
-        book_shipment: BookingFn,
-        get_label_content: Callable[[str], bytes],
-    ) -> None:
-        self.name = name
-        self.services = services
-        self.provider_shipment = provider_shipment
-        self.agnostic_shipment = agnostic_shipment
-        self.book_shipment = book_shipment
-        self.get_label_content = get_label_content
+#
+# class ShipProv:
+#     name: str
+#     services: Services
+#     provider_shipment: ProviderShipmentFn
+#     agnostic_shipment: AgnosticShipmentFn
+#     book_shipment: BookingFn
+#     get_label_content: Callable[[str], bytes]
+#
+#     def __init__(
+#         self,
+#         name: str,
+#         services: Services,
+#         provider_shipment: ProviderShipmentFn,
+#         agnostic_shipment: AgnosticShipmentFn,
+#         book_shipment: BookingFn,
+#         get_label_content: Callable[[str], bytes],
+#     ) -> None:
+#         self.name = name
+#         self.services = services
+#         self.provider_shipment = provider_shipment
+#         self.agnostic_shipment = agnostic_shipment
+#         self.book_shipment = book_shipment
+#         self.get_label_content = get_label_content
 
 
 # @dataclass

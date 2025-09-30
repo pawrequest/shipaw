@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 
 from fastapi import Depends, Form
@@ -48,7 +49,9 @@ async def shipment_f_form(
     service: str = Form(...),
     direction: ShipDirection = Form(...),
     reference: str = Form(...),
+    context_str: str = Form(...),
 ) -> Shipment:
+    context = json.loads(context_str)
     logger.info('Creating Shipment Request from form')
 
     if direction == ShipDirection.OUTBOUND:
@@ -68,6 +71,7 @@ async def shipment_f_form(
         direction=direction,
         reference=reference,
         service=service,
+        context=context,
     )
     return shipment
 
@@ -86,7 +90,7 @@ async def shipment_request_from_form(
     return ShipmentRequest(
         shipment=shipment,
         provider_name=provider_name,
-        context={},
+        # context={},
         # handler=a_handler,
     )
 

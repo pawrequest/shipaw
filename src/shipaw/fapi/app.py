@@ -40,7 +40,7 @@ app.alerts = Alerts.empty()
 
 
 @app.exception_handler(RequestValidationError)
-async def request_exception_handler(request: Request, exc: RequestValidationError):
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
     msg2 = ''
     for err in errors:
@@ -56,8 +56,6 @@ async def request_exception_handler(request: Request, exc: RequestValidationErro
 
     logger.error(msg2)
     alerts = Alerts(alert=[Alert(code=1, message=msg2, type=AlertType.ERROR)])
-    # return {'request': request, 'alerts': alerts}
-
     return JSONResponse(
         status_code=422, content={'detail': jsonable_encoder(exc.errors()), 'alerts': alerts.model_dump(mode='json'), 'message': msg2}
     )

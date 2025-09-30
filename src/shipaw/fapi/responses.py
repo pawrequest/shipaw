@@ -7,7 +7,7 @@ from typing import Literal
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
 
-from pydantic import Field, ConfigDict, field_validator, model_validator
+from pydantic import Field, ConfigDict, field_validator, model_validator, BaseModel
 
 from shipaw.models.base import ShipawBaseModel
 
@@ -24,7 +24,29 @@ class BaseResponse(ShipawBaseModel):
     status: str | None = None
 
 
-class ShipmentBookingResponse(BaseResponse):
+class ShipawTemplate(ShipawBaseModel):
+    template_path: str
+    context: dict = Field(default_factory=dict)
+
+    def render_template(self, request):
+        from shipaw.config import shipaw_settings
+
+        if not self.template_path:
+            raise ValueError('No template_path set')
+        return shipaw_settings().templates.TemplateResponse(
+            request=request, name=self.template_path, context=self.context
+        )
+
+
+class BaseResponse2(ShipawBaseModel):
+    alerts: Alerts = Alerts.empty()
+    data: dict | None = None
+    success: bool | None = None
+    status: str | None = None
+    template: ShipawTemplate | None = None
+
+
+class ShipmentBookingResponse(BaseResponse2):
     shipment: Shipment
     shipment_num: str | None = None
     tracking_link: str | None = None
@@ -61,13 +83,5 @@ class ShipmentBookingResponse(BaseResponse):
         on_a4(input_file=unsize, output_file=label_path)
         logger.info(f'Wrote label to {label_path}')
 
-
-class ShipawTemplateResponse(BaseResponse):
-    template_path: str
-    context: dict = Field(default_factory=dict)
-
-
-class ShipawTemplateResponseBooking(ShipawTemplateResponse):
-    template_path: str
-    context: dict[Literal['shipment_response'], ShipmentBookingResponse] = Field(default_factory=dict)
-
+class ShipawTemplateResponse(BaseResponse2):
+    template: ShipawTemplate

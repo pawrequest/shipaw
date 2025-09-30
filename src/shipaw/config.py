@@ -21,9 +21,11 @@ def load_envs() -> Path:
     shipaw_envs = Path(os.getenv('SHIPAW_ENVS'))
     if not shipaw_envs or not shipaw_envs.exists():
         raise ValueError('SHIPAW_ENVS not set')
+
     apc = shipaw_envs / 'apc.env'
     pf = shipaw_envs / 'parcelforce.env'
     shipaw_env = shipaw_envs / 'shipaw.env'
+
     for f in (apc, pf, shipaw_env):
         if not f.exists():
             raise ValueError(f'Env file {f} does not exist')

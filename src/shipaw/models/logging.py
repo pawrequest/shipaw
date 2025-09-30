@@ -17,9 +17,9 @@ def log_shipment_json(data: dict, ndjson_file=shipaw_settings().ndjson_log_file)
         print(json.dumps(data, separators=(',', ':')), file=jf)
 
 
-def log_obj(obj: BaseModel, message: str = None):
+def log_obj(obj: BaseModel, message: str = None, *, level: str = 'DEBUG'):
     message = message or obj.__class__.__name__
-    logger.debug(
+    logger.log(level,
         message
         + ':\n'
         + pprint.pformat(
@@ -39,7 +39,7 @@ def log_booked_shipment(request: 'ShipmentRequest', response: 'ShipmentBookingRe
     from shipaw.models.conversation import ShipmentConversation
 
     conversation = ShipmentConversation(request=request, response=response)
-    log_obj(conversation)
+    # log_obj(conversation)
     log_shipment_json(conversation.model_dump(mode='json', exclude={'response': {'label_data'}}))
 
 

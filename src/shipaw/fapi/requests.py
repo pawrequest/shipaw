@@ -1,9 +1,10 @@
 import base64
 import uuid
-from typing import Annotated
+from typing import Annotated, Callable
 
-from pydantic import Field, StringConstraints
+from pydantic import Field, StringConstraints, model_validator
 
+from shipaw.fapi.callbacks import CALLBACK_REGISTER
 from shipaw.models.address import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
@@ -24,8 +25,6 @@ class ShipmentRequest(ShipawBaseModel):
     id: uuid.UUID = uuid.uuid4()
     shipment: Shipment
     provider_name: str
-    context: dict = Field(default_factory=dict)
-    # handler: Callable | None = None
 
     @property
     def provider(self) -> ShippingProvider:

@@ -157,6 +157,7 @@ class APCShippingProvider(ShippingProvider):
         params = {'labelformat': 'PDF'}
         settings = apc_settings()
         label = httpx.get(settings.one_order_endpoint(shipment_num), headers=settings.headers, params=params)
+        label.raise_for_status()
         content = label.json()['Orders']['Order']['Label']['Content']
         return b64decode(content)
 
