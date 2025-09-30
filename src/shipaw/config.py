@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 import pydantic as _p
+from dotenv import load_dotenv
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
 from pydantic import computed_field, model_validator
@@ -17,6 +18,10 @@ from starlette.templating import Jinja2Templates
 
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
+
+
+def load_env_index(envs_index: Path) -> None:
+    load_dotenv(envs_index)
 
 
 # def load_envs() -> Path:
@@ -40,6 +45,8 @@ from shipaw.models.ship_types import ShipDirection
 
 #
 def load_env():
+    ei = Path(os.environ.get('ENV_INDEX'))
+    load_env_index(ei)
     shipaw_env = os.getenv('SHIPAW_ENV')
     shipaw_env = Path(shipaw_env) if shipaw_env else None
     if not shipaw_env or not shipaw_env.exists():
@@ -60,8 +67,6 @@ def date_int_w_ordinal(n: int):
 def ordinal_dt(dt: datetime | date) -> str:
     """Convert a datetime or date to a string with an ordinal day, e.g. 'Mon 1st Jan 2020'."""
     return dt.strftime(f'%a {date_int_w_ordinal(dt.day)} %b %Y')
-
-
 
 
 class ShipawSettings(BaseSettings):
