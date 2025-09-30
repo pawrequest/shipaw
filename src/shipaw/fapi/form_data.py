@@ -8,7 +8,6 @@ from loguru import logger
 from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
 
-from parcelforce_expresslink.request_response import ShipmentResponse
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.config import shipaw_settings
 from shipaw.fapi.requests import ShipmentRequest
@@ -16,7 +15,7 @@ from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
 
-async def full_contact_from_form(
+async def full_contact_form(
     address_line1: str = Form(...),
     address_line2: str = Form(''),
     address_line3: str = Form(''),
@@ -43,15 +42,15 @@ async def full_contact_from_form(
 
 
 async def shipment_f_form(
-    full_contact: FullContact = Depends(full_contact_from_form),
+    full_contact: FullContact = Depends(full_contact_form),
     shipping_date: date = Form(...),
     boxes: int = Form(...),
     service: str = Form(...),
     direction: ShipDirection = Form(...),
     reference: str = Form(...),
-    context_str: str = Form(...),
+    context_json: str = Form(...),
 ) -> Shipment:
-    context = json.loads(context_str)
+    context = json.loads(context_json)
     logger.info('Creating Shipment Request from form')
 
     if direction == ShipDirection.OUTBOUND:
@@ -76,32 +75,25 @@ async def shipment_f_form(
     return shipment
 
 
-async def a_handler(req: ShipmentRequest, resp: ShipmentResponse) -> None:
-    print(f'Handling response for shipment {req.id}, success: {resp.success}')
-    print(f'Handling response for shipment {req.id}, success: {resp.success}')
-    print(f'Handling response for shipment {req.id}, success: {resp.success}')
-    print(f'Handling response for shipment {req.id}, success: {resp.success}')
-    print(f'Handling response for shipment {req.id}, success: {resp.success}')
-
-
-async def shipment_request_from_form(
+async def shipment_request_form(
     shipment: Shipment = Depends(shipment_f_form), provider_name: str = Form(...)
 ) -> ShipmentRequest:
     return ShipmentRequest(
         shipment=shipment,
         provider_name=provider_name,
-        # context={},
-        # handler=a_handler,
     )
 
 
-async def shipment_from_json(shipment_str: str = Form(...)) -> Shipment:
-    shipy = Shipment.model_validate_json(shipment_str)
+async def shipment_form_json(shipment_json: str = Form(...)) -> Shipment:
+    shipy = Shipment.model_validate_json(shipment_json)
     return shipy
 
 
-async def shipment_request_from_json(shipment_request_json: str = Form(...)) -> ShipmentRequest:
-    # ship_json = json.loads(shipment_request_json)
+async def shipment_request_form_json(shipment_request_json: str = Form(...)) -> ShipmentRequest:
     shipy = ShipmentRequest.model_validate_json(shipment_request_json)
     return shipy
 
+
+async def context_form_json(context_json: str = Form(...)) -> dict:
+    context = json.loads(context_json)
+    return context

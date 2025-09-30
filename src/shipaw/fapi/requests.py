@@ -1,10 +1,9 @@
 import base64
 import uuid
-from typing import Annotated, Callable
+from typing import Annotated
 
-from pydantic import Field, StringConstraints, model_validator
+from pydantic import StringConstraints
 
-from shipaw.fapi.callbacks import CALLBACK_REGISTER
 from shipaw.models.address import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
@@ -15,10 +14,6 @@ class Authentication(ShipawBaseModel):
     # todo SecretStr!!!!
     user_name: Annotated[str, StringConstraints(max_length=80)]
     password: Annotated[str, StringConstraints(max_length=80)]
-
-
-def encode_b64_str(s: str) -> str:
-    return base64.b64encode(s.encode('utf8')).decode('utf8')
 
 
 class ShipmentRequest(ShipawBaseModel):

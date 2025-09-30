@@ -8,8 +8,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
-from shipaw.fapi.html_routes import router as html_router
-from shipaw.fapi.json_routes import router as json_router
+from shipaw.fapi.routes_html import router as html_router
+from shipaw.fapi.routes_api import router as json_router
 from shipaw.config import shipaw_settings
 from shipaw.fapi.alerts import AlertType, Alert, Alerts
 from shipaw.models.logging import log_obj

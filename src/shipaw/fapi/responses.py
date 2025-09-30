@@ -16,14 +16,6 @@ from shipaw.models.label_file import get_label_folder, get_label_stem, unused_pa
 from shipaw.models.shipment import Shipment
 
 
-class BaseResponse(ShipawBaseModel):
-    alerts: Alerts = Alerts.empty()
-    message: str | None = None
-    data: dict | None = None
-    success: bool | None = None
-    status: str | None = None
-
-
 class ShipawTemplate(ShipawBaseModel):
     template_path: str
     context: dict = Field(default_factory=dict)
@@ -38,7 +30,7 @@ class ShipawTemplate(ShipawBaseModel):
         )
 
 
-class BaseResponse2(ShipawBaseModel):
+class BaseResponse(ShipawBaseModel):
     alerts: Alerts = Alerts.empty()
     data: dict | None = None
     success: bool | None = None
@@ -46,7 +38,7 @@ class BaseResponse2(ShipawBaseModel):
     template: ShipawTemplate | None = None
 
 
-class ShipmentBookingResponse(BaseResponse2):
+class ShipmentBookingResponse(BaseResponse):
     shipment: Shipment
     shipment_num: str | None = None
     tracking_link: str | None = None
@@ -83,5 +75,5 @@ class ShipmentBookingResponse(BaseResponse2):
         on_a4(input_file=unsize, output_file=label_path)
         logger.info(f'Wrote label to {label_path}')
 
-class ShipawTemplateResponse(BaseResponse2):
+class ShipawTemplateResponse(BaseResponse):
     template: ShipawTemplate

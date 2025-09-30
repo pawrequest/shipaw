@@ -1,21 +1,10 @@
-/*.ship-form {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*}*/
-
-
+/* MAIN SHIP FORM*/
 .wrapper__booking {
-    /*grid-template-columns: 12rem 15rem 20rem 15rem;*/
     grid-template-areas:
            "shipment contact address notes"
            "shipment contact address sub-btns";
 }
 
-/*.inputs > * {*/
-/*    overflow: hidden; !* Prevent overflow *!*/
-/*    text-overflow: ellipsis; !* Truncate text with ellipsis *!*/
-/*    white-space: nowrap; !* Prevent text wrapping *!*/
-/*}*/
 
 .booking-confirmed {
     /* used in js*/

@@ -11,7 +11,7 @@ from parcelforce_expresslink.client import ParcelforceClient
 from parcelforce_expresslink.address import AddressChoice as AddressChoicePF, Contact as ContactPF
 from shipaw.config import shipaw_settings
 from shipaw.fapi.backend import get_el_client, try_book_shipment, try_get_label_data, try_get_write_label
-from shipaw.fapi.form_data import shipment_request_from_form, shipment_request_from_json
+from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
 from shipaw.models.logging import log_obj
@@ -50,7 +50,7 @@ async def ship_form(
 @router.post('/order_summary', response_model=ShipawTemplateResponse)
 async def order_summary(
     request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_from_form),
+    shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
     log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
@@ -66,7 +66,7 @@ async def order_summary(
 @router.post('/order_results', response_model=ShipawTemplateResponse)
 async def order_results(
     request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_from_json),
+    shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
     await try_get_write_label(shipment_request, shipment_response)

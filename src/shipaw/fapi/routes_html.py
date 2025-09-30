@@ -8,10 +8,10 @@ from starlette.responses import HTMLResponse
 
 from shipaw.config import shipaw_settings
 from shipaw.fapi.responses import ShipawTemplateResponse
-from shipaw.fapi.form_data import shipment_request_from_form, shipment_request_from_json
+from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment, sample_shipment
-from shipaw.fapi.json_routes import (
+from shipaw.fapi.routes_api import (
     order_results as order_confirm_json,
     order_summary as order_review_json,
     ship_form as ship_form_json
@@ -61,7 +61,7 @@ async def shipping_form(request: Request, shipment: Shipment = Body(...)) -> HTM
 @router.post('/order_summary', response_class=HTMLResponse)
 async def order_summary(
     request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_from_form),
+    shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> HTMLResponse:
     res = await order_review_json(request, shipment_request)
     return render_template_response(request, res)
@@ -70,7 +70,7 @@ async def order_summary(
 @router.post('/order_results', response_class=HTMLResponse)
 async def order_results(
     request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_from_json),
+    shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> HTMLResponse:
     template_response = await order_confirm_json(request, shipment_request)
     return render_template_response(request, template_response)

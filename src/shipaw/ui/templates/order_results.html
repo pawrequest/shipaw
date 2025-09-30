@@ -38,7 +38,7 @@
                     <form hx-post="email_label/"
                           hx-target="#email-btn"
                           hx-swap="afterbegin">
-                        <input type="hidden" name="shipment_str" value="{{ response.shipment.model_dump_json() }}">
+                        <input type="hidden" name="shipment_json" value="{{ response.shipment.model_dump_json() }}">
                         <input type="hidden" name="label" value="{{ response.label_path }}">
                         <button type="submit" id="email-btn" class="btn-print-label">Email Label</button>
 
