@@ -60,4 +60,4 @@ parcelforce-expresslink = { git = "https://github.com/pawrequest/parcelforce_exp
 apc-hypaship = { git = "https://github.com/pawrequest/apc-hypaship" }
 
 [tool.uv.build-backend]
-source-include = ["ui/**"]
+source-include = ["src/shipaw/ui/**"]
