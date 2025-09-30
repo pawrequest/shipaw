@@ -9,6 +9,7 @@ from urllib.parse import quote
 
 import pydantic as _p
 from fastapi.encoders import jsonable_encoder
+from loguru import logger
 from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
@@ -17,33 +18,33 @@ from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
 
 
-def load_envs() -> Path:
-    shipaw_envs = Path(os.getenv('SHIPAW_ENVS'))
-    if not shipaw_envs or not shipaw_envs.exists():
-        raise ValueError('SHIPAW_ENVS not set')
-
-    apc = shipaw_envs / 'apc.env'
-    pf = shipaw_envs / 'parcelforce.env'
-    shipaw_env = shipaw_envs / 'shipaw.env'
-
-    for f in (apc, pf, shipaw_env):
-        if not f.exists():
-            raise ValueError(f'Env file {f} does not exist')
-
-    os.environ['APC_ENV'] = str(apc)
-    os.environ['PARCELFORCE_ENV'] = str(pf)
-    os.environ['SHIPAW_ENV'] = str(shipaw_env)
-    return shipaw_env
+# def load_envs() -> Path:
+#     shipaw_envs = Path(os.getenv('SHIPAW_ENVS'))
+#     if not shipaw_envs or not shipaw_envs.exists():
+#         raise ValueError('SHIPAW_ENVS not set')
+#
+#     apc = shipaw_envs / 'apc.env'
+#     pf = shipaw_envs / 'parcelforce.env'
+#     shipaw_env = shipaw_envs / 'shipaw.env'
+#
+#     for f in (apc, pf, shipaw_env):
+#         if not f.exists():
+#             raise ValueError(f'Env file {f} does not exist')
+#
+#     os.environ['APC_ENV'] = str(apc)
+#     os.environ['PARCELFORCE_ENV'] = str(pf)
+#     os.environ['SHIPAW_ENV'] = str(shipaw_env)
+#     return shipaw_env
 
 
 #
-# def load_env():
-#     shipaw_env = os.getenv('SHIPAW_ENV')
-#     shipaw_env = Path(shipaw_env) if shipaw_env else None
-#     if not shipaw_env or not shipaw_env.exists():
-#         raise ValueError('SHIPAW_ENV not set')
-#     logger.debug(f'Loading SHIPAW environment from {shipaw_env}')
-#     return shipaw_env
+def load_env():
+    shipaw_env = os.getenv('SHIPAW_ENV')
+    shipaw_env = Path(shipaw_env) if shipaw_env else None
+    if not shipaw_env or not shipaw_env.exists():
+        raise ValueError('SHIPAW_ENV not set')
+    logger.debug(f'Loading SHIPAW environment from {shipaw_env}')
+    return shipaw_env
 
 
 def sanitise_id(value):
@@ -88,7 +89,7 @@ class ShipawSettings(BaseSettings):
     phone: str | None = None
     mobile_phone: str
 
-    model_config = SettingsConfigDict(env_ignore_empty=True, env_file=load_envs())
+    model_config = SettingsConfigDict(env_ignore_empty=True, env_file=load_env())
 
     ## SET UI/TEMPLATE DIRS ##
     @model_validator(mode='after')
