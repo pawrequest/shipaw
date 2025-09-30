@@ -12,7 +12,7 @@ import pydantic as _p
 from dotenv import load_dotenv
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
-from pydantic import computed_field, model_validator
+from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
@@ -69,6 +69,11 @@ def ordinal_dt(dt: datetime | date) -> str:
     return dt.strftime(f'%a {date_int_w_ordinal(dt.day)} %b %Y')
 
 
+def get_ui():
+    res = files('shipaw').joinpath('ui')
+    return res
+
+
 class ShipawSettings(BaseSettings):
     # toggles
     shipper_live: bool = False
@@ -77,7 +82,7 @@ class ShipawSettings(BaseSettings):
     # dirs
     label_dir: Path
     log_dir: Path
-    ui_dir: Path = files('shipaw').joinpath('ui')
+    ui_dir: Path = Field(default_factory=get_ui)
 
     # auto dirs
     static_dir: Path | None = None
