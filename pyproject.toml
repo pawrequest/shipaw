@@ -64,20 +64,3 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]
-
-#[tool.uv.build-backend]
-#source-include = ["src/shipaw/ui/**"]
-#[tool.uv.build-backend.data]
-#["src/shipaw/ui"]
-
-
-#[build-system]
-#requires = ["hatchling"]
-#build-backend = "hatchling.build"
-
-
-#[tool.hatch.build.targets.sdist]
-#include = [
-#    "src/",
-#    "ui/,
-#]
