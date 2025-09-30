@@ -22,6 +22,11 @@ from shipaw.models.ship_types import ShipDirection
 
 def load_env_index(envs_index: Path) -> None:
     load_dotenv(envs_index)
+    for env in ('APC_ENV', 'PARCELFORCE_ENV', 'SHIPAW_ENV'):
+        if not os.getenv(env):
+            raise ValueError(f'Environment variable {env} not set in {envs_index}')
+        if not Path(os.getenv(env)).exists():
+            raise ValueError(f'Environment variable {env} points to non-existent file {os.getenv(env)}')
 
 
 # def load_envs() -> Path:
@@ -46,6 +51,9 @@ def load_env_index(envs_index: Path) -> None:
 #
 def load_env():
     ei = Path(os.environ.get('ENV_INDEX'))
+    logger.info(f'Loading env index from {ei}')
+    if not ei or not ei.exists():
+        raise ValueError('ENV_INDEX not set or does not exist')
     load_env_index(ei)
     shipaw_env = os.getenv('SHIPAW_ENV')
     shipaw_env = Path(shipaw_env) if shipaw_env else None
