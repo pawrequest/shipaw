@@ -68,18 +68,6 @@ header {
     /*border-color: red;*/
 }
 
-.alert__ERROR {
-    background-color: var(--clr-danger);
-}
-
-.alert__NOTIFICATION {
-    background-color: cornflowerblue;
-}
-
-.alert__WARNING {
-    background-color: var(--clr-warning);
-}
-
 h1 {
     /*text-align: center;*/
     font-size: 1.4rem;

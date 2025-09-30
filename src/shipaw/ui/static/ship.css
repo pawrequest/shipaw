@@ -6,16 +6,6 @@
 }
 
 
-.booking-confirmed {
-    /* used in js*/
-    background-color: var(--clr-wrapper);
-    color: var(--clr-success-font);
-}
-
-.email-body {
-    font-family: "Roboto", sans-serif;
-/*    */
-}
 
 #address-select {
     max-width: 100%; /* Constrain width to parent container */
@@ -158,20 +148,6 @@ select:focus {
 /*        "collection collection collection collection";*/
 /*}*/
 
-.shipper {
-    padding-inline: 3rem;
-    display: flex;
-    justify-content: center;
-}
-
-.shipper__live {
-    background-color: var(--clr-danger);
-}
-
-.shipper__sandbox {
-    background: var(--clr-warning);
-
-}
 
 .wrapper__requested {
     /*display: grid;*/
