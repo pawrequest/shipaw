@@ -25,7 +25,12 @@ dependencies = [
     "fastapi[standard]>=0.117.1",
     "pawdf",
     "jinja2>=3.1.6",
+    "hatchling>=1.27.0",
 ]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 
 [project.optional-dependencies]
 dev = [
@@ -58,6 +63,12 @@ pawdf = { git = 'https://github.com/pawrequest/pawdf' }
 royal-mail-click-and-drop = { git = "https://github.com/pawrequest/royal-mail-click-and-drop" }
 parcelforce-expresslink = { git = "https://github.com/pawrequest/parcelforce_expresslink" }
 apc-hypaship = { git = "https://github.com/pawrequest/apc-hypaship" }
+#
+#[tool.uv.build-backend]
+#source-include = ["src/shipaw/ui/**"]
 
-[tool.uv.build-backend]
-source-include = ["src/shipaw/ui/**"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/",
+    "ui/,
+]
