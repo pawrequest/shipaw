@@ -29,25 +29,6 @@ def load_env_index(envs_index: Path) -> None:
             raise ValueError(f'Environment variable {env} points to non-existent file {os.getenv(env)}')
 
 
-# def load_envs() -> Path:
-#     shipaw_envs = Path(os.getenv('SHIPAW_ENVS'))
-#     if not shipaw_envs or not shipaw_envs.exists():
-#         raise ValueError('SHIPAW_ENVS not set')
-#
-#     apc = shipaw_envs / 'apc.env'
-#     pf = shipaw_envs / 'parcelforce.env'
-#     shipaw_env = shipaw_envs / 'shipaw.env'
-#
-#     for f in (apc, pf, shipaw_env):
-#         if not f.exists():
-#             raise ValueError(f'Env file {f} does not exist')
-#
-#     os.environ['APC_ENV'] = str(apc)
-#     os.environ['PARCELFORCE_ENV'] = str(pf)
-#     os.environ['SHIPAW_ENV'] = str(shipaw_env)
-#     return shipaw_env
-
-
 #
 def load_env() -> Path:
     ei = Path(os.environ.get('ENV_INDEX'))
