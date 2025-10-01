@@ -9,7 +9,11 @@ authors = [
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
-    #    'phonenumbers',
+    "apc-hypaship",
+    'pawdantic', # special pydantic types eg truncated strings
+    "pawdf",
+    #    "royal-mail-click-and-drop",
+#
     "httpx>=0.28.1",
     "pygments>=2.19.2",
     "parcelforce-expresslink",
@@ -23,11 +27,7 @@ dependencies = [
     "thefuzz>=0.22.1",
     "pydantic-extra-types>=2.10.5",
     "pydantic-settings>=2.11.0",
-#    custom:
-    #    "royal-mail-click-and-drop",
-    "apc-hypaship",
-    'pawdantic', # special pydantic types eg truncated strings
-    "pawdf",
+    "phonenumbers>=9.0.15",
 ]
 
 [project.optional-dependencies]
