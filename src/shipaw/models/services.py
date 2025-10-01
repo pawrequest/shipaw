@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Literal
 
 
-
 @dataclass
 class Services:
     NEXT_DAY: str
