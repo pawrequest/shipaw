@@ -57,6 +57,9 @@ royal-mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-cl
 parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
 apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
 
+[tool.uv]
+package = true
+
 [build-system]
 requires = ["uv_build"]
 build-backend = "uv_build"
