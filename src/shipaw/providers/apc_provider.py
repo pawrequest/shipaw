@@ -84,6 +84,8 @@ def apc_shipment_to_agnostic(shipment: ShipmentAPC) -> ShipmentAgnost:
         sender=send_fc,
         boxes=order.shipment_details.number_of_pieces,
         direction=ShipDirection.INBOUND if order.collection is not None else ShipDirection.OUTBOUND,
+        collect_ready=order.ready_at,
+        collect_closed=order.closed_at,
     )
 
 
