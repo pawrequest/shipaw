@@ -24,14 +24,8 @@
                 {% endfor %}
             </select>
 
-            <label for="collect_ready">Collect From</label>
-            <input type="number" id="collect_ready" name="collect_ready" min="8" max="19" value="9" required>
-
-            <label for="collect_closed">Collect Until</label>
-            <input type="number" id="collect_closed" name="collect_closed" min="13" max="19" value="17" required>
-
             <label for="provider_name">Provider:</label>
-            <select name="provider_name" id="provider_name">
+            <select name="provider_name" id="provider_name" onchange="setProvider()">
                 <option value="PARCELFORCE" selected>Parcelforce</option>
                 <option value="APC">APC</option>
             </select>
@@ -45,11 +39,21 @@
             </select>
 
             <label for="direction">Direction:</label>
-            <select id="direction" name="direction" onchange="toggleOwnLabel()">
+            <select id="direction" name="direction" onchange="setProvider()">
                 <option value="out" selected>Outbound</option>
                 <option value="in">Inbound Collection</option>
                 <option value="dropoff">Inbound Dropoff</option>
             </select>
+
+
+            <div id="collect_times">
+                <label for="collect_ready">Collect From</label>
+                <input type="number" id="collect_ready" name="collect_ready" min="8" max="19" value="9" required>
+
+                <label for="collect_closed">Collect Until</label>
+                <input type="number" id="collect_closed" name="collect_closed" min="13" max="19" value="17" required>
+            </div>
+
 
             <div id="own_label">
                 <label>Label Printing:
