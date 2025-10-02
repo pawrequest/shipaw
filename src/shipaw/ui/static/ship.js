@@ -57,7 +57,9 @@ async function initShipForm(shipment) {
     const contextjson = JSON.stringify(shipment.Context);
     await setContextJson(contextjson);
     await loadAddrChoices();
-    toggleOwnLabel();
+    setProvider();
+    // checkToggleOwnLabel();
+    // toggleCollectionTimes();
 }
 
 async function setContextJson(contextJson) {
@@ -89,20 +91,62 @@ function populateShipment(shipment) {
     document.getElementById('postcode').value = shipment.Recipient.Address.Postcode || "";
 }
 
-function toggleOwnLabel() {
-    return toggleDiv("direction", "own_label", "in");
+
+function toggleDiv(idToToggle, toggleOn) {
+    let elementToToggle = document.getElementById(idToToggle);
+    if (toggleOn) {
+        console.log(`Showing ${idToToggle}`);
+        elementToToggle.style.opacity = '100';
+    } else {
+        console.log(`Hiding ${idToToggle}`);
+        elementToToggle.style.opacity = '0'
+    }
+
 }
 
-function toggleDiv(id, param, condition) {
-    let thing = document.getElementById(id).value;
-    let element = document.getElementById(param);
-    if (thing === condition) {
-        console.log(`Showing ${param} fields`);
-        element.style.opacity = '100';
+function checkToggleDiv(idToCheck, idToToggle, conditionToShow) {
+    let valueToCheck = document.getElementById(idToCheck).value;
+    if (valueToCheck === conditionToShow) {
+        toggleDiv(idToToggle, true);
     } else {
-        console.log(`Hiding ${param} fields`);
-        element.style.opacity = '0'
+        toggleDiv(idToToggle, false);
     }
+}
+
+//
+//
+// function directionChange() {
+//     if (document.getElementById('provider_name').value === 'APC') {
+//         setProviderAPC();
+//     } else if (document.getElementById('provider_name').value === 'PARCELFORCE') {
+//         setProviderParcelforce();
+//     }
+// }
+
+
+function setProvider() {
+    console.log('Setting provider based on selection');
+    let provider = document.getElementById('provider_name').value;
+    if (provider === 'PARCELFORCE') {
+        setProviderParcelforce();
+    } else if (provider === 'APC') {
+        setProviderAPC();
+    } else {
+        console.warn('Unknown provider selected:', provider);
+    }
+
+}
+
+function setProviderParcelforce() {
+    console.log('Setting provider to PARCELFORCE');
+    toggleDiv('collect_times', false);
+    checkToggleDiv("direction", "own_label", "in");
+}
+
+function setProviderAPC() {
+    console.log('Setting provider to APC');
+    toggleDiv('own_label', false);
+    checkToggleDiv('direction', 'collect_times', 'in');
 }
 
 // GATHER FORM DATA
