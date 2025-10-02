@@ -1,7 +1,7 @@
 [project]
 license = "MIT"
 name = "shipaw"
-version = "0.3.3"
+version = "0.3.4"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -57,8 +57,8 @@ royal-mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-cl
 parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
 apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
 
-[tool.uv]
-package = true
+#[tool.uv]
+#package = true
 
 [build-system]
 requires = ["uv_build"]
