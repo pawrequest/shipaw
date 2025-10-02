@@ -33,6 +33,10 @@
         /*display: none;*/
         opacity: 0;
     }
+    #collect_times {
+        /*display: none;*/
+        opacity: 0;
+    }
 }
 
 .inputs__contact {
