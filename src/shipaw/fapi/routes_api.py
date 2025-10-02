@@ -121,10 +121,3 @@ async def convert_choice(choice: AddressChoicePF) -> AddressChoiceAgnost:
     return AddressChoiceAgnost(address=fc.address, score=choice.score)
 
 
-@router.get('/home_mobile_phone', response_class=HTMLResponse)
-async def home_mobile_phone():
-    mobile_phone = shipaw_settings().mobile_phone
-    return f"""
-    <input type="tel" id="mobile_phone" name="mobile_phone" value="{mobile_phone}" required>
-    """
-

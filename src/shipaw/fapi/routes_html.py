@@ -14,7 +14,7 @@ from shipaw.models.shipment import Shipment, sample_shipment
 from shipaw.fapi.routes_api import (
     order_results as order_confirm_json,
     order_summary as order_review_json,
-    ship_form as ship_form_json
+    ship_form as ship_form_json,
 )
 
 router = APIRouter()
@@ -83,18 +83,10 @@ async def ship(request: Request) -> HTMLResponse:
     return render_template_response(request, res)
 
 
-#
-# @router.get('/ship_form_test', response_class=HTMLResponse)
-# async def ship_form_test(request: Request) -> HTMLResponse:
-#     shipment = sample_shipment()
-#     resp: ShipawTemplateResponse = await ship_form_json(request, shipment)
-#     return shipaw_settings().templates.TemplateResponse(request=request, name=resp.template_path, context=resp.context)
+@router.get('/home_mobile_phone', response_class=HTMLResponse)
+async def home_mobile_phone():
+    mobile_phone = shipaw_settings().mobile_phone
+    return f"""
+    <input type="tel" id="mobile_phone" name="mobile_phone" value="{mobile_phone}" required>
+    """
 
-
-#
-#
-# @router.post('/ship_form', response_class=HTMLResponse)
-# @html_from_json
-# async def ship_form(request: Request, shipment: Shipment = Body(...)) -> HTMLResponse:
-#     resp: ShipawTemplateResponse = await ship_form_json(request, shipment)
-#     return shipaw_settings().templates.TemplateResponse(request=request, name=resp.template_path, context=resp.context)
