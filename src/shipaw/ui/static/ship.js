@@ -90,17 +90,20 @@ function populateShipment(shipment) {
 }
 
 function toggleOwnLabel() {
-    let direction = document.getElementById("direction").value;
-    let ownLabel = document.getElementById("own_label");
-    if (direction === "in") {
-        console.log('Showing own label fields');
-        ownLabel.style.opacity = '100';
-    } else {
-        console.log('Hiding own label fields');
-        ownLabel.style.opacity = '0'
-    }
+    return toggleDiv("direction", "own_label", "in");
 }
 
+function toggleDiv(id, param, condition) {
+    let thing = document.getElementById(id).value;
+    let element = document.getElementById(param);
+    if (thing === condition) {
+        console.log(`Showing ${param} fields`);
+        element.style.opacity = '100';
+    } else {
+        console.log(`Hiding ${param} fields`);
+        element.style.opacity = '0'
+    }
+}
 
 // GATHER FORM DATA
 function contactFromForm() {
