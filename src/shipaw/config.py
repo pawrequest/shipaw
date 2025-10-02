@@ -34,7 +34,7 @@ def load_env() -> Path:
     ei = Path(os.environ.get('ENV_INDEX'))
     logger.info(f'Loading env index from {ei}')
     if not ei or not ei.exists():
-        raise ValueError('ENV_INDEX not set or does not exist')
+        raise ValueError(f'ENV_INDEX ({ei}) not set or does not exist')
     load_env_index(ei)
     shipaw_env = Path(os.getenv('SHIPAW_ENV'))
     logger.debug(f'Loading SHIPAW environment from {shipaw_env}')
