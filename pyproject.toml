@@ -1,11 +1,21 @@
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
 [project]
-license = "MIT"
 name = "shipaw"
 version = "0.3.4"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
 ]
+license = "MIT"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
@@ -40,8 +50,6 @@ dev = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [tool.ruff]
 line-length = 120
@@ -57,14 +65,8 @@ royal-mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-cl
 parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
 apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
 
-#[tool.uv]
-#package = true
-
-[build-system]
-requires = ["uv_build"]
-build-backend = "uv_build"
-
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]
 
-# a change
+#[tool.uv]
+#package = true
