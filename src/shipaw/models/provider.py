@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Callable, ClassVar, Self, TYPE_CHECKING
 
+from loguru import logger
 from pydantic import BaseModel
 
-from shipaw.models.logging import log_booked_shipment
+# from shipaw.fapi.backend import try_get_write_label
+from shipaw.models.logging import log_obj
 from shipaw.models.services import Services
 from shipaw.models.shipment import Shipment
 
@@ -86,7 +88,18 @@ class ShippingProvider(ABC):
 
     @staticmethod
     def handle_response(request: 'ShipmentRequest', response: 'ShipmentBookingResponse'):
-        log_booked_shipment(request, response)
+        # log_booked_shipment(request, response)
+        log_obj(response)
+
+    @staticmethod
+    async def handle_response_async(request: 'ShipmentRequest', response: 'ShipmentBookingResponse'):
+        log_obj(response, 'Shipment Booked')
+        try:
+            if response.label_data is None and response.shipment_num:
+                response.label_data = request.provider.get_label_content(response.shipment_num)
+            await response.write_label_file()
+        except Exception as e:
+            logger.exception(f'Error getting or writing label data: {e}')
 
     def get_shipment_alias_dict(self, shipment: Shipment | dict) -> dict:
         shipment = shipment.model_validate(shipment)

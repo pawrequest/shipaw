@@ -10,9 +10,9 @@ from shipaw.fapi.alerts import Alert, Alerts
 from shipaw.models.services import Services
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment, Shipment as ShipmentAgnost
-from apc_hypaship.address import Address, Contact
+from apc_hypaship.models.request.address import Address, Contact
 from apc_hypaship.config import apc_settings
-from apc_hypaship.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
+from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
 from shipaw.models.provider import ShippingProvider, register_provider
 
 APC_SERVICES = Services(
