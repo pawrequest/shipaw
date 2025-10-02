@@ -206,14 +206,13 @@ async function loadAddrChoices() {
  * @returns {Promise<AddrChoice[]>}
  */
 async function fetchAddrChoices(Postcode, Address) {
-    console.log('Fetching AddressChoices at postcode:', Postcode, 'matching address:', Address);
-    console.log('Posting to /cand', {Postcode, Address});
-    const requestBody = {
-        postcode: Postcode, address: Address
-    };
+    const addrChoiceUrl = 'api/addr_choices';
+    console.log(`Posting to ${addrChoiceUrl} pc=${Postcode}, add=${Address}`);
     try {
-        const response = await fetch('/api/shipaw/addr_choices', {
-            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(requestBody)
+        const response = await fetch(addrChoiceUrl, {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+                postcode: Postcode, address: Address
+            })
         });
         return await response.json();
     } catch (error) {
