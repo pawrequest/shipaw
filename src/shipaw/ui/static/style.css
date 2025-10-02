@@ -211,3 +211,14 @@ select:focus {
 }
 
 
+.alert__ERROR {
+    background-color: var(--clr-danger);
+}
+
+.alert__NOTIFICATION {
+    background-color: cornflowerblue;
+}
+
+.alert__WARNING {
+    background-color: var(--clr-warning);
+}
