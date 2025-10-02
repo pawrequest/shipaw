@@ -5,13 +5,13 @@ from datetime import date, time
 
 from fastapi import Depends, Form
 from loguru import logger
-from pawdantic.paw_types import VALID_POSTCODE
+# from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
 
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.config import shipaw_settings
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.ship_types import ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
 
 

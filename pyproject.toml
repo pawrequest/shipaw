@@ -4,29 +4,22 @@ build-backend = "uv_build"
 
 [project]
 name = "shipaw"
-version = "0.3.4"
+version = "0.3.5"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
 ]
 license = "MIT"
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-]
 
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
-    "apc-hypaship",
-    'pawdantic', # special pydantic types eg truncated strings
-    "pawdf",
-    #    "royal-mail-click-and-drop",
+    "apc-hypaship>=0.1.0",
+    "parcelforce-expresslink>=0.1.0",
+    "pawdf>=0.1.0",
     #
     "httpx>=0.28.1",
     "pygments>=2.19.2",
-    "parcelforce-expresslink",
     "pydantic[email]>=2.11.9",
     "pytest>=8.4.2",
     "fastapi[standard]>=0.117.1",
@@ -39,6 +32,11 @@ dependencies = [
     "pydantic-settings>=2.11.0",
     "phonenumbers>=9.0.15",
 ]
+
+
+[project.urls]
+Homepage = "https://github.com/pawrequest/shipaw"
+
 [dependency-groups]
 dev = [
     "autodoc-pydantic>=2.2.0",
@@ -57,13 +55,13 @@ extend-select = ["Q", "RUF100", "UP"]
 flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
 format.quote-style = "single"
 
-[tool.uv.sources]
+#[tool.uv.sources]
 # GIT
-pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
-pawdf = { git = 'https://github.com/pawrequest/pawdf' }
-royal-mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-click-and-drop' }
-parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
-apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
+#pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
+#pawdf = { git = 'https://github.com/pawrequest/pawdf' }
+#royal-mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-click-and-drop' }
+#parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
+#apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
 
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]

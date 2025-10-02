@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import re
 from enum import StrEnum
 import datetime as dt
+from typing import Annotated
 
 import phonenumbers
 from loguru import logger
+from pydantic import ValidationError, AfterValidator, BeforeValidator, Field
 
 
 class ShipDirection(StrEnum):
@@ -21,10 +24,6 @@ WEEKDAYS_IN_RANGE = [
 ]
 
 COLLECTION_WEEKDAYS = [i for i in WEEKDAYS_IN_RANGE if not i == TOD]
-
-# COLLECTION_TIME_FROM = dt.time(0, 0)
-# COLLECTION_TIME_TO = dt.time(0, 0)
-
 
 
 def limit_daterange_no_weekends(v: dt.date) -> dt.date:
@@ -54,21 +53,20 @@ def validate_phone(v: str, values) -> str:
     return phonenumbers.format_number(nummy, phonenumbers.PhoneNumberFormat.E164)
 
 
-# ConvertMode = Literal['pydantic', 'python', 'python-alias', 'json', 'json-alias']
+POSTCODE_PATTERN = re.compile(r'([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})')
+
+pc_excluded = {'C', 'I', 'K', 'M', 'O', 'V'}
 
 
-# def pydantic_export(obj: BaseModel, mode: ConvertMode) -> dict | BaseModel | str:
-#     match mode:
-#         case 'pydantic':
-#             return obj
-#         case 'python':
-#             return obj.model_dump(mode='json', by_alias=False)
-#         case 'python-alias':
-#             return obj.model_dump(mode='json', by_alias=True)
-#         case 'json':
-#             return obj.model_dump_json(by_alias=False)
-#         case 'json-alias':
-#             return obj.model_dump_json(by_alias=True)
-#         case _:
-#             raise ValueError(f'Invalid ConvertMode: {mode}')
+def validate_uk_postcode(v: str):
+    if not re.match(POSTCODE_PATTERN, v) and not set(v[-2:]).intersection(pc_excluded):
+        raise ValidationError('Invalid UK postcode')
+    return v
 
+
+VALID_POSTCODE = Annotated[
+    str,
+    AfterValidator(validate_uk_postcode),
+    BeforeValidator(lambda s: s.strip().upper()),
+    Field(..., description='A valid UK postcode'),
+]
