@@ -109,6 +109,22 @@ def apc_shipment_from_agnostic(shipment: ShipmentAgnost) -> ShipmentAPC:
     return ShipmentAPC(orders=Orders(order=order))
 
 
+def shipment_booking_errored(messages, res, res_json, shipment):
+    fieldname = messages['ErrorFields']['ErrorField']['FieldName']
+    message = messages['ErrorFields']['ErrorField']['ErrorMessage']
+    alerts = Alerts(alert=[Alert(message=f'Error booking shipment: {fieldname}: {message}')])
+    return ShipmentBookingResponse(
+        alerts=alerts,
+        shipment=shipment,
+        shipment_num='FAILED TO BOOK',
+        tracking_link='NOT IMPLEMENTED',
+        data=res_json,
+        status=str(res.status_code),
+        success=False,
+        label_data=b'',
+    )
+
+
 # @dataclass
 @register_provider
 class APCShippingProvider(ShippingProvider):
@@ -123,25 +139,15 @@ class APCShippingProvider(ShippingProvider):
 
     def book_shipment(self, shipment: dict | ShipmentAgnost, settings=apc_settings()) -> ShipmentBookingResponse:
         """Takes provider ShipmnentDict, or ShipmentAgnost object"""
-        shipment_dict = self.get_shipment_alias_dict(shipment)
+        apc_shipment = self.provider_shipment(shipment)
+        shipment_dict = apc_shipment.model_dump(mode='json', by_alias=True)
+
         res = httpx.post(settings.orders_endpoint, headers=settings.headers, json=shipment_dict)
         res.raise_for_status()
         res_json = res.json()
         messages = json.loads(res.text).get('Orders').get('Order').get('Messages')
         if 'ErrorFields' in messages.keys():
-            fieldname = messages['ErrorFields']['ErrorField']['FieldName']
-            message = messages['ErrorFields']['ErrorField']['ErrorMessage']
-            alerts = Alerts(alert=[Alert(message=f'Error booking shipment: {fieldname}: {message}')])
-            return ShipmentBookingResponse(
-                alerts=alerts,
-                shipment=shipment,
-                shipment_num='FAILED TO BOOK',
-                tracking_link='NOT IMPLEMENTED',
-                data=res_json,
-                status=str(res.status_code),
-                success=False,
-                label_data=b'',
-            )
+            return shipment_booking_errored(messages, res, res_json, shipment)
         order = res_json['Orders']['Order']
         order_number = order['OrderNumber']
 
