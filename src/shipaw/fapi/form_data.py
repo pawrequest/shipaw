@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, time
 
 from fastapi import Depends, Form
 from loguru import logger
@@ -49,7 +49,11 @@ async def shipment_f_form(
     direction: ShipDirection = Form(...),
     reference: str = Form(...),
     context_json: str = Form(...),
+    collect_ready: int = Form(...),
+    collect_closed: int = Form(...),
 ) -> Shipment:
+    collect_ready = time(hour=collect_ready)
+    collect_closed = time(hour=collect_closed)
     context = json.loads(context_json)
     logger.info('Creating Shipment Request from form')
 
@@ -71,6 +75,8 @@ async def shipment_f_form(
         reference=reference,
         service=service,
         context=context,
+        collect_ready=collect_ready,
+        collect_closed=collect_closed,
     )
     return shipment
 

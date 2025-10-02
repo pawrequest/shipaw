@@ -20,6 +20,9 @@ class Shipment(ShipawBaseModel):
     service: str = 'NEXT_DAY'
     context: dict = Field(default_factory=dict)
 
+    collect_ready: dt.time = dt.time(hour=9, minute=0)
+    collect_closed: dt.time = dt.time(hour=17, minute=0)
+
     @property
     def remote_full_contact(self) -> FullContact:
         match self.direction:

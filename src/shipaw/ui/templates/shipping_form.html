@@ -24,6 +24,12 @@
                 {% endfor %}
             </select>
 
+            <label for="collect_ready">Collect From</label>
+            <input type="number" id="collect_ready" name="collect_ready" min="8" max="19" value="9" required>
+
+            <label for="collect_closed">Collect Until</label>
+            <input type="number" id="collect_closed" name="collect_closed" min="13" max="19" value="17" required>
+
             <label for="provider_name">Provider:</label>
             <select name="provider_name" id="provider_name">
                 <option value="PARCELFORCE" selected>Parcelforce</option>

@@ -96,6 +96,8 @@ def apc_shipment_from_agnostic(shipment: ShipmentAgnost) -> ShipmentAPC:
     ship_deets = ShipmentDetails(number_of_pieces=shipment.boxes)
 
     order = Order(
+        ready_at=shipment.collect_ready,
+        closed_at=shipment.collect_closed,
         collection_date=shipment.shipping_date,
         product_code=service_code,
         reference=shipment.reference,
