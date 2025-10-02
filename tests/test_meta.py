@@ -1,6 +1,6 @@
-from shipaw.providers.apc_provider import APCShippingProvider
+from shipaw.providers.apc.provider import APCShippingProvider
 from shipaw.models.provider import PROVIDER_REGISTER, ShippingProvider
-from shipaw.providers.parcelforce_provider import ParcelforceShippingProvider
+from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
 
 
 def test_providers_registered():

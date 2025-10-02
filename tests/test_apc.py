@@ -4,16 +4,16 @@ from pawdantic.paw_types import pydantic_export
 
 from conftest import TEST_DATE
 from shipaw.fapi.responses import ShipmentBookingResponse
-from apc_hypaship.address import Address as APCAddress, Contact, Contact as APCContact
+from apc_hypaship.models.request.address import Address as APCAddress, Contact, Contact as APCContact
 from apc_hypaship.config import apc_date, apc_settings
-from apc_hypaship.services import ServiceSpec
-from apc_hypaship.shipment import Shipment as APCShipment
-from shipaw.providers.apc_provider import (
+from apc_hypaship.models.request.services import ServiceSpec
+from apc_hypaship.models.request.shipment import Shipment as APCShipment
+from shipaw.providers.apc.provider import (
     APCShippingProvider,
-    address_from_agnostic_fc,
-    apc_shipment_from_agnostic,
-    contact_from_agnostic_fc,
 )
+from shipaw.providers.apc.provider_funcs import address_from_agnostic_fc, \
+    apc_shipment_from_agnostic, \
+    contact_from_agnostic_fc
 
 TEST_DATE_STR = apc_date(TEST_DATE)
 PROVIDER = APCShippingProvider()

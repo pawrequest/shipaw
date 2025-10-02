@@ -4,7 +4,7 @@ from parcelforce_expresslink.address import AddressRecipient
 from parcelforce_expresslink.config import pf_settings
 from parcelforce_expresslink.request_response import ShipmentResponse
 
-from shipaw.providers.parcelforce_provider import address_from_agnostic_fc, parcelforce_shipment_from_agnostic
+from shipaw.providers.parcelforce.provider_funcs import address_from_agnostic_fc, parcelforce_shipment_from_agnostic
 
 
 @pytest.fixture

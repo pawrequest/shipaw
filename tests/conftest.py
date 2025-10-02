@@ -1,6 +1,9 @@
-from shipaw.config import shipaw_settings # FIRST!
-from shipaw.providers.apc_provider import APCShippingProvider  # noqa
-from shipaw.providers.parcelforce_provider import ParcelforceShippingProvider  # noqa
+import os
+os.environ['ENV_INDEX'] = r'C:\prdev\envs\sandbox.env'
+
+from shipaw.config import shipaw_settings  # FIRST!
+from shipaw.providers.apc.provider import APCShippingProvider  # noqa
+from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider  # noqa
 
 
 from shipaw.models.provider import PROVIDER_REGISTER, ShippingProvider

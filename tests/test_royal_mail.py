@@ -154,16 +154,16 @@ def do_manifest(config):
 
 
 def test_lots(config, tmp_path, rm_contact, rm_shipmemt):
-    # ADD AN ORDER TO THE SYSTEM
-    order_response: CreateOrdersResponse = book_shipment(config, rm_contact, rm_shipmemt.model_dump(by_alias=True, mode='json'))
-    order_identifier = order_response.created_orders[0].order_identifier
+    # ADD A REAL ORDER TO THE REAL SYSTEM!!!
+    # order_response: CreateOrdersResponse = book_shipment(config, rm_contact, rm_shipmemt.model_dump(by_alias=True, mode='json'))
+    # order_identifier = order_response.created_orders[0].order_identifier
 
     # manifest orders
     res = do_manifest(config)
 
     # GET LABELS
-    save_to = tmp_path / f'RMCAD label_{order_identifier}.pdf'
-    do_get_label(str(order_identifier), save_to, config)
+    # save_to = tmp_path / f'RMCAD label_{order_identifier}.pdf'
+    # do_get_label(str(order_identifier), save_to, config)
 
     #  TEARDOWN
     res: GetOrdersResponse = fetch_orders(config)
