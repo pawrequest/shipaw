@@ -7,6 +7,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
 from shipaw.config import shipaw_settings
+from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.responses import ShipawTemplateResponse
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
@@ -21,10 +22,19 @@ router = APIRouter()
 
 
 def render_template_response(request: Request, resp: ShipawTemplateResponse) -> HTMLResponse:
+    context = resp.template.context
+    context['alerts'] = context.get('alerts', Alerts.empty()) + resp.alerts
+    if resp.alerts.errors:
+        return shipaw_settings().templates.TemplateResponse(
+            request=request,
+            name='alerts.html',
+            context=context,
+        )
+
     return shipaw_settings().templates.TemplateResponse(
         request=request,
         name=resp.template.template_path,
-        context=resp.template.context,
+        context=context,
     )
 
 
