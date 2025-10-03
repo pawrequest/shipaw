@@ -565,7 +565,7 @@ wheels = [
 
 [[package]]
 name = "parcelforce-expresslink"
-version = "0.1.1"
+version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "combadge" },
@@ -575,9 +575,9 @@ dependencies = [
     { name = "thefuzz" },
     { name = "zeep" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/26/276f4580fb961f93a72faae1938e3b479e1c5e7c7dd4531b0318230ebc79/parcelforce_expresslink-0.1.1.tar.gz", hash = "sha256:08e65677739503bdbe21256827ac80715ea81b70fda064563842bd1d4ccd9e5d", size = 17753, upload-time = "2025-10-03T12:00:58.72Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3c/1c/94e22bf9200075fc0c5f31333a874f7605698a15cea6a3165b7ee2b3780e/parcelforce_expresslink-0.1.2.tar.gz", hash = "sha256:2531da18a497f293a226e86ae68bc230aec464a55fbd89c7225e0387e2dc4d02", size = 17754, upload-time = "2025-10-03T12:11:02.567Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/ff/6dfef4f8dc3be3b4877ac63d15a6cd0d5605acc5b5991110db61a822c270/parcelforce_expresslink-0.1.1-py3-none-any.whl", hash = "sha256:c2502d7a6ed94102184a14b9577c0997b177d1ff547ccda7ad8ff102e63e6209", size = 23767, upload-time = "2025-10-03T12:00:57.54Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/8b/7c8f1b1da2387ac0c8180620bbe1547f3eddb22f7b4708c6f66b9ff19e2e/parcelforce_expresslink-0.1.2-py3-none-any.whl", hash = "sha256:5926e74683eca4b37ea274615a1301678a56720e216bf3adb28d1b8023047ea2", size = 23767, upload-time = "2025-10-03T12:11:01.698Z" },
 ]
 
 [[package]]
@@ -979,7 +979,7 @@ wheels = [
 
 [[package]]
 name = "shipaw"
-version = "0.3.10"
+version = "0.3.11"
 source = { editable = "." }
 dependencies = [
     { name = "apc-hypaship" },
@@ -1020,7 +1020,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "parcelforce-expresslink", specifier = ">=0.1.1" },
+    { name = "parcelforce-expresslink", specifier = ">=0.1.2" },
     { name = "pawdf", specifier = ">=0.1.0" },
     { name = "phonenumbers", specifier = ">=9.0.15" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.11.9" },
