@@ -34,6 +34,18 @@ class Alert(ShipawBaseModel):
 class Alerts(ShipawBaseModel):
     alert: list[Alert] = Field(default_factory=list[Alert])
 
+    @property
+    def errors(self):
+        return [a for a in self.alert if a.type == AlertType.ERROR]
+
+    @property
+    def warnings(self):
+        return [a for a in self.alert if a.type == AlertType.WARNING]
+
+    @property
+    def notifications(self):
+        return [a for a in self.alert if a.type == AlertType.NOTIFICATION]
+
     def __bool__(self):
         return bool(self.alert)
 
