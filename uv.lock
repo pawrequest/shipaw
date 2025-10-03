@@ -565,7 +565,7 @@ wheels = [
 
 [[package]]
 name = "parcelforce-expresslink"
-version = "0.1.0"
+version = "0.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "combadge" },
@@ -575,9 +575,9 @@ dependencies = [
     { name = "thefuzz" },
     { name = "zeep" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1b/c9/d36856e12db95a02d3eb2b2ed9666f66d2230606bd044077426b3f1314ad/parcelforce_expresslink-0.1.0.tar.gz", hash = "sha256:d86fe0e740ab83bbb501d9cd75c90973069508a262c248561cf3b21920676694", size = 17732, upload-time = "2025-10-02T18:49:53.4Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f0/26/276f4580fb961f93a72faae1938e3b479e1c5e7c7dd4531b0318230ebc79/parcelforce_expresslink-0.1.1.tar.gz", hash = "sha256:08e65677739503bdbe21256827ac80715ea81b70fda064563842bd1d4ccd9e5d", size = 17753, upload-time = "2025-10-03T12:00:58.72Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b7/3d/c2859c3d24f3c832811acc0ae4781256ad00a493f9f08a3b4fa3300c389f/parcelforce_expresslink-0.1.0-py3-none-any.whl", hash = "sha256:84c64d808d506a8337d0d0797236638e00482ae7e0583f95b86fbaa9839425ce", size = 23748, upload-time = "2025-10-02T18:49:52.42Z" },
+    { url = "https://files.pythonhosted.org/packages/43/ff/6dfef4f8dc3be3b4877ac63d15a6cd0d5605acc5b5991110db61a822c270/parcelforce_expresslink-0.1.1-py3-none-any.whl", hash = "sha256:c2502d7a6ed94102184a14b9577c0997b177d1ff547ccda7ad8ff102e63e6209", size = 23767, upload-time = "2025-10-03T12:00:57.54Z" },
 ]
 
 [[package]]
@@ -1020,7 +1020,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "parcelforce-expresslink", specifier = ">=0.1.0" },
+    { name = "parcelforce-expresslink", specifier = ">=0.1.1" },
     { name = "pawdf", specifier = ">=0.1.0" },
     { name = "phonenumbers", specifier = ">=9.0.15" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.11.9" },
