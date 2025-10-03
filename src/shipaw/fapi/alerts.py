@@ -78,7 +78,7 @@ async def maybe_alert_phone_number(phone_num: str):
         '7',
     ]:
         alerts += Alert(
-            type=AlertType.WARNING,
-            message='The Mobile phone number must be 11 digits and begin with 01, 02 or 07, no SMS will be sent',
+            type=AlertType.ERROR,
+            message='The Mobile phone number must be 11 digits and begin with 01, 02 or 07. Unable to send with no phone number (try "Use Home Base Mobile").',
         )
     return alerts
