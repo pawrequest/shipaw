@@ -55,26 +55,25 @@ async def order_summary(
     shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
     log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
-    alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
-
     context = {'shipment_request': shipment_request}
 
-    if shipment_request.provider_name == 'APC' and shipment_request.shipment.direction == ShipDirection.DROPOFF:
-        alerts += Alert(
-            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
-            type=AlertType.ERROR,
-        )
-        # todo: better handling
-        return ShipawTemplateResponse(
-            template=ShipawTemplate(template_path='alerts.html', context={'alerts': alerts}),
-            alerts=alerts
-            ,
-        )
+    alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
+    alerts += await maybe_alert_apc(shipment_request)
 
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
         alerts=alerts,
     )
+
+
+async def maybe_alert_apc(shipment_request):
+    alerts = Alerts.empty()
+    if shipment_request.provider_name == 'APC' and shipment_request.shipment.direction == ShipDirection.DROPOFF:
+        alerts += Alert(
+            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
+            type=AlertType.ERROR,
+        )
+    return alerts
 
 
 @router.post('/order_results', response_model=ShipawTemplateResponse)
