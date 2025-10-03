@@ -17,9 +17,12 @@ from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.logging import log_obj
+from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
-from shipaw.providers.parcelforce.provider_funcs import address_from_agnostic, \
-    full_contact_from_provider_contact_address
+from shipaw.providers.parcelforce.provider_funcs import (
+    address_from_agnostic,
+    full_contact_from_provider_contact_address,
+)
 
 router = APIRouter()
 router.mount('/static', StaticFiles(directory=str(shipaw_settings().static_dir)), name='static')
@@ -55,6 +58,18 @@ async def order_summary(
     alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
 
     context = {'shipment_request': shipment_request}
+
+    if shipment_request.provider_name == 'APC' and shipment_request.shipment.direction == ShipDirection.DROPOFF:
+        alerts += Alert(
+            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
+            type=AlertType.ERROR,
+        )
+        # todo: better handling
+        return ShipawTemplateResponse(
+            template=ShipawTemplate(template_path='alerts.html', context={'alerts': alerts}),
+            alerts=alerts
+            ,
+        )
 
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
