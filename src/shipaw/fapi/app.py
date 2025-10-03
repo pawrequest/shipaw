@@ -1,11 +1,12 @@
 import contextlib
+import os
 
-from fastapi import FastAPI, responses
+from fastapi import FastAPI, responses, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, HTMLResponse
 from starlette.staticfiles import StaticFiles
 
 from shipaw.config import shipaw_settings
@@ -56,7 +57,8 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
     logger.error(msg2)
     alerts = Alerts(alert=[Alert(code=1, message=msg2, type=AlertType.ERROR)])
     return JSONResponse(
-        status_code=422, content={'detail': jsonable_encoder(exc.errors()), 'alerts': alerts.model_dump(mode='json'), 'message': msg2}
+        status_code=422,
+        content={'detail': jsonable_encoder(exc.errors()), 'alerts': alerts.model_dump(mode='json'), 'message': msg2},
     )
 
 
@@ -75,4 +77,8 @@ async def base():
     return JSONResponse(content={'status': 'ok'})
 
 
+@app.get('/open-file', response_class=HTMLResponse)
+async def open_file(filepath: str = Query(...)):
+    os.startfile(filepath)
+    return HTMLResponse(content=f'<span>Re</span>')
 

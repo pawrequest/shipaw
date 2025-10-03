@@ -20,18 +20,6 @@ from shipaw.fapi.routes_api import (
 router = APIRouter()
 
 
-@router.get('/open-file', response_class=HTMLResponse)
-async def open_file(filepath: str = Query(...)):
-    os.startfile(filepath)
-    return HTMLResponse(content=f'<span>Re</span>')
-
-
-@router.post('/print-file', response_class=HTMLResponse)
-async def print_file(filepath: str = Query(...)):
-    os.startfile(filepath, 'print')
-    return HTMLResponse(content=f'<span>Re</span>')
-
-
 def render_template_response(request: Request, resp: ShipawTemplateResponse) -> HTMLResponse:
     return shipaw_settings().templates.TemplateResponse(
         request=request,
@@ -90,3 +78,14 @@ async def home_mobile_phone():
     <input type="tel" id="mobile_phone" name="mobile_phone" value="{mobile_phone}" required>
     """
 
+
+@router.get('/open-file/{filepath}', response_class=HTMLResponse)
+async def open_file(filepath: str):
+    os.startfile(filepath)
+    return HTMLResponse(content=f'<span>Re</span>')
+
+
+@router.post('/print-file/{filepath}', response_class=HTMLResponse)
+async def print_file(filepath: str):
+    os.startfile(filepath, 'print')
+    return HTMLResponse(content=f'<span>Re</span>')
