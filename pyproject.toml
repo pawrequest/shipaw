@@ -14,8 +14,8 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
-    "apc-hypaship>=0.1.0",
-    "parcelforce-expresslink>=0.1.2",
+    "apc-hypaship>=0.1.3",
+    "parcelforce-expresslink>=0.1.3",
     "pawdf>=0.1.0",
     #
     "httpx>=0.28.1",
