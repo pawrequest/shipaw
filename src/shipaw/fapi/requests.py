@@ -1,4 +1,3 @@
-import base64
 import uuid
 from typing import Annotated
 
@@ -7,7 +6,7 @@ from pydantic import StringConstraints
 from shipaw.models.address import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
-from shipaw.models.provider import PROVIDER_REGISTER, ShippingProvider
+from shipaw.providers.providers import PROVIDER_REGISTER, ShippingProvider
 
 
 class Authentication(ShipawBaseModel):

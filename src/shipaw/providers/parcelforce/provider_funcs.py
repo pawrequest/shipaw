@@ -1,17 +1,29 @@
 from __future__ import annotations
 
-from parcelforce_expresslink.address import AddressBase, AddressRecipient, Contact as ContactPF
-from parcelforce_expresslink.client import ParcelforceClient
-from parcelforce_expresslink.combadge import CreateShipmentService
-from parcelforce_expresslink.request_response import ShipmentRequest, ShipmentResponse
-from parcelforce_expresslink.shipment import Shipment as ShipmentPF
-from shipaw.fapi.responses import ShipmentBookingResponse
-from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
+from typing import override, cast
 
+from parcelforce_expresslink.address import AddressBase, AddressRecipient, Contact as ContactPF
+from parcelforce_expresslink.services import ServiceCode
+from parcelforce_expresslink.shipment import Shipment as ShipmentPF
+from parcelforce_expresslink.types import ShipmentType
+
+from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.services import Services
+from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
 
-PARCELFORCE_SERVICES = Services(
+
+class ParcelforceServices(Services):
+    NEXT_DAY: ServiceCode = 'SND'
+    NEXT_DAY_12: ServiceCode = 'S12'
+    NEXT_DAY_9: ServiceCode = '09'
+
+    @override
+    def lookup(self, agnostic_name: str) -> ServiceCode:
+        return ServiceCode(super().lookup(agnostic_name))
+
+
+PARCELFORCE_SERVICES = ParcelforceServices(
     NEXT_DAY='SND',
     NEXT_DAY_12='S12',
     NEXT_DAY_9='09',
@@ -82,21 +94,17 @@ def join_refs(refs: dict[str, str]) -> str:
     return ''.join(refs).strip()
 
 
-def parcelforce_shipment_from_agnostic(
-    shipment: ShipmentAgnost | dict,
-) -> ShipmentPF | dict:
-    shipment = ShipmentAgnost.model_validate(shipment)
+def parcelforce_shipment_from_agnostic(shipment: ShipmentAgnost | dict, contract_number: str) -> ShipmentPF | dict:
     ship_pf = ShipmentPF(
         **ref_dict_from_str(shipment.reference),
         recipient_contact=contact_from_agnostic_fc(ContactPF, shipment.recipient),
         recipient_address=address_from_agnostic_fc(AddressRecipient, shipment.recipient),
         total_number_of_parcels=shipment.boxes,
         shipping_date=shipment.shipping_date,
-        service_code=(PARCELFORCE_SERVICES.lookup(shipment.service)),
+        service_code=PARCELFORCE_SERVICES.lookup(shipment.service),
+        contract_number=contract_number,
     )
-    ship_pf = ship_pf.convert(shipment.direction)
-
-    return ship_pf
+    return shipment_directed(ship_pf)
 
 
 def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
@@ -107,7 +115,7 @@ def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
         else None,
         boxes=shipment.total_number_of_parcels,
         shipping_date=shipment.shipping_date,
-        direction=shipment.direction,
+        direction=shipment_direction(shipment),
         reference=', '.join(
             filter(
                 None,
@@ -123,27 +131,53 @@ def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
     )
 
 
-def book_shipment(shipment: dict | ShipmentAgnost) -> ShipmentBookingResponse:
-    shipment = ShipmentAgnost.model_validate(shipment)
-    shipment_pf = parcelforce_shipment_from_agnostic(shipment)
-    shipment_request_pf = ShipmentRequest(requested_shipment=shipment_pf)
+# def book_shipment(shipment: ShipmentAgnost) -> ShipmentBookingResponse:
+#     shipment_pf = parcelforce_shipment_from_agnostic(shipment)
+#     shipment_request_pf = ShipmentRequest(requested_shipment=shipment_pf)
+#
+#     el_client = ParcelforceClient.from_env()
+#     authorized_shipment = shipment_request_pf.authenticate_from_settings()
+#     ship_req = authorized_shipment.model_dump(by_alias=True)
+#
+#     back = el_client.backend(CreateShipmentService)
+#     pf_response: ShipmentResponse = back.createshipment(request=ship_req)
+#     pf_response.handle_errors()
+#
+#     resp_agnost = ShipmentBookingResponse(
+#         shipment=shipment,
+#         shipment_num=pf_response.shipment_num,
+#         tracking_link=pf_response.tracking_link(),
+#         data=pf_response.model_dump(),
+#         status=pf_response.status,
+#         success=pf_response.success,
+#         label_data=el_client.get_label_content(pf_response.shipment_num),
+#     )
+#
+#     return resp_agnost
 
-    el_client = ParcelforceClient()
-    authorized_shipment = shipment_request_pf.authenticate_from_settings()
-    ship_req = authorized_shipment.model_dump(by_alias=True)
 
-    back = el_client.backend(CreateShipmentService)
-    pf_response: ShipmentResponse = back.createshipment(request=ship_req)
-    pf_response.handle_errors()
+def shipment_direction(shipment: ShipmentPF) -> ShipDirection:
+    if shipment.shipment_type == ShipmentType.DELIVERY:
+        if shipment.sender_address is None:
+            return ShipDirection.OUTBOUND
+        else:
+            return ShipDirection.DROPOFF
+    elif shipment.shipment_type == ShipmentType.COLLECTION:
+        return ShipDirection.INBOUND
+    else:
+        raise ValueError()
 
-    resp_agnost = ShipmentBookingResponse(
-        shipment=shipment,
-        shipment_num=pf_response.shipment_num,
-        tracking_link=pf_response.tracking_link(),
-        data=pf_response.model_dump(),
-        status=pf_response.status,
-        success=pf_response.success,
-        label_data=el_client.get_label_content(pf_response.shipment_num),
-    )
 
-    return resp_agnost
+def convert_shipment(shipment, direction: ShipDirection):
+    match direction:
+        case ShipDirection.OUTBOUND:
+            return shipment
+        case ShipDirection.INBOUND:
+            return shipment.to_inbound()
+        case ShipDirection.DROPOFF:
+            return shipment.to_dropoff()
+        case _:
+            raise ValueError('Invalid Ship Direction')
+
+def shipment_directed(shipment: ShipmentPF) -> ShipmentPF:
+    return convert_shipment(shipment, shipment_direction(shipment))

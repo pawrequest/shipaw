@@ -9,7 +9,7 @@ from starlette.staticfiles import StaticFiles
 
 from parcelforce_expresslink.address import AddressChoice as AddressChoicePF, Contact as ContactPF
 from parcelforce_expresslink.client import ParcelforceClient
-from shipaw.config import shipaw_settings
+from shipaw.config import shipaw_settings, ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
 from shipaw.fapi.backend import get_el_client, try_book_shipment
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
@@ -25,7 +25,7 @@ from shipaw.providers.parcelforce.provider_funcs import (
 )
 
 router = APIRouter()
-router.mount('/static', StaticFiles(directory=str(shipaw_settings().static_dir)), name='static')
+router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
 
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)

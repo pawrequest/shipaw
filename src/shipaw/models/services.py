@@ -8,16 +8,16 @@ class Services:
     NEXT_DAY_12: str
     NEXT_DAY_9: str
 
-    def reverse_lookup(self, service_code: str) -> str | None:
-        res = next((name for name, code in self.__dict__.items() if code == service_code), None)
+    def reverse_lookup(self, provider_code: str) -> str | None:
+        res = next((name for name, code in self.__dict__.items() if code == provider_code), None)
         if not res:
-            raise ValueError(f'Invalid service code: {service_code}')
+            raise ValueError(f'Invalid service code: {provider_code}')
         return res
 
-    def lookup(self, service_name: str) -> str:
-        res = self.__dict__.get(service_name)
+    def lookup(self, agnostic_name: str) -> str:
+        res = self.__dict__.get(agnostic_name)
         if not res:
-            raise ValueError(f'Invalid service name: {service_name}')
+            raise ValueError(f'Invalid service name: {agnostic_name}')
         return res
 
 

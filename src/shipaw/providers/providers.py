@@ -1,8 +1,13 @@
+import time
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Callable, ClassVar, Self, TYPE_CHECKING
 
 from loguru import logger
 from pydantic import BaseModel
+from pydantic_settings import BaseSettings
+
+from shipaw.models.base import ShipawBaseModel
 
 # from shipaw.fapi.backend import try_get_write_label
 from shipaw.models.logging import log_obj
@@ -61,10 +66,28 @@ BookingFn = Callable[[dict | Shipment], 'ShipmentBookingResponseAgnost']
 
 
 # @dataclass
-class ShippingProvider(ABC):
+class ShippingProvider(ABC, ShipawBaseModel):
     name: ClassVar[str]
     # service_map: ClassVar[MappingProxyType]
-    services: Services
+    services: ClassVar[Services]
+    settings_type: ClassVar[type[BaseSettings]]
+    settings: BaseSettings | None = None
+
+    def wait_label(self, shipment_num: str) -> bytes:
+        for i in range(10):
+            try:
+                time.sleep(1)
+                label_data = self.get_label_content(shipment_num=shipment_num)
+                assert label_data is not None
+                return label_data
+            except AssertionError as e:
+                print(f'Label not ready yet for {shipment_num}, retrying...')
+        raise RuntimeError(f'Label not ready after retries for {shipment_num}')
+
+    @classmethod
+    def from_env(cls, env_file: Path) -> Self:
+        settings = cls.settings_type(_env_file=env_file)
+        return cls(settings=settings)
 
     @staticmethod
     @abstractmethod
@@ -87,11 +110,6 @@ class ShippingProvider(ABC):
     def get_label_content(shipment_num: str) -> bytes: ...
 
     @staticmethod
-    def handle_response(request: 'ShipmentRequest', response: 'ShipmentBookingResponse'):
-        # log_booked_shipment(request, response)
-        log_obj(response)
-
-    @staticmethod
     async def handle_response_async(request: 'ShipmentRequest', response: 'ShipmentBookingResponse'):
         log_obj(response, 'Shipment Booked')
         try:
@@ -101,16 +119,12 @@ class ShippingProvider(ABC):
         except Exception as e:
             logger.exception(f'Error getting or writing label data: {e}')
 
-    def get_shipment_alias_dict(self, shipment: Shipment | dict) -> dict:
-        shipment = shipment.model_validate(shipment)
-        shipment = self.provider_shipment(shipment)
-        shipment_alias = shipment.model_dump(mode='json', by_alias=True)
-        return shipment_alias
-
 
 PROVIDER_REGISTER: dict[str, type[ShippingProvider]] = {}
 
 
 def register_provider(cls: type[ShippingProvider]) -> type[ShippingProvider]:
+    if not issubclass(cls, ShippingProvider):
+        raise TypeError('Can only register subclasses of ShippingProvider')
     PROVIDER_REGISTER[str(cls.name)] = cls
     return cls

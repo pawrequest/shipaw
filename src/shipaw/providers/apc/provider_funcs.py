@@ -102,18 +102,3 @@ def apc_shipment_from_agnostic(shipment: ShipmentAgnost) -> ShipmentAPC:
     )
     return ShipmentAPC(orders=Orders(order=order))
 
-
-def shipment_booking_errored(messages, res, res_json, shipment):
-    fieldname = messages['ErrorFields']['ErrorField']['FieldName']
-    message = messages['ErrorFields']['ErrorField']['ErrorMessage']
-    alerts = Alerts(alert=[Alert(message=f'Error booking shipment: {fieldname}: {message}')])
-    return ShipmentBookingResponse(
-        alerts=alerts,
-        shipment=shipment,
-        shipment_num='FAILED TO BOOK',
-        tracking_link='NOT IMPLEMENTED',
-        data=res_json,
-        status=str(res.status_code),
-        success=False,
-        label_data=b'',
-    )

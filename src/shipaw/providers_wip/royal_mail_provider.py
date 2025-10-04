@@ -5,7 +5,7 @@ from royal_mail_click_and_drop.models.create_orders_request import CreateOrderRe
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.services import Services
 from shipaw.models.shipment import Shipment
-from shipaw.models.provider import ShippingProvider
+from shipaw.providers.providers import ShippingProvider
 
 # ServiceDictPlaceholder: ServiceDict = {
 #     'NEXT_DAY': 'sdfdasfg',

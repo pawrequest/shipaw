@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from base64 import b64encode, b64decode
 from pathlib import Path
 from typing import Literal
@@ -11,7 +12,7 @@ from pydantic import Field, ConfigDict, field_validator, model_validator, BaseMo
 
 from shipaw.models.base import ShipawBaseModel
 
-from shipaw.fapi.alerts import Alerts
+from shipaw.fapi.alerts import Alerts, Alert
 from shipaw.models.label_file import get_label_folder, get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
 
@@ -44,14 +45,16 @@ class ShipmentBookingResponse(BaseResponse):
     tracking_link: str | None = None
     label_data: bytes | None = None
     label_path: Path | None = None
+    decoded: bool = False
 
     model_config = ConfigDict(json_encoders={bytes: lambda v: b64encode(v).decode('utf-8') if v else None})
 
-    @field_validator('label_data', mode='before')
-    def decode_label_data(cls, value):
-        if isinstance(value, str):
-            return b64decode(value)
-        return value
+    @model_validator(mode='after')
+    def decode_label_data(self):
+        if isinstance(self.label_data, bytes) and not self.decoded:
+            self.label_data = b64decode(self.label_data)
+            self.decoded = True
+        return self
 
     @model_validator(mode='after')
     def get_label_path(self):
@@ -74,6 +77,7 @@ class ShipmentBookingResponse(BaseResponse):
         unsize.write_bytes(label_content)
         on_a4(input_file=unsize, output_file=label_path)
         logger.info(f'Wrote label to {label_path}')
+
 
 class ShipawTemplateResponse(BaseResponse):
     template: ShipawTemplate

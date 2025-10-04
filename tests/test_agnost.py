@@ -1,4 +1,5 @@
-from shipaw.models.provider import ShippingProvider
+from conftest import sample_provider
+from shipaw.providers.providers import ShippingProvider
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.ship_types import ShipDirection
@@ -11,23 +12,22 @@ def test_sample_fixtures(sample_contact, sample_address, sample_shipment):
     assert sample_shipment.direction == ShipDirection.OUTBOUND
 
 
-def test_provider_makes_ship_dict(sample_shipment: Shipment, provider: ShippingProvider):
-    ship = provider.provider_shipment(sample_shipment)
+def test_provider_makes_ship_dict(sample_shipment: Shipment, sample_provider):
+    ship = sample_provider.provider_shipment(sample_shipment)
     ship = ship.model_dump(by_alias=True)
     assert isinstance(ship, dict)
 
 
-def test_provider_books_shipment(sample_shipment, provider: ShippingProvider):
-    ship_req = ShipmentRequest(shipment=sample_shipment, provider_name=provider.name)
-    response = provider.book_shipment(sample_shipment)
+def test_provider_books_shipment(sample_shipment, sample_provider):
+    response = sample_provider.book_shipment(sample_shipment)
     assert isinstance(response, ShipmentBookingResponse)
     assert response.shipment_num
     assert response.label_data
 
 
-def test_provider_converts_shiments(sample_shipment: Shipment, provider: ShippingProvider):
-    ship = provider.provider_shipment(sample_shipment)
-    back = provider.agnostic_shipment(ship)
+def test_provider_converts_shiments(sample_shipment: Shipment, sample_provider):
+    ship = sample_provider.provider_shipment(sample_shipment)
+    back = sample_provider.agnostic_shipment(ship)
     assert sample_shipment == back
 
 
