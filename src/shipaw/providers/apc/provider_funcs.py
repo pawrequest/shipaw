@@ -1,7 +1,5 @@
 from apc_hypaship.models.request.address import Address, Contact
-from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
-from shipaw.fapi.alerts import Alert, Alerts
-from shipaw.fapi.responses import ShipmentBookingResponse
+from apc_hypaship.models.request.shipment import Shipment as ShipmentAPC
 from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.services import Services
 from shipaw.models.ship_types import ShipDirection
@@ -58,47 +56,4 @@ def full_contact_from_apc_contact_address(contact: Contact, address: Address) ->
             phone_number=contact.phone_number or contact.mobile_number,
         ),
     )
-
-
-def apc_shipment_to_agnostic(shipment: ShipmentAPC) -> ShipmentAgnost:
-    order = shipment.orders.order
-    del_fc = full_contact_from_apc_contact_address(order.delivery.contact, order.delivery)
-    send_fc = (
-        full_contact_from_apc_contact_address(order.collection.contact, order.collection) if order.collection else None
-    )
-    service = APC_SERVICES.reverse_lookup(order.product_code)
-
-    return ShipmentAgnost(
-        service=service,
-        shipping_date=order.collection_date,
-        reference=order.reference,
-        recipient=del_fc,
-        sender=send_fc,
-        boxes=order.shipment_details.number_of_pieces,
-        direction=ShipDirection.INBOUND if order.collection is not None else ShipDirection.OUTBOUND,
-        collect_ready=order.ready_at,
-        collect_closed=order.closed_at,
-    )
-
-
-def apc_shipment_from_agnostic(shipment: ShipmentAgnost) -> ShipmentAPC:
-    # todo handle direction
-    if shipment.direction not in [ShipDirection.INBOUND, ShipDirection.OUTBOUND]:
-        raise NotImplementedError('APCShippingProvider does not support DROPOFF shipments')
-
-    service_code = APC_SERVICES.lookup(shipment.service)
-    ship_deets = ShipmentDetails(number_of_pieces=shipment.boxes)
-
-    order = Order(
-        ready_at=shipment.collect_ready,
-        closed_at=shipment.collect_closed,
-        collection_date=shipment.shipping_date,
-        product_code=service_code,
-        reference=shipment.reference,
-        delivery=address_from_agnostic_fc(Address, shipment.recipient),
-        collection=address_from_agnostic_fc(Address, shipment.sender) if shipment.sender else None,
-        goods_info=GoodsInfo(),
-        shipment_details=ship_deets,
-    )
-    return ShipmentAPC(orders=Orders(order=order))
 

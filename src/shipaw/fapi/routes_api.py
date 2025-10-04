@@ -1,17 +1,17 @@
 from pathlib import Path
+from typing import cast
 
 from combadge.core.errors import BackendError
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-
 from parcelforce_expresslink.address import AddressChoice as AddressChoicePF, Contact as ContactPF
-from parcelforce_expresslink.client import ParcelforceClient
-from shipaw.config import shipaw_settings, ShipawSettings
+
+from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
-from shipaw.fapi.backend import get_el_client, try_book_shipment
+from shipaw.fapi.backend import try_book_shipment, try_get_write_label
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
@@ -19,10 +19,12 @@ from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
+from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
 from shipaw.providers.parcelforce.provider_funcs import (
     address_from_agnostic,
     full_contact_from_provider_contact_address,
 )
+from shipaw.providers.registry import PROVIDER_REGISTER
 
 router = APIRouter()
 router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
@@ -38,7 +40,7 @@ async def ship_form(request: Request, shipment: Shipment = Body(...)) -> ShipawT
         logger.warning(msg)
         alerts += Alert(message=msg, type=AlertType.WARNING)
 
-    if shipaw_settings().shipper_live:
+    if ShipawSettings.from_env().shipper_live:
         msg = 'Shipper Live is True - Real Shipments will be booked'
     else:
         msg = 'Shipper_live is False - No Shipments will be booked'
@@ -82,7 +84,8 @@ async def order_results(
     shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
-    await shipment_request.provider.handle_response_async(shipment_request, shipment_response)
+    log_obj(shipment_response, 'Shipment Booked')
+    await try_get_write_label(shipment_request, shipment_response)
 
     if hasattr(request.app, 'callback'):
         await request.app.callback(shipment_request, shipment_response)
@@ -98,25 +101,25 @@ async def order_results(
 async def get_addr_choices(
     request: Request,
     body: AddressRequest = Body(...),
-    el_client: ParcelforceClient = Depends(get_el_client),
 ) -> list[AddressChoiceAgnost]:
     """Fetch candidate address choices for a postcode, optionally scored by closeness to provided address.
+    Hardcoded to use Parcelforce provider for now - APC does not provide address lookup.
 
     Args:
         request: Request - FastAPI request object
         body: Address - request body containing postcode and optional address
-        el_client: ELClient - Parcelforce ExpressLink client
     """
+    p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, PROVIDER_REGISTER['PARCELFORCE'])
+    client = p.client
     postcode = body.postcode
     address_agnost = body.address
     pf_address = address_from_agnostic(address_agnost) if address_agnost else None
     # log_obj(pf_address, 'Address received at /cand:')
 
     try:
-        res = el_client.get_choices(postcode=postcode, address=pf_address)
-        res_agnost = [await convert_choice(_) for _ in res]
-        # log_objs(res_agnost, 'Address choices returned from /cand:')
-        return res_agnost
+        res_pf = client.get_choices(postcode=postcode, address=pf_address)
+        res = [await convert_choice(_) for _ in res_pf]
+        return res
 
     except BackendError as e:
         alert = Alert(

@@ -1,12 +1,12 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
+import re
 
 from loguru import logger
 
-from shipaw.config import shipaw_settings
-import re
-
+from shipaw.config import ShipawSettings
 from shipaw.models.ship_types import ShipDirection
+
 if TYPE_CHECKING:
     from shipaw.models.shipment import Shipment
 
@@ -16,7 +16,7 @@ def make_filename_safe(name: str) -> str:
 
 
 def get_label_folder(direction: ShipDirection):
-    return shipaw_settings().label_dir / direction
+    return ShipawSettings.from_env().label_dir / direction
 
 
 def get_label_stem(shipment: 'Shipment'):

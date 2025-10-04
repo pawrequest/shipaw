@@ -9,7 +9,7 @@ from loguru import logger
 from pydantic import EmailStr
 
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.config import shipaw_settings
+from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.ship_types import ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
@@ -61,7 +61,7 @@ async def shipment_f_form(
         recipient = full_contact
         sender = None
     elif direction in {ShipDirection.INBOUND, ShipDirection.DROPOFF}:
-        recipient = shipaw_settings().full_contact
+        recipient = ShipawSettings.from_env().full_contact
         sender = full_contact
     else:
         raise ValueError(f'Unknown direction: {direction}')

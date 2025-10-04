@@ -1,12 +1,12 @@
 import json
 import pprint
 from datetime import datetime
-from typing import TYPE_CHECKING, Sequence
+from typing import Sequence, TYPE_CHECKING
 
 from loguru import logger
 from pydantic import BaseModel
 
-from shipaw.config import shipaw_settings
+from shipaw.config import ShipawSettings
 
 if TYPE_CHECKING:
     from shipaw.fapi.requests import ShipmentRequest
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def ndlog_dict(data: dict, ndjson_file=None):
-    ndjson_file = ndjson_file or shipaw_settings().ndjson_log_file
+    ndjson_file = ndjson_file or ShipawSettings.from_env().ndjson_log_file
     with open(ndjson_file, 'a') as jf:
         print(json.dumps(data, separators=(',', ':')), file=jf)
 
@@ -39,7 +39,7 @@ def log_obj_text(obj: BaseModel, message: str = None, *, level: str = 'DEBUG', l
 
 
 def log_obj_json(obj: BaseModel, message: str = None, *, ndjson_file=None):
-    ndjson_file = ndjson_file or shipaw_settings().ndjson_log_file
+    ndjson_file = ndjson_file or ShipawSettings.from_env().ndjson_log_file
     timestamp = datetime.now().isoformat(timespec='seconds')
     logdict = {
         'data_type': type(obj).__name__,
@@ -57,7 +57,7 @@ def log_obj(
     logger_=logger,
     ndjson_file=None,
 ):
-    ndjson_file = ndjson_file or shipaw_settings().ndjson_log_file
+    ndjson_file = ndjson_file or ShipawSettings.from_env().ndjson_log_file
     log_obj_text(obj, message, level=level, logger_=logger_)
     log_obj_json(obj, message, ndjson_file=ndjson_file)
 

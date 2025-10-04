@@ -5,7 +5,7 @@ from royal_mail_click_and_drop.models.create_orders_request import CreateOrderRe
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.services import Services
 from shipaw.models.shipment import Shipment
-from shipaw.providers.providers import ShippingProvider
+from shipaw.providers.provider_abc import ShippingProvider
 
 # ServiceDictPlaceholder: ServiceDict = {
 #     'NEXT_DAY': 'sdfdasfg',
@@ -85,4 +85,4 @@ class RoyalMailProvider(ShippingProvider):
 
     def book_shipment(self, shipment: dict | Shipment) -> 'ShipmentBookingResponseAgnost': ...
 
-    def get_label_content(self, shipment_num: str) -> bytes: ...
+    def fetch_label_content(self, shipment_num: str) -> bytes: ...

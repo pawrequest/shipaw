@@ -2,11 +2,11 @@ import os
 from functools import wraps
 
 from fastapi import APIRouter, Body
-from fastapi.params import Depends, Query
+from fastapi.params import Depends
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
-from shipaw.config import shipaw_settings
+from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.responses import ShipawTemplateResponse
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
@@ -25,13 +25,13 @@ def render_template_response(request: Request, resp: ShipawTemplateResponse) -> 
     context = resp.template.context
     context['alerts'] = context.get('alerts', Alerts.empty()) + resp.alerts
     if resp.alerts.errors:
-        return shipaw_settings().templates.TemplateResponse(
+        return ShipawSettings.from_env().templates.TemplateResponse(
             request=request,
             name='alerts.html',
             context=context,
         )
 
-    return shipaw_settings().templates.TemplateResponse(
+    return ShipawSettings.from_env().templates.TemplateResponse(
         request=request,
         name=resp.template.template_path,
         context=context,
@@ -43,7 +43,7 @@ def html_from_json(json_endpoint):
     async def wrapper(request: Request, *args, **kwargs):
         resp = await json_endpoint(request, *args, **kwargs)
 
-        return shipaw_settings().templates.TemplateResponse(
+        return ShipawSettings.from_env().templates.TemplateResponse(
             request=request, name=resp.template_path, context=resp.context
         )
 
@@ -83,7 +83,7 @@ async def ship(request: Request) -> HTMLResponse:
 
 @router.get('/home_mobile_phone', response_class=HTMLResponse)
 async def home_mobile_phone():
-    mobile_phone = shipaw_settings().mobile_phone
+    mobile_phone = ShipawSettings.from_env().mobile_phone
     return f"""
     <input type="tel" id="mobile_phone" name="mobile_phone" value="{mobile_phone}" required>
     """

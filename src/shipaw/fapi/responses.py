@@ -1,18 +1,15 @@
 from __future__ import annotations
 
-import time
-from base64 import b64encode, b64decode
+from base64 import b64decode, b64encode
 from pathlib import Path
-from typing import Literal
 
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
+from pydantic import ConfigDict, Field, model_validator
 
-from pydantic import Field, ConfigDict, field_validator, model_validator, BaseModel
-
+from shipaw.config import ShipawSettings
 from shipaw.models.base import ShipawBaseModel
-
-from shipaw.fapi.alerts import Alerts, Alert
+from shipaw.fapi.alerts import Alerts
 from shipaw.models.label_file import get_label_folder, get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
 
@@ -22,11 +19,9 @@ class ShipawTemplate(ShipawBaseModel):
     context: dict = Field(default_factory=dict)
 
     def render_template(self, request):
-        from shipaw.config import shipaw_settings
-
         if not self.template_path:
             raise ValueError('No template_path set')
-        return shipaw_settings().templates.TemplateResponse(
+        return ShipawSettings.from_env().templates.TemplateResponse(
             request=request, name=self.template_path, context=self.context
         )
 

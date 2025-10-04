@@ -5,35 +5,36 @@ from typing import ClassVar, override
 from parcelforce_expresslink.address import AddressRecipient, Contact as ContactPF
 from parcelforce_expresslink.combadge import CreateShipmentService
 from parcelforce_expresslink.request_response import ShipmentRequest, ShipmentResponse as ShipmentResponsePF
-
 #
 from parcelforce_expresslink.config import ParcelforceSettings
 from parcelforce_expresslink.client import ParcelforceClient
 from parcelforce_expresslink.shipment import Shipment as ShipmentPF
 
-from shipaw.models.services import Services
-from shipaw.providers.providers import ShippingProvider, register_provider
+from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.shipment import Shipment, Shipment as ShipmentAgnost
 from shipaw.providers.parcelforce.provider_funcs import (
     PARCELFORCE_SERVICES,
+    ParcelforceServices,
     address_from_agnostic_fc,
-    shipment_directed,
     contact_from_agnostic_fc,
     parcelforce_shipment_to_agnostic,
     ref_dict_from_str,
-    ParcelforceServices,
+    shipment_directed
 )
 
 
 # @dataclass
-@register_provider
+# @register_provider
 class ParcelforceShippingProvider(ShippingProvider):
     name = 'PARCELFORCE'
     services: ClassVar[ParcelforceServices] = PARCELFORCE_SERVICES
     settings_type: ClassVar[type[ParcelforceSettings]] = ParcelforceSettings
-    settings: ParcelforceSettings | None = None
+    settings: ParcelforceSettings
     _client: ParcelforceClient | None = None
+
+    def is_sandbox(self) -> bool:
+        return 'test' in self.settings.pf_endpoint.lower()
 
     @property
     def client(self) -> ParcelforceClient:
@@ -81,7 +82,7 @@ class ParcelforceShippingProvider(ShippingProvider):
             data=pf_response.model_dump(),
             status=pf_response.status,
             success=pf_response.success,
-            label_data=self.get_label_content(pf_response.shipment_num),
+            label_data=self.fetch_label_content(pf_response.shipment_num),
         )
 
     def make_pf_book_request(self, ship_req):
@@ -91,6 +92,6 @@ class ParcelforceShippingProvider(ShippingProvider):
         return pf_response
 
     @override
-    def get_label_content(self, shipment_num: str) -> bytes:
+    def fetch_label_content(self, shipment_num: str) -> bytes:
         return self.client.get_label_content(shipment_num)
 

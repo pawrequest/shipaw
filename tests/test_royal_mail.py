@@ -58,7 +58,7 @@
 #
 # @pytest.fixture
 # def our_address():
-#     return rm_address_from_agnostic_fc(shipaw_settings().full_contact)
+#     return rm_address_from_agnostic_fc(ShipawSettings.from_env().full_contact)
 #
 #
 # def packages_():

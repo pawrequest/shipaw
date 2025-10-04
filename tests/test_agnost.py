@@ -1,5 +1,5 @@
 from conftest import sample_provider
-from shipaw.providers.providers import ShippingProvider
+from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.ship_types import ShipDirection

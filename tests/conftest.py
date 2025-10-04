@@ -3,8 +3,6 @@ from datetime import date, timedelta
 import pytest
 
 from shipaw.config import ShipawSettings  # FIRST!
-from shipaw.providers.apc.provider import APCShippingProvider
-from shipaw.providers.providers import PROVIDER_REGISTER, ShippingProvider
 from shipaw.models.shipment import Shipment
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
@@ -31,7 +29,9 @@ def sample_provider(sample_settings, request):
     name = request.param[0]
     type_ = request.param[1]
     env_file = sample_settings.provider_dict[name]
-    return type_.from_env(env_file)
+    provider = type_.from_env(env_file)
+    assert provider.is_sandbox(), f'Must use sandbox environment for tests, got {provider.settings}'
+    return provider
 
 
 @pytest.fixture
