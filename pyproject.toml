@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "shipaw"
-version = "0.3.12"
+version = "0.3.13"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
