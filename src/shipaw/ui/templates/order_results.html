@@ -17,7 +17,7 @@
             <div id="label-action-result"></div>
             <div class="label-actions">
                 <div class="label-action">
-                    <form hx-post="{{ request.url_for('print_file') ~ '?filepath=' ~ response.label_path | urlencode }}"
+                    <form hx-post="{{ request.url_for('print_file', filepath=response.label_path | urlencode) }}"
                           hx-target="#print-btn"
                           hx-swap="afterbegin"
                     >
@@ -27,7 +27,7 @@
 
                 <div class="label-action">
                     <script>console.log("OPEN FILE{{ response.label_path }}")</script>
-                    <form hx-get="{{ request.url_for('open_file', filepath=response.label_path | urlencode )}}"
+                    <form hx-get="{{ request.url_for('open_file', filepath = response.label_path| urlencode ) }}"
                             {#                    <form hx-get="{{ request.url_for('open_file') ~ '?filepath=' ~ response.label_path | urlencode }}"#}
                           hx-target="#open-btn"
                           hx-swap="afterbegin">

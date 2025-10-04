@@ -1,27 +1,23 @@
+from apc_hypaship.models.response.resp import BookingResponse
+
 from shipaw.fapi.alerts import Alerts, Alert
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.shipment import Shipment as ShipmentAgnost
 
 
-def booking_has_errors(res_json: dict):
-    if messages := res_json.get('Orders').get('Order').get('Messages'):
-        return 'ErrorFields' in messages.keys()
-    return False
-
-
-def errored_booking(shipment: ShipmentAgnost, res_json: dict):
-    messages = res_json.get('Orders').get('Order').get('Messages')
+def errored_booking(shipment: ShipmentAgnost, response: BookingResponse):
+    messages = response.orders.order.messages
     fieldname, message = strip_apc_error_msgs(messages)
-    return errored_deets(fieldname, message, shipment, res_json)
+    return errored_response(fieldname, message, shipment, response.model_dump())
 
 
 def strip_apc_error_msgs(messages):
-    fieldname = messages['ErrorFields']['ErrorField']['FieldName']
-    message = messages['ErrorFields']['ErrorField']['ErrorMessage']
+    fieldname = messages.error_fields.error_field.field_name
+    message = messages.error_fields.error_field.error_message
     return fieldname, message
 
 
-def errored_deets(fieldname: str, message: str, shipment: ShipmentAgnost, data: dict):
+def errored_response(fieldname: str, message: str, shipment: ShipmentAgnost, data: dict):
     alerts = Alerts(alert=[Alert(message=f'Error booking shipment: {fieldname}: {message}')])
     return ShipmentBookingResponse(
         alerts=alerts,

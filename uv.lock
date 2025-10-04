@@ -35,7 +35,7 @@ wheels = [
 
 [[package]]
 name = "apc-hypaship"
-version = "0.1.3"
+version = "0.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dotenv" },
@@ -43,9 +43,9 @@ dependencies = [
     { name = "loguru" },
     { name = "pydantic-settings" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/8e/e35d10bdb1196556e8138c35ae77449090ce8583cacca1cd01aa53fd8bb2/apc_hypaship-0.1.3.tar.gz", hash = "sha256:0b3e4f3e1c73b6a4bae310934c4f8190a768f3dde9e4383bb25e273ddb49b586", size = 4976, upload-time = "2025-10-04T18:46:22.233Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/95/25/38cddaba2fe9ea50c1909a6a2920a9eac0172a849a0e232263c2568abb38/apc_hypaship-0.1.5.tar.gz", hash = "sha256:61c59df1c9836549ef22e5b4e3c3be4ad55bf39fd4cc26b3ffb115c4a2197f97", size = 5764, upload-time = "2025-10-04T23:07:30.9Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/6d/0797d745b2e37fcb163d22539ecbca97b9d594d788e12ae239e7cebfc88a/apc_hypaship-0.1.3-py3-none-any.whl", hash = "sha256:c76021a130bdcaf4e8a08f5c0eb4df0155641e90a5b264c5833604cd9fdad8b2", size = 9958, upload-time = "2025-10-04T18:46:21.195Z" },
+    { url = "https://files.pythonhosted.org/packages/71/44/6e4726f6c6cc71adfe3a47a5f95e1fd535054b012a2d99c1942bdf98eca3/apc_hypaship-0.1.5-py3-none-any.whl", hash = "sha256:eb7ba5454ff7c536b1c61b8f7db79d71c643ac6e89e2e03be2adf1593c1605b0", size = 11085, upload-time = "2025-10-04T23:07:29.842Z" },
 ]
 
 [[package]]
@@ -565,7 +565,7 @@ wheels = [
 
 [[package]]
 name = "parcelforce-expresslink"
-version = "0.1.3"
+version = "0.1.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "combadge" },
@@ -575,9 +575,9 @@ dependencies = [
     { name = "thefuzz" },
     { name = "zeep" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/02/84990b01a7133bec3259aeb94a10a4d800454fdb8514d0cce298bf829b76/parcelforce_expresslink-0.1.3.tar.gz", hash = "sha256:7a2b215e97b377639a6eb498ff44b131958b72e153054bf3efe67dca1302f6e0", size = 17461, upload-time = "2025-10-04T18:43:13.64Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/91/db/16c7468043d810035c2381a89ecd6557c825b433e5a23a28d07efa90e08f/parcelforce_expresslink-0.1.4.tar.gz", hash = "sha256:4a007bcce093777cb105cdab3ef908bf4e389936543a36fca65ed2a62619870c", size = 17466, upload-time = "2025-10-04T20:58:50.592Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/77/16a89ea336d0d65c65fbb593d9e8160b8be532262ead4bb1b3d6b1995df6/parcelforce_expresslink-0.1.3-py3-none-any.whl", hash = "sha256:6ce21f5ebb0463469df4864e7c5ba782fa785c334f539910568e78f96fe1a6b4", size = 23686, upload-time = "2025-10-04T18:43:12.501Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/1a/54ab290a1bde3a7622b1781cfbdc5698139fb0748cfb2e171e02d9610a71/parcelforce_expresslink-0.1.4-py3-none-any.whl", hash = "sha256:71fc9761cef5c6d44987a0d4837704efff3c0dea6d7b7fd9f184b5f8c6ece8b5", size = 23695, upload-time = "2025-10-04T20:58:49.789Z" },
 ]
 
 [[package]]
@@ -1013,14 +1013,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "apc-hypaship", specifier = ">=0.1.3" },
+    { name = "apc-hypaship", specifier = ">=0.1.5" },
     { name = "combadge", extras = ["zeep"], specifier = ">=4.8.2" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.117.1" },
     { name = "hatchling", specifier = ">=1.27.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "parcelforce-expresslink", specifier = ">=0.1.3" },
+    { name = "parcelforce-expresslink", specifier = ">=0.1.4" },
     { name = "pawdf", specifier = ">=0.1.0" },
     { name = "phonenumbers", specifier = ">=9.0.15" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.11.9" },

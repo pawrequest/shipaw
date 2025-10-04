@@ -40,20 +40,13 @@ class ShipmentBookingResponse(BaseResponse):
     tracking_link: str | None = None
     label_data: bytes | None = None
     label_path: Path | None = None
-    decoded: bool = False
 
     model_config = ConfigDict(json_encoders={bytes: lambda v: b64encode(v).decode('utf-8') if v else None})
 
-    @model_validator(mode='after')
-    def decode_label_data(self):
-        if isinstance(self.label_data, bytes) and not self.decoded:
-            self.label_data = b64decode(self.label_data)
-            self.decoded = True
-        return self
 
     @model_validator(mode='after')
     def get_label_path(self):
-        if self.label_path is None and self.label_data:
+        if self.label_path is None:
             folder = get_label_folder(self.shipment.direction)
             label_stem = get_label_stem(self.shipment)
             label_filepath = (folder / label_stem).with_suffix('.pdf')
