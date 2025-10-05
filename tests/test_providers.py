@@ -5,7 +5,7 @@ from shipaw.models.shipment import Shipment
 
 
 def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_shipment):
-    assert sample_remote_contact.contact_name == 'Test Contact name'
+    assert sample_remote_contact.contact_name == 'Test Remote Contact Name'
     assert sample_remote_address.postcode == 'DA16 3HU'
     assert sample_shipment.direction == ShipDirection.OUTBOUND
 

@@ -19,6 +19,7 @@ from shipaw.providers.apc.provider_funcs import (
     address_from_agnostic_fc,
     full_contact_from_apc_contact_address,
 )
+from src.apc_hypaship.models.response.common import APCException
 
 
 # @dataclass
@@ -86,9 +87,10 @@ class APCShippingProvider(ShippingProvider):
         # request_json = self.build_request_json(shipment)
         apc_ship = self.provider_shipment(shipment)
         log_obj(apc_ship, 'APC Shipment Request')
-        apc_response: BookingResponse = self.client.fetch_book_shipment(apc_ship)
-        if apc_response.has_errors:
-            return errored_booking(shipment, apc_response)
+        try:
+            apc_response: BookingResponse = self.client.fetch_book_shipment(apc_ship)
+        except APCException as e:
+            return errored_booking(shipment, e)
         response = self.build_response(apc_response, shipment)
         response.label_data = self.wait_fetch_label(response.shipment_num)
         return response
