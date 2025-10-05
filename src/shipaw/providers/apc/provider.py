@@ -19,7 +19,7 @@ from shipaw.providers.apc.provider_funcs import (
     address_from_agnostic_fc,
     full_contact_from_apc_contact_address,
 )
-from src.apc_hypaship.models.response.common import APCException
+from apc_hypaship.models.response.common import APCException
 
 
 # @dataclass
