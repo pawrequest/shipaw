@@ -979,7 +979,7 @@ wheels = [
 
 [[package]]
 name = "shipaw"
-version = "0.3.16"
+version = "0.3.17"
 source = { editable = "." }
 dependencies = [
     { name = "apc-hypaship" },
