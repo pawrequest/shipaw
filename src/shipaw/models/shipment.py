@@ -9,15 +9,15 @@ from shipaw.models.ship_types import ShipDirection
 
 class Shipment(ShipawBaseModel):
     recipient: FullContact
-    sender: FullContact | None = None  # default to account settings home address if None
+    sender: FullContact | None = None  # default to ShipawSettings.address/contact if None
 
     boxes: int = 1
     shipping_date: dt.date
     direction: ShipDirection
-
+    own_label: bool = False # print own label vs driver brings, Parcelforce Only
+    service: str = 'NEXT_DAY'
     reference: str = ''
 
-    service: str = 'NEXT_DAY'
     context: dict = Field(default_factory=dict)
 
     collect_ready: dt.time = dt.time(hour=9, minute=0)

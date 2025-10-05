@@ -8,6 +8,7 @@ from apc_hypaship.config import APCSettings
 from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
 
 from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.models.logging import ndlog_dict, log_obj
 from shipaw.models.services import Services
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
@@ -84,6 +85,7 @@ class APCShippingProvider(ShippingProvider):
         """Takes provider ShipmnentDict, or ShipmentAgnost object"""
         # request_json = self.build_request_json(shipment)
         apc_ship = self.provider_shipment(shipment)
+        log_obj(apc_ship, 'APC Shipment Request')
         apc_response: BookingResponse = self.client.fetch_book_shipment(apc_ship)
         if apc_response.has_errors:
             return errored_booking(shipment, apc_response)

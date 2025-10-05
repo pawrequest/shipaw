@@ -94,17 +94,17 @@ def join_refs(refs: dict[str, str]) -> str:
     return ''.join(refs).strip()
 
 
-def parcelforce_shipment_from_agnostic(shipment: ShipmentAgnost | dict, contract_number: str) -> ShipmentPF | dict:
-    ship_pf = ShipmentPF(
-        **ref_dict_from_str(shipment.reference),
-        recipient_contact=contact_from_agnostic_fc(ContactPF, shipment.recipient),
-        recipient_address=address_from_agnostic_fc(AddressRecipient, shipment.recipient),
-        total_number_of_parcels=shipment.boxes,
-        shipping_date=shipment.shipping_date,
-        service_code=PARCELFORCE_SERVICES.lookup(shipment.service),
-        contract_number=contract_number,
-    )
-    return shipment_directed(ship_pf)
+# def parcelforce_shipment_from_agnostic(shipment: ShipmentAgnost | dict, contract_number: str) -> ShipmentPF | dict:
+#     ship_pf = ShipmentPF(
+#         **ref_dict_from_str(shipment.reference),
+#         recipient_contact=contact_from_agnostic_fc(ContactPF, shipment.recipient),
+#         recipient_address=address_from_agnostic_fc(AddressRecipient, shipment.recipient),
+#         total_number_of_parcels=shipment.boxes,
+#         shipping_date=shipment.shipping_date,
+#         service_code=PARCELFORCE_SERVICES.lookup(shipment.service),
+#         contract_number=contract_number,
+#     )
+#     return shipment_directed(ship_pf)
 
 
 def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
@@ -167,17 +167,6 @@ def shipment_direction(shipment: ShipmentPF) -> ShipDirection:
     else:
         raise ValueError()
 
-
-def convert_shipment(shipment, direction: ShipDirection):
-    match direction:
-        case ShipDirection.OUTBOUND:
-            return shipment
-        case ShipDirection.INBOUND:
-            return shipment.to_inbound()
-        case ShipDirection.DROPOFF:
-            return shipment.to_dropoff()
-        case _:
-            raise ValueError('Invalid Ship Direction')
 
 def shipment_directed(shipment: ShipmentPF) -> ShipmentPF:
     return convert_shipment(shipment, shipment_direction(shipment))

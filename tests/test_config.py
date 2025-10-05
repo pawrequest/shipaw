@@ -6,8 +6,8 @@ from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 
 def test_settings(sample_settings):
-    assert sample_settings.provider_dict
-    pprint(sample_settings.provider_dict)
+    assert sample_settings.provider_env_dict
+    pprint(sample_settings.provider_env_dict)
 
 
 def test_provider_from_settings(sample_provider):

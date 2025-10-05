@@ -43,7 +43,7 @@ class ShipawSettings(BaseSettings):
     ui_dir: Path = Field(default_factory=get_ui)
 
     # Provider env file dict (json string in .env)
-    provider_dict: dict
+    provider_env_dict: dict
 
     # auto dirs
     static_dir: Path | None = None

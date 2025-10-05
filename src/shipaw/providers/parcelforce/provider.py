@@ -2,13 +2,19 @@ from __future__ import annotations
 
 from typing import ClassVar, override
 
-from parcelforce_expresslink.address import AddressRecipient, Contact as ContactPF
+from parcelforce_expresslink.address import AddressRecipient, Contact as ContactPF, ContactSender, AddressSender
 from parcelforce_expresslink.combadge import CreateShipmentService
 from parcelforce_expresslink.request_response import ShipmentRequest, ShipmentResponse as ShipmentResponsePF
+
 #
 from parcelforce_expresslink.config import ParcelforceSettings
 from parcelforce_expresslink.client import ParcelforceClient
-from parcelforce_expresslink.shipment import Shipment as ShipmentPF
+from parcelforce_expresslink.shipment import Shipment as ShipmentPF, collection_info_from_deets
+from parcelforce_expresslink.types import ShipmentType
+
+from shipaw.config import ShipawSettings
+from shipaw.models.logging import log_obj_text, ndlog_dict, log_obj
+from shipaw.models.ship_types import ShipDirection
 
 from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.fapi.responses import ShipmentBookingResponse
@@ -20,7 +26,7 @@ from shipaw.providers.parcelforce.provider_funcs import (
     contact_from_agnostic_fc,
     parcelforce_shipment_to_agnostic,
     ref_dict_from_str,
-    shipment_directed
+    shipment_directed,
 )
 
 
@@ -45,8 +51,7 @@ class ParcelforceShippingProvider(ShippingProvider):
         return self._client
 
     @override
-    def provider_shipment(self, shipment: Shipment) -> ShipmentPF:
-        shipment = ShipmentAgnost.model_validate(shipment)
+    def provider_shipment(self, shipment: ShipmentAgnost) -> ShipmentPF:
         ship_pf = ShipmentPF(
             **ref_dict_from_str(shipment.reference),
             recipient_contact=contact_from_agnostic_fc(ContactPF, shipment.recipient),
@@ -56,7 +61,14 @@ class ParcelforceShippingProvider(ShippingProvider):
             service_code=self.services.lookup(shipment.service),
             contract_number=self.settings.pf_contract_num_1,
         )
-        return shipment_directed(ship_pf)
+        if shipment.sender:
+            sender_contact = contact_from_agnostic_fc(ContactSender, shipment.sender)
+            sender_address = address_from_agnostic_fc(AddressSender, shipment.sender)
+            ship_pf = self.convert_shipment_deets(
+                ship_pf, sender_address, sender_contact, shipment.shipping_date, shipment.direction
+            )
+            # ship_pf = self.convert_shipment(ship_pf, shipment.direction)
+        return ship_pf
 
     @override
     def agnostic_shipment(self, shipment: ShipmentPF) -> Shipment:
@@ -65,6 +77,7 @@ class ParcelforceShippingProvider(ShippingProvider):
     def build_booking_request(self, shipment: ShipmentAgnost) -> ShipmentRequest:
         shipment_pf = self.provider_shipment(shipment)
         shipment_request_pf = ShipmentRequest(requested_shipment=shipment_pf)
+        log_obj(shipment_request_pf, 'ParcelForce Shipment Request')
         authorized_shipment = shipment_request_pf.authenticate(*self.settings.get_auth_secrets())
         return authorized_shipment
 
@@ -82,7 +95,7 @@ class ParcelforceShippingProvider(ShippingProvider):
             data=pf_response.model_dump(),
             status=pf_response.status,
             success=pf_response.success,
-            label_data=self.fetch_label_content(pf_response.shipment_num),
+            # label_data=self.fetch_label_content(pf_response.shipment_num),
         )
 
     def make_pf_book_request(self, ship_req):
@@ -94,4 +107,26 @@ class ParcelforceShippingProvider(ShippingProvider):
     @override
     def fetch_label_content(self, shipment_num: str) -> bytes:
         return self.client.get_label_content(shipment_num)
+
+    def convert_shipment(self, shipment, direction: ShipDirection):
+        if direction == ShipDirection.INBOUND:
+            shipment.shipment_type = ShipmentType.COLLECTION
+            shipment.collection_info = collection_info_from_deets(
+                address=shipment.sender_address,
+                contact=shipment.sender_contact,
+                shipping_date=shipment.shipping_date,
+            )
+        return shipment
+
+    def convert_shipment_deets(self, shipment, sender_address, sender_contact, shipping_date, direction: ShipDirection):
+        if direction == ShipDirection.INBOUND:
+            shipment.shipment_type = ShipmentType.COLLECTION
+            shipment.collection_info = collection_info_from_deets(
+                address=sender_address,
+                contact=sender_contact,
+                shipping_date=shipping_date,
+            )
+            # shipment.print_own_label=True
+        return shipment
+
 

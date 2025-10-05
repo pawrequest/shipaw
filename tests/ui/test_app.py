@@ -17,6 +17,7 @@ def test_form_route_json(test_client, sample_shipment):
     respy = ShipawTemplateResponse(**resp_json)
     assert respy.template.template_path == 'shipping_form_container.html'
     assert 'shipment' in respy.template.context
+    assert not respy.alerts.errors
 
 
 def test_form_route_html(test_client, sample_shipment, tmp_path):

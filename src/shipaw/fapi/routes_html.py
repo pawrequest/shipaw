@@ -13,9 +13,9 @@ from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_j
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment, sample_shipment
 from shipaw.fapi.routes_api import (
-    order_results as order_confirm_json,
-    order_summary as order_review_json,
-    ship_form as ship_form_json,
+    order_results_api as order_confirm_json,
+    order_summary_api as order_review_json,
+    shipping_form_api as ship_form_json,
 )
 
 router = APIRouter()

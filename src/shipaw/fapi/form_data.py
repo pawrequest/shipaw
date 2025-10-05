@@ -5,6 +5,7 @@ from datetime import date, time
 
 from fastapi import Depends, Form
 from loguru import logger
+
 # from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
 
@@ -36,7 +37,7 @@ async def full_contact_form(
         contact=Contact(
             contact_name=contact_name,
             email_address=email_address,
-            mobile_phone=mobile_phone,
+            mobile_phone=mobile_phone.strip().replace(' ', ''),
         ),
     )
 
@@ -51,6 +52,7 @@ async def shipment_f_form(
     context_json: str = Form(...),
     collect_ready: int = Form(...),
     collect_closed: int = Form(...),
+    own_label: bool = Form(True),
 ) -> Shipment:
     collect_ready = time(hour=collect_ready)
     collect_closed = time(hour=collect_closed)
@@ -77,12 +79,14 @@ async def shipment_f_form(
         context=context,
         collect_ready=collect_ready,
         collect_closed=collect_closed,
+        own_label=own_label,
     )
     return shipment
 
 
 async def shipment_request_form(
-    shipment: Shipment = Depends(shipment_f_form), provider_name: str = Form(...)
+    shipment: Shipment = Depends(shipment_f_form),
+    provider_name: str = Form(...),
 ) -> ShipmentRequest:
     return ShipmentRequest(
         shipment=shipment,

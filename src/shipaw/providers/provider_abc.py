@@ -35,7 +35,7 @@ class ShippingProvider(ABC, ShipawBaseModel):
     @classmethod
     def from_env_settings(cls, shipaw_settings=None) -> Self:
         shipaw_settings = shipaw_settings or ShipawSettings.from_env('SHIPAW_ENV')
-        env_file = shipaw_settings.provider_dict.get(cls.name)
+        env_file = shipaw_settings.provider_env_dict.get(cls.name)
         provider_settings = cls.settings_type(_env_file=env_file)
         return cls(settings=provider_settings)
 
@@ -72,6 +72,18 @@ class ShippingProvider(ABC, ShipawBaseModel):
     #         logger.exception(f'Error getting or writing label data: {e}')
 
     def wait_fetch_label(self, shipment_num: str) -> bytes:
+        for i in range(10):
+            try:
+                time.sleep(1)
+                label_data = self.fetch_label_content(shipment_num=shipment_num)
+                assert label_data is not None
+                return label_data
+            except AssertionError as e:
+                print(f'Label not ready yet for {shipment_num}, retrying...')
+        raise RuntimeError(f'Label not ready after retries for {shipment_num}')
+
+
+    async def wait_fetch_label_as(self, shipment_num: str) -> bytes:
         for i in range(10):
             try:
                 time.sleep(1)

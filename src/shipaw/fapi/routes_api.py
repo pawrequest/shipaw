@@ -7,22 +7,19 @@ from loguru import logger
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-from parcelforce_expresslink.address import AddressChoice as AddressChoicePF, Contact as ContactPF
 
 from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
-from shipaw.fapi.backend import try_book_shipment, try_get_write_label
+from shipaw.fapi.backend import try_book_shipment, try_get_write_label, maybe_alert_apc, convert_choice
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.logging import log_obj
-from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
 from shipaw.providers.parcelforce.provider_funcs import (
     address_from_agnostic,
-    full_contact_from_provider_contact_address,
 )
 from shipaw.providers.registry import PROVIDER_REGISTER
 
@@ -31,7 +28,7 @@ router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().stat
 
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
-async def ship_form(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
+async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
     log_obj(shipment, 'Shipment received at /ship_form:')
     alerts: Alerts = request.app.alerts
 
@@ -52,7 +49,7 @@ async def ship_form(request: Request, shipment: Shipment = Body(...)) -> ShipawT
 
 
 @router.post('/order_summary', response_model=ShipawTemplateResponse)
-async def order_summary(
+async def order_summary_api(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
@@ -68,22 +65,23 @@ async def order_summary(
     )
 
 
-async def maybe_alert_apc(shipment_request):
-    alerts = Alerts.empty()
-    if shipment_request.provider_name == 'APC' and shipment_request.shipment.direction == ShipDirection.DROPOFF:
-        alerts += Alert(
-            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
-            type=AlertType.ERROR,
-        )
-    return alerts
-
-
 @router.post('/order_results', response_model=ShipawTemplateResponse)
-async def order_results(
+async def order_results_api(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
+    await try_get_write_label(shipment_request, shipment_response)
+
+    if shipment_response.alerts.errors:
+        log_obj(shipment_response.alerts, 'Errors booking shipment:')
+        alerts = shipment_response.alerts
+        shipment_response.template = ShipawTemplate(
+            template_path='/alerts.html',
+            context={'alerts': alerts},
+        )
+        return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
+
     log_obj(shipment_response, 'Shipment Booked')
     await try_get_write_label(shipment_request, shipment_response)
 
@@ -98,7 +96,7 @@ async def order_results(
 
 
 @router.post('/addr_choices', response_model=list[AddressChoiceAgnost], response_class=JSONResponse)
-async def get_addr_choices(
+async def get_addr_choices_api(
     request: Request,
     body: AddressRequest = Body(...),
 ) -> list[AddressChoiceAgnost]:
@@ -131,10 +129,5 @@ async def get_addr_choices(
         addr = Address(address_lines=['ERROR:', str(e)], town='Error', postcode='Error', business_name='Error')
         chc = AddressChoiceAgnost(address=addr, score=0)
         return [chc]
-
-
-async def convert_choice(choice: AddressChoicePF) -> AddressChoiceAgnost:
-    fc = full_contact_from_provider_contact_address(contact=ContactPF.empty(), address=choice.address)
-    return AddressChoiceAgnost(address=fc.address, score=choice.score)
 
 
