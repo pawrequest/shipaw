@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-from typing import override, cast
+from typing import override
 
-from parcelforce_expresslink.address import AddressBase, AddressRecipient, Contact as ContactPF
+from parcelforce_expresslink.address import (
+    AddressBase,
+    AddressRecipient,
+    Contact as ContactPF,
+    ContactSender,
+    AddressSender,
+)
 from parcelforce_expresslink.services import ServiceCode
 from parcelforce_expresslink.shipment import Shipment as ShipmentPF
-from parcelforce_expresslink.types import ShipmentType
 
 from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.services import Services
@@ -89,24 +94,6 @@ def ref_dict_from_str(ref_string: str) -> dict[str, str]:
     return ref_nums
 
 
-def join_refs(refs: dict[str, str]) -> str:
-    refs = [refs.get(f'reference_number{i+1}', '') for i in range(len(refs))]
-    return ''.join(refs).strip()
-
-
-# def parcelforce_shipment_from_agnostic(shipment: ShipmentAgnost | dict, contract_number: str) -> ShipmentPF | dict:
-#     ship_pf = ShipmentPF(
-#         **ref_dict_from_str(shipment.reference),
-#         recipient_contact=contact_from_agnostic_fc(ContactPF, shipment.recipient),
-#         recipient_address=address_from_agnostic_fc(AddressRecipient, shipment.recipient),
-#         total_number_of_parcels=shipment.boxes,
-#         shipping_date=shipment.shipping_date,
-#         service_code=PARCELFORCE_SERVICES.lookup(shipment.service),
-#         contract_number=contract_number,
-#     )
-#     return shipment_directed(ship_pf)
-
-
 def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
     return ShipmentAgnost(
         recipient=full_contact_from_provider_contact_address(shipment.recipient_contact, shipment.recipient_address),
@@ -115,7 +102,7 @@ def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
         else None,
         boxes=shipment.total_number_of_parcels,
         shipping_date=shipment.shipping_date,
-        direction=shipment_direction(shipment),
+        direction=shipment.direction,
         reference=', '.join(
             filter(
                 None,
@@ -131,42 +118,21 @@ def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
     )
 
 
-# def book_shipment(shipment: ShipmentAgnost) -> ShipmentBookingResponse:
-#     shipment_pf = parcelforce_shipment_from_agnostic(shipment)
-#     shipment_request_pf = ShipmentRequest(requested_shipment=shipment_pf)
-#
-#     el_client = ParcelforceClient.from_env()
-#     authorized_shipment = shipment_request_pf.authenticate_from_settings()
-#     ship_req = authorized_shipment.model_dump(by_alias=True)
-#
-#     back = el_client.backend(CreateShipmentService)
-#     pf_response: ShipmentResponse = back.createshipment(request=ship_req)
-#     pf_response.handle_errors()
-#
-#     resp_agnost = ShipmentBookingResponse(
-#         shipment=shipment,
-#         shipment_num=pf_response.shipment_num,
-#         tracking_link=pf_response.tracking_link(),
-#         data=pf_response.model_dump(),
-#         status=pf_response.status,
-#         success=pf_response.success,
-#         label_data=el_client.get_label_content(pf_response.shipment_num),
-#     )
-#
-#     return resp_agnost
+def add_sender(ship_pf, shipment):
+    ship_pf.sender_contact = contact_from_agnostic_fc(ContactSender, shipment.sender)
+    ship_pf.sender_address = address_from_agnostic_fc(AddressSender, shipment.sender)
 
 
-def shipment_direction(shipment: ShipmentPF) -> ShipDirection:
-    if shipment.shipment_type == ShipmentType.DELIVERY:
-        if shipment.sender_address is None:
-            return ShipDirection.OUTBOUND
-        else:
-            return ShipDirection.DROPOFF
-    elif shipment.shipment_type == ShipmentType.COLLECTION:
-        return ShipDirection.INBOUND
-    else:
-        raise ValueError()
+def convert_shipment_by_direction(ship_pf: ShipmentPF, shipment: ShipmentAgnost):
+    if shipment.direction == ShipDirection.OUTBOUND:
+        return
+    add_sender(ship_pf, shipment)  # make dropoff
+    if shipment.direction == ShipDirection.INBOUND:
+        ship_pf.change_sender_to_collection()  # make inbound collection
 
 
-def shipment_directed(shipment: ShipmentPF) -> ShipmentPF:
-    return convert_shipment(shipment, shipment_direction(shipment))
+def join_refs(refs: dict[str, str]) -> str:
+    refs = [refs.get(f'reference_number{i+1}', '') for i in range(len(refs))]
+    return ''.join(refs).strip()
+
+

@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 import re
-from enum import StrEnum
 import datetime as dt
 from typing import Annotated
 
 import phonenumbers
 from loguru import logger
-from pydantic import ValidationError, AfterValidator, BeforeValidator, Field
+from parcelforce_expresslink.shipment import ShipDirection
+from pydantic import AfterValidator, BeforeValidator, Field, ValidationError
 
-
-class ShipDirection(StrEnum):
-    INBOUND = 'in'
-    OUTBOUND = 'out'
-    DROPOFF = 'dropoff'
-
+#
+# class ShipDirection(StrEnum):
+#     INBOUND = 'in'
+#     OUTBOUND = 'out'
+#     DROPOFF = 'dropoff'
 
 TOD = dt.date.today()
 COLLECTION_CUTOFF = dt.time(23, 59, 59)
@@ -70,3 +69,6 @@ VALID_POSTCODE = Annotated[
     BeforeValidator(lambda s: s.strip().upper()),
     Field(..., description='A valid UK postcode'),
 ]
+
+
+__all__ = ['ShipDirection']

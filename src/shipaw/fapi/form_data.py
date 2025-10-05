@@ -60,11 +60,13 @@ async def shipment_f_form(
     logger.info('Creating Shipment Request from form')
 
     if direction == ShipDirection.OUTBOUND:
-        recipient = full_contact
         sender = None
+        recipient = full_contact
+        own_label = None
     elif direction in {ShipDirection.INBOUND, ShipDirection.DROPOFF}:
-        recipient = ShipawSettings.from_env().full_contact
         sender = full_contact
+        recipient = ShipawSettings.from_env().full_contact
+        own_label = own_label
     else:
         raise ValueError(f'Unknown direction: {direction}')
 

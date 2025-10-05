@@ -35,57 +35,96 @@ def sample_provider(sample_settings, request):
 
 
 @pytest.fixture
-def sample_contact():
+def sample_remote_contact():
     yield Contact(
-        contact_name='Test Contact name',
+        contact_name='Test Remote Contact Name',
         mobile_phone='07666666666',
-        email_address='dsvkndslvn@dzv.com',
+        email_address='remote@dzv.com',
     )
 
 
 @pytest.fixture
-def sample_address():
+def sample_remote_address():
     yield Address(
         postcode='DA16 3HU',
-        address_lines=['25 Bennet Close'],
+        address_lines=['25 Remote Street'],
         town='Welling',
         country='GB',
-        business_name='Test Company',
+        business_name='Remote Company',
     )
 
 
 @pytest.fixture
-def sample_full_contact(sample_contact, sample_address):
+def sample_remote_fc(sample_remote_contact, sample_remote_address):
     yield FullContact(
-        contact=sample_contact,
-        address=sample_address,
+        contact=sample_remote_contact,
+        address=sample_remote_address,
     )
 
 
 @pytest.fixture
-def sample_shipment(sample_full_contact):
+def sample_home_contact():
+    yield Contact(
+        contact_name='Home Contact name',
+        mobile_phone='07555555555',
+        email_address='home@sdagfdasg.com',
+    )
+
+
+@pytest.fixture
+def sample_home_address():
+    yield Address(
+        postcode='W1A 1AA',
+        address_lines=['1 Home Street'],
+        town='London',
+        country='GB',
+        business_name='Home Company',
+    )
+
+
+@pytest.fixture
+def sample_full_home_contact(sample_home_contact, sample_home_address):
+    yield FullContact(
+        contact=sample_home_contact,
+        address=sample_home_address,
+    )
+
+
+@pytest.fixture
+def sample_shipment(sample_remote_fc):
     yield Shipment(
-        recipient=sample_full_contact,
+        recipient=sample_remote_fc,
         boxes=2,
         shipping_date=TEST_DATE,
         direction=ShipDirection.OUTBOUND,
-        reference='Test Reference',
+        reference='Test Reference outbound',
         service='NEXT_DAY',
     )
 
 
-# @pytest.fixture(params=[_ for _ in PROVIDER_REGISTER.values()], ids=[_ for _ in PROVIDER_REGISTER.keys()])
-# def provider_type(request) -> type[ShippingProvider]:
-#     return request.param
+@pytest.fixture
+def sample_shipment_inbound(sample_remote_fc, sample_full_home_contact):
+    return Shipment(
+        sender=sample_remote_fc,
+        recipient=sample_full_home_contact,
+        boxes=1,
+        shipping_date=TEST_DATE,
+        direction=ShipDirection.INBOUND,
+        reference='Test Inbound Reference',
+        service='NEXT_DAY',
+        own_label=True,
+    )
 
 
-# @pytest.fixture
-# def provider(provider_type) -> ShippingProvider:
-#     return provider_type()
+@pytest.fixture
+def sample_shipment_dropoff(sample_shipment_inbound):
+    dropoff = sample_shipment_inbound.model_copy()
+    dropoff.direction = ShipDirection.DROPOFF
+    dropoff.reference = 'Test Dropoff Reference'
+    dropoff.own_label = None
+    return dropoff
 
 
-# @pytest.fixture
-# def sample_shipment_dicts(sample_shipment, request, provider):
-#     res = provider.provider_shipment(sample_shipment)
-#     res = res.model_dump()
-#     return res, provider
+@pytest.fixture(params=['sample_shipment', 'sample_shipment_inbound', 'sample_shipment_dropoff'], ids=lambda val: val)
+def all_sample_shipments(request):
+    return request.getfixturevalue(request.param)

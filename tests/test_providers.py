@@ -1,28 +1,26 @@
 from conftest import sample_provider
-from shipaw.providers.provider_abc import ShippingProvider
-from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
 
-def test_sample_fixtures(sample_contact, sample_address, sample_shipment):
-    assert sample_contact.contact_name == 'Test Contact name'
-    assert sample_address.postcode == 'DA16 3HU'
+def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_shipment):
+    assert sample_remote_contact.contact_name == 'Test Contact name'
+    assert sample_remote_address.postcode == 'DA16 3HU'
     assert sample_shipment.direction == ShipDirection.OUTBOUND
 
 
-def test_provider_makes_ship_dict(sample_shipment: Shipment, sample_provider):
-    ship = sample_provider.provider_shipment(sample_shipment)
+def test_provider_makes_ship_dict(all_sample_shipments: Shipment, sample_provider):
+    ship = sample_provider.provider_shipment(all_sample_shipments)
     ship = ship.model_dump(by_alias=True)
     assert isinstance(ship, dict)
 
 
-def test_provider_books_shipment(sample_shipment, sample_provider):
-    response = sample_provider.book_shipment(sample_shipment)
+def test_provider_books_shipment(all_sample_shipments, sample_provider):
+    response = sample_provider.book_shipment(all_sample_shipments)
     assert isinstance(response, ShipmentBookingResponse)
     assert response.shipment_num
-    assert response.label_data
+    assert response.success
 
 
 def test_provider_converts_shiments(sample_shipment: Shipment, sample_provider):
