@@ -11,10 +11,10 @@ from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
+from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.ship_types import ShipDirection
-from shipaw.fapi.ui_funcs import sanitise_id, ordinal_dt, get_ui
 
 
 def get_path_from_environment(env_key: str) -> Path:
@@ -102,14 +102,16 @@ class ShipawSettings(BaseSettings):
 
     @_p.field_validator('label_dir', mode='after')
     def create_label_dirs(cls, v, values):
+        # todo bad path crashes progqram - try/except + fallback label path?
         directions = [_ for _ in ShipDirection]
-        for subdir in directions:
-            apath = v / subdir
-            if not apath.exists():
-                apath.mkdir(parents=True, exist_ok=True)
+        try:
+            make_label_dirs(directions, v)
+        except FileNotFoundError as e:
+            v = Path.home() / 'Shipping Labels'
+            make_label_dirs(directions, v)
         return v
 
-    ## SET ADDRESS/CONTACT OBJECTS ##
+    # SET ADDRESS/CONTACT OBJECTS #
     @property
     def contact(self):
         return Contact(
@@ -135,3 +137,9 @@ class ShipawSettings(BaseSettings):
             contact=self.contact,
         )
 
+
+def make_label_dirs(directions, v):
+    for direction in directions:
+        apath = v / direction
+        if not apath.exists():
+            apath.mkdir(parents=True, exist_ok=True)
