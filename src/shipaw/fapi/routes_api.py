@@ -10,7 +10,7 @@ from starlette.staticfiles import StaticFiles
 
 from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
-from shipaw.fapi.backend import try_book_shipment, try_get_write_label, maybe_alert_apc, convert_choice
+from shipaw.fapi.backend import convert_choice, maybe_alert_apc, try_book_shipment, try_get_write_label
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
@@ -21,7 +21,7 @@ from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
 from shipaw.providers.parcelforce.provider_funcs import (
     address_from_agnostic,
 )
-from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 router = APIRouter()
 router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
@@ -107,7 +107,9 @@ async def get_addr_choices_api(
         request: Request - FastAPI request object
         body: Address - request body containing postcode and optional address
     """
-    p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, PROVIDER_REGISTER['PARCELFORCE'])
+    p: ParcelforceShippingProvider = cast(
+        ParcelforceShippingProvider, PROVIDER_TYPE_REGISTER['PARCELFORCE'].from_env_settings()
+    )
     client = p.client
     postcode = body.postcode
     address_agnost = body.address

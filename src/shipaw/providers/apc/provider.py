@@ -2,24 +2,24 @@ from base64 import b64decode
 from typing import ClassVar, override
 
 from apc_hypaship.apc_client import APCClient
-from apc_hypaship.models.request.address import Address
-from apc_hypaship.models.response.resp import BookingResponse
 from apc_hypaship.config import APCSettings
+from apc_hypaship.models.request.address import Address
 from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
+from apc_hypaship.models.response.common import APCException
+from apc_hypaship.models.response.resp import BookingResponse
 
 from shipaw.fapi.responses import ShipmentBookingResponse
-from shipaw.models.logging import ndlog_dict, log_obj
+from shipaw.models.logging import log_obj
 from shipaw.models.services import Services
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
-from shipaw.providers.apc.response import errored_booking
-from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.providers.apc.provider_funcs import (
     APC_SERVICES,
     address_from_agnostic_fc,
     full_contact_from_apc_contact_address,
 )
-from apc_hypaship.models.response.common import APCException
+from shipaw.providers.apc.response import errored_booking
+from shipaw.providers.provider_abc import ShippingProvider
 
 
 # @dataclass
