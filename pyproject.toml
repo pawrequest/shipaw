@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "shipaw"
-version = "0.3.18"
+version = "0.3.19"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -14,8 +14,8 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
-    "apc-hypaship>=0.1.6",
-    "parcelforce-expresslink>=0.1.6",
+    "apc-hypaship>=0.1.7",
+    "parcelforce-expresslink>=0.1.7",
     "pawdf>=0.1.0",
     #
     "httpx>=0.28.1",
