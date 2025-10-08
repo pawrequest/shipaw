@@ -1,13 +1,3 @@
-import webbrowser
-
-
-# def do_track():
-#     consignmentnum = 39
-#     postcode = 'TF1 2NP'
-#     url = r'https://apcchoice.apc-overnight.com/APCChoice'
-#
-
-
 import requests
 import webbrowser
 import tempfile
