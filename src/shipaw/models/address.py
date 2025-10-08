@@ -1,4 +1,4 @@
-from pydantic import conlist, constr, field_validator, EmailStr, model_validator
+from pydantic import EmailStr, conlist, constr, field_validator, model_validator
 
 from shipaw.models.base import ShipawBaseModel
 
@@ -14,6 +14,10 @@ class Contact(ShipawBaseModel):
         if not self.phone_number:
             self.phone_number = self.mobile_phone
         return self
+
+    @field_validator('mobile_phone', mode='after')
+    def clean_mobile_phone(cls, v):
+        return v.replace(' ', '').replace('-', '')
 
 
 class Address(ShipawBaseModel):
