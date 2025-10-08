@@ -43,7 +43,6 @@ class ShipmentBookingResponse(BaseResponse):
 
     model_config = ConfigDict(json_encoders={bytes: lambda v: b64encode(v).decode('utf-8') if v else None})
 
-
     @model_validator(mode='after')
     def get_label_path(self):
         if self.label_path is None:
