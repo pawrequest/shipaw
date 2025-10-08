@@ -1,22 +1,26 @@
 import os
 from functools import wraps
+from pathlib import Path
+from urllib.parse import unquote
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Form
 from fastapi.params import Depends
+from loguru import logger
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
 from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alerts
-from shipaw.fapi.responses import ShipawTemplateResponse
+from shipaw.fapi.emailer import send_label_email
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.shipment import Shipment, sample_shipment
+from shipaw.fapi.responses import ShipawTemplateResponse
 from shipaw.fapi.routes_api import (
     order_results_api as order_confirm_json,
     order_summary_api as order_review_json,
     shipping_form_api as ship_form_json,
 )
+from shipaw.models.shipment import Shipment, sample_shipment
 
 router = APIRouter()
 
@@ -98,4 +102,14 @@ async def open_file(filepath: str):
 @router.get('/print-file/{filepath}', response_class=HTMLResponse)
 async def print_file(filepath: str):
     os.startfile(filepath, 'print')
+    return HTMLResponse(content=f'<span>Re</span>')
+
+
+@router.post('/email-label', response_class=HTMLResponse)
+async def email_label(
+    label_path: str = Form(...), shipment_request: ShipmentRequest = Depends(shipment_request_form_json)
+):
+    label_path = Path(unquote(label_path))
+    logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email_address}')
+    await send_label_email(shipment_request, label_path)
     return HTMLResponse(content=f'<span>Re</span>')

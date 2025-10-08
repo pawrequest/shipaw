@@ -28,25 +28,25 @@
                 <div class="label-action">
                     <script>console.log("OPEN FILE{{ response.label_path }}")</script>
                     <form hx-get="{{ request.url_for('open_file', filepath = response.label_path| urlencode ) }}"
-                            {#                    <form hx-get="{{ request.url_for('open_file') ~ '?filepath=' ~ response.label_path | urlencode }}"#}
                           hx-target="#open-btn"
                           hx-swap="afterbegin">
                         <button type="submit" id="open-btn" class="btn-print-label">Open Label</button>
                     </form>
                 </div>
 
-                {#                <div class="label-action">#}
-                {#                    <script>console.log("Email Label{{ response.label_path }}")</script>#}
-                {#                    <form hx-post="email_label/"#}
-                {#                          hx-target="#email-btn"#}
-                {#                          hx-swap="afterbegin">#}
-                {#                        <input type="hidden" name="shipment_json" value="{{ response.shipment.model_dump_json() }}">#}
-                {#                        <input type="hidden" name="label" value="{{ response.label_path }}">#}
-                {#                        <button type="submit" id="email-btn" class="btn-print-label">Email Label</button>#}
-                {##}
-                {##}
-                {#                    </form>#}
-                {#                </div>#}
+                <div class="label-action">
+                    <script>console.log("Email Label {{ response.label_path }}")</script>
+                    <form hx-post="{{ request.url_for("email_label") }}"
+                          hx-target="#email-btn"
+                          hx-swap="afterbegin">
+                        <input type="hidden" name="label_path" value="{{ response.label_path | urlencode }}">
+                        <input type="hidden" name="shipment_request_json"
+                               value="{{ shipment_request.model_dump_json() }}">
+                        <button type="submit" id="email-btn" class="btn-print-label">Email Label</button>
+
+
+                    </form>
+                </div>
             </div>
         </div>
     {% else %}

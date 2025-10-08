@@ -74,13 +74,7 @@ async def order_results_api(
     await try_get_write_label(shipment_request, shipment_response)
 
     if shipment_response.alerts.errors:
-        log_obj(shipment_response.alerts, 'Errors booking shipment:')
-        alerts = shipment_response.alerts
-        shipment_response.template = ShipawTemplate(
-            template_path='/alerts.html',
-            context={'alerts': alerts},
-        )
-        return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
+        return await errored_shipment(shipment_response)
 
     log_obj(shipment_response, 'Shipment Booked')
     await try_get_write_label(shipment_request, shipment_response)
@@ -90,7 +84,17 @@ async def order_results_api(
 
     shipment_response.template = ShipawTemplate(
         template_path='/order_results.html',
-        context={'response': shipment_response},
+        context={'shipment_request': shipment_request, 'response': shipment_response},
+    )
+    return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
+
+
+async def errored_shipment(shipment_response):
+    log_obj(shipment_response.alerts, 'Errors booking shipment:')
+    alerts = shipment_response.alerts
+    shipment_response.template = ShipawTemplate(
+        template_path='/alerts.html',
+        context={'alerts': alerts},
     )
     return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
 
