@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import re
 import datetime as dt
+from enum import StrEnum
 from typing import Annotated
 
 import phonenumbers
 from loguru import logger
-from parcelforce_expresslink.shipment import ShipDirection
 from pydantic import AfterValidator, BeforeValidator, Field, ValidationError
 
 #
@@ -71,4 +71,7 @@ VALID_POSTCODE = Annotated[
 ]
 
 
-__all__ = ['ShipDirection']
+class ShipDirection(StrEnum):
+    INBOUND = 'in'
+    OUTBOUND = 'out'
+    DROPOFF = 'dropoff'

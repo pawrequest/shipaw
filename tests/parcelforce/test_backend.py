@@ -1,14 +1,8 @@
-from parcelforce_expresslink.address import (
-    AddressCollection,
-    ContactCollection,
-    AddressSender,
-    ContactSender,
-    AddressRecipient,
-    Contact,
-)
-from parcelforce_expresslink.shared import DateTimeRange
-from parcelforce_expresslink.top import CollectionInfo
-from parcelforce_expresslink.types import ShipmentType
+from parcelforce_expresslink.models.address import AddressCollection, AddressSender, AddressRecipient
+from parcelforce_expresslink.models.base import DateTimeRange
+from parcelforce_expresslink.models.contact import ContactCollection, ContactSender, Contact
+from parcelforce_expresslink.models.delivery_collection import CollectionInfo
+from parcelforce_expresslink.models.shipment import ShipmentType
 
 
 def test_parcelforce_shipment_direction(sample_shipment, sample_parcelforce_provider):

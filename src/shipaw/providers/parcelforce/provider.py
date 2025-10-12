@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from typing import ClassVar, override
 
-from parcelforce_expresslink.address import (
+from parcelforce_expresslink.models.address import (
     AddressRecipient,
-    Contact as ContactPF,
 )
-from parcelforce_expresslink.combadge import CreateShipmentService
-from parcelforce_expresslink.request_response import ShipmentRequest, ShipmentResponse as ShipmentResponsePF
+from parcelforce_expresslink.models.contact import Contact as ContactPF
+from parcelforce_expresslink.client.combadge import CreateShipmentService
+from parcelforce_expresslink.client.request_response import ShipmentRequest, ShipmentResponse as ShipmentResponsePF
 #
 from parcelforce_expresslink.config import ParcelforceSettings
-from parcelforce_expresslink.client import ParcelforceClient
-from parcelforce_expresslink.shipment import Shipment as ShipmentPF
+from parcelforce_expresslink.expresslink_client import ParcelforceClient
+from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 
 from shipaw.models.logging import log_obj
 from shipaw.providers.provider_abc import ShippingProvider

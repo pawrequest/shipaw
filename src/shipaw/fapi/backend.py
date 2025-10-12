@@ -1,7 +1,8 @@
 from apc_hypaship.error import apc_http_status_alerts
 from httpx import HTTPStatusError
 from loguru import logger
-from parcelforce_expresslink.address import AddressChoice as AddressChoicePF, Contact as ContactPF
+from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
+from parcelforce_expresslink.models.contact import Contact as ContactPF
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse

@@ -13,8 +13,8 @@ from starlette.templating import Jinja2Templates
 
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.ship_types import ShipDirection
 from shipaw.fapi.ui_funcs import sanitise_id, ordinal_dt, get_ui
+from shipaw.models.ship_types import ShipDirection
 
 
 def get_path_from_environment(env_key: str) -> Path:

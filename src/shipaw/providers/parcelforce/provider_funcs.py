@@ -2,15 +2,10 @@ from __future__ import annotations
 
 from typing import override
 
-from parcelforce_expresslink.address import (
-    AddressBase,
-    AddressRecipient,
-    Contact as ContactPF,
-    ContactSender,
-    AddressSender,
-)
-from parcelforce_expresslink.services import ServiceCode
-from parcelforce_expresslink.shipment import Shipment as ShipmentPF
+from parcelforce_expresslink.models.address import AddressBase, AddressRecipient, AddressSender
+from parcelforce_expresslink.models.contact import Contact as ContactPF, ContactSender
+from parcelforce_expresslink.models.services import ServiceCode
+from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 
 from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.services import Services
