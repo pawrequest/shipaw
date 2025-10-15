@@ -1,7 +1,12 @@
+from typing import ClassVar
+
 from pydantic import BaseModel
 
+from royal_mail_click_and_drop.config import RoyalMailSettings
 from royal_mail_click_and_drop.models.address import AddressRequest as AddressRM, RecipientDetailsRequest as ContactRM
 from royal_mail_click_and_drop.models.create_orders_request import CreateOrderRequest
+from royal_mail_click_and_drop.v2.client import RoyalMailClient
+from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.services import Services
 from shipaw.models.shipment import Shipment
@@ -74,15 +79,31 @@ def shipment_from_rm(shipment: CreateOrderRequest) -> Shipment:
 
 
 class RoyalMailProvider(ShippingProvider):
-    name: str = 'ROYAL_MAIL'
+    name: ClassVar[str] = 'ROYAL_MAIL'
     services = SERVICES_PLACEHOLDER
+    settings_type: ClassVar[type[RoyalMailSettings]] = RoyalMailSettings
+    settings: RoyalMailSettings
+    _client: RoyalMailClient | None = None
 
-    def provider_shipment(self, shipment: Shipment) -> BaseModel:
-        pass
+    def is_sandbox(self) -> bool:
+        return False
+
+    @property
+    def client(self) -> RoyalMailClient:
+        if self._client is None:
+            if self.settings is None:
+                raise ValueError('Settings must be set before using the client')
+            self._client = RoyalMailClient(config=self.settings.config)
+        return self._client
+
+    def provider_shipment(self, shipment: Shipment) -> CreateOrderRequest:
+        raise NotImplementedError("provider_shipment method is not implemented yet.")
 
     def agnostic_shipment(self, shipment: BaseModel) -> Shipment:
-        pass
+        raise NotImplementedError("agnostic_shipment method is not implemented yet.")
 
-    def book_shipment(self, shipment: dict | Shipment) -> 'ShipmentBookingResponseAgnost': ...
+    def book_shipment(self, shipment: dict | Shipment) -> ShipmentBookingResponse:
+        raise NotImplementedError("book_shipment method is not implemented yet.")
 
-    def fetch_label_content(self, shipment_num: str) -> bytes: ...
+    def fetch_label_content(self, shipment_num: str) -> bytes:
+        raise NotImplementedError("fetch_label_content method is not implemented yet.")
