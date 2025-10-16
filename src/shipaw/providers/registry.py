@@ -5,6 +5,7 @@ from shipaw.providers.apc.provider import APCShippingProvider
 PROVIDER_TYPE_REGISTER: dict[str, type[ShippingProvider]] = {
     'APC': APCShippingProvider,
     'PARCELFORCE': ParcelforceShippingProvider,
+    'ROYAL_MAIL': RoyalMailProvider,
 }
 #
 # PROVIDER_REGISTER: dict[str, ShippingProvider] = {

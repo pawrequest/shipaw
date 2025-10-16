@@ -14,29 +14,27 @@ if TEST_DATE.weekday() in (5, 6):
 
 
 @pytest.fixture
-def sample_settings():
-    return ShipawSettings(_env_file=r'C:\prdev\envs\amdev\sandbox\shipaw.env')
-
-
-@pytest.fixture
 def sample_settings_rm():
     return ShipawSettings(_env_file=r'C:\prdev\envs\amdev\with_rm.env')
 
 
 @pytest.fixture(
     params=[
-        ('APC', PROVIDER_TYPE_REGISTER['APC']),
-        ('PARCELFORCE', PROVIDER_TYPE_REGISTER['PARCELFORCE']),
+        ('ROYAL_MAIL', PROVIDER_TYPE_REGISTER['ROYAL_MAIL']),
     ],
     ids=lambda val: val[0],
 )
-def sample_provider(sample_settings, request):
+def sample_provider_rm(sample_settings_rm, request):
     name = request.param[0]
     type_ = request.param[1]
-    env_file = sample_settings.provider_env_dict[name]
+    env_file = sample_settings_rm.provider_env_dict[name]
     provider = type_.from_env(env_file)
     assert provider.is_sandbox(), f'Must use sandbox environment for tests, got {provider.settings}'
     return provider
+
+
+def test_rm(sample_provider_rm):
+    ...
 
 
 @pytest.fixture
