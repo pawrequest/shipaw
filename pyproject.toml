@@ -31,6 +31,7 @@ dependencies = [
     "pydantic-extra-types>=2.10.5",
     "pydantic-settings>=2.11.0",
     "phonenumbers>=9.0.15",
+    "pywin32>=311",
 ]
 
 

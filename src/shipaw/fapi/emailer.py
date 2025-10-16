@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import smtplib
 from dataclasses import dataclass
-from email.message import EmailMessage
 from pathlib import Path
 
 import pythoncom
@@ -11,7 +9,6 @@ from win32com.client import Dispatch
 
 from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.shipment import Shipment
 
 
 @dataclass
