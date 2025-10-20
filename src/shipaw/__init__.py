@@ -1,3 +1,8 @@
-# from .providers import *
-#
-# __all__ = ['ParcelforceShippingProvider', 'APCShippingProvider']
+from .providers import *
+
+__all__ = [
+    'APCSettings',
+    'APCShippingProvider',
+    'ParcelforceSettings',
+    'ParcelforceShippingProvider',
+]

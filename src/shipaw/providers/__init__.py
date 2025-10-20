@@ -1,4 +1,9 @@
-# from shipaw.providers.apc.provider import APCShippingProvider
-# from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
-#
-# __all__ = ['APCShippingProvider', 'ParcelforceShippingProvider']
+from shipaw.providers.apc import APCShippingProvider, APCSettings
+from shipaw.providers.parcelforce import ParcelforceShippingProvider, ParcelforceSettings
+
+__all__ = [
+    'APCSettings',
+    'APCShippingProvider',
+    'ParcelforceSettings',
+    'ParcelforceShippingProvider',
+]
