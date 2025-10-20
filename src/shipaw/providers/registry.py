@@ -1,14 +1,13 @@
-from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
 from shipaw.providers.provider_abc import ShippingProvider
-from shipaw.providers.apc.provider import APCShippingProvider
 
-PROVIDER_TYPE_REGISTER: dict[str, type[ShippingProvider]] = {
-    'APC': APCShippingProvider,
-    'PARCELFORCE': ParcelforceShippingProvider,
-    'ROYAL_MAIL': RoyalMailProvider,
-}
-#
-# PROVIDER_REGISTER: dict[str, ShippingProvider] = {
-#     'APC': APCShippingProvider.from_env_settings(),
-#     'PARCELFORCE': ParcelforceShippingProvider.from_env_settings(),
+# PROVIDER_TYPE_REGISTER: dict[str, type[ShippingProvider]] = {
+#     'APC': APCShippingProvider,
+#     'PARCELFORCE': ParcelforceShippingProvider,
+#     'ROYAL_MAIL': RoyalMailProvider,
 # }
+PROVIDER_TYPE_REGISTER: dict[str, type[ShippingProvider]] = {}
+
+
+def register_provider(cls):
+    PROVIDER_TYPE_REGISTER[cls.name] = cls
+    return cls

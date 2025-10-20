@@ -35,7 +35,7 @@ def sample_provider(sample_settings, request):
     type_ = request.param[1]
     env_file = sample_settings.provider_env_dict[name]
     provider = type_.from_env(env_file)
-    assert provider.is_sandbox(), f'Must use sandbox environment for tests, got {provider.settings}'
+    assert provider.is_sandbox(), f'Must use sandbox environment for tests, {provider.settings=}'
     return provider
 
 

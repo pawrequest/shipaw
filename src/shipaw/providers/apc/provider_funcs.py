@@ -1,9 +1,6 @@
 from apc_hypaship.models.request.address import Address, Contact
-from apc_hypaship.models.request.shipment import Shipment as ShipmentAPC
 from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.services import Services
-from shipaw.models.ship_types import ShipDirection
-from shipaw.models.shipment import Shipment as ShipmentAgnost
 
 APC_SERVICES = Services(
     NEXT_DAY='ND16',

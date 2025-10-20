@@ -47,7 +47,7 @@ async def try_get_label_data(request: ShipmentRequest, response: ShipmentBooking
         await maybe_apc(e, request, response)
 
     except Exception as e:
-        logger.exception(f'Error getting label data')
+        logger.exception('Error getting label data')
         response.alerts += Alert.from_exception(e)
 
 

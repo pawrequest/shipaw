@@ -1,4 +1,3 @@
-from conftest import sample_provider
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment

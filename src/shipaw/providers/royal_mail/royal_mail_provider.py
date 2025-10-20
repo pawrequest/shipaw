@@ -1,6 +1,6 @@
 from typing import ClassVar, override
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from royal_mail_click_and_drop import CreateOrdersRequest, CreateOrdersResponse, ShipmentPackageRequest
 from royal_mail_click_and_drop.config import RoyalMailSettings
 from royal_mail_click_and_drop.models.address import (
@@ -94,6 +94,7 @@ def full_contact_from_rm(recipient: ContactRM) -> FullContact:
     )
 
 
+# @register_provider
 class RoyalMailProvider(ShippingProvider):
     name: ClassVar[str] = 'ROYAL_MAIL'
     services = ROYAL_MAIL_SERVICES
@@ -103,6 +104,7 @@ class RoyalMailProvider(ShippingProvider):
     responses: list[CreateOrdersResponse] = Field(default_factory=list)
 
     def is_sandbox(self) -> bool:
+        # Royal mail do not have a test environment. that's fun
         return False
 
     @property
@@ -132,6 +134,7 @@ class RoyalMailProvider(ShippingProvider):
                 )
             ]
         )
+
     #
     # def agnostic_shipment(self, orders_req: CreateOrdersRequest) -> Shipment:
     #     order = orders_req.items[0]

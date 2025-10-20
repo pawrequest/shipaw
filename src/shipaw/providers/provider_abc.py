@@ -3,18 +3,15 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import ClassVar, Self, TYPE_CHECKING
 
-from loguru import logger
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 from shipaw.config import ShipawSettings
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.logging import log_obj
 from shipaw.models.services import Services
 from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
-    from shipaw.fapi.requests import ShipmentRequest
     from shipaw.fapi.responses import ShipmentBookingResponse
 
 
@@ -78,7 +75,7 @@ class ShippingProvider(ABC, ShipawBaseModel):
                 label_data = self.fetch_label_content(shipment_num=shipment_num)
                 assert label_data is not None
                 return label_data
-            except AssertionError as e:
+            except AssertionError:
                 print(f'Label not ready yet for {shipment_num}, retrying...')
         raise RuntimeError(f'Label not ready after retries for {shipment_num}')
 
@@ -90,7 +87,7 @@ class ShippingProvider(ABC, ShipawBaseModel):
                 label_data = self.fetch_label_content(shipment_num=shipment_num)
                 assert label_data is not None
                 return label_data
-            except AssertionError as e:
+            except AssertionError:
                 print(f'Label not ready yet for {shipment_num}, retrying...')
         raise RuntimeError(f'Label not ready after retries for {shipment_num}')
 

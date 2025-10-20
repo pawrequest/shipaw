@@ -96,13 +96,13 @@ async def home_mobile_phone():
 @router.get('/open-file/{filepath}', response_class=HTMLResponse)
 async def open_file(filepath: str):
     os.startfile(filepath)
-    return HTMLResponse(content=f'<span>Re</span>')
+    return HTMLResponse(content='<span>Re</span>')
 
 
 @router.get('/print-file/{filepath}', response_class=HTMLResponse)
 async def print_file(filepath: str):
     os.startfile(filepath, 'print')
-    return HTMLResponse(content=f'<span>Re</span>')
+    return HTMLResponse(content='<span>Re</span>')
 
 
 @router.post('/email-label', response_class=HTMLResponse)
@@ -112,4 +112,4 @@ async def email_label(
     label_path = Path(unquote(label_path))
     logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email_address}')
     await send_label_email(shipment_request, label_path)
-    return HTMLResponse(content=f'<span>Re</span>')
+    return HTMLResponse(content='<span>Re</span>')

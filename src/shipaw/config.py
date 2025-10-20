@@ -106,7 +106,7 @@ class ShipawSettings(BaseSettings):
         directions = [_ for _ in ShipDirection]
         try:
             make_label_dirs(directions, v)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             v = Path.home() / 'Shipping Labels'
             make_label_dirs(directions, v)
         return v

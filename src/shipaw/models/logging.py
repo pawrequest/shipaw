@@ -1,7 +1,8 @@
 import json
 import pprint
 from datetime import datetime
-from typing import Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from collections.abc import Sequence
 
 from loguru import logger
 from pydantic import BaseModel

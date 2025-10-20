@@ -6,54 +6,53 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
 
 class Notifications(BaseModel):
-    NotificationType: List[str] = Field(..., description='')
+    NotificationType: list[str] = Field(..., description='')
 
 
 class Address(BaseModel):
     AddressLine1: str
-    AddressLine2: Optional[str] = None
-    AddressLine3: Optional[str] = None
-    Town: Optional[str] = None
-    Postcode: Optional[str] = None
+    AddressLine2: str | None = None
+    AddressLine3: str | None = None
+    Town: str | None = None
+    Postcode: str | None = None
     Country: str
 
 
 class Enhancement(BaseModel):
-    EnhancedCompensation: Optional[str] = None
-    SaturdayDeliveryRequired: Optional[bool] = None
+    EnhancedCompensation: str | None = None
+    SaturdayDeliveryRequired: bool | None = None
 
 
 class HazardousGood(BaseModel):
-    LQDGUNCode: Optional[str] = None
-    LQDGDescription: Optional[str] = None
-    LQDGVolume: Optional[float] = None
-    Firearms: Optional[str] = None
+    LQDGUNCode: str | None = None
+    LQDGDescription: str | None = None
+    LQDGVolume: float | None = None
+    Firearms: str | None = None
 
 
 class Returns(BaseModel):
-    ReturnsEmail: Optional[str] = None
-    EmailMessage: Optional[str] = None
+    ReturnsEmail: str | None = None
+    EmailMessage: str | None = None
     EmailLabel: bool
 
 
 class ContentDetail(BaseModel):
     CountryOfManufacture: str
-    CountryOfOrigin: Optional[str] = None
-    ManufacturersName: Optional[str] = None
+    CountryOfOrigin: str | None = None
+    ManufacturersName: str | None = None
     Description: str
     UnitWeight: float
     UnitQuantity: int
     UnitValue: float
     Currency: str
-    TariffCode: Optional[str] = None
-    TariffDescription: Optional[str] = None
-    ArticleReference: Optional[str] = None
+    TariffCode: str | None = None
+    TariffDescription: str | None = None
+    ArticleReference: str | None = None
 
 
 class DateTimeRange(BaseModel):
@@ -96,10 +95,10 @@ class ManifestShipment(BaseModel):
 
 
 class CompletedShipment(BaseModel):
-    ShipmentNumber: Optional[str] = None
-    OutBoundShipmentNumber: Optional[str] = None
-    InBoundShipmentNumber: Optional[str] = None
-    PartnerNumber: Optional[str] = None
+    ShipmentNumber: str | None = None
+    OutBoundShipmentNumber: str | None = None
+    InBoundShipmentNumber: str | None = None
+    PartnerNumber: str | None = None
 
 
 class CompletedReturnInfo(BaseModel):
@@ -114,36 +113,36 @@ class Authentication(BaseModel):
 
 
 class CompletedCancelInfo(BaseModel):
-    Status: Optional[str] = None
-    ShipmentNumber: Optional[str] = None
+    Status: str | None = None
+    ShipmentNumber: str | None = None
 
 
 class SpecifiedNeighbour(BaseModel):
-    Address: Optional[List[Address]] = Field(None, description='')
+    Address: list[Address] | None = Field(None, description='')
 
 
 class SafePlaceList(BaseModel):
-    SafePlace: Optional[List[str]] = Field(None, description='')
+    SafePlace: list[str] | None = Field(None, description='')
 
 
 class NominatedDeliveryDateList(BaseModel):
-    NominatedDeliveryDate: Optional[List[str]] = Field(None, description='')
+    NominatedDeliveryDate: list[str] | None = Field(None, description='')
 
 
 class ServiceCodes(BaseModel):
-    ServiceCode: Optional[List[str]] = Field(None, description='')
+    ServiceCode: list[str] | None = Field(None, description='')
 
 
 class Hours(BaseModel):
-    Open: Optional[str] = None
-    Close: Optional[str] = None
-    CloseLunch: Optional[str] = None
-    AfterLunchOpening: Optional[str] = None
+    Open: str | None = None
+    Close: str | None = None
+    CloseLunch: str | None = None
+    AfterLunchOpening: str | None = None
 
 
 class Position(BaseModel):
-    Longitude: Optional[float] = None
-    Latitude: Optional[float] = None
+    Longitude: float | None = None
+    Latitude: float | None = None
 
 
 class AlertType(Enum):
@@ -158,67 +157,67 @@ class BaseRequest(BaseModel):
 
 class Contact(BaseModel):
     BusinessName: str
-    ContactName: Optional[str] = None
-    EmailAddress: Optional[str] = None
-    Telephone: Optional[str] = None
-    Fax: Optional[str] = None
-    MobilePhone: Optional[str] = None
-    SendersName: Optional[str] = None
-    Notifications: Optional[Notifications] = None
+    ContactName: str | None = None
+    EmailAddress: str | None = None
+    Telephone: str | None = None
+    Fax: str | None = None
+    MobilePhone: str | None = None
+    SendersName: str | None = None
+    Notifications: Notifications | None = None
 
 
 class InBoundDetails(BaseModel):
     ContractNumber: str
     ServiceCode: str
-    TotalShipmentWeight: Optional[str] = None
-    Enhancement: Optional[Enhancement] = None
-    ReferenceNumber1: Optional[str] = None
-    ReferenceNumber2: Optional[str] = None
-    ReferenceNumber3: Optional[str] = None
-    ReferenceNumber4: Optional[str] = None
-    ReferenceNumber5: Optional[str] = None
-    SpecialInstructions1: Optional[str] = None
-    SpecialInstructions2: Optional[str] = None
-    SpecialInstructions3: Optional[str] = None
-    SpecialInstructions4: Optional[str] = None
+    TotalShipmentWeight: str | None = None
+    Enhancement: Enhancement | None = None
+    ReferenceNumber1: str | None = None
+    ReferenceNumber2: str | None = None
+    ReferenceNumber3: str | None = None
+    ReferenceNumber4: str | None = None
+    ReferenceNumber5: str | None = None
+    SpecialInstructions1: str | None = None
+    SpecialInstructions2: str | None = None
+    SpecialInstructions3: str | None = None
+    SpecialInstructions4: str | None = None
 
 
 class HazardousGoods(BaseModel):
-    HazardousGood: List[HazardousGood] = Field(..., description='')
+    HazardousGood: list[HazardousGood] = Field(..., description='')
 
 
 class ContentDetails(BaseModel):
-    ContentDetail: List[ContentDetail] = Field(..., description='')
+    ContentDetail: list[ContentDetail] = Field(..., description='')
 
 
 class CollectionInfo(BaseModel):
     CollectionContact: Contact
     CollectionAddress: Address
-    CollectionTime: Optional[DateTimeRange] = None
+    CollectionTime: DateTimeRange | None = None
 
 
 class ParcelContents(BaseModel):
-    Item: List[ContentData] = Field(..., description='')
+    Item: list[ContentData] = Field(..., description='')
 
 
 class LabelData(BaseModel):
-    Item: List[LabelItem] = Field(..., description='')
+    Item: list[LabelItem] = Field(..., description='')
 
 
 class Barcodes(BaseModel):
-    Barcode: List[Barcode] = Field(..., description='')
+    Barcode: list[Barcode] = Field(..., description='')
 
 
 class Images(BaseModel):
-    Image: List[Image] = Field(..., description='')
+    Image: list[Image] = Field(..., description='')
 
 
 class ManifestShipments(BaseModel):
-    ManifestShipment: List[ManifestShipment] = Field(..., description='')
+    ManifestShipment: list[ManifestShipment] = Field(..., description='')
 
 
 class CompletedShipments(BaseModel):
-    CompletedShipment: List[CompletedShipment] = Field(..., description='')
+    CompletedShipment: list[CompletedShipment] = Field(..., description='')
 
 
 class Alert(BaseModel):
@@ -228,73 +227,73 @@ class Alert(BaseModel):
 
 
 class CompletedCancel(BaseModel):
-    CompletedCancelInfo: Optional[CompletedCancelInfo] = None
+    CompletedCancelInfo: CompletedCancelInfo | None = None
 
 
 class PAF(BaseModel):
-    Postcode: Optional[str] = None
-    Count: Optional[int] = None
-    SpecifiedNeighbour: Optional[List[SpecifiedNeighbour]] = Field(None, description='')
+    Postcode: str | None = None
+    Count: int | None = None
+    SpecifiedNeighbour: list[SpecifiedNeighbour] | None = Field(None, description='')
 
 
 class Department(BaseModel):
-    DepartmentID: Optional[List[int]] = Field(None, description='')
-    ServiceCodes: Optional[List[ServiceCodes]] = Field(None, description='')
-    NominatedDeliveryDateList: Optional[NominatedDeliveryDateList] = None
+    DepartmentID: list[int] | None = Field(None, description='')
+    ServiceCodes: list[ServiceCodes] | None = Field(None, description='')
+    NominatedDeliveryDateList: NominatedDeliveryDateList | None = None
 
 
 class Mon(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class Tue(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class Wed(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class Thu(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class Fri(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class Sat(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class Sun(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class BankHol(BaseModel):
-    Hours: Optional[Hours] = None
+    Hours: Hours | None = None
 
 
 class PrintLabelRequest(BaseRequest):
     ShipmentNumber: str
-    PrintFormat: Optional[str] = None
-    BarcodeFormat: Optional[str] = None
-    PrintType: Optional[PrintType] = None
+    PrintFormat: str | None = None
+    BarcodeFormat: str | None = None
+    PrintType: PrintType | None = None
 
 
 class PrintDocumentRequest(BaseRequest):
     ShipmentNumber: str
     DocumentType: int
-    PrintFormat: Optional[str] = None
+    PrintFormat: str | None = None
 
 
 class CreateManifestRequest(BaseRequest):
-    DepartmentId: Optional[int] = None
+    DepartmentId: int | None = None
 
 
 class PrintManifestRequest(BaseRequest):
     ManifestNumber: str
-    PrintFormat: Optional[str] = None
+    PrintFormat: str | None = None
 
 
 class ReturnShipmentRequest(BaseRequest):
@@ -311,26 +310,26 @@ class CancelShipmentRequest(BaseRequest):
 
 
 class Parcel(BaseModel):
-    Weight: Optional[float] = None
-    Length: Optional[int] = None
-    Height: Optional[int] = None
-    Width: Optional[int] = None
-    PurposeOfShipment: Optional[str] = None
-    InvoiceNumber: Optional[str] = None
-    ExportLicenseNumber: Optional[str] = None
-    CertificateNumber: Optional[str] = None
-    ContentDetails: Optional[ContentDetails] = None
-    ShippingCost: Optional[float] = None
+    Weight: float | None = None
+    Length: int | None = None
+    Height: int | None = None
+    Width: int | None = None
+    PurposeOfShipment: str | None = None
+    InvoiceNumber: str | None = None
+    ExportLicenseNumber: str | None = None
+    CertificateNumber: str | None = None
+    ContentDetails: ContentDetails | None = None
+    ShippingCost: float | None = None
 
 
 class ParcelLabelData(BaseModel):
-    ParcelNumber: Optional[str] = None
-    ShipmentNumber: Optional[str] = None
-    JourneyLeg: Optional[str] = None
-    LabelData: Optional[LabelData] = None
-    Barcodes: Optional[Barcodes] = None
-    Images: Optional[Images] = None
-    ParcelContents: Optional[List[ParcelContents]] = Field(None, description='')
+    ParcelNumber: str | None = None
+    ShipmentNumber: str | None = None
+    JourneyLeg: str | None = None
+    LabelData: LabelData | None = None
+    Barcodes: Barcodes | None = None
+    Images: Images | None = None
+    ParcelContents: list[ParcelContents] | None = Field(None, description='')
 
 
 class CompletedManifestInfo(BaseModel):
@@ -342,30 +341,30 @@ class CompletedManifestInfo(BaseModel):
 
 
 class CompletedShipmentInfoCreatePrint(BaseModel):
-    LeadShipmentNumber: Optional[str] = None
-    ShipmentNumber: Optional[str] = None
-    DeliveryDate: Optional[str] = None
+    LeadShipmentNumber: str | None = None
+    ShipmentNumber: str | None = None
+    DeliveryDate: str | None = None
     Status: str
     CompletedShipments: CompletedShipments
 
 
 class Alerts(BaseModel):
-    Alert: List[Alert] = Field(..., description='')
+    Alert: list[Alert] = Field(..., description='')
 
 
 class Departments(BaseModel):
-    Department: Optional[List[Department]] = Field(None, description='')
+    Department: list[Department] | None = Field(None, description='')
 
 
 class OpeningHours(BaseModel):
-    Mon: Optional[Mon] = None
-    Tue: Optional[Tue] = None
-    Wed: Optional[Wed] = None
-    Thu: Optional[Thu] = None
-    Fri: Optional[Fri] = None
-    Sat: Optional[Sat] = None
-    Sun: Optional[Sun] = None
-    BankHol: Optional[BankHol] = None
+    Mon: Mon | None = None
+    Tue: Tue | None = None
+    Wed: Wed | None = None
+    Thu: Thu | None = None
+    Fri: Fri | None = None
+    Sat: Sat | None = None
+    Sun: Sun | None = None
+    BankHol: BankHol | None = None
 
 
 class CancelShipmentRequest1(BaseModel):
@@ -397,109 +396,109 @@ class ReturnShipmentRequest1(BaseModel):
 
 
 class BaseReply(BaseModel):
-    Alerts: Optional[Alerts] = None
+    Alerts: Alerts | None = None
 
 
 class Parcels(BaseModel):
-    Parcel: List[Parcel] = Field(..., description='')
+    Parcel: list[Parcel] = Field(..., description='')
 
 
 class ShipmentLabelData(BaseModel):
-    ParcelLabelData: List[ParcelLabelData] = Field(..., description='')
+    ParcelLabelData: list[ParcelLabelData] = Field(..., description='')
 
 
 class CompletedManifests(BaseModel):
-    CompletedManifestInfo: List[CompletedManifestInfo] = Field(..., description='')
+    CompletedManifestInfo: list[CompletedManifestInfo] = Field(..., description='')
 
 
 class NominatedDeliveryDates(BaseModel):
-    ServiceCode: Optional[str] = None
-    Departments: Optional[Departments] = None
+    ServiceCode: str | None = None
+    Departments: Departments | None = None
 
 
 class PostcodeExclusion(BaseModel):
-    DeliveryPostcode: Optional[str] = None
-    CollectionPostcode: Optional[str] = None
-    Departments: Optional[Departments] = None
+    DeliveryPostcode: str | None = None
+    CollectionPostcode: str | None = None
+    Departments: Departments | None = None
 
 
 class PostOffice(BaseModel):
-    PostOfficeID: Optional[str] = None
-    Business: Optional[str] = None
-    Address: Optional[Address] = None
-    OpeningHours: Optional[OpeningHours] = None
-    Distance: Optional[float] = None
-    Availability: Optional[bool] = None
-    Position: Optional[Position] = None
-    BookingReference: Optional[str] = None
+    PostOfficeID: str | None = None
+    Business: str | None = None
+    Address: Address | None = None
+    OpeningHours: OpeningHours | None = None
+    Distance: float | None = None
+    Availability: bool | None = None
+    Position: Position | None = None
+    BookingReference: str | None = None
 
 
 class CreatePrintReply(BaseReply):
-    CompletedShipmentInfoCreatePrint: Optional[CompletedShipmentInfoCreatePrint] = None
-    Label: Optional[Document] = None
-    LabelData: Optional[ShipmentLabelData] = None
-    PartnerCode: Optional[str] = None
+    CompletedShipmentInfoCreatePrint: CompletedShipmentInfoCreatePrint | None = None
+    Label: Document | None = None
+    LabelData: ShipmentLabelData | None = None
+    PartnerCode: str | None = None
 
 
 class PrintLabelReply(BaseReply):
-    Label: Optional[Document] = None
-    LabelData: Optional[ShipmentLabelData] = None
-    PartnerCode: Optional[str] = None
+    Label: Document | None = None
+    LabelData: ShipmentLabelData | None = None
+    PartnerCode: str | None = None
 
 
 class PrintDocumentReply(BaseReply):
-    Label: Optional[Document] = None
-    LabelData: Optional[ShipmentLabelData] = None
-    DocumentType: Optional[Document] = None
+    Label: Document | None = None
+    LabelData: ShipmentLabelData | None = None
+    DocumentType: Document | None = None
 
 
 class CreateManifestReply(BaseReply):
-    CompletedManifests: Optional[CompletedManifests] = None
+    CompletedManifests: CompletedManifests | None = None
 
 
 class PrintManifestReply(BaseReply):
-    Manifest: Optional[Document] = None
+    Manifest: Document | None = None
 
 
 class ReturnShipmentReply(BaseReply):
-    CompletedShipmentInfo: Optional[CompletedReturnInfo] = None
+    CompletedShipmentInfo: CompletedReturnInfo | None = None
 
 
 class CCReserveReply(BaseReply):
-    PostOffice: Optional[PostOffice] = None
+    PostOffice: PostOffice | None = None
 
 
 class CancelShipmentReply(BaseReply):
-    CompletedCancel: Optional[CompletedCancel] = None
+    CompletedCancel: CompletedCancel | None = None
 
 
 class InternationalInfo(BaseModel):
-    Parcels: Optional[Parcels] = None
-    ExporterCustomsReference: Optional[str] = None
-    RecipientImporterVatNo: Optional[str] = None
-    OriginalExportShipmentNo: Optional[str] = None
-    DocumentsOnly: Optional[bool] = None
-    DocumentsDescription: Optional[str] = None
-    ValueUnder200USDollars: Optional[bool] = None
-    ShipmentDescription: Optional[str] = None
-    Comments: Optional[str] = None
-    InvoiceDate: Optional[str] = None
-    TermsOfDelivery: Optional[str] = None
-    PurchaseOrderRef: Optional[str] = None
+    Parcels: Parcels | None = None
+    ExporterCustomsReference: str | None = None
+    RecipientImporterVatNo: str | None = None
+    OriginalExportShipmentNo: str | None = None
+    DocumentsOnly: bool | None = None
+    DocumentsDescription: str | None = None
+    ValueUnder200USDollars: bool | None = None
+    ShipmentDescription: str | None = None
+    Comments: str | None = None
+    InvoiceDate: str | None = None
+    TermsOfDelivery: str | None = None
+    PurchaseOrderRef: str | None = None
 
 
 class ConvenientCollect(BaseModel):
-    Postcode: Optional[str] = None
-    PostOffice: Optional[List[PostOffice]] = Field(None, description='')
-    Count: Optional[int] = None
-    PostOfficeID: Optional[str] = None
+    Postcode: str | None = None
+    PostOffice: list[PostOffice] | None = Field(None, description='')
+    Count: int | None = None
+    PostOfficeID: str | None = None
 
 
 class SpecifiedPostOffice(BaseModel):
-    Postcode: Optional[str] = None
-    PostOffice: Optional[List[PostOffice]] = Field(None, description='')
-    Count: Optional[int] = None
-    PostOfficeID: Optional[str] = None
+    Postcode: str | None = None
+    PostOffice: list[PostOffice] | None = Field(None, description='')
+    Count: int | None = None
+    PostOfficeID: str | None = None
 
 
 class CancelShipmentReply1(BaseModel):
@@ -535,35 +534,35 @@ class ReturnShipmentReply1(BaseModel):
 
 
 class FindRequest(BaseRequest):
-    ConvenientCollect: Optional[ConvenientCollect] = None
-    SpecifiedPostOffice: Optional[SpecifiedPostOffice] = None
-    PAF: Optional[PAF] = None
-    SafePlaces: Optional[bool] = None
-    NominatedDeliveryDates: Optional[NominatedDeliveryDates] = None
-    PostcodeExclusion: Optional[PostcodeExclusion] = None
+    ConvenientCollect: ConvenientCollect | None = None
+    SpecifiedPostOffice: SpecifiedPostOffice | None = None
+    PAF: PAF | None = None
+    SafePlaces: bool | None = None
+    NominatedDeliveryDates: NominatedDeliveryDates | None = None
+    PostcodeExclusion: PostcodeExclusion | None = None
 
 
 class FindReply(BaseReply):
-    ConvenientCollect: Optional[ConvenientCollect] = None
-    SpecifiedPostOffice: Optional[SpecifiedPostOffice] = None
-    PAF: Optional[PAF] = None
-    SafePlaceList: Optional[SafePlaceList] = None
-    NominatedDeliveryDates: Optional[NominatedDeliveryDates] = None
-    PostcodeExclusion: Optional[PostcodeExclusion] = None
+    ConvenientCollect: ConvenientCollect | None = None
+    SpecifiedPostOffice: SpecifiedPostOffice | None = None
+    PAF: PAF | None = None
+    SafePlaceList: SafePlaceList | None = None
+    NominatedDeliveryDates: NominatedDeliveryDates | None = None
+    PostcodeExclusion: PostcodeExclusion | None = None
 
 
 class DeliveryOptions(BaseModel):
-    ConvenientCollect: Optional[ConvenientCollect] = None
-    IRTS: Optional[bool] = None
-    Letterbox: Optional[bool] = None
-    SpecifiedPostOffice: Optional[SpecifiedPostOffice] = None
-    SpecifiedNeighbour: Optional[str] = None
-    SafePlace: Optional[str] = None
-    PIN: Optional[int] = None
-    NamedRecipient: Optional[bool] = None
-    AddressOnly: Optional[bool] = None
-    NominatedDeliveryDate: Optional[str] = None
-    PersonalParcel: Optional[str] = None
+    ConvenientCollect: ConvenientCollect | None = None
+    IRTS: bool | None = None
+    Letterbox: bool | None = None
+    SpecifiedPostOffice: SpecifiedPostOffice | None = None
+    SpecifiedNeighbour: str | None = None
+    SafePlace: str | None = None
+    PIN: int | None = None
+    NamedRecipient: bool | None = None
+    AddressOnly: bool | None = None
+    NominatedDeliveryDate: str | None = None
+    PersonalParcel: str | None = None
 
 
 class FindReply1(BaseModel):
@@ -575,53 +574,53 @@ class FindRequest1(BaseModel):
 
 
 class RequestedShipment(BaseModel):
-    DepartmentId: Optional[int] = None
+    DepartmentId: int | None = None
     ShipmentType: str
     ContractNumber: str
-    RequestId: Optional[int] = None
+    RequestId: int | None = None
     ServiceCode: str
-    PrePrinted: Optional[bool] = None
-    ShippingDate: Optional[str] = None
-    JobReference: Optional[str] = None
+    PrePrinted: bool | None = None
+    ShippingDate: str | None = None
+    JobReference: str | None = None
     RecipientContact: Contact
     RecipientAddress: Address
-    ImporterContact: Optional[Contact] = None
-    ImporterAddress: Optional[Address] = None
-    ExporterContact: Optional[Contact] = None
-    ExporterAddress: Optional[Address] = None
-    SenderContact: Optional[Contact] = None
-    SenderAddress: Optional[Address] = None
-    TotalNumberOfParcels: Optional[int] = None
-    TotalShipmentWeight: Optional[float] = None
-    Enhancement: Optional[Enhancement] = None
-    DeliveryOptions: Optional[DeliveryOptions] = None
-    HazardousGoods: Optional[HazardousGoods] = None
-    Returns: Optional[Returns] = None
-    DropOffInd: Optional[str] = None
-    PrintOwnLabel: Optional[bool] = None
-    CollectionInfo: Optional[CollectionInfo] = None
-    InternationalInfo: Optional[InternationalInfo] = None
-    ReferenceNumber1: Optional[str] = None
-    ReferenceNumber2: Optional[str] = None
-    ReferenceNumber3: Optional[str] = None
-    ReferenceNumber4: Optional[str] = None
-    ReferenceNumber5: Optional[str] = None
-    SpecialInstructions1: Optional[str] = None
-    SpecialInstructions2: Optional[str] = None
-    SpecialInstructions3: Optional[str] = None
-    SpecialInstructions4: Optional[str] = None
-    InBoundContact: Optional[Contact] = None
-    InBoundAddress: Optional[Address] = None
-    InBoundDetails: Optional[InBoundDetails] = None
-    ExchangeInstructions1: Optional[str] = None
-    ExchangeInstructions2: Optional[str] = None
-    ExchangeInstructions3: Optional[str] = None
-    ConsignmentHandling: Optional[bool] = None
+    ImporterContact: Contact | None = None
+    ImporterAddress: Address | None = None
+    ExporterContact: Contact | None = None
+    ExporterAddress: Address | None = None
+    SenderContact: Contact | None = None
+    SenderAddress: Address | None = None
+    TotalNumberOfParcels: int | None = None
+    TotalShipmentWeight: float | None = None
+    Enhancement: Enhancement | None = None
+    DeliveryOptions: DeliveryOptions | None = None
+    HazardousGoods: HazardousGoods | None = None
+    Returns: Returns | None = None
+    DropOffInd: str | None = None
+    PrintOwnLabel: bool | None = None
+    CollectionInfo: CollectionInfo | None = None
+    InternationalInfo: InternationalInfo | None = None
+    ReferenceNumber1: str | None = None
+    ReferenceNumber2: str | None = None
+    ReferenceNumber3: str | None = None
+    ReferenceNumber4: str | None = None
+    ReferenceNumber5: str | None = None
+    SpecialInstructions1: str | None = None
+    SpecialInstructions2: str | None = None
+    SpecialInstructions3: str | None = None
+    SpecialInstructions4: str | None = None
+    InBoundContact: Contact | None = None
+    InBoundAddress: Address | None = None
+    InBoundDetails: InBoundDetails | None = None
+    ExchangeInstructions1: str | None = None
+    ExchangeInstructions2: str | None = None
+    ExchangeInstructions3: str | None = None
+    ConsignmentHandling: bool | None = None
 
 
 class CompletedShipmentInfo(BaseModel):
-    LeadShipmentNumber: Optional[str] = None
-    DeliveryDate: Optional[str] = None
+    LeadShipmentNumber: str | None = None
+    DeliveryDate: str | None = None
     Status: str
     CompletedShipments: CompletedShipments
     RequestedShipment: RequestedShipment
@@ -632,7 +631,7 @@ class CreateShipmentRequest(BaseRequest):
 
 
 class CreateShipmentReply(BaseReply):
-    CompletedShipmentInfo: Optional[CompletedShipmentInfo] = None
+    CompletedShipmentInfo: CompletedShipmentInfo | None = None
 
 
 class CreatePrintRequest(BaseRequest):

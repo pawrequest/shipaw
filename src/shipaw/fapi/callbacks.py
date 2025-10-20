@@ -1,4 +1,5 @@
-from typing import Callable, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
+from collections.abc import Callable
 
 if TYPE_CHECKING:
     from shipaw.fapi.requests import ShipmentRequest

@@ -20,10 +20,10 @@ from shipaw.providers.apc.provider_funcs import (
 )
 from shipaw.providers.apc.response import errored_booking
 from shipaw.providers.provider_abc import ShippingProvider
+from shipaw.providers.registry import register_provider
 
 
-# @dataclass
-# @register_provider
+@register_provider
 class APCShippingProvider(ShippingProvider):
     name = 'APC'
     services: ClassVar[Services] = APC_SERVICES

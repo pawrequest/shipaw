@@ -26,10 +26,10 @@ from shipaw.providers.parcelforce.provider_funcs import (
     parcelforce_shipment_to_agnostic,
     ref_dict_from_str
 )
+from shipaw.providers.registry import register_provider
 
 
-# @dataclass
-# @register_provider
+@register_provider
 class ParcelforceShippingProvider(ShippingProvider):
     name = 'PARCELFORCE'
     services: ClassVar[ParcelforceServices] = PARCELFORCE_SERVICES

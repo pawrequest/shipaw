@@ -1,4 +1,3 @@
-import webbrowser
 
 from shipaw.fapi.responses import ShipawTemplateResponse
 

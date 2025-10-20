@@ -6,7 +6,6 @@ from shipaw.config import ShipawSettings  # FIRST!
 from shipaw.models.shipment import Shipment
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
-from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 TEST_DATE = date.today() + timedelta(days=2)
 if TEST_DATE.weekday() in (5, 6):
@@ -18,23 +17,23 @@ def sample_settings_rm():
     return ShipawSettings(_env_file=r'C:\prdev\envs\amdev\with_rm.env')
 
 
-@pytest.fixture(
-    params=[
-        ('ROYAL_MAIL', PROVIDER_TYPE_REGISTER['ROYAL_MAIL']),
-    ],
-    ids=lambda val: val[0],
-)
-def sample_provider_rm(sample_settings_rm, request):
-    name = request.param[0]
-    type_ = request.param[1]
-    env_file = sample_settings_rm.provider_env_dict[name]
-    provider = type_.from_env(env_file)
-    assert provider.is_sandbox(), f'Must use sandbox environment for tests, got {provider.settings}'
-    return provider
+# @pytest.fixture(
+#     params=[
+#         ('ROYAL_MAIL', PROVIDER_TYPE_REGISTER['ROYAL_MAIL']),
+#     ],
+#     ids=lambda val: val[0],
+# )
+# def sample_provider_rm(sample_settings_rm, request):
+#     name = request.param[0]
+#     type_ = request.param[1]
+#     env_file = sample_settings_rm.provider_env_dict[name]
+#     provider = type_.from_env(env_file)
+#     assert provider.is_sandbox(), f'Must use sandbox environment for tests, got {provider.settings}'
+#     return provider
 
 
-def test_rm(sample_provider_rm):
-    ...
+# def test_rm(sample_provider_rm):
+#     ...
 
 
 @pytest.fixture

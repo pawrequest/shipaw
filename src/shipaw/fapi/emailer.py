@@ -80,7 +80,7 @@ async def send_label_email(shipment_request: ShipmentRequest, label_path: Path):
     )
     email = Email(
         to_address=shipment_request.shipment.remote_full_contact.contact.email_address,
-        subject=f'Amherst Radios Shipping - Shipping Label Attached',
+        subject='Amherst Radios Shipping - Shipping Label Attached',
         body=body,
         attachment_paths=[label_path],
     )

@@ -81,5 +81,5 @@ async def base():
 @app.get('/open-file', response_class=HTMLResponse)
 async def open_file(filepath: str = Query(...)):
     os.startfile(filepath)
-    return HTMLResponse(content=f'<span>Re</span>')
+    return HTMLResponse(content='<span>Re</span>')
 
