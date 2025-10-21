@@ -56,9 +56,10 @@ async def order_summary_api(
     log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     context = {'shipment_request': shipment_request}
 
+    # check phone number
     alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
+    # check not apc + dropoff
     alerts += await maybe_alert_apc(shipment_request)
-
     # check if royal mail and not standard service
     alerts += await check_royal_mail(shipment_request)
 
