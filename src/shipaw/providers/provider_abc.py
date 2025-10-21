@@ -1,5 +1,6 @@
 import time
 from abc import ABC, abstractmethod
+from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar, Self, TYPE_CHECKING
 
@@ -13,6 +14,12 @@ from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
     from shipaw.fapi.responses import ShipmentBookingResponse
+
+
+class ProviderName(StrEnum):
+    PARCELFORCE = ('Parcelforce',)
+    ROYAL_MAIL = ('RoyalMail',)
+    APC = ('APC',)
 
 
 class ShippingProvider(ABC, ShipawBaseModel):
@@ -78,7 +85,6 @@ class ShippingProvider(ABC, ShipawBaseModel):
             except AssertionError:
                 print(f'Label not ready yet for {shipment_num}, retrying...')
         raise RuntimeError(f'Label not ready after retries for {shipment_num}')
-
 
     async def wait_fetch_label_as(self, shipment_num: str) -> bytes:
         for i in range(10):

@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from shipaw.config import ShipawSettings
-from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
+from shipaw.fapi.alerts import Alert, AlertType, Alerts, check_royal_mail, maybe_alert_phone_number
 from shipaw.fapi.backend import convert_choice, maybe_alert_apc, try_book_shipment, try_get_write_label
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
@@ -58,6 +58,9 @@ async def order_summary_api(
 
     alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
     alerts += await maybe_alert_apc(shipment_request)
+
+    # check if royal mail and not standard service
+    alerts += await check_royal_mail(shipment_request)
 
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
