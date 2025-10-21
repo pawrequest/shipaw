@@ -16,6 +16,7 @@ requires-python = ">= 3.13"
 dependencies = [
     "apc-hypaship>=0.1.8",
     "parcelforce-expresslink>=0.1.7",
+    'royal-mail-click-and-drop',
     "pawdf>=0.1.0",
     #
     "httpx>=0.28.1",
@@ -65,9 +66,9 @@ format.quote-style = "single"
 #parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
 #apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
 
-royal_mail-click-and-drop = { path = '../royal-mail-click-and-drop' }
-parcelforce-expresslink = { path = '../parcelforce-expresslink' }
-apc-hypaship = { path = '../apc-hypaship' }
+royal-mail-click-and-drop = { path = '../royal-mail-click-and-drop', editable=true}
+parcelforce-expresslink = { path = '../parcelforce-expresslink', editable=true }
+apc-hypaship = { path = '../apc-hypaship', editable=true }
 
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]

@@ -19,13 +19,13 @@ from shipaw.providers.apc.provider_funcs import (
     full_contact_from_apc_contact_address,
 )
 from shipaw.providers.apc.response import errored_booking
-from shipaw.providers.provider_abc import ShippingProvider
+from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider
 
 
 @register_provider
 class APCShippingProvider(ShippingProvider):
-    name = 'APC'
+    name: ClassVar[ProviderName] = ProviderName.APC
     services: ClassVar[Services] = APC_SERVICES
     settings_type: ClassVar[APCSettings] = APCSettings
     settings: APCSettings

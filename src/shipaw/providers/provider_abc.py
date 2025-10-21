@@ -17,19 +17,16 @@ if TYPE_CHECKING:
 
 
 class ProviderName(StrEnum):
-    PARCELFORCE = ('Parcelforce',)
-    ROYAL_MAIL = ('RoyalMail',)
-    APC = ('APC',)
+    PARCELFORCE = 'PARCELFORCE'
+    ROYAL_MAIL = 'ROYAL_MAIL'
+    APC = 'APC'
 
 
 class ShippingProvider(ABC, ShipawBaseModel):
-    name: ClassVar[str]
+    name: ClassVar[ProviderName]
     services: ClassVar[Services]
     settings_type: ClassVar[type[BaseSettings]]
     settings: BaseSettings
-
-    @abstractmethod
-    def is_sandbox(self) -> bool: ...
 
     @classmethod
     def from_env(cls, env_file: Path) -> Self:
@@ -37,11 +34,14 @@ class ShippingProvider(ABC, ShipawBaseModel):
         return cls(settings=settings)
 
     @classmethod
-    def from_env_settings(cls, shipaw_settings=None) -> Self:
+    def from_shipaw_settings_env_dict(cls, shipaw_settings=None) -> Self:
         shipaw_settings = shipaw_settings or ShipawSettings.from_env('SHIPAW_ENV')
-        env_file = shipaw_settings.provider_env_dict.get(cls.name)
+        env_file = shipaw_settings.provider_env_dict[cls.name]
         provider_settings = cls.settings_type(_env_file=env_file)
         return cls(settings=provider_settings)
+
+    @abstractmethod
+    def is_sandbox(self) -> bool: ...
 
     @staticmethod
     @abstractmethod

@@ -8,13 +8,14 @@ from parcelforce_expresslink.models.address import (
 from parcelforce_expresslink.models.contact import Contact as ContactPF
 from parcelforce_expresslink.client.combadge import CreateShipmentService
 from parcelforce_expresslink.client.request_response import ShipmentRequest, ShipmentResponse as ShipmentResponsePF
+
 #
 from parcelforce_expresslink.config import ParcelforceSettings
 from parcelforce_expresslink.expresslink_client import ParcelforceClient
 from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 
 from shipaw.models.logging import log_obj
-from shipaw.providers.provider_abc import ShippingProvider
+from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.shipment import Shipment, Shipment as ShipmentAgnost
 from shipaw.providers.parcelforce.provider_funcs import (
@@ -24,14 +25,14 @@ from shipaw.providers.parcelforce.provider_funcs import (
     contact_from_agnostic_fc,
     convert_shipment_by_direction,
     parcelforce_shipment_to_agnostic,
-    ref_dict_from_str
+    ref_dict_from_str,
 )
 from shipaw.providers.registry import register_provider
 
 
 @register_provider
 class ParcelforceShippingProvider(ShippingProvider):
-    name = 'PARCELFORCE'
+    name = ProviderName.PARCELFORCE
     services: ClassVar[ParcelforceServices] = PARCELFORCE_SERVICES
     settings_type: ClassVar[type[ParcelforceSettings]] = ParcelforceSettings
     settings: ParcelforceSettings

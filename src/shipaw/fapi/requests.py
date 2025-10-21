@@ -6,7 +6,7 @@ from pydantic import StringConstraints
 from shipaw.models.address import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
-from shipaw.providers.provider_abc import ShippingProvider
+from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 
@@ -19,7 +19,7 @@ class Authentication(ShipawBaseModel):
 class ShipmentRequest(ShipawBaseModel):
     id: uuid.UUID = uuid.uuid4()
     shipment: Shipment
-    provider_name: str
+    provider_name: ProviderName
 
     @property
     def provider(self) -> ShippingProvider:
@@ -27,7 +27,7 @@ class ShipmentRequest(ShipawBaseModel):
             raise ValueError('Provider name is not set')
         if self.provider_name not in PROVIDER_TYPE_REGISTER:
             raise ValueError(f'Unknown provider: {self.provider_name}')
-        return PROVIDER_TYPE_REGISTER[self.provider_name].from_env_settings()
+        return PROVIDER_TYPE_REGISTER[self.provider_name].from_shipaw_settings_env_dict()
 
 
 class AddressRequest(ShipawBaseModel):

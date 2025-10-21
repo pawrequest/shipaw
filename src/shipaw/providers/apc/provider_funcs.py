@@ -1,12 +1,23 @@
+from typing import ClassVar, override
+
 from apc_hypaship.models.request.address import Address, Contact
+from apc_hypaship.models.request.services import APCServiceCode
+
 from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.services import Services
 
-APC_SERVICES = Services(
-    NEXT_DAY='ND16',
-    NEXT_DAY_12='ND12',
-    NEXT_DAY_9='ND09',
-)
+
+class APCServices(Services):
+    NEXT_DAY: ClassVar[str] = 'ND16'
+    NEXT_DAY_12: ClassVar[str] = 'ND12'
+    NEXT_DAY_9: ClassVar[str] = 'ND09'
+
+    @override
+    def lookup(self, agnostic_name: str) -> APCServiceCode:
+        return APCServiceCode(super().lookup(agnostic_name))
+
+
+APC_SERVICES = APCServices()
 
 
 def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_contact: FullContact) -> addr_type:

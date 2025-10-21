@@ -3,9 +3,11 @@ from datetime import date, timedelta
 import pytest
 
 from shipaw.config import ShipawSettings  # FIRST!
+from shipaw.models.services import AgnostServiceName
 from shipaw.models.shipment import Shipment
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
+from shipaw.providers import RoyalMailProvider
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 TEST_DATE = date.today() + timedelta(days=2)
@@ -37,6 +39,11 @@ def sample_provider(sample_settings, request):
     provider = type_.from_env(env_file)
     assert provider.is_sandbox(), f'Must use sandbox environment for tests, {provider.settings=}'
     return provider
+
+
+@pytest.fixture
+def sample_provider_rm(sample_settings_rm):
+    return RoyalMailProvider.from_shipaw_settings_env_dict(shipaw_settings=sample_settings_rm)
 
 
 @pytest.fixture
@@ -103,7 +110,7 @@ def sample_shipment(sample_remote_fc):
         shipping_date=TEST_DATE,
         direction=ShipDirection.OUTBOUND,
         reference='Test Reference outbound',
-        service='NEXT_DAY',
+        service=AgnostServiceName.NEXT_DAY,
     )
 
 
@@ -116,7 +123,7 @@ def sample_shipment_inbound(sample_remote_fc, sample_full_home_contact):
         shipping_date=TEST_DATE,
         direction=ShipDirection.INBOUND,
         reference='Test Inbound Reference',
-        service='NEXT_DAY',
+        service=AgnostServiceName.NEXT_DAY,
         own_label=True,
     )
 

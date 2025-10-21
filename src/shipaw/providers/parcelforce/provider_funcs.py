@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import override
+from typing import ClassVar, override
 
 from parcelforce_expresslink.models.address import AddressBase, AddressRecipient, AddressSender
 from parcelforce_expresslink.models.contact import Contact as ContactPF, ContactSender
@@ -14,20 +14,16 @@ from shipaw.models.shipment import Shipment as ShipmentAgnost
 
 
 class ParcelforceServices(Services):
-    NEXT_DAY: ServiceCode = 'SND'
-    NEXT_DAY_12: ServiceCode = 'S12'
-    NEXT_DAY_9: ServiceCode = '09'
+    NEXT_DAY: ClassVar[str] = 'SND'
+    NEXT_DAY_12: ClassVar[str] = 'S12'
+    NEXT_DAY_9: ClassVar[str] = '09'
 
     @override
     def lookup(self, agnostic_name: str) -> ServiceCode:
         return ServiceCode(super().lookup(agnostic_name))
 
 
-PARCELFORCE_SERVICES = ParcelforceServices(
-    NEXT_DAY='SND',
-    NEXT_DAY_12='S12',
-    NEXT_DAY_9='09',
-)
+PARCELFORCE_SERVICES = ParcelforceServices()
 
 
 def address_from_agnostic[addr_type: AddressBase](

@@ -5,6 +5,7 @@ from enum import StrEnum
 from pydantic import Field
 
 from shipaw.models.base import ShipawBaseModel
+from shipaw.models.ship_types import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
@@ -99,5 +100,8 @@ async def check_royal_mail(shipment_request) -> Alerts:
     if ProviderName.ROYAL_MAIL in PROVIDER_TYPE_REGISTER and shipment_request.provider_name == ProviderName.ROYAL_MAIL:
         if shipment_request.shipment.service != 'NEXT_DAY':
             msg = f'Royal Mail only supports NEXT_DAY service in this demo. You selected {shipment_request.shipment.service}.'
-            alerts += Alert(message=msg, type=AlertType.WARNING)
+            alerts += Alert(message=msg, type=AlertType.ERROR)
+        if shipment_request.shipment.direction != ShipDirection.OUTBOUND:
+            msg = f'Royal Mail only supports OUTBOUND shipments in this demo. You selected {shipment_request.shipment.direction}.'
+            alerts += Alert(message=msg, type=AlertType.ERROR)
     return alerts

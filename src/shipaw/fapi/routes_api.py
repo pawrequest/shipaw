@@ -21,6 +21,7 @@ from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
 from shipaw.providers.parcelforce.provider_funcs import (
     address_from_agnostic,
 )
+from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 router = APIRouter()
@@ -116,7 +117,7 @@ async def get_addr_choices_api(
         body: Address - request body containing postcode and optional address
     """
     p: ParcelforceShippingProvider = cast(
-        ParcelforceShippingProvider, PROVIDER_TYPE_REGISTER['PARCELFORCE'].from_env_settings()
+        ParcelforceShippingProvider, PROVIDER_TYPE_REGISTER[ProviderName.PARCELFORCE].from_shipaw_settings_env_dict()
     )
     client = p.client
     postcode = body.postcode

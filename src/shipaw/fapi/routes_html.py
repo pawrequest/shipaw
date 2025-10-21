@@ -7,10 +7,10 @@ from fastapi import APIRouter, Body, Form
 from fastapi.params import Depends
 from loguru import logger
 from starlette.requests import Request
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, JSONResponse
 
 from shipaw.config import ShipawSettings
-from shipaw.fapi.alerts import Alerts
+from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.emailer import send_label_email
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
@@ -21,6 +21,7 @@ from shipaw.fapi.routes_api import (
     shipping_form_api as ship_form_json,
 )
 from shipaw.models.shipment import Shipment, sample_shipment
+from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
 
 router = APIRouter()
 
@@ -78,13 +79,6 @@ async def order_results(
     return render_template_response(request, template_response)
 
 
-@router.get('/test', response_class=HTMLResponse)
-async def ship(request: Request) -> HTMLResponse:
-    shipment = sample_shipment()
-    res = await ship_form_json(request, shipment)
-    return render_template_response(request, res)
-
-
 @router.get('/home_mobile_phone', response_class=HTMLResponse)
 async def home_mobile_phone():
     mobile_phone = ShipawSettings.from_env().mobile_phone
@@ -113,3 +107,25 @@ async def email_label(
     logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email_address}')
     await send_label_email(shipment_request, label_path)
     return HTMLResponse(content='<span>Re</span>')
+
+
+@router.get('/test', response_class=HTMLResponse)
+async def test_route(request: Request) -> HTMLResponse:
+    shipment = sample_shipment()
+    res = await ship_form_json(request, shipment)
+    return render_template_response(request, res)
+
+
+@router.get('/health', response_class=JSONResponse)
+async def health(request: Request) -> JSONResponse:
+    return JSONResponse({'status': 'ok'})
+
+
+@router.get('/', response_class=HTMLResponse)
+async def test_route2(request: Request) -> HTMLResponse:
+    providers = ', '.join(PROVIDER_TYPE_REGISTER.keys())
+    shipment = sample_shipment()
+    res = await ship_form_json(request, shipment)
+    res.alerts += Alert(message=providers, type=AlertType.WARNING)
+    return render_template_response(request, res)
+

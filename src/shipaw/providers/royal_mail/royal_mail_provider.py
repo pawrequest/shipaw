@@ -1,102 +1,38 @@
-from typing import ClassVar, override
+from typing import ClassVar
 
+from loguru import logger
 from pydantic import Field
-from royal_mail_click_and_drop import CreateOrdersRequest, CreateOrdersResponse, ShipmentPackageRequest
-from royal_mail_click_and_drop.config import RoyalMailSettings
-from royal_mail_click_and_drop.models.address import (
-    AddressRequest as AddressRM,
-    RecipientDetailsRequest as ContactRM,
+from royal_mail_click_and_drop import (
+    CreateOrdersRequest,
+    CreateOrdersResponse,
 )
+from royal_mail_click_and_drop.config import RoyalMailSettings
 from royal_mail_click_and_drop.models.create_orders_request import CreateOrderRequest
-from royal_mail_click_and_drop.v2.client import RoyalMailClient, RoyalMailServiceCode
+from royal_mail_click_and_drop.models.shipment_package_request import PackageFormat
+from royal_mail_click_and_drop.v2.client import RoyalMailClient
 
+from shipaw.config import ShipawSettings
 from shipaw.fapi.responses import ShipmentBookingResponse
-from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.logging import log_obj
-from shipaw.models.services import Services
+from shipaw.models.services import AgnostServiceName
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
-from shipaw.providers.provider_abc import ShippingProvider
-from shipaw.providers.royal_mail.provider_funcs import date_to_datetime
+from shipaw.providers.provider_abc import ProviderName, ShippingProvider
+from shipaw.providers.registry import register_provider
+from shipaw.providers.royal_mail.provider_funcs import (
+    ROYAL_MAIL_SERVICES,
+    create_packages,
+    create_postage_details,
+    date_to_datetime,
+    full_contact_from_rm,
+    rm_billing_details_from_fc,
+    rm_recipient_details_from_agnostic_fc,
+)
 
 
-class RoyalMailServices(Services):
-    NEXT_DAY = 'parcel'
-    NEXT_DAY_12 = ''
-    NEXT_DAY_9 = ''
-
-    @override
-    def lookup(self, agnostic_name: str) -> RoyalMailServiceCode:
-        return RoyalMailServiceCode(super().lookup(agnostic_name))
-
-
-ROYAL_MAIL_SERVICES = RoyalMailServices(NEXT_DAY='parcel', NEXT_DAY_12='', NEXT_DAY_9='')
-
-
-def create_packages(*, num_parcels: int, service: RoyalMailServiceCode):
-    if not service == RoyalMailServices.NEXT_DAY:
-        raise NotImplementedError('only next day available atm')
-    return [
-        ShipmentPackageRequest(
-            weight_in_grams=10000,
-            package_format_identifier=service,
-        )
-        for _ in range(num_parcels)
-    ]
-
-
-def rm_address_from_agnostic_fc(full_contact: FullContact) -> AddressRM:
-    return AddressRM(
-        full_name=full_contact.contact.contact_name,
-        company_name=full_contact.address.business_name,
-        address_line1=full_contact.address.address_lines[0],
-        address_line2=full_contact.address.address_lines[1] if len(full_contact.address.address_lines) > 1 else None,
-        address_line3=full_contact.address.address_lines[2] if len(full_contact.address.address_lines) > 2 else None,
-        city=full_contact.address.town,
-        county=full_contact.address.county,
-        postcode=full_contact.address.postcode,
-        country_code=full_contact.address.country,
-    )
-
-
-def rm_recipient_details_from_agnostic_fc(full_contact: FullContact) -> ContactRM:
-    return ContactRM(
-        address=rm_address_from_agnostic_fc(full_contact),
-        phone_number=full_contact.contact.mobile_phone or full_contact.contact.phone_number,
-        email_address=full_contact.contact.email_address,
-    )
-
-
-def full_contact_from_rm(recipient: ContactRM) -> FullContact:
-    return FullContact(
-        contact=Contact(
-            contact_name=recipient.address.full_name,
-            phone_number=recipient.phone_number,
-            email_address=recipient.email_address,
-            mobile_phone=recipient.phone_number,
-        ),
-        address=Address(
-            business_name=recipient.address.company_name,
-            address_lines=[
-                line
-                for line in [
-                    recipient.address.address_line1,
-                    recipient.address.address_line2,
-                    recipient.address.address_line3,
-                ]
-                if line
-            ],
-            town=recipient.address.city,
-            county=recipient.address.county,
-            postcode=recipient.address.postcode,
-            country=recipient.address.country_code,
-        ),
-    )
-
-
-# @register_provider
+@register_provider
 class RoyalMailProvider(ShippingProvider):
-    name: ClassVar[str] = 'ROYAL_MAIL'
+    name: ClassVar[ProviderName] = ProviderName.ROYAL_MAIL
     services = ROYAL_MAIL_SERVICES
     settings_type: ClassVar[type[RoyalMailSettings]] = RoyalMailSettings
     settings: RoyalMailSettings
@@ -119,33 +55,41 @@ class RoyalMailProvider(ShippingProvider):
         if shipment.direction != ShipDirection.OUTBOUND:
             # todo: implement inbound / dropoff
             raise NotImplementedError('only outbound shipments are supported for Royal Mail')
+        if shipment.service not in (AgnostServiceName.NEXT_DAY, AgnostServiceName.NEXT_DAY_12):
+            raise NotImplementedError('only NEXT_DAY service is implemented for Royal Mail')
+        shipaw_settings = ShipawSettings.from_env('SHIPAW_ENV')
+        billing_details = rm_billing_details_from_fc(shipaw_settings.full_contact)
+        postage_details = create_postage_details(shipment=shipment)
+
         return CreateOrdersRequest(
             items=[
                 CreateOrderRequest(
+                    order_reference=shipment.reference,
+                    postage_details=postage_details,
+                    billing=billing_details,
                     recipient=rm_recipient_details_from_agnostic_fc(shipment.recipient),
                     order_date=date_to_datetime(shipment.shipping_date),
                     planned_despatch_date=date_to_datetime(shipment.shipping_date),
                     subtotal=1000,
                     shipping_cost_charged=0,
                     total=1000,
-                    packages=create_packages(
-                        num_parcels=shipment.boxes, service=self.services.lookup(shipment.service)
-                    ),
+                    packages=create_packages(num_parcels=shipment.boxes, package_format=PackageFormat.PARCEL),
                 )
             ]
         )
 
-    #
-    # def agnostic_shipment(self, orders_req: CreateOrdersRequest) -> Shipment:
-    #     order = orders_req.items[0]
-    #     return Shipment(
-    #         recipient=full_contact_from_rm(order.recipient),
-    #         boxes=len(order.packages),
-    #         shipping_date=order.planned_despatch_date.date(),
-    #         direction=ShipDirection.OUTBOUND,
-    #         reference=order.order_reference,
-    #         service=self.services.reverse_lookup(order.packages[0].package_format_identifier),
-    #     )
+    @staticmethod
+    def agnostic_shipment(orders_req: CreateOrdersRequest) -> Shipment:
+        order = orders_req.items[0]
+        return Shipment(
+            recipient=full_contact_from_rm(order.recipient),
+            boxes=len(order.packages),
+            shipping_date=order.planned_despatch_date.date(),
+            direction=ShipDirection.OUTBOUND,
+            reference=order.order_reference,
+            # service=ROYAL_MAIL_SERVICES.reverse_lookup(order.packages[0].package_format_identifier),
+            service=ROYAL_MAIL_SERVICES.reverse_lookup(order.postage_details.service_code),
+        )
 
     def build_booking_request(self, shipment: Shipment) -> CreateOrdersRequest:
         shipment_rm = self.provider_shipment(shipment)
@@ -155,6 +99,7 @@ class RoyalMailProvider(ShippingProvider):
     def book_shipment(self, shipment: Shipment) -> ShipmentBookingResponse:
         ship = self.build_booking_request(shipment)
         resp = self.client.book_shipment(ship)
+        logger.warning(f'{resp.created_orders_idents}')
         return self.build_booking_response(resp, shipment)
 
     def build_booking_response(self, rm_response: CreateOrdersResponse, shipment):
