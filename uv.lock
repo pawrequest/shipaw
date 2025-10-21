@@ -35,7 +35,7 @@ wheels = [
 
 [[package]]
 name = "apc-hypaship"
-version = "0.1.8"
+version = "0.1.9"
 source = { editable = "../apc-hypaship" }
 dependencies = [
     { name = "dotenv" },
@@ -57,6 +57,7 @@ dev = [
     { name = "autodoc-pydantic", specifier = ">=2.2.0" },
     { name = "myst-parser", specifier = ">=4.0.1" },
     { name = "pytest", specifier = ">=8.4.2" },
+    { name = "ruff", specifier = ">=0.14.1" },
     { name = "sphinx", specifier = ">=8.2.3" },
     { name = "sphinx-autodoc-typehints", specifier = ">=3.2.0" },
     { name = "sphinx-readme", specifier = ">=1.2.1" },
@@ -581,7 +582,7 @@ wheels = [
 
 [[package]]
 name = "parcelforce-expresslink"
-version = "0.1.8"
+version = "0.1.9"
 source = { editable = "../parcelforce-expresslink" }
 dependencies = [
     { name = "combadge" },
@@ -1007,7 +1008,7 @@ wheels = [
 
 [[package]]
 name = "royal-mail-click-and-drop"
-version = "0.0.6"
+version = "0.0.7"
 source = { editable = "../royal-mail-click-and-drop" }
 dependencies = [
     { name = "loguru" },
@@ -1089,7 +1090,7 @@ wheels = [
 
 [[package]]
 name = "shipaw"
-version = "0.3.21"
+version = "0.3.22"
 source = { editable = "." }
 dependencies = [
     { name = "apc-hypaship" },
