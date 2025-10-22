@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 def make_filename_safe(name: str) -> str:
-    return re.sub(r'[<>:"/\\|?*\x00-\x1F]', '_', name)
+    return re.sub(r'[ <>:"/\\|?*\x00-\x1F]', '_', name)
 
 
 def get_label_folder(direction: ShipDirection):
@@ -21,10 +21,10 @@ def get_label_folder(direction: ShipDirection):
 
 def get_label_stem(shipment: 'Shipment'):
     label_name = (
-        f'Shipping Label'
-        f'{f'-FROM {shipment.sender.address.business_name} | ' if shipment.sender else ''}'
-        f'-TO {shipment.recipient.address.business_name} | '
-        f'-ON {shipment.shipping_date}'
+        f'{'Dropoff' if shipment.direction == ShipDirection.DROPOFF else 'Shipping'} Label '
+        f'{f'FROM {shipment.sender.address.business_name} ' if shipment.sender else ''}'
+        f'TO {shipment.recipient.address.business_name} '
+        f'ON {shipment.shipping_date}'
     )
     return make_filename_safe(label_name)
 
