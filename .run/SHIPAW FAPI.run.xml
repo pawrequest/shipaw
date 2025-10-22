@@ -1,14 +1,14 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="SHIPAW FAPI" type="Python.FastAPI">
     <option name="additionalOptions" />
-    <option name="file" value="C:\prdev\amdev\shipaw\src\shipaw\fapi\app.py" />
+    <option name="appName" value="shipaw.fapi.app:app" />
     <module name="shipaw" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <option name="SDK_HOME" value="$PROJECT_DIR$/.venv/Scripts/python.exe" />
-    <option name="SDK_NAME" value="Python 3.12 (shipaw) (3)" />
-    <option name="WORKING_DIRECTORY" value="" />
+    <option name="SDK_NAME" value="uv (shipaw)" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
