@@ -109,6 +109,11 @@ async def email_label(
     return HTMLResponse(content='<span>Re</span>')
 
 
+@router.get('/health', response_class=JSONResponse)
+async def health(request: Request) -> JSONResponse:
+    return JSONResponse({'status': 'ok'})
+
+
 @router.get('/test', response_class=HTMLResponse)
 async def test_route(request: Request) -> HTMLResponse:
     shipment = sample_shipment()
@@ -116,16 +121,13 @@ async def test_route(request: Request) -> HTMLResponse:
     return render_template_response(request, res)
 
 
-@router.get('/health', response_class=JSONResponse)
-async def health(request: Request) -> JSONResponse:
-    return JSONResponse({'status': 'ok'})
-
-
 @router.get('/', response_class=HTMLResponse)
 async def test_route2(request: Request) -> HTMLResponse:
-    providers = ', '.join(PROVIDER_TYPE_REGISTER.keys())
+    providers = ', '.join(_.title() for _ in PROVIDER_TYPE_REGISTER.keys())
+    msg = f'Available Providers: {providers}'
+    logger.info(msg)
     shipment = sample_shipment()
     res = await ship_form_json(request, shipment)
-    res.alerts += Alert(message=providers, type=AlertType.WARNING)
+    res.alerts += Alert(message=msg, type=AlertType.NOTIFICATION)
     return render_template_response(request, res)
 

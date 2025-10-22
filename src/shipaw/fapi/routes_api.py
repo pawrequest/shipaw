@@ -28,22 +28,41 @@ router = APIRouter()
 router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
 
 
-@router.post('/shipping_form', response_model=ShipawTemplateResponse)
-async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
-    log_obj(shipment, 'Shipment received at /ship_form:')
-    alerts: Alerts = request.app.alerts
+def get_version():
+    from importlib.metadata import version, PackageNotFoundError
 
+    try:
+        return version('shipaw')
+    except PackageNotFoundError:
+        return 'unknown'
+
+
+async def notify_version():
+    alerts = Alerts.empty()
+    live = ShipawSettings.from_env().shipper_live
+    live_msg = 'Live Mode - Real Shipments will be booked' if live else 'Test Mode - No Shipments will be booked'
+    msg = f'Shipaw Version {get_version()} is in {live_msg}'
+    logger.warning(msg)
+    alerts += Alert(message=msg, type=AlertType.NOTIFICATION)
+    return alerts
+
+
+def notify_dev() -> Alerts:
+    alerts = Alerts.empty()
     if any(['prdev' in str(_).lower() for _ in Path(__file__).parents]):
         msg = '"prdev" in cwd tree - BETA MODE - This is a development version'
         logger.warning(msg)
         alerts += Alert(message=msg, type=AlertType.WARNING)
+    return alerts
 
-    if ShipawSettings.from_env().shipper_live:
-        msg = 'Shipper Live is True - Real Shipments will be booked'
-    else:
-        msg = 'Shipper_live is False - No Shipments will be booked'
-    logger.warning(msg)
-    alerts += Alert(message=msg, type=AlertType.NOTIFICATION)
+
+@router.post('/shipping_form', response_model=ShipawTemplateResponse)
+async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
+    log_obj(shipment, 'Shipment received at /ship_form:')
+
+    alerts: Alerts = request.app.alerts
+    alerts += notify_dev()
+    alerts += await notify_version()
 
     tmplt = ShipawTemplate(template_path='shipping_form_container.html', context={'shipment': shipment})
     return ShipawTemplateResponse(template=tmplt, alerts=alerts)
