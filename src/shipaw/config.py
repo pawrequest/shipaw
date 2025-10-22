@@ -34,7 +34,7 @@ class ProviderEnv(ShipawBaseModel):
 
 class ShipawSettings(BaseSettings):
     # toggles
-    shipper_live: bool = False
+    shipper_live: bool
     log_level: str = 'DEBUG'
 
     # dirs
