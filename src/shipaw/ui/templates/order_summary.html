@@ -7,26 +7,16 @@
 
 {% set shipment = shipment_request.shipment %}
 
-{% if shipment.direction == 'in' %}
-    {% set shipdir = "Inbound" %}
-{% elif shipment.direction == 'out' %}
-    {% set shipdir = "Outbound" %}
-{% elif shipment.direction == 'dropoff' %}
-    {% set shipdir = "Dropoff" %}
-{% else %}
-    {% set shipdir = "UNKNOWN DIRECTION!" %}
-{% endif %}
-
 {% if alerts %}
     {% include "alerts.html" with context %}
 {% endif %}
 <script>
-    console.log('SHIP DIR: {{ shipdir }}');
+    console.log('SHIP DIR: {{ shipment.direction }}');
 </script>
 
 <div id=requested_shipment class="wrapper wrapper__requested">
     <section class="requested requested__head">
-        <h3 class="requested-title">{{ shipdir }} {{ shipment_request.provider_name }} Shipment:</h3>
+        <h3 class="requested-title">{{ shipment.direction }} {{ shipment_request.provider_name.title() }} Shipment:</h3>
         <form hx-post="order_results"
               hx-target=#content_main
               hx-swap="innerHTML"

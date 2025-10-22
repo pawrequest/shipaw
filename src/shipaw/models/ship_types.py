@@ -72,6 +72,6 @@ VALID_POSTCODE = Annotated[
 
 
 class ShipDirection(StrEnum):
-    INBOUND = 'in'
-    OUTBOUND = 'out'
-    DROPOFF = 'dropoff'
+    INBOUND = 'Inbound'
+    OUTBOUND = 'Outbound'
+    DROPOFF = 'Dropoff'
