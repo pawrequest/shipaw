@@ -25,8 +25,10 @@ from shipaw.providers.registry import register_provider_type
 
 @register_provider_type
 class APCShippingProvider(ShippingProvider):
-    name: ClassVar[ProviderName] = ProviderName.APC
     settings: APCSettings
+
+    name: ClassVar[ProviderName] = ProviderName.APC
+
     settings_type: ClassVar[APCSettings] = APCSettings
     service_codes_type: ClassVar[type[APCServiceCode]] = APCServiceCode
     default_service: ClassVar[APCServiceCode] = APCServiceCode.PARCEL_1600

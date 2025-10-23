@@ -86,9 +86,9 @@ class ShipawSettings(BaseSettings):
     @classmethod
     @functools.lru_cache
     def from_env(cls, env_key='SHIPAW_ENV') -> ShipawSettings:
-        return cls(_env_file=get_path_from_environment(env_key))
+        return cls(_env_file=get_path_from_environment(env_key))  # pycharm_pydantic false positive
 
-    ## SET UI/TEMPLATE DIRS ##
+    # SET UI/TEMPLATE DIRS #
     @model_validator(mode='after')
     def set_ui(self):
         self.static_dir = self.static_dir or self.ui_dir / 'static'

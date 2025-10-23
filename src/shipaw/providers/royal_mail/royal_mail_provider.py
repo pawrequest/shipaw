@@ -1,4 +1,4 @@
-from typing import ClassVar
+from typing import ClassVar, override
 
 from loguru import logger
 from royal_mail_click_and_drop import (
@@ -31,19 +31,23 @@ from shipaw.providers.royal_mail.royal_mail_funcs import (
 
 @register_provider_type
 class RoyalMailProvider(ShippingProvider):
-    name: ClassVar[ProviderName] = ProviderName.ROYAL_MAIL
     settings: RoyalMailSettings
+
+    name: ClassVar[ProviderName] = ProviderName.ROYAL_MAIL
     settings_type: ClassVar[type[RoyalMailSettings]] = RoyalMailSettings
     service_codes_type: ClassVar[type[RoyalMailServiceCode]] = RoyalMailServiceCode
     default_service: ClassVar[RoyalMailServiceCode] = RoyalMailServiceCode.EXPRESS_24
-    _client: RoyalMailClient | None = None
     valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND]
 
+    _client: RoyalMailClient | None = None
+
+    @override
     def is_sandbox(self) -> bool:
         # Royal mail do not have a test environment. that's fun
         return False
 
     @property
+    @override
     def client(self) -> RoyalMailClient:
         if self._client is None:
             if self.settings is None:
@@ -52,6 +56,7 @@ class RoyalMailProvider(ShippingProvider):
         return self._client
 
     @classmethod
+    @override
     def agnostic_shipment(cls, orders_req: CreateOrdersRequest) -> Shipment:
         order = orders_req.items[0]
         return Shipment(
@@ -62,6 +67,7 @@ class RoyalMailProvider(ShippingProvider):
             reference=order.order_reference,
         )
 
+    @override
     def provider_shipment(self, shipment: Shipment, service_code: RoyalMailServiceCode) -> CreateOrdersRequest:
         if shipment.direction != ShipDirection.OUTBOUND:
             # todo: implement inbound / dropoff
@@ -93,6 +99,7 @@ class RoyalMailProvider(ShippingProvider):
         log_obj(shipment_rm, 'Royal Mail Shipment Request')
         return shipment_rm
 
+    @override
     def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> ShipmentBookingResponse:
         shipment = shipment_request.shipment
         provider_shipment_request = self.provider_shipment_request(shipment_request)
@@ -116,5 +123,6 @@ class RoyalMailProvider(ShippingProvider):
             success=success,
         )
 
+    @override
     def fetch_label_content(self, order_ident_str: str) -> bytes:
         return self.client.get_label_content(order_ident_str)
