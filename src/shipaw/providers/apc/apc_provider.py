@@ -32,7 +32,7 @@ class APCShippingProvider(ShippingProvider):
     default_service: ClassVar[APCServiceCode] = APCServiceCode.PARCEL_1600
     _client: APCClient | None = None
 
-    valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.INBOUND, ShipDirection.OUTBOUND]
+    valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND, ShipDirection.INBOUND]
 
     @override
     def is_sandbox(self) -> bool:

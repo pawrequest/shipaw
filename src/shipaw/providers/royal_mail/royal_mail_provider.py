@@ -35,7 +35,7 @@ class RoyalMailProvider(ShippingProvider):
     settings: RoyalMailSettings
     settings_type: ClassVar[type[RoyalMailSettings]] = RoyalMailSettings
     service_codes_type: ClassVar[type[RoyalMailServiceCode]] = RoyalMailServiceCode
-    default_service: ClassVar[RoyalMailServiceCode] = RoyalMailServiceCode.TRACKED_24
+    default_service: ClassVar[RoyalMailServiceCode] = RoyalMailServiceCode.EXPRESS_24
     _client: RoyalMailClient | None = None
     valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND]
 

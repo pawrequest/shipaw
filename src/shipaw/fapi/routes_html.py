@@ -10,7 +10,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 
 from shipaw.config import ShipawSettings
-from shipaw.fapi.alerts import Alert, AlertType, Alerts
+from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.emailer import send_label_email
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
@@ -21,7 +21,6 @@ from shipaw.fapi.routes_api import (
     shipping_form_api as ship_form_json,
 )
 from shipaw.models.shipment import Shipment, sample_shipment
-from shipaw.providers.registry import PROVIDER_REGISTER
 
 router = APIRouter()
 
@@ -123,10 +122,6 @@ async def test_route(request: Request) -> HTMLResponse:
 
 @router.get('/', response_class=HTMLResponse)
 async def test_route2(request: Request) -> HTMLResponse:
-    providers = ', '.join(_.title() for _ in PROVIDER_REGISTER.keys())
-    msg = f'Available Providers: {providers}'
-    logger.info(msg)
     shipment = sample_shipment()
     res = await ship_form_json(request, shipment)
-    res.alerts += Alert(message=msg, type=AlertType.NOTIFICATION)
     return render_template_response(request, res)

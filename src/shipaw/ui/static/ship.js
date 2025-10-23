@@ -387,4 +387,11 @@ function getAddressLines(Address) {
         .filter(line => line);
 }
 
+// force make small after selection
+document.addEventListener('DOMContentLoaded', function() {
+    const serviceSelect = document.getElementById('service');
 
+    serviceSelect.addEventListener('change', function() {
+        this.blur();
+    });
+});

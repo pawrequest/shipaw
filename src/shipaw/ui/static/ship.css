@@ -283,3 +283,81 @@ select:focus {
     padding: 1rem;
     gap: .5rem;
 }
+
+/*!* Move #service styles outside of .inputs__ship to ensure they apply *!*/
+/*#service {*/
+/*    width: 10rem;           !* Normal width *!*/
+/*    transition: width 0.2s ease;*/
+/*    text-overflow: ellipsis;*/
+/*    white-space: nowrap;*/
+/*    overflow: hidden;*/
+/*}*/
+
+/*#service:focus,*/
+/*#service:active {*/
+/*    width: 25rem;           !* Larger expanded width *!*/
+/*    z-index: 1000;          !* Higher z-index to appear above other elements *!*/
+/*    position: relative;*/
+/*}*/
+
+/*!* Style the dropdown options when open *!*/
+/*#service option {*/
+/*    white-space: normal;    !* Allow text wrapping in options *!*/
+/*    word-wrap: break-word;*/
+/*}*/
+
+/*!* Move #service styles outside of .inputs__ship to ensure they apply *!*/
+/*#service {*/
+/*    width: 10rem;           !* Normal width *!*/
+/*    transition: width 0.2s ease;*/
+/*    text-overflow: ellipsis;*/
+/*    white-space: nowrap;*/
+/*    overflow: hidden;*/
+/*}*/
+
+/*#service:focus,*/
+/*#service:active {*/
+/*    width: 25rem;           !* Larger expanded width *!*/
+/*    z-index: 1000;          !* Higher z-index to appear above other elements *!*/
+/*    position: relative;*/
+/*}*/
+
+/*!* Ensure it shrinks back when not focused *!*/
+/*#service:not(:focus):not(:active) {*/
+/*    width: 10rem;*/
+/*}*/
+
+/*!* Style the dropdown options when open *!*/
+/*#service option {*/
+/*    white-space: normal;    !* Allow text wrapping in options *!*/
+/*    word-wrap: break-word;*/
+/*}*/
+
+/* Move #service styles outside of .inputs__ship to ensure they apply */
+#service {
+    width: 10rem;           /* Normal width */
+    transition: width 0.2s ease;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#service:focus,
+#service:active {
+    width: max-content;     /* Expand to fit content */
+    min-width: 10rem;       /* Don't shrink below original size */
+    max-width: 35rem;       /* Prevent it from getting too wide */
+    z-index: 1000;          /* Higher z-index to appear above other elements */
+    position: relative;
+}
+
+/* Ensure it shrinks back when not focused */
+#service:not(:focus):not(:active) {
+    width: 11rem;
+}
+
+/* Style the dropdown options when open */
+#service option {
+    white-space: normal;    /* Allow text wrapping in options */
+    word-wrap: break-word;
+}

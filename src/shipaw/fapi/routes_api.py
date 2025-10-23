@@ -176,12 +176,13 @@ async def get_providers():
 async def provider_services(provider_name: str):
     provider = await provider_from_form(provider_name)
     services = enum_as_dict(provider.service_codes_type)
-    return JSONResponse(services)
+    serv = {k.title(): v for k, v in services.items()}
+    return JSONResponse(serv)
 
 
 @router.get('/provider_directions/{provider_name}', response_class=JSONResponse)
 async def provider_directions(provider_name: str):
     provider = await provider_from_form(provider_name)
     directions = provider.valid_directions
-    dir_dict = {_.name: _.value for _ in directions}
+    dir_dict = {_.value: _.value for _ in directions}
     return JSONResponse(dir_dict)

@@ -97,9 +97,9 @@ async def shipment_request_form(
     provider: ShippingProvider = Depends(provider_from_form),
     shipment: Shipment = Depends(shipment_f_form),
     provider_name: ProviderName = Form(...),
-    service_code: str = Form(...),
+    service: str = Form(...),
 ) -> ShipmentRequest:
-    serv = provider.service_codes_type(service_code)
+    serv = provider.service_codes_type(service)
     return ShipmentRequest(shipment=shipment, provider_name=provider_name, service_code=serv)
 
 

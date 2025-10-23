@@ -44,8 +44,8 @@ class ParcelforceShippingProvider(ShippingProvider):
     _client: ParcelforceClient | None = None
 
     valid_directions: ClassVar[list[ShipDirection]] = [
-        ShipDirection.INBOUND,
         ShipDirection.OUTBOUND,
+        ShipDirection.INBOUND,
         ShipDirection.DROPOFF,
     ]
 

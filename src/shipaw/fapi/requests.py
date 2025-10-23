@@ -1,5 +1,4 @@
 import uuid
-from enum import StrEnum
 from typing import Annotated
 
 from pydantic import StringConstraints
@@ -21,7 +20,7 @@ class ShipmentRequest(ShipawBaseModel):
     id: uuid.UUID = uuid.uuid4()
     shipment: Shipment
     provider_name: ProviderName
-    service_code: StrEnum
+    service_code: str
 
     @property
     def provider(self) -> ShippingProvider:
