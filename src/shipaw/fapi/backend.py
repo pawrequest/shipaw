@@ -9,15 +9,15 @@ from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.models.address import AddressChoice as AddressChoiceAgnost
 from shipaw.models.ship_types import ShipDirection
-from shipaw.providers.parcelforce.provider_funcs import full_contact_from_provider_contact_address
+from shipaw.providers.parcelforce.parcelforce_funcs import full_contact_from_provider_contact_address
 from shipaw.providers.provider_abc import ProviderName
-from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
+from shipaw.providers.registry import PROVIDER_REGISTER
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentBookingResponse:
     shipment_response = ShipmentBookingResponse(shipment=shipment_request.shipment)
     try:
-        shipment_response = shipment_request.provider.book_shipment(shipment_request.shipment)
+        shipment_response = shipment_request.provider.book_shipment_agnostic(shipment_request.shipment)
 
     except HTTPStatusError as e:
         await maybe_apc(e, shipment_request, shipment_response)
@@ -72,7 +72,7 @@ async def maybe_apc(e: HTTPStatusError, shipment_request, shipment_response):
 
 async def maybe_alert_apc(shipment_request):
     alerts = Alerts.empty()
-    if ProviderName.APC in PROVIDER_TYPE_REGISTER:
+    if ProviderName.APC in PROVIDER_REGISTER:
         if shipment_request.provider_name == 'APC' and shipment_request.shipment.direction == ShipDirection.DROPOFF:
             alerts += Alert(
                 message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',

@@ -15,6 +15,7 @@ from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.ship_types import ShipDirection
+from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
 
 
 def get_path_from_environment(env_key: str) -> Path:
@@ -43,7 +44,7 @@ class ShipawSettings(BaseSettings):
     ui_dir: Path = Field(default_factory=get_ui)
 
     # Provider env file dict (json string in .env)
-    provider_env_dict: dict
+    provider_env_dict: dict[str, Path]
 
     # auto dirs
     static_dir: Path | None = None
@@ -64,6 +65,23 @@ class ShipawSettings(BaseSettings):
     mobile_phone: str
 
     model_config = SettingsConfigDict()
+
+    # @model_validator(mode='after')
+    # def populate_provider_registry(self):
+    #     for name, env_path in self.provider_env_dict.items():
+    #         provider_type = PROVIDER_TYPE_REGISTER.get(name)
+    #         provider = provider_type.from_shipaw_settings_env_dict(self)
+    #         register_provider_instance(provider)
+    #     return self
+
+    @model_validator(mode='after')
+    def populate_provider_registry2(self):
+        for name, env_path in self.provider_env_dict.items():
+            provider_type = PROVIDER_TYPE_REGISTER.get(name)
+            provider_settings = provider_type.settings_type(_env_file=env_path)
+            provider = provider_type(settings=provider_settings)
+            register_provider_instance(provider)
+        return self
 
     @classmethod
     @functools.lru_cache

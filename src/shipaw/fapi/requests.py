@@ -1,4 +1,5 @@
 import uuid
+from enum import StrEnum
 from typing import Annotated
 
 from pydantic import StringConstraints
@@ -7,7 +8,7 @@ from shipaw.models.address import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
-from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
+from shipaw.providers.registry import PROVIDER_REGISTER
 
 
 class Authentication(ShipawBaseModel):
@@ -20,14 +21,15 @@ class ShipmentRequest(ShipawBaseModel):
     id: uuid.UUID = uuid.uuid4()
     shipment: Shipment
     provider_name: ProviderName
+    service_code: StrEnum
 
     @property
     def provider(self) -> ShippingProvider:
         if not self.provider_name:
             raise ValueError('Provider name is not set')
-        if self.provider_name not in PROVIDER_TYPE_REGISTER:
+        if self.provider_name not in PROVIDER_REGISTER:
             raise ValueError(f'Unknown provider: {self.provider_name}')
-        return PROVIDER_TYPE_REGISTER[self.provider_name].from_shipaw_settings_env_dict()
+        return PROVIDER_REGISTER[self.provider_name]
 
 
 class AddressRequest(ShipawBaseModel):

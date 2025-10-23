@@ -17,12 +17,12 @@ from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.logging import log_obj
 from shipaw.models.shipment import Shipment
-from shipaw.providers.parcelforce.provider import ParcelforceShippingProvider
-from shipaw.providers.parcelforce.provider_funcs import (
+from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
+from shipaw.providers.parcelforce.parcelforce_funcs import (
     address_from_agnostic,
 )
 from shipaw.providers.provider_abc import ProviderName
-from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
+from shipaw.providers.registry import PROVIDER_REGISTER
 
 router = APIRouter()
 router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
@@ -135,9 +135,10 @@ async def get_addr_choices_api(
         request: Request - FastAPI request object
         body: Address - request body containing postcode and optional address
     """
-    p: ParcelforceShippingProvider = cast(
-        ParcelforceShippingProvider, PROVIDER_TYPE_REGISTER[ProviderName.PARCELFORCE].from_shipaw_settings_env_dict()
-    )
+    # p: ParcelforceShippingProvider = cast(
+    #     ParcelforceShippingProvider, PROVIDER_TYPE_REGISTER[ProviderName.PARCELFORCE].from_shipaw_settings_env_dict()
+    # )
+    p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, PROVIDER_REGISTER[ProviderName.PARCELFORCE])
     client = p.client
     postcode = body.postcode
     address_agnost = body.address
@@ -159,5 +160,3 @@ async def get_addr_choices_api(
         addr = Address(address_lines=['ERROR:', str(e)], town='Error', postcode='Error', business_name='Error')
         chc = AddressChoiceAgnost(address=addr, score=0)
         return [chc]
-
-

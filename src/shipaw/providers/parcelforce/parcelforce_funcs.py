@@ -1,29 +1,13 @@
 from __future__ import annotations
 
-from typing import ClassVar, override
 
 from parcelforce_expresslink.models.address import AddressBase, AddressRecipient, AddressSender
 from parcelforce_expresslink.models.contact import Contact as ContactPF, ContactSender
-from parcelforce_expresslink.models.services import ServiceCode
 from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 
 from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
-from shipaw.models.services import Services
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
-
-
-class ParcelforceServices(Services):
-    NEXT_DAY: ClassVar[str] = 'SND'
-    NEXT_DAY_12: ClassVar[str] = 'S12'
-    NEXT_DAY_9: ClassVar[str] = '09'
-
-    @override
-    def lookup(self, agnostic_name: str) -> ServiceCode:
-        return ServiceCode(super().lookup(agnostic_name))
-
-
-PARCELFORCE_SERVICES = ParcelforceServices()
 
 
 def address_from_agnostic[addr_type: AddressBase](
@@ -86,11 +70,19 @@ def ref_dict_from_str(ref_string: str) -> dict[str, str]:
 
 
 def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
+    sender = None
+    if shipment.direction == ShipDirection.INBOUND:
+        address = shipment.collection_info.collection_address
+        contact = shipment.collection_info.collection_contact
+        sender = full_contact_from_provider_contact_address(contact, address)
+    elif shipment.direction == ShipDirection.DROPOFF:
+        address = shipment.sender_address
+        contact = shipment.sender_contact
+        sender = full_contact_from_provider_contact_address(contact, address)
+
     return ShipmentAgnost(
         recipient=full_contact_from_provider_contact_address(shipment.recipient_contact, shipment.recipient_address),
-        sender=full_contact_from_provider_contact_address(shipment.sender_contact, shipment.sender_address)
-        if shipment.sender_contact and shipment.sender_address
-        else None,
+        sender=sender,
         boxes=shipment.total_number_of_parcels,
         shipping_date=shipment.shipping_date,
         direction=shipment.direction,
@@ -123,7 +115,5 @@ def convert_shipment_by_direction(ship_pf: ShipmentPF, shipment: ShipmentAgnost)
 
 
 def join_refs(refs: dict[str, str]) -> str:
-    refs = [refs.get(f'reference_number{i+1}', '') for i in range(len(refs))]
+    refs = [refs.get(f'reference_number{i + 1}', '') for i in range(len(refs))]
     return ''.join(refs).strip()
-
-

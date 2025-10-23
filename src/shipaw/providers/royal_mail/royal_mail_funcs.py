@@ -1,5 +1,4 @@
 from datetime import datetime, date
-from typing import ClassVar, override
 
 from royal_mail_click_and_drop import (
     AddressRequest as AddressRM,
@@ -10,10 +9,8 @@ from royal_mail_click_and_drop import (
 from royal_mail_click_and_drop.models.address import RecipientDetailsRequest as ContactRM
 from royal_mail_click_and_drop.models.shipment_package_request import PackageFormat
 from royal_mail_click_and_drop.v2.consts import SendNotifcationsTo
-from royal_mail_click_and_drop.v2.services import RoyalMailServiceCode
 
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.models.services import AgnostServiceName, Services
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
@@ -22,40 +19,12 @@ def date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.min.time())
 
 
-class RoyalMailServices(Services):
-    NEXT_DAY: ClassVar[str] = 'TOLP24'  # no signature... use 'TOLP24SF' for signature
-    NEXT_DAY_12: ClassVar[str] = 'SD1OLP'  # £750 comp... use 'SD2OLP' for 1,000 or 'SD3OLP' for 2,500
-
-    @override
-    def lookup(self, agnostic_name: str) -> RoyalMailServiceCode:
-        if agnostic_name not in (AgnostServiceName.NEXT_DAY, AgnostServiceName.NEXT_DAY_12):
-            raise NotImplementedError('only next day and pre noon services are implemented for royal mail atm')
-        return RoyalMailServiceCode(super().lookup(agnostic_name))
-
-
-#
-# # tod these should be service spec but using parcelspec until RM provide data.
-# class RoyalMailServicesOopsParcel(Services):
-#     NEXT_DAY = 'parcel'
-#     NEXT_DAY_12 = ''
-#     NEXT_DAY_9 = ''
-#
-#     @override
-#     def lookup(self, agnostic_name: str) -> RoyalMailServiceCode:
-#         if agnostic_name != AgnostServiceName.NEXT_DAY:
-#             raise NotImplementedError('only next day service is implemented for royal mail atm')
-#         return RoyalMailServiceCode(super().lookup(agnostic_name))
-
-
-ROYAL_MAIL_SERVICES = RoyalMailServices()
-
-
-def create_postage_details(shipment: Shipment):
+def create_postage_details(shipment: Shipment, service_code):
     send_to = (
         SendNotifcationsTo.RECIPIENT if shipment.direction == ShipDirection.OUTBOUND else SendNotifcationsTo.BILLING
     )
     return PostageDetailsRequest(
-        service_code=ROYAL_MAIL_SERVICES.lookup(shipment.service),
+        service_code=service_code,
         send_notifications_to=send_to,
         receive_email_notification=True,
         receive_sms_notification=True,

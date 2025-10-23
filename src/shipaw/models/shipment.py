@@ -4,7 +4,6 @@ from pydantic import Field
 
 from shipaw.models.address import FullContact
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.services import AgnostServiceName
 from shipaw.models.ship_types import ShipDirection
 
 
@@ -16,7 +15,7 @@ class Shipment(ShipawBaseModel):
     shipping_date: dt.date
     direction: ShipDirection
     own_label: bool | None = None  # print own label vs driver brings, Parcelforce Only
-    service: AgnostServiceName = AgnostServiceName.NEXT_DAY
+    # service: AgnostServiceName = AgnostServiceName.NEXT_DAY
     reference: str = ''
 
     context: dict = Field(default_factory=dict)
@@ -59,5 +58,5 @@ def sample_shipment() -> Shipment:
         shipping_date=dt.date.today() + dt.timedelta(days=2),
         direction=ShipDirection.OUTBOUND,
         reference='Test Reference',
-        service=AgnostServiceName.NEXT_DAY,
+        # service=AgnostServiceName.NEXT_DAY,
     )

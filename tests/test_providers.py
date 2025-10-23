@@ -1,6 +1,11 @@
+import contextlib
+
+import pytest
+
+from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.ship_types import ShipDirection
-from shipaw.models.shipment import Shipment
+from shipaw.providers.provider_abc import ProviderName
 
 
 def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_shipment):
@@ -9,23 +14,45 @@ def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_sh
     assert sample_shipment.direction == ShipDirection.OUTBOUND
 
 
-def test_provider_makes_ship_dict(all_sample_shipments: Shipment, sample_provider):
-    ship = sample_provider.provider_shipment(all_sample_shipments)
-    ship = ship.model_dump(by_alias=True)
-    assert isinstance(ship, dict)
+def test_provider_makes_ship_dict(all_sample_shipment_requests: ShipmentRequest):
+    provider = all_sample_shipment_requests.provider
+    with provider_context(all_sample_shipment_requests):
+        service_code = provider.default_service
+        ship = provider.provider_shipment(all_sample_shipment_requests.shipment, service_code=service_code)
+        ship = ship.model_dump(by_alias=True)
+        assert isinstance(ship, dict)
 
 
-def test_provider_books_shipment(all_sample_shipments, sample_provider):
-    response = sample_provider.book_shipment(all_sample_shipments)
-    assert isinstance(response, ShipmentBookingResponse)
-    assert response.shipment_num
-    assert response.success
+def test_provider_books_shipment(all_sample_shipment_requests):
+    provider = all_sample_shipment_requests.provider
+    with provider_context(all_sample_shipment_requests):
+        response = provider.book_shipment_agnostic(all_sample_shipment_requests)
+        assert isinstance(response, ShipmentBookingResponse)
+        assert response.shipment_num
+        assert response.success
 
 
-def test_provider_converts_shiments(sample_shipment: Shipment, sample_provider):
-    ship = sample_provider.provider_shipment(sample_shipment)
-    back = sample_provider.agnostic_shipment(ship)
-    assert sample_shipment == back
+def test_provider_converts_shiments(all_sample_shipment_requests: ShipmentRequest):
+    provider = all_sample_shipment_requests.provider
+    service = provider.service_codes_type(all_sample_shipment_requests.service_code)
+    sampo_shipment = all_sample_shipment_requests.shipment
+
+    with provider_context(all_sample_shipment_requests):
+        ship = provider.provider_shipment(sampo_shipment, service_code=service)
+        back = provider.agnostic_shipment(ship)
+        assert sampo_shipment == back
+
+
+def provider_context(shipment_request):
+    provider = shipment_request.provider
+    ctx = contextlib.nullcontext()
+    if provider.name == ProviderName.APC:
+        if shipment_request.shipment.direction == ShipDirection.DROPOFF:
+            ctx = pytest.raises(NotImplementedError)
+    elif provider.name == ProviderName.ROYAL_MAIL:
+        if shipment_request.shipment.direction not in [ShipDirection.OUTBOUND]:
+            ctx = pytest.raises(NotImplementedError)
+    return ctx
 
 
 # def test_address_conversions(provider: ShippingProvider, sample_full_contact):

@@ -14,6 +14,8 @@ from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.ship_types import ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
+from shipaw.providers.provider_abc import ProviderName
+from shipaw.providers.registry import PROVIDER_REGISTER
 
 
 async def full_contact_form(
@@ -46,7 +48,6 @@ async def shipment_f_form(
     full_contact: FullContact = Depends(full_contact_form),
     shipping_date: date = Form(...),
     boxes: int = Form(...),
-    service: str = Form(...),
     direction: ShipDirection = Form(...),
     reference: str = Form(...),
     context_json: str = Form(...),
@@ -77,7 +78,6 @@ async def shipment_f_form(
         shipping_date=shipping_date,
         direction=direction,
         reference=reference,
-        service=service,
         context=context,
         collect_ready=collect_ready,
         collect_closed=collect_closed,
@@ -88,12 +88,12 @@ async def shipment_f_form(
 
 async def shipment_request_form(
     shipment: Shipment = Depends(shipment_f_form),
-    provider_name: str = Form(...),
+    provider_name: ProviderName = Form(...),
+    service_code: str = Form(...),
 ) -> ShipmentRequest:
-    return ShipmentRequest(
-        shipment=shipment,
-        provider_name=provider_name,
-    )
+    prov = PROVIDER_REGISTER[provider_name]
+    serv = prov.service_codes_type(service_code)
+    return ShipmentRequest(shipment=shipment, provider_name=provider_name, service_code=serv)
 
 
 async def shipment_form_json(shipment_json: str = Form(...)) -> Shipment:

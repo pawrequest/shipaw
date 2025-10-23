@@ -3,12 +3,11 @@ from datetime import date, timedelta
 import pytest
 
 from shipaw.config import ShipawSettings  # FIRST!
-from shipaw.models.services import AgnostServiceName
+from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
-from shipaw.providers import RoyalMailProvider
-from shipaw.providers.registry import PROVIDER_TYPE_REGISTER
+from shipaw.providers.registry import PROVIDER_REGISTER, PROVIDER_TYPE_REGISTER
 
 TEST_DATE = date.today() + timedelta(days=2)
 if TEST_DATE.weekday() in (5, 6):
@@ -26,24 +25,31 @@ def sample_settings_rm():
 
 
 @pytest.fixture(
-    params=[
-        ('APC', PROVIDER_TYPE_REGISTER['APC']),
-        ('PARCELFORCE', PROVIDER_TYPE_REGISTER['PARCELFORCE']),
-    ],
-    ids=lambda val: val[0],
+    params=['APC', 'PARCELFORCE'],
+    ids=lambda val: val,
 )
 def sample_provider(sample_settings, request):
-    name = request.param[0]
-    type_ = request.param[1]
-    env_file = sample_settings.provider_env_dict[name]
-    provider = type_.from_env(env_file)
+    name = request.param
+    provider = PROVIDER_REGISTER[name]
+    assert isinstance(provider, PROVIDER_TYPE_REGISTER[name])
     assert provider.is_sandbox(), f'Must use sandbox environment for tests, {provider.settings=}'
     return provider
 
 
-@pytest.fixture
-def sample_provider_rm(sample_settings_rm):
-    return RoyalMailProvider.from_shipaw_settings_env_dict(shipaw_settings=sample_settings_rm)
+# @pytest.fixture(
+#     params=[
+#         ('APC', PROVIDER_TYPE_REGISTER['APC']),
+#         ('PARCELFORCE', PROVIDER_TYPE_REGISTER['PARCELFORCE']),
+#     ],
+#     ids=lambda val: val[0],
+# )
+# def sample_provider1(sample_settings, request):
+#     name = request.param[0]
+#     type_ = request.param[1]
+#     env_file = sample_settings.provider_env_dict[name]
+#     provider = type_.from_env(env_file)
+#     assert provider.is_sandbox(), f'Must use sandbox environment for tests, {provider.settings=}'
+#     return provider
 
 
 @pytest.fixture
@@ -110,7 +116,6 @@ def sample_shipment(sample_remote_fc):
         shipping_date=TEST_DATE,
         direction=ShipDirection.OUTBOUND,
         reference='Test Reference outbound',
-        service=AgnostServiceName.NEXT_DAY,
     )
 
 
@@ -123,8 +128,7 @@ def sample_shipment_inbound(sample_remote_fc, sample_full_home_contact):
         shipping_date=TEST_DATE,
         direction=ShipDirection.INBOUND,
         reference='Test Inbound Reference',
-        service=AgnostServiceName.NEXT_DAY,
-        own_label=True,
+        # own_label=True,
     )
 
 
@@ -140,3 +144,13 @@ def sample_shipment_dropoff(sample_shipment_inbound):
 @pytest.fixture(params=['sample_shipment', 'sample_shipment_inbound', 'sample_shipment_dropoff'], ids=lambda val: val)
 def all_sample_shipments(request):
     return request.getfixturevalue(request.param)
+
+
+@pytest.fixture
+def all_sample_shipment_requests(all_sample_shipments, sample_provider):
+    service_code = sample_provider.default_service
+    return ShipmentRequest(
+        shipment=all_sample_shipments,
+        provider_name=sample_provider.name,
+        service_code=service_code,
+    )
