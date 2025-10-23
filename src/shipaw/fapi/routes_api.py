@@ -1,3 +1,4 @@
+import pprint
 from pathlib import Path
 from typing import cast
 
@@ -11,11 +12,12 @@ from starlette.staticfiles import StaticFiles
 from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, check_royal_mail, maybe_alert_phone_number
 from shipaw.fapi.backend import convert_choice, maybe_alert_apc, try_book_shipment, try_get_write_label
-from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
+from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.logging import log_obj
+from shipaw.models.services2 import enum_as_dict
 from shipaw.models.shipment import Shipment
 from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
 from shipaw.providers.parcelforce.parcelforce_funcs import (
@@ -160,3 +162,26 @@ async def get_addr_choices_api(
         addr = Address(address_lines=['ERROR:', str(e)], town='Error', postcode='Error', business_name='Error')
         chc = AddressChoiceAgnost(address=addr, score=0)
         return [chc]
+
+
+@router.get('/providers', response_class=JSONResponse)
+async def get_providers():
+    logger.warning('hit PROVIDERS')
+    provider_response = {_.title(): _ for _ in PROVIDER_REGISTER.keys()}
+    logger.warning(pprint.pformat(provider_response))
+    return JSONResponse(provider_response)
+
+
+@router.get('/provider_services/{provider_name}', response_class=JSONResponse)
+async def provider_services(provider_name: str):
+    provider = await provider_from_form(provider_name)
+    services = enum_as_dict(provider.service_codes_type)
+    return JSONResponse(services)
+
+
+@router.get('/provider_directions/{provider_name}', response_class=JSONResponse)
+async def provider_directions(provider_name: str):
+    provider = await provider_from_form(provider_name)
+    directions = provider.valid_directions
+    dir_dict = {_.name: _.value for _ in directions}
+    return JSONResponse(dir_dict)

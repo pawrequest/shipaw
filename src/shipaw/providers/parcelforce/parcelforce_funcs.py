@@ -38,7 +38,7 @@ def contact_from_agnostic_fc[contact_type: ContactPF](
     )
 
 
-def full_contact_from_provider_contact_address(contact: ContactPF, address: AddressBase) -> FullContact:
+def parcelforce_full_contact(contact: ContactPF, address: AddressBase) -> FullContact:
     return FullContact(
         address=AddressAgnost(
             business_name=contact.business_name,
@@ -74,14 +74,14 @@ def parcelforce_shipment_to_agnostic(shipment: ShipmentPF) -> ShipmentAgnost:
     if shipment.direction == ShipDirection.INBOUND:
         address = shipment.collection_info.collection_address
         contact = shipment.collection_info.collection_contact
-        sender = full_contact_from_provider_contact_address(contact, address)
+        sender = parcelforce_full_contact(contact, address)
     elif shipment.direction == ShipDirection.DROPOFF:
         address = shipment.sender_address
         contact = shipment.sender_contact
-        sender = full_contact_from_provider_contact_address(contact, address)
+        sender = parcelforce_full_contact(contact, address)
 
     return ShipmentAgnost(
-        recipient=full_contact_from_provider_contact_address(shipment.recipient_contact, shipment.recipient_address),
+        recipient=parcelforce_full_contact(shipment.recipient_contact, shipment.recipient_address),
         sender=sender,
         boxes=shipment.total_number_of_parcels,
         shipping_date=shipment.shipping_date,

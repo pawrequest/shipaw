@@ -21,6 +21,7 @@ from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse
 from shipaw.models.logging import log_obj
+from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment, Shipment as ShipmentAgnost
 from shipaw.providers.parcelforce.parcelforce_funcs import (
     address_from_agnostic_fc,
@@ -41,6 +42,12 @@ class ParcelforceShippingProvider(ShippingProvider):
     service_codes_type: ClassVar[type[ServiceCode]] = ServiceCode
     default_service: ClassVar[ServiceCode] = ServiceCode.EXPRESS24
     _client: ParcelforceClient | None = None
+
+    valid_directions: ClassVar[list[ShipDirection]] = [
+        ShipDirection.INBOUND,
+        ShipDirection.OUTBOUND,
+        ShipDirection.DROPOFF,
+    ]
 
     def is_sandbox(self) -> bool:
         return 'test' in self.settings.pf_endpoint.lower()

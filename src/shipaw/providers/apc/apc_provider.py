@@ -32,6 +32,8 @@ class APCShippingProvider(ShippingProvider):
     default_service: ClassVar[APCServiceCode] = APCServiceCode.PARCEL_1600
     _client: APCClient | None = None
 
+    valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.INBOUND, ShipDirection.OUTBOUND]
+
     @override
     def is_sandbox(self) -> bool:
         return 'training' in self.settings.base_url.lower()

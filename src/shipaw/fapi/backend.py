@@ -4,23 +4,22 @@ from loguru import logger
 from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
 from parcelforce_expresslink.models.contact import Contact as ContactPF
 
+from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentBookingResponse
-from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.models.address import AddressChoice as AddressChoiceAgnost
 from shipaw.models.ship_types import ShipDirection
-from shipaw.providers.parcelforce.parcelforce_funcs import full_contact_from_provider_contact_address
+from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
 from shipaw.providers.provider_abc import ProviderName
-from shipaw.providers.registry import PROVIDER_REGISTER
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentBookingResponse:
     shipment_response = ShipmentBookingResponse(shipment=shipment_request.shipment)
     try:
-        shipment_response = shipment_request.provider.book_shipment_agnostic(shipment_request.shipment)
+        shipment_response = shipment_request.provider.book_shipment_agnostic(shipment_request)
 
     except HTTPStatusError as e:
-        await maybe_apc(e, shipment_request, shipment_response)
+        await maybe_apc_response_error(e, shipment_request, shipment_response)
 
     except Exception as e:
         logger.exception(f'Error booking shipment: {e}')
@@ -46,7 +45,7 @@ async def try_get_label_data(request: ShipmentRequest, response: ShipmentBooking
                 logger.warning('No shipment number to fetch label data')
 
     except HTTPStatusError as e:
-        await maybe_apc(e, request, response)
+        await maybe_apc_response_error(e, request, response)
 
     except Exception as e:
         logger.exception('Error getting label data')
@@ -61,8 +60,8 @@ async def try_write_label(response: ShipmentBookingResponse):
         response.alerts += Alert.from_exception(e)
 
 
-async def maybe_apc(e: HTTPStatusError, shipment_request, shipment_response):
-    if 'APC' in shipment_request.provider_name:
+async def maybe_apc_response_error(e: HTTPStatusError, shipment_request, shipment_response):
+    if shipment_request.provider_name == ProviderName.APC:
         for alert in await apc_http_status_alerts(e):
             shipment_response.alerts += alert
     else:
@@ -72,15 +71,17 @@ async def maybe_apc(e: HTTPStatusError, shipment_request, shipment_response):
 
 async def maybe_alert_apc(shipment_request):
     alerts = Alerts.empty()
-    if ProviderName.APC in PROVIDER_REGISTER:
-        if shipment_request.provider_name == 'APC' and shipment_request.shipment.direction == ShipDirection.DROPOFF:
-            alerts += Alert(
-                message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
-                type=AlertType.ERROR,
-            )
+    if (
+        shipment_request.provider_name == ProviderName.APC
+        and shipment_request.shipment.direction == ShipDirection.DROPOFF
+    ):
+        alerts += Alert(
+            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
+            type=AlertType.ERROR,
+        )
     return alerts
 
 
 async def convert_choice(choice: AddressChoicePF) -> AddressChoiceAgnost:
-    fc = full_contact_from_provider_contact_address(contact=ContactPF.empty(), address=choice.address)
+    fc = parcelforce_full_contact(contact=ContactPF.empty(), address=choice.address)
     return AddressChoiceAgnost(address=fc.address, score=choice.score)

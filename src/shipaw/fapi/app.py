@@ -82,4 +82,3 @@ async def base():
 async def open_file(filepath: str = Query(...)):
     os.startfile(filepath)
     return HTMLResponse(content='<span>Re</span>')
-

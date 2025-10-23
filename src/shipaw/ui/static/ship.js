@@ -53,11 +53,14 @@
 async function initShipForm(shipment) {
     console.log('Initializing ship form with shipment:', shipment);
     populateShipment(shipment);
+    // await logProviderNames();
+    await populateProviderDropdown();
 
     const contextjson = JSON.stringify(shipment.Context);
     await setContextJson(contextjson);
     await loadAddrChoices();
-    setProvider();
+    await providerChange()
+    // setProvider();
     // checkToggleOwnLabel();
     // toggleCollectionTimes();
 }
@@ -124,7 +127,7 @@ function checkToggleDiv(idToCheck, idToToggle, conditionToShow) {
 // }
 
 
-function setProvider() {
+function setProviderNames() {
     console.log('Setting provider based on selection');
     let provider = document.getElementById('provider_name').value;
     if (provider === 'PARCELFORCE') {
@@ -135,6 +138,24 @@ function setProvider() {
         console.warn('Unknown provider selected:', provider);
     }
 
+}
+
+async function providerChange() {
+    console.log('Provider changed, updating dependent fields');
+    await populateServicesDropdown();
+    await populateDirectionsDropdown();
+}
+
+function setProvider() {
+    console.log('Setting provider based on selection');
+    let provider = document.getElementById('provider_name').value;
+    if (provider === 'PARCELFORCE') {
+        setProviderParcelforce();
+    } else if (provider === 'APC') {
+        setProviderAPC();
+    } else {
+        console.warn('Unknown provider selected:', provider);
+    }
 }
 
 function setProviderParcelforce() {
@@ -183,10 +204,59 @@ function shipmentFromForm() {
 
 function shipmentRequestFromForm() {
     return {
-        Shipment: shipmentFromForm(), ProviderName: document.getElementById('provider').value
+        Shipment: shipmentFromForm(), ProviderName: document.getElementById('provider_name').value
     }
 }
 
+
+// API Requests
+// Provider Specific
+async function getSmth(url) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET', headers: {'Content-Type': 'application/json'}
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching providers:', error);
+    }
+}
+
+
+async function populateDropdown(element_id, url) {
+    const select = document.getElementById(element_id);
+    select.innerHTML = ''; // Clear existing options
+    const items = await getSmth(url);
+
+    Object.entries(items).forEach(([key, value]) => {
+        console.log(`${element_id} AVAILABLE: `, key, value);
+        const option = document.createElement('option');
+        option.textContent = key;
+        option.value = String(value);
+        select.appendChild(option);
+    });
+}
+
+async function populateDirectionsDropdown() {
+    const element = 'direction';
+    const provider_name = document.getElementById('provider_name').value;
+    const url = `/api/provider_directions/${provider_name}`;
+    await populateDropdown(element, url);
+}
+
+async function populateServicesDropdown() {
+    const element = 'service';
+    const provider_name = document.getElementById('provider_name').value;
+    const url = `api/provider_services/${provider_name}`;
+    await populateDropdown(element, url);
+}
+
+
+async function populateProviderDropdown() {
+    const element = document.getElementById('provider_name');
+    const url = `api/providers`;
+    await populateDropdown('provider_name', url);
+}
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
 async function loadAddrChoices() {

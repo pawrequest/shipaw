@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date, time
 
-from fastapi import Depends, Form
+from fastapi import Depends, Form, HTTPException
 from loguru import logger
 
 # from pawdantic.paw_types import VALID_POSTCODE
@@ -14,7 +14,7 @@ from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.ship_types import ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
-from shipaw.providers.provider_abc import ProviderName
+from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
 
 
@@ -86,13 +86,20 @@ async def shipment_f_form(
     return shipment
 
 
+async def provider_from_form(provider_name: str = Form(...)):
+    provider = PROVIDER_REGISTER.get(provider_name)
+    if not provider:
+        raise HTTPException(status_code=404, detail='Provider not found')
+    return provider
+
+
 async def shipment_request_form(
+    provider: ShippingProvider = Depends(provider_from_form),
     shipment: Shipment = Depends(shipment_f_form),
     provider_name: ProviderName = Form(...),
     service_code: str = Form(...),
 ) -> ShipmentRequest:
-    prov = PROVIDER_REGISTER[provider_name]
-    serv = prov.service_codes_type(service_code)
+    serv = provider.service_codes_type(service_code)
     return ShipmentRequest(shipment=shipment, provider_name=provider_name, service_code=serv)
 
 

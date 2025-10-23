@@ -37,7 +37,7 @@ class RoyalMailProvider(ShippingProvider):
     service_codes_type: ClassVar[type[RoyalMailServiceCode]] = RoyalMailServiceCode
     default_service: ClassVar[RoyalMailServiceCode] = RoyalMailServiceCode.TRACKED_24
     _client: RoyalMailClient | None = None
-    # responses: list[CreateOrdersResponse] = Field(default_factory=list)
+    valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND]
 
     def is_sandbox(self) -> bool:
         # Royal mail do not have a test environment. that's fun

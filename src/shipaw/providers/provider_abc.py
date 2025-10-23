@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.services2 import enum_as_tups, enum_lookup, enum_reverse_lookup
+from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
@@ -76,6 +77,8 @@ class ShippingProvider(ShipawBaseModel, HasServiceCodes, HasLabels, ABC):
     # services: ClassVar[Services]
     service_codes_type: ClassVar[type[StrEnum]]
     default_service: ClassVar[StrEnum]
+
+    valid_directions: ClassVar[list[ShipDirection]]
 
     @classmethod
     def from_env_path(cls, env_file: Path) -> Self:
