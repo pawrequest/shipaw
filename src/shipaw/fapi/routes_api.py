@@ -1,4 +1,3 @@
-import pprint
 from pathlib import Path
 from typing import cast
 
@@ -17,12 +16,11 @@ from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.logging import log_obj
-from shipaw.models.services2 import enum_as_dict
 from shipaw.models.shipment import Shipment
-from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
 from shipaw.providers.parcelforce.parcelforce_funcs import (
     address_from_agnostic,
 )
+from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 
@@ -168,14 +166,13 @@ async def get_addr_choices_api(
 async def get_providers():
     logger.warning('hit PROVIDERS')
     provider_response = {_.title(): _ for _ in PROVIDER_REGISTER.keys()}
-    logger.warning(pprint.pformat(provider_response))
     return JSONResponse(provider_response)
 
 
 @router.get('/provider_services/{provider_name}', response_class=JSONResponse)
 async def provider_services(provider_name: str):
     provider = await provider_from_form(provider_name)
-    services = enum_as_dict(provider.service_codes_type)
+    services = provider.services_as_dict()
     serv = {k.title(): v for k, v in services.items()}
     return JSONResponse(serv)
 

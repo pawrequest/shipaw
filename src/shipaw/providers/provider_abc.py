@@ -1,14 +1,13 @@
 import time
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from pathlib import Path
-from typing import ClassVar, Self, TYPE_CHECKING
+from typing import ClassVar, TYPE_CHECKING
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.services2 import enum_as_tups, enum_lookup, enum_reverse_lookup
+from shipaw.models.services2 import enum_as_dict, enum_as_tups, enum_lookup, enum_reverse_lookup
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
@@ -38,6 +37,10 @@ class HasServiceCodes(ABC):
     @classmethod
     def services_as_tups(cls) -> list[tuple[str, str]]:
         return enum_as_tups(cls.service_codes_type)
+
+    @classmethod
+    def services_as_dict(cls) -> dict[str, str]:
+        return enum_as_dict(cls.service_codes_type)
 
 
 class HasLabels(ABC):
@@ -70,20 +73,14 @@ class HasLabels(ABC):
 
 class ShippingProvider(ShipawBaseModel, HasServiceCodes, HasLabels, ABC):
     name: ClassVar[ProviderName]
-
     settings: BaseSettings
     settings_type: ClassVar[type[BaseSettings]]
-
-    # services: ClassVar[Services]
-    service_codes_type: ClassVar[type[StrEnum]]
-    default_service: ClassVar[StrEnum]
-
     valid_directions: ClassVar[list[ShipDirection]]
 
-    @classmethod
-    def from_env_path(cls, env_file: Path) -> Self:
-        settings = cls.settings_type(_env_file=env_file)
-        return cls(settings=settings)
+    @property
+    @abstractmethod
+    def client(self):
+        raise NotImplementedError
 
     @abstractmethod
     def is_sandbox(self) -> bool: ...
@@ -103,15 +100,3 @@ class ShippingProvider(ShipawBaseModel, HasServiceCodes, HasLabels, ABC):
     @staticmethod
     @abstractmethod
     def book_shipment_agnostic(shipment_request: 'ShipmentRequest') -> 'ShipmentBookingResponse': ...
-
-    # @staticmethod
-    # async def booking_response_callback(request: 'ShipmentRequest', response: 'ShipmentBookingResponse'):
-    #     """Do after booking, e.g. log, write label file, etc."""
-    #     log_obj(response, 'Shipment Booked')
-    #     try:
-    #         if response.label_data is None and response.shipment_num:
-    #             logger.info('Fetching missing label data...')
-    #             response.label_data = request.provider.fetch_label_content(response.shipment_num)
-    #         await response.write_label_file()
-    #     except Exception as e:
-    #         logger.exception(f'Error getting or writing label data: {e}')
