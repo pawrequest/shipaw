@@ -12,11 +12,10 @@
 </head>
 <body>
 <main>
-    <div class="main_div"
-    >
-    {%  if request.app.alerts.alert %}
+    {% if request.app.alerts.alert %}
         {% include "app_alerts.html" with context %}
     {% endif %}
+    <div class="main_div">
         <div id="content_top">
             {% block content_top %}{% endblock %}
         </div>

@@ -6,7 +6,6 @@
 }
 
 
-
 #address-select {
     max-width: 100%; /* Constrain width to parent container */
     width: 100%; /* Ensure it takes up full width of the container */
@@ -29,13 +28,14 @@
     width: 13rem;
     grid-area: shipment;
 
-    #own_label {
-        /*display: none;*/
-        opacity: 0;
-    }
+    /*#own_label {*/
+    /*    display: none;*/
+    /*    !*opacity: 0;*!*/
+    /*}*/
+
     #collect_times {
-        /*display: none;*/
-        opacity: 0;
+        display: none;
+        /*opacity: 0;*/
     }
 }
 
@@ -284,58 +284,8 @@ select:focus {
     gap: .5rem;
 }
 
-/*!* Move #service styles outside of .inputs__ship to ensure they apply *!*/
-/*#service {*/
-/*    width: 10rem;           !* Normal width *!*/
-/*    transition: width 0.2s ease;*/
-/*    text-overflow: ellipsis;*/
-/*    white-space: nowrap;*/
-/*    overflow: hidden;*/
-/*}*/
-
-/*#service:focus,*/
-/*#service:active {*/
-/*    width: 25rem;           !* Larger expanded width *!*/
-/*    z-index: 1000;          !* Higher z-index to appear above other elements *!*/
-/*    position: relative;*/
-/*}*/
-
-/*!* Style the dropdown options when open *!*/
-/*#service option {*/
-/*    white-space: normal;    !* Allow text wrapping in options *!*/
-/*    word-wrap: break-word;*/
-/*}*/
-
-/*!* Move #service styles outside of .inputs__ship to ensure they apply *!*/
-/*#service {*/
-/*    width: 10rem;           !* Normal width *!*/
-/*    transition: width 0.2s ease;*/
-/*    text-overflow: ellipsis;*/
-/*    white-space: nowrap;*/
-/*    overflow: hidden;*/
-/*}*/
-
-/*#service:focus,*/
-/*#service:active {*/
-/*    width: 25rem;           !* Larger expanded width *!*/
-/*    z-index: 1000;          !* Higher z-index to appear above other elements *!*/
-/*    position: relative;*/
-/*}*/
-
-/*!* Ensure it shrinks back when not focused *!*/
-/*#service:not(:focus):not(:active) {*/
-/*    width: 10rem;*/
-/*}*/
-
-/*!* Style the dropdown options when open *!*/
-/*#service option {*/
-/*    white-space: normal;    !* Allow text wrapping in options *!*/
-/*    word-wrap: break-word;*/
-/*}*/
-
-/* Move #service styles outside of .inputs__ship to ensure they apply */
 #service {
-    width: 10rem;           /* Normal width */
+    width: 11rem; /* Normal width */
     transition: width 0.2s ease;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -344,10 +294,10 @@ select:focus {
 
 #service:focus,
 #service:active {
-    width: max-content;     /* Expand to fit content */
-    min-width: 10rem;       /* Don't shrink below original size */
-    max-width: 35rem;       /* Prevent it from getting too wide */
-    z-index: 1000;          /* Higher z-index to appear above other elements */
+    width: max-content; /* Expand to fit content */
+    min-width: 11rem; /* Don't shrink below original size */
+    max-width: 35rem; /* Prevent it from getting too wide */
+    z-index: 1000; /* Higher z-index to appear above other elements */
     position: relative;
 }
 
@@ -358,6 +308,6 @@ select:focus {
 
 /* Style the dropdown options when open */
 #service option {
-    white-space: normal;    /* Allow text wrapping in options */
+    white-space: normal; /* Allow text wrapping in options */
     word-wrap: break-word;
 }

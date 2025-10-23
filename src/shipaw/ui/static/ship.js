@@ -107,67 +107,15 @@ function toggleDiv(idToToggle, toggleOn) {
 
 }
 
-function checkToggleDiv(idToCheck, idToToggle, conditionToShow) {
-    let valueToCheck = document.getElementById(idToCheck).value;
-    if (valueToCheck === conditionToShow) {
-        toggleDiv(idToToggle, true);
-    } else {
-        toggleDiv(idToToggle, false);
-    }
-}
-
-//
-//
-// function directionChange() {
-//     if (document.getElementById('provider_name').value === 'APC') {
-//         setProviderAPC();
-//     } else if (document.getElementById('provider_name').value === 'PARCELFORCE') {
-//         setProviderParcelforce();
-//     }
-// }
-
-
-function setProviderNames() {
-    console.log('Setting provider based on selection');
-    let provider = document.getElementById('provider_name').value;
-    if (provider === 'PARCELFORCE') {
-        setProviderParcelforce();
-    } else if (provider === 'APC') {
-        setProviderAPC();
-    } else {
-        console.warn('Unknown provider selected:', provider);
-    }
-
-}
 
 async function providerChange() {
     console.log('Provider changed, updating dependent fields');
-    await populateServicesDropdown();
-    await populateDirectionsDropdown();
-}
-
-function setProvider() {
-    console.log('Setting provider based on selection');
-    let provider = document.getElementById('provider_name').value;
-    if (provider === 'PARCELFORCE') {
-        setProviderParcelforce();
-    } else if (provider === 'APC') {
-        setProviderAPC();
-    } else {
-        console.warn('Unknown provider selected:', provider);
-    }
-}
-
-function setProviderParcelforce() {
-    console.log('Setting provider to PARCELFORCE');
-    toggleDiv('collect_times', false);
-    checkToggleDiv("direction", "own_label", "in");
-}
-
-function setProviderAPC() {
-    console.log('Setting provider to APC');
-    toggleDiv('own_label', false);
-    checkToggleDiv('direction', 'collect_times', 'in');
+    await Promise.all([
+        populateServicesDropdown(),
+        populateDirectionsDropdown()
+    ]);
+    // await populateServicesDropdown();
+    // await populateDirectionsDropdown();
 }
 
 // GATHER FORM DATA
@@ -388,10 +336,10 @@ function getAddressLines(Address) {
 }
 
 // force make small after selection
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const serviceSelect = document.getElementById('service');
 
-    serviceSelect.addEventListener('change', function() {
+    serviceSelect.addEventListener('change', function () {
         this.blur();
     });
 });
