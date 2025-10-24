@@ -13,7 +13,7 @@
     --clr-success: rgba(19, 117, 27, 0.5);
     --clr-loader-border: #FF3D00;
     --clr-success-font: white;
-    --clr-btn: blue;
+    --clr-btn: #1656e0;
     --clr-btn-hover: purple;
     --clr-danger: rgba(255, 0, 0, 0.23);
     --clr-warning: rgba(255, 193, 7, 0.48);
@@ -94,7 +94,7 @@ h1 {
     /*margin-block: .5rem;*/
     padding-block: .5rem;
     padding-inline: 1rem;
-    max-width: min(100% - 3rem, 1400px);
+    max-width: min(100% - 3rem, 1000px);
     margin-inline: auto;
     gap: 1rem;
     background-color: var(--clr-wrapper);
