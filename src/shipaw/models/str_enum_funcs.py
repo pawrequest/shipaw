@@ -1,19 +1,18 @@
 from enum import StrEnum
-from typing import cast
 
 
 def enum_as_tups(enum_type: type[StrEnum]) -> list[tuple[str, str]]:
-    return [(_.name, cast(str, _.value)) for _ in enum_type]
+    return list(enum_type.__members__.items())
 
 
 def enum_as_dict(enum_type: type[StrEnum]) -> dict[str, str]:
-    return {k: v for k, v in enum_as_tups(enum_type)}
+    return dict(enum_type.__members__.items())
 
 
 def enum_lookup(*, enum_type: type[StrEnum], attr_name: str) -> str:
     res = getattr(enum_type, attr_name, None)
     if not res:
-        raise ValueError(f'Invalid service name: {attr_name}')
+        raise ValueError(f'Invalid attr_name: {attr_name}')
     return res
 
 

@@ -116,7 +116,7 @@ class RoyalMailProvider(ShippingProvider):
         success = rm_response.errors_count == 0
         return ShipmentBookingResponse(
             shipment=shipment,
-            shipment_num=order.order_identifier,
+            shipment_num=str(order.order_identifier),
             tracking_link=self.settings.tracking_link(track_num),
             data=rm_response.model_dump(),
             status='Success' if success else 'FAIL',
@@ -124,5 +124,5 @@ class RoyalMailProvider(ShippingProvider):
         )
 
     @override
-    def fetch_label_content(self, order_ident_str: str) -> bytes:
-        return self.client.get_label_content(order_ident_str)
+    def fetch_label_content(self, shipment_num: str) -> bytes:
+        return self.client.get_label_content(shipment_num)

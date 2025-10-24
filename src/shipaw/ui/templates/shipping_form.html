@@ -5,6 +5,7 @@
     <link href="{{ url_for('static', path='ship.css') }}" rel="stylesheet">
 {% endblock %}
 <!--suppress HtmlFormInputWithoutLabel -->
+
 <form id="main-form"
       hx-post="order_summary/"
       hx-target=#content_top
@@ -13,31 +14,36 @@
     <input type="hidden" name="context_json" value="">
     <div class="wrapper wrapper__booking">
         <section class="inputs inputs__ship">
-            <h1>Shipment</h1>
-            <label for="ship_date">Date:</label>
-            <input type="date" id="ship_date" name="shipping_date" required>
-
-            <label for="boxes">Boxes:</label>
-            <select id="boxes" name="boxes">
-                {% for i in range(1,13) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-            </select>
-
-            <label for="provider_name">Provider:</label>
-            <select name="provider_name" id="provider_name" onchange="providerChange()">
-                {# populated by JS #}
-            </select>
-
-            <label for="service">Service:</label>
-            <select id="service" name="service">
-                {# populated by JS #}
-            </select>
-
-            <label for="direction">Direction:</label>
-            <select id="direction" name="direction">
-                {# populated by JS #}
-            </select>
+            <div class="ship-field">
+                <label for="ship_date">Date:</label>
+                <input type="date" id="ship_date" name="shipping_date" required>
+            </div>
+            <div class="ship-field">
+                <label for="boxes">Boxes:</label>
+                <select id="boxes" name="boxes">
+                    {% for i in range(1,13) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ship-field">
+                <label for="provider_name">Provider:</label>
+                <select name="provider_name" id="provider_name" onchange="providerChange()">
+                    {# populated by JS #}
+                </select>
+            </div>
+            <div class="ship-field">
+                <label for="direction">Direction:</label>
+                <select id="direction" name="direction">
+                    {# populated by JS #}
+                </select>
+            </div>
+            <div class="ship-field">
+                <label for="service">Service:</label>
+                <select id="service" name="service">
+                    {# populated by JS #}
+                </select>
+            </div>
 
 
             <div id="collect_times">
@@ -49,23 +55,25 @@
             </div>
 
 
-{#            <div id="own_label">#}
-{#                <label>Label Printing:#}
-{#                    <select name="own_label">#}
-{#                        <option value="True" selected>We Print Labels</option>#}
-{#                        <option value="False">Driver Brings Labels</option>#}
-{#                    </select>#}
-{#                </label>#}
-{#            </div>#}
+            {#            <div id="own_label">#}
+            {#                <label>Label Printing:#}
+            {#                    <select name="own_label">#}
+            {#                        <option value="True" selected>We Print Labels</option>#}
+            {#                        <option value="False">Driver Brings Labels</option>#}
+            {#                    </select>#}
+            {#                </label>#}
+            {#            </div>#}
         </section>
 
         <section class="inputs inputs__contact">
-            <h1>Contact</h1>
+            <h1>Contact
+                <label for="contact_name"></label>
+            </h1>
+            <input type="text" id="contact_name" name="contact_name" required>
+
             <label for="business_name">Business Name:</label>
             <input type="text" id="business_name" name="business_name" required>
 
-            <label for="contact_name">Contact Name:</label>
-            <input type="text" id="contact_name" name="contact_name" required>
 
             <label for="email">Email:</label>
             <input type="email" id="email" name="email_address" required>
@@ -82,7 +90,6 @@
         </section>
 
         <section class="inputs inputs__address">
-            <div id="score-span" data-score=""></div>
             <h1>
                 <label for="address_line1">Address:</label>
             </h1>
@@ -102,6 +109,7 @@
             <label for="address-select">Choose Address</label>
             <select id="address-select" name="address" onchange="updateAddressFromSelect()">
             </select>
+            <div id="score-span" data-score=""></div>
         </section>
 
         <section class="inputs inputs__notes">
@@ -118,8 +126,5 @@
 
 <script>
     shipment = {{ shipment.model_dump(mode='json', by_alias=True) | tojson }};
-    console.log('shipment', shipment);
     initShipForm(shipment);
-
-
 </script>

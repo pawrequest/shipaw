@@ -55,9 +55,7 @@
 async function initShipForm(shipment) {
     console.log('Initializing ship form with shipment:', shipment);
     populateShipment(shipment);
-    // await logProviderNames();
     await populateProviderDropdown();
-
     const contextjson = JSON.stringify(shipment.Context);
     await setContextJson(contextjson);
     await loadAddrChoices();
@@ -152,8 +150,6 @@ async function shipmentFromForm() {
         ShippingDate: document.getElementById('ship_date').value,
         Direction: document.getElementById('direction').value || "out",
         Reference: document.getElementById('reference').value || "",
-        Service: document.getElementById('service').value || "",
-
     };
 }
 
@@ -190,7 +186,7 @@ async function populateDropdown(element_id, url) {
     const items = await getSmth(url);
 
     Object.entries(items).forEach(([key, value]) => {
-        console.log(`${element_id} AVAILABLE: `, key, value);
+        // console.log(`${element_id} AVAILABLE: `, key, value);
         const option = document.createElement('option');
         option.textContent = key;
         option.value = String(value);
@@ -201,7 +197,7 @@ async function populateDropdown(element_id, url) {
 async function populateDirectionsDropdown() {
     const element = 'direction';
     const provider_name = document.getElementById('provider_name').value;
-    const url = `/api/provider_directions/${provider_name}`;
+    const url = `api/provider_directions/${provider_name}`;
     await populateDropdown(element, url);
 }
 
@@ -222,7 +218,7 @@ async function populateProviderDropdown() {
 // ADDRESS CHOICES / CANDIDATE LOOKUP
 async function loadAddrChoices() {
     // get address from form fields
-    const address = addressFromForm();
+    const address = await addressFromForm();
     console.log('Loading AddressChoices for address:', address);
     // fetch AddressChices from server
     const addrChoicesJson = await fetchAddrChoices(address.Postcode, address);
@@ -255,27 +251,26 @@ async function fetchAddrChoices(Postcode, Address) {
  * Handles AddressChoices from server.
  * @param {AddrChoice[]} addrChoices
  */
-function handleAddrChoices(addrChoices) {
-
+async function handleAddrChoices(addrChoices) {
     console.log('HANDLING ADDR CHOICES', addrChoices);
     let highestScoreOption = null;
     let highestScore = -Infinity;
     const addressSelect = document.getElementById('address-select');
     addressSelect.innerHTML = '';
 
-    addrChoices.forEach(choice => {
-        const option = addrChoiceOption(choice);
+    for (const choice of addrChoices) {
+        const option = await addrChoiceOption(choice);
         if (choice.Score > highestScore) {
             highestScore = choice.Score;
             highestScoreOption = option;
         }
         addressSelect.appendChild(option);
-    });
+    }
 
     if (highestScoreOption) {
         console.log('Match Score', highestScore, '%', highestScoreOption.value);
         highestScoreOption.selected = true;
-        setScoreSpan(highestScoreOption);
+        await setScoreSpan(highestScoreOption);
     }
 }
 
@@ -284,10 +279,10 @@ function handleAddrChoices(addrChoices) {
  * @param {AddrChoice} addressChoice
  * @returns {HTMLOptionElement}
  */
-function addrChoiceOption(addressChoice) {
+async function addrChoiceOption(addressChoice) {
     const option = document.createElement('option');
     option.value = JSON.stringify(addressChoice.Address);
-    option.textContent = addressLinesOutput(addressChoice.Address, ', ');
+    option.textContent = await addressLinesOutput(addressChoice.Address, ', ');
     option.dataset.score = addressChoice.Score.toString();
     return option;
 }
@@ -306,7 +301,7 @@ function updateAddressFields(Address) {
     document.getElementById('postcode').value = Address.Postcode || '';
 }
 
-function updateAddressFromSelect() {
+async function updateAddressFromSelect() {
     const selectedOption = document.getElementById('address-select').value;
     updateAddressFieldsFromJson(selectedOption);
 }
@@ -316,34 +311,34 @@ function updateAddressFieldsFromJson(address_json) {
     updateAddressFields(address);
 }
 
-function scoreCssSelector(score) {
+async function scoreCssSelector(score) {
     if (score > 80) return 'high-score';
     if (score >= 60) return 'medium-score';
     return 'low-score';
 }
 
 
-function setScoreSpan(option) {
+async function setScoreSpan(option) {
     const scoreSpan = document.getElementById('score-span');
     const address = JSON.parse(option.value);
     const score = parseInt(option.dataset.score, 10) || 0;
-    const addressHtml = addressLinesOutput(address, '<br>');
+    const addressHtml = await addressLinesOutput(address, '<br>');
 
-    scoreSpan.className = scoreCssSelector(score);
+    scoreSpan.className = await scoreCssSelector(score);
     scoreSpan.innerHTML = `Best Guess (click to insert)<br>${addressHtml}`;
-    scoreSpan.onclick = updateAddressFromSelect;
+    scoreSpan.onclick = await updateAddressFromSelect;
 }
 
-function addressLinesOutput(Address, Seperator) {
-    return getAddressLines(Address).join(Seperator);
+async function addressLinesOutput(Address, Seperator) {
+    return (await getAddressLines(Address)).join(Seperator);
 }
 
 /**
  * Get non-empty address lines from Address object.
  * @param {Address} Address
- * @returns {string[]}
+ * @returns {Promise[string[]]}}
  */
-function getAddressLines(Address) {
+async function getAddressLines(Address) {
     return [...Address.AddressLines]
         .filter(line => line);
 }
@@ -354,8 +349,11 @@ document.addEventListener('DOMContentLoaded', function () {
     serviceSelect.addEventListener('change', function () {
         this.blur();
     });
-    (async () => {
-        const shipreq = await shipmentRequestFromForm();
-        console.log("SHIPREQ FROM FORM", shipreq);
-    })();
+
 });
+
+
+async function logShipreq() {
+    const shipreq = await shipmentRequestFromForm();
+    console.log("SHIPREQ FROM FORM", shipreq);
+}

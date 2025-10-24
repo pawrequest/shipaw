@@ -1,8 +1,9 @@
 /* MAIN SHIP FORM*/
 .wrapper__booking {
     grid-template-areas:
-           "shipment contact address notes"
-           "shipment contact address sub-btns";
+            "shipment shipment shipment "
+            "contact address notes"
+            "contact address sub-btns";
 }
 
 
@@ -24,38 +25,73 @@
     border-radius: 1rem;
 }
 
-.inputs__ship {
-    width: 13rem;
-    grid-area: shipment;
+.ship-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 8rem;
+    align-items: center;
+}
 
+.inputs__ship {
+    /*width: 13rem;*/
+    grid-area: shipment;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
     /*#own_label {*/
     /*    display: none;*/
     /*    !*opacity: 0;*!*/
     /*}*/
 
+    select {
+        text-align: center;
+        text-align-last: center; /* For option alignment in most browsers */
+    }
+
     #collect_times {
         display: none;
+        /* todo make visible if inbound / wire up to providers*/
         /*opacity: 0;*/
     }
 }
 
+/*.inputs__ship label {*/
+/*    margin-bottom: 0.2rem;*/
+/*}*/
+
+/*.inputs__ship input,*/
+/*.inputs__ship select {*/
+/*    margin-bottom: 0.8rem;*/
+/*    width: 100%;*/
+/*    box-sizing: border-box;*/
+/*}*/
+
 .inputs__contact {
-    width: 15rem;
+    /*width: 18rem;*/
     grid-area: contact;
 }
 
 
 .inputs__address {
-    width: 20rem;
+    /*width: 20rem;*/
     grid-area: address;
 }
 
 
 .inputs__notes {
-    width: 15rem;
+    /*width: 15rem;*/
     grid-area: notes;
 }
 
+.inputs__submit {
+    grid-area: sub-btns;
+    background-color: purple;
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*gap: 3px;*/
+}
 
 #score-span {
     /*display: none;*/
@@ -80,14 +116,6 @@
 
 .low-score {
     background-color: var(--clr-danger);
-}
-
-.inputs__submit {
-    grid-area: sub-btns;
-    background-color: purple;
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*gap: 3px;*/
 }
 
 
@@ -284,30 +312,44 @@ select:focus {
     gap: .5rem;
 }
 
+/*#service {*/
+/*    width: 11rem; !* Normal width *!*/
+/*    transition: width 0.2s ease;*/
+/*    text-overflow: ellipsis;*/
+/*    white-space: nowrap;*/
+/*    overflow: hidden;*/
+/*}*/
+
+/*#service:focus,*/
+/*#service:active {*/
+/*    width: max-content; !* Expand to fit content *!*/
+/*    min-width: 11rem; !* Don't shrink below original size *!*/
+/*    max-width: 35rem; !* Prevent it from getting too wide *!*/
+/*    z-index: 1000; !* Higher z-index to appear above other elements *!*/
+/*    position: relative;*/
+/*}*/
+
+/*!* Ensure it shrinks back when not focused *!*/
+/*#service:not(:focus):not(:active) {*/
+/*    width: 11rem;*/
+/*}*/
+
+/*!* Style the dropdown options when open *!*/
+/*#service option {*/
+/*    white-space: normal; !* Allow text wrapping in options *!*/
+/*    word-wrap: break-word;*/
+/*}*/
+
 #service {
-    width: 11rem; /* Normal width */
-    transition: width 0.2s ease;
+    width: 11rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
 
-#service:focus,
-#service:active {
-    width: max-content; /* Expand to fit content */
-    min-width: 11rem; /* Don't shrink below original size */
-    max-width: 35rem; /* Prevent it from getting too wide */
-    z-index: 1000; /* Higher z-index to appear above other elements */
-    position: relative;
-}
-
-/* Ensure it shrinks back when not focused */
-#service:not(:focus):not(:active) {
-    width: 11rem;
-}
-
-/* Style the dropdown options when open */
 #service option {
-    white-space: normal; /* Allow text wrapping in options */
-    word-wrap: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }

@@ -7,7 +7,6 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.services2 import enum_as_dict, enum_as_tups, enum_lookup, enum_reverse_lookup
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
@@ -28,19 +27,19 @@ class HasServiceCodes(ABC):
 
     @classmethod
     def lookup_service(cls, service_name: str):
-        return enum_lookup(enum_type=cls.service_codes_type, attr_name=service_name)
+        return cls.service_codes_type[service_name]
 
     @classmethod
     def reverse_lookup_service(cls, service_code: str):
-        return enum_reverse_lookup(enum_type=cls.service_codes_type, attr_value=service_code)
+        return cls.service_codes_type(service_code).name
 
     @classmethod
     def services_as_tups(cls) -> list[tuple[str, str]]:
-        return enum_as_tups(cls.service_codes_type)
+        return [(e.name, str(e.value)) for e in cls.service_codes_type]
 
     @classmethod
     def services_as_dict(cls) -> dict[str, str]:
-        return enum_as_dict(cls.service_codes_type)
+        return dict(cls.service_codes_type.__members__.items())
 
 
 class HasLabels(ABC):
@@ -71,7 +70,7 @@ class HasLabels(ABC):
         raise RuntimeError(f'Label not ready after {tries}retries for {shipment_num}')
 
 
-class ShippingProvider(ShipawBaseModel, HasServiceCodes, HasLabels, ABC):
+class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
     name: ClassVar[ProviderName]
     settings: BaseSettings
     settings_type: ClassVar[type[BaseSettings]]
