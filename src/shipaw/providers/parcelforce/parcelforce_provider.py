@@ -19,7 +19,7 @@ from parcelforce_expresslink.models.services import ServiceCode
 from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment, Shipment as ShipmentAgnost
@@ -88,14 +88,14 @@ class ParcelforceShippingProvider(ShippingProvider):
         return authorized_shipment
 
     @override
-    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> ShipmentBookingResponse:
+    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> ShipmentResponse:
         ship_req = self.provider_shipment_request(shipment_request)
         pf_response = self.book_shipment_provider(ship_req)
         return self.build_booking_response(pf_response, shipment_request.shipment)
 
     def build_booking_response(self, pf_response, shipment):
         """without label data"""
-        return ShipmentBookingResponse(
+        return ShipmentResponse(
             shipment=shipment,
             shipment_num=pf_response.shipment_num,
             tracking_link=self.settings.tracking_link(pf_response.shipment_num),

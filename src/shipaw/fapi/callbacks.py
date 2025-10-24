@@ -3,6 +3,6 @@ from collections.abc import Callable
 
 if TYPE_CHECKING:
     from shipaw.fapi.requests import ShipmentRequest
-    from shipaw.fapi.responses import ShipmentBookingResponse
+    from shipaw.fapi.responses import ShipmentResponse
 
-CALLBACK_REGISTER: dict[str, Callable[['ShipmentRequest', 'ShipmentBookingResponse'], Any]] = {}
+CALLBACK_REGISTER: dict[str, Callable[['ShipmentRequest', 'ShipmentResponse'], Any]] = {}

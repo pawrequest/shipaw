@@ -34,7 +34,7 @@ class BaseResponse(ShipawBaseModel):
     template: ShipawTemplate | None = None
 
 
-class ShipmentBookingResponse(BaseResponse):
+class ShipmentResponse(BaseResponse):
     shipment: Shipment
     shipment_num: str | None = None
     tracking_link: str | None = None

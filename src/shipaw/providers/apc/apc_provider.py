@@ -10,7 +10,7 @@ from apc_hypaship.models.response.common import APCException
 from apc_hypaship.models.response.resp import BookingResponse
 
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
@@ -87,7 +87,7 @@ class APCShippingProvider(ShippingProvider):
         )
 
     @override
-    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> 'ShipmentBookingResponse':
+    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> 'ShipmentResponse':
         """Takes provider ShipmnentDict, or ShipmentAgnost object"""
         # request_json = self.build_request_json(shipment)
         provider_service = self.service_codes_type(shipment_request.service_code)
@@ -112,7 +112,7 @@ class APCShippingProvider(ShippingProvider):
     def build_response(resp: BookingResponse, shipment: ShipmentAgnost):
         orders = resp.orders
         order = orders.order
-        return ShipmentBookingResponse(
+        return ShipmentResponse(
             shipment=shipment,
             shipment_num=order.order_number,
             tracking_link=r'https://apc.hypaship.com/app/shared/customerordersoverview/index#search_form',

@@ -11,7 +11,7 @@ from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
-    from shipaw.fapi.responses import ShipmentBookingResponse
+    from shipaw.fapi.responses import ShipmentResponse
     from shipaw.fapi.requests import ShipmentRequest
 
 
@@ -98,4 +98,4 @@ class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
 
     @staticmethod
     @abstractmethod
-    def book_shipment_agnostic(shipment_request: 'ShipmentRequest') -> 'ShipmentBookingResponse': ...
+    def book_shipment_agnostic(shipment_request: 'ShipmentRequest') -> 'ShipmentResponse': ...

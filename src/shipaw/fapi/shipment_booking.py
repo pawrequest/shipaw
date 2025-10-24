@@ -5,9 +5,9 @@ from shipaw.models.base import ShipawBaseModel
 if TYPE_CHECKING:
     ...
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.fapi.responses import ShipmentResponse
 
 
-class ShipmentConversation(ShipawBaseModel):
+class ShipmentBooking(ShipawBaseModel):
     request: 'ShipmentRequest'
-    response: 'ShipmentBookingResponse'
+    response: 'ShipmentResponse'

@@ -1,7 +1,7 @@
 from apc_hypaship.models.response.resp import BookingResponse
 
 from shipaw.fapi.alerts import Alerts, Alert
-from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.shipment import Shipment as ShipmentAgnost
 
 
@@ -19,7 +19,7 @@ def strip_apc_error_msgs(messages):
 
 def errored_response(fieldname: str, message: str, shipment: ShipmentAgnost, data: dict):
     alerts = Alerts(alert=[Alert(message=f'Error booking shipment: {fieldname}: {message}')])
-    return ShipmentBookingResponse(
+    return ShipmentResponse(
         alerts=alerts,
         shipment=shipment,
         shipment_num='FAILED TO BOOK',
@@ -27,4 +27,3 @@ def errored_response(fieldname: str, message: str, shipment: ShipmentAgnost, dat
         data=data,
         success=False,
     )
-

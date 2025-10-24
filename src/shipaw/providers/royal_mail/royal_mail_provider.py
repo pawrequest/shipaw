@@ -13,7 +13,7 @@ from royal_mail_click_and_drop.v2.services import RoyalMailServiceCode
 
 from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
@@ -100,7 +100,7 @@ class RoyalMailProvider(ShippingProvider):
         return shipment_rm
 
     @override
-    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> ShipmentBookingResponse:
+    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> ShipmentResponse:
         shipment = shipment_request.shipment
         provider_shipment_request = self.provider_shipment_request(shipment_request)
         resp = self.client.book_shipment(provider_shipment_request)
@@ -114,7 +114,7 @@ class RoyalMailProvider(ShippingProvider):
         order = rm_response.created_orders[0]
         track_num = order.tracking_number
         success = rm_response.errors_count == 0
-        return ShipmentBookingResponse(
+        return ShipmentResponse(
             shipment=shipment,
             shipment_num=str(order.order_identifier),
             tracking_link=self.settings.tracking_link(track_num),

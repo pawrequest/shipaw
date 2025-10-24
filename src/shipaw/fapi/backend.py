@@ -6,15 +6,15 @@ from parcelforce_expresslink.models.contact import Contact as ContactPF
 
 from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentBookingResponse
+from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.address import AddressChoice as AddressChoiceAgnost
 from shipaw.models.ship_types import ShipDirection
 from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
 from shipaw.providers.provider_abc import ProviderName
 
 
-async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentBookingResponse:
-    shipment_response = ShipmentBookingResponse(shipment=shipment_request.shipment)
+async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentResponse:
+    shipment_response = ShipmentResponse(shipment=shipment_request.shipment)
     try:
         shipment_response = shipment_request.provider.book_shipment_agnostic(shipment_request)
 
@@ -28,13 +28,13 @@ async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentBookin
     return shipment_response
 
 
-async def try_get_write_label(request: ShipmentRequest, response: ShipmentBookingResponse):
+async def try_get_write_label(request: ShipmentRequest, response: ShipmentResponse):
     if not response.label_data:
         await try_get_label_data(request, response)
     await try_write_label(response)
 
 
-async def try_get_label_data(request: ShipmentRequest, response: ShipmentBookingResponse) -> None:
+async def try_get_label_data(request: ShipmentRequest, response: ShipmentResponse) -> None:
     try:
         if response.label_data is not None:
             logger.info('Label data already present, not fetching')
@@ -52,7 +52,7 @@ async def try_get_label_data(request: ShipmentRequest, response: ShipmentBooking
         response.alerts += Alert.from_exception(e)
 
 
-async def try_write_label(response: ShipmentBookingResponse):
+async def try_write_label(response: ShipmentResponse):
     try:
         await response.write_label_file()
     except Exception as e:
