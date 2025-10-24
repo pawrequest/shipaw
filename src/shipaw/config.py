@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import functools
 import os
+import pprint
 from pathlib import Path
 from urllib.parse import quote
 
 import pydantic as _p
 from fastapi.encoders import jsonable_encoder
+from loguru import logger
 from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
@@ -20,6 +22,7 @@ from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_
 
 def get_path_from_environment(env_key: str) -> Path:
     env = os.getenv(env_key)
+    logger.warning(f'Getting env var {env_key}: {env}')
     if not env:
         raise ValueError(f'{env_key} not set')
     env_path = Path(env)
@@ -69,6 +72,7 @@ class ShipawSettings(BaseSettings):
     @model_validator(mode='after')
     def populate_provider_registry(self):
         for name, env_path in self.provider_env_dict.items():
+            logger.warning(f'Registering provider {name} from env file {env_path}')  # todo not a warning
             if provider_type := PROVIDER_TYPE_REGISTER.get(name):
                 provider_settings = provider_type.settings_type(_env_file=env_path)
                 provider = provider_type(settings=provider_settings)
@@ -90,6 +94,11 @@ class ShipawSettings(BaseSettings):
         self.templates.env.filters['urlencode'] = lambda value: quote(str(value))
         self.templates.env.filters['sanitise_id'] = sanitise_id
         self.templates.env.filters['ordinal_dt'] = ordinal_dt
+        return self
+
+    @model_validator(mode='after')
+    def log_self(self):
+        logger.warning(pprint.pformat(self.model_dump(), indent=4))
         return self
 
     ## SET LOGGING & LABELS ##
