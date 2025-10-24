@@ -98,7 +98,7 @@ class ShipawSettings(BaseSettings):
 
     @model_validator(mode='after')
     def log_self(self):
-        logger.warning(pprint.pformat(self.model_dump(), indent=4))
+        logger.warning('ShipawSettings:\n' + pprint.pformat(self.model_dump(), indent=4))
         return self
 
     ## SET LOGGING & LABELS ##
