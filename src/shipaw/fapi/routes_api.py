@@ -144,10 +144,11 @@ async def get_addr_choices_api(
         request: Request - FastAPI request object
         body: Address - request body containing postcode and optional address
     """
-    # p: ParcelforceShippingProvider = cast(
-    #     ParcelforceShippingProvider, PROVIDER_TYPE_REGISTER[ProviderName.PARCELFORCE].from_shipaw_settings_env_dict()
-    # )
-    p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, PROVIDER_REGISTER[ProviderName.PARCELFORCE])
+
+    parcelforce_ = PROVIDER_REGISTER.get(ProviderName.PARCELFORCE)
+    if not parcelforce_:
+        ...
+    p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, parcelforce_)
     client = p.client
     postcode = body.postcode
     address_agnost = body.address

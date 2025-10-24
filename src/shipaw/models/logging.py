@@ -39,7 +39,7 @@ def log_obj_text(obj: BaseModel, message: str = None, *, level: str = 'DEBUG', l
     )
 
 
-def log_obj_json(obj: BaseModel, message: str = None, *, ndjson_file=None):
+def log_obj_json(obj: BaseModel, message: str = '', *, ndjson_file=None):
     ndjson_file = ndjson_file or ShipawSettings.from_env().ndjson_log_file
     timestamp = datetime.now().isoformat(timespec='seconds')
     logdict = {
