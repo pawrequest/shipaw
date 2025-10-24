@@ -41,7 +41,9 @@
 /**
  * @typedef {Object} ShipmentRequest
  * @property {Shipment} Shipment
- * @property {string} Provider
+ * @property {string} ProviderName
+ * @property {string} ServiceCode
+ *
  */
 
 
@@ -114,12 +116,10 @@ async function providerChange() {
         populateServicesDropdown(),
         populateDirectionsDropdown()
     ]);
-    // await populateServicesDropdown();
-    // await populateDirectionsDropdown();
 }
 
 // GATHER FORM DATA
-function contactFromForm() {
+async function contactFromForm() {
     return {
         ContactName: document.getElementById('contact_name').value,
         EmailAddress: document.getElementById('email').value,
@@ -127,7 +127,7 @@ function contactFromForm() {
     };
 }
 
-function addressFromForm() {
+async function addressFromForm() {
     return {
         AddressLines: [document.getElementById('address_line1').value, document.getElementById('address_line2').value, document.getElementById('address_line3').value].filter(line => line),
         Town: document.getElementById('town').value,
@@ -136,11 +136,18 @@ function addressFromForm() {
     };
 }
 
-function shipmentFromForm() {
+/**
+ * Returns a Contact object.
+ * @returns {Shipment}
+ */
+async function shipmentFromForm() {
+    const contactPromise = contactFromForm();
+    const addressPromise = addressFromForm();
+
+    // Wait for both to finish
+    const [Contact, Address] = await Promise.all([contactPromise, addressPromise]);
     return {
-        Recipient: {
-            Contact: contactFromForm(), Address: addressFromForm()
-        },
+        Recipient: {Contact, Address},
         Boxes: parseInt(document.getElementById('boxes').value, 10) || 1,
         ShippingDate: document.getElementById('ship_date').value,
         Direction: document.getElementById('direction').value || "out",
@@ -150,9 +157,15 @@ function shipmentFromForm() {
     };
 }
 
-function shipmentRequestFromForm() {
+/**
+ * Returns a Contact object.
+ * @returns {ShipmentRequest}
+ */
+async function shipmentRequestFromForm() {
     return {
-        Shipment: shipmentFromForm(), ProviderName: document.getElementById('provider_name').value
+        Shipment: await shipmentFromForm(),
+        ProviderName: document.getElementById('provider_name').value,
+        ServiceCode: document.getElementById('service').value
     }
 }
 
@@ -338,8 +351,11 @@ function getAddressLines(Address) {
 // force make small after selection
 document.addEventListener('DOMContentLoaded', function () {
     const serviceSelect = document.getElementById('service');
-
     serviceSelect.addEventListener('change', function () {
         this.blur();
     });
+    (async () => {
+        const shipreq = await shipmentRequestFromForm();
+        console.log("SHIPREQ FROM FORM", shipreq);
+    })();
 });
