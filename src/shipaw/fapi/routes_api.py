@@ -40,10 +40,19 @@ def get_version():
 async def notify_version():
     alerts = Alerts.empty()
     live = ShipawSettings.from_env().shipper_live
-    live_msg = 'Live Mode - Real Shipments will be booked' if live else 'Test Mode - No Shipments will be booked'
+    if live:
+        live_msg = 'Live Mode - Real Shipments will be booked'
+        notification_type = AlertType.WARNING
+    else:
+        live_msg = 'Test Mode - No Shipments will be booked'
+        notification_type = AlertType.NOTIFICATION
+    if not live and ProviderName.ROYAL_MAIL in PROVIDER_REGISTER:
+        live_msg += ' EXCEPT ROYAL MAIL!!'
+        notification_type = AlertType.WARNING
+
     msg = f'Shipaw Version {get_version()} is in {live_msg}'
     logger.warning(msg)
-    alerts += Alert(message=msg, type=AlertType.NOTIFICATION)
+    alerts += Alert(message=msg, type=notification_type)
     return alerts
 
 
