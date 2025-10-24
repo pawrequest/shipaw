@@ -11,7 +11,7 @@ from shipaw.config import ShipawSettings
 
 if TYPE_CHECKING:
     from shipaw.fapi.requests import ShipmentRequest
-    from shipaw.fapi.responses import ShipmentBookingResponse
+    from shipaw.fapi.responses import ShipmentResponse
 
 
 def ndlog_dict(data: dict, ndjson_file=None):
@@ -63,10 +63,10 @@ def log_obj(
     log_obj_json(obj, message, ndjson_file=ndjson_file)
 
 
-def log_booked_shipment(request: 'ShipmentRequest', response: 'ShipmentBookingResponse'):
-    from shipaw.models.conversation import ShipmentConversation
+def log_booked_shipment(request: 'ShipmentRequest', response: 'ShipmentResponse'):
+    from shipaw.fapi.shipment_booking import ShipmentBooking
 
-    conversation = ShipmentConversation(request=request, response=response)
+    conversation = ShipmentBooking(request=request, response=response)
     ndlog_dict(conversation.model_dump(mode='json', exclude={'response': {'label_data'}}))
 
 
