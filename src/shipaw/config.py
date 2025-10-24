@@ -66,21 +66,13 @@ class ShipawSettings(BaseSettings):
 
     model_config = SettingsConfigDict()
 
-    # @model_validator(mode='after')
-    # def populate_provider_registry(self):
-    #     for name, env_path in self.provider_env_dict.items():
-    #         provider_type = PROVIDER_TYPE_REGISTER.get(name)
-    #         provider = provider_type.from_shipaw_settings_env_dict(self)
-    #         register_provider_instance(provider)
-    #     return self
-
     @model_validator(mode='after')
-    def populate_provider_registry2(self):
+    def populate_provider_registry(self):
         for name, env_path in self.provider_env_dict.items():
-            provider_type = PROVIDER_TYPE_REGISTER.get(name)
-            provider_settings = provider_type.settings_type(_env_file=env_path)
-            provider = provider_type(settings=provider_settings)
-            register_provider_instance(provider)
+            if provider_type := PROVIDER_TYPE_REGISTER.get(name):
+                provider_settings = provider_type.settings_type(_env_file=env_path)
+                provider = provider_type(settings=provider_settings)
+                register_provider_instance(provider)
         return self
 
     @classmethod
