@@ -160,4 +160,4 @@ cython_debug/
 .idea/
 /docs/build/
 /play.py
-/.run/
+/.run/SHIPAW FAPI.run.xml
