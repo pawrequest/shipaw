@@ -194,6 +194,11 @@ async function populateDropdown(element_id, url) {
     });
 }
 
+async function populateProviderDropdown() {
+    const url = `api/providers`;
+    await populateDropdown('provider_name', url);
+}
+
 async function populateDirectionsDropdown() {
     const element = 'direction';
     const provider_name = document.getElementById('provider_name').value;
@@ -201,18 +206,12 @@ async function populateDirectionsDropdown() {
     await populateDropdown(element, url);
 }
 
+
 async function populateServicesDropdown() {
-    const element = 'service';
+    const element_id = 'service';
     const provider_name = document.getElementById('provider_name').value;
     const url = `api/provider_services/${provider_name}`;
-    await populateDropdown(element, url);
-}
-
-
-async function populateProviderDropdown() {
-    const element = document.getElementById('provider_name');
-    const url = `api/providers`;
-    await populateDropdown('provider_name', url);
+    await populateDropdown(element_id, url);
 }
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
