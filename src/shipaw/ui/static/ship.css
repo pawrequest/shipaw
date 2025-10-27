@@ -111,29 +111,29 @@
 }
 
 
-/*.postcode-div {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*    gap: 1rem;*/
-/*    !*align-items: center;*!*/
-/*    !*margin-block: 1rem;*!*/
+.postcode-div {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    /*align-items: center;*/
+    /*margin-block: 1rem;*/
 
-/*    .postcode-pair {*/
-/*        display: flex;*/
-/*        flex-direction: column;*/
-/*        !*gap: 1rem;*!*/
-/*    }*/
+    .postcode-pair {
+        display: flex;
+        flex-direction: column;
+        /*gap: 1rem;*/
+    }
 
-/*    #postcode {*/
-/*        !*max-width: max(50%, 150px);*!*/
-/*        !*display: inline;*!*/
-/*    }*/
+    #postcode {
+        /*max-width: max(50%, 150px);*/
+        /*display: inline;*/
+    }
 
-/*    button {*/
-/*        align-self: end;*/
-/*        font-size: 18px;*/
-/*    }*/
-/*}*/
+    button {
+        align-self: end;
+        font-size: 18px;
+    }
+}
 
 
 button {
