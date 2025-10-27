@@ -1,6 +1,7 @@
 import json
 import pprint
 from datetime import datetime
+from pathlib import Path
 from typing import TYPE_CHECKING
 from collections.abc import Sequence
 
@@ -14,13 +15,13 @@ if TYPE_CHECKING:
     from shipaw.fapi.responses import ShipmentResponse
 
 
-def ndlog_dict(data: dict, ndjson_file=None):
+def ndlog_dict(data: dict, ndjson_file: Path | None = None):
     ndjson_file = ndjson_file or ShipawSettings.from_env().ndjson_log_file
     with open(ndjson_file, 'a') as jf:
         print(json.dumps(data, separators=(',', ':')), file=jf)
 
 
-def log_obj_text(obj: BaseModel, message: str = None, *, level: str = 'DEBUG', logger_=logger):
+def log_obj_text(obj: BaseModel, message: str = '', *, level: str = 'DEBUG', logger_=logger):
     message = message or obj.__class__.__name__
     logger_.log(
         level,
