@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import cast
+from urllib.error import HTTPError
 
 from combadge.core.errors import BackendError
 from fastapi import APIRouter, Body, Depends
@@ -147,7 +148,7 @@ async def get_addr_choices_api(
 
     parcelforce_ = PROVIDER_REGISTER.get(ProviderName.PARCELFORCE)
     if not parcelforce_:
-        ...
+        raise HTTPError('Parcelforce Provider not available - unable to fetch address candidates')
     p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, parcelforce_)
     client = p.client
     postcode = body.postcode
