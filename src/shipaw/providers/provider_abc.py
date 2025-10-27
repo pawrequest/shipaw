@@ -43,9 +43,8 @@ class HasServiceCodes(ABC):
 
 
 class HasLabels(ABC):
-    @staticmethod
     @abstractmethod
-    def fetch_label_content(shipment_num: str) -> bytes: ...
+    def fetch_label_content(self, shipment_num: str) -> bytes: ...
 
     def wait_fetch_label(self, shipment_num: str, tries=10) -> bytes:
         for i in range(tries):
