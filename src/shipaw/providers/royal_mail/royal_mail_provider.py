@@ -85,9 +85,9 @@ class RoyalMailProvider(ShippingProvider):
                     recipient=rm_recipient_details_from_agnostic_fc(shipment.recipient),
                     order_date=date_to_datetime(shipment.shipping_date),
                     planned_despatch_date=date_to_datetime(shipment.shipping_date),
-                    subtotal=1000,
+                    subtotal=0,
                     shipping_cost_charged=0,
-                    total=1000,
+                    total=0,
                     packages=create_packages(num_parcels=shipment.boxes, package_format=PackageFormat.PARCEL),
                 )
             ]
@@ -112,7 +112,7 @@ class RoyalMailProvider(ShippingProvider):
         if rm_response.errors_count > 0:
             raise RuntimeError()
         order = rm_response.created_orders[0]
-        track_num = order.tracking_number
+        track_num = order.tracking_number if order.tracking_number else ''
         success = rm_response.errors_count == 0
         return ShipmentResponse(
             shipment=shipment,
