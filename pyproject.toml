@@ -33,6 +33,7 @@ dependencies = [
     "pydantic-settings>=2.11.0",
     "phonenumbers>=9.0.15",
     "pywin32>=311",
+    "uvicorn>=0.37.0",
 ]
 
 

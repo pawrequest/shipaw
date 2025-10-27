@@ -1068,6 +1068,7 @@ dependencies = [
     { name = "pywin32" },
     { name = "royal-mail-click-and-drop" },
     { name = "thefuzz" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -1102,6 +1103,7 @@ requires-dist = [
     { name = "pywin32", specifier = ">=311" },
     { name = "royal-mail-click-and-drop", specifier = ">=0.0.9" },
     { name = "thefuzz", specifier = ">=0.22.1" },
+    { name = "uvicorn", specifier = ">=0.37.0" },
 ]
 
 [package.metadata.requires-dev]
