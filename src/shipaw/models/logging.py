@@ -23,20 +23,11 @@ def ndlog_dict(data: dict, ndjson_file: Path | None = None):
 
 def log_obj_text(obj: BaseModel, message: str = '', *, level: str = 'DEBUG', logger_=logger):
     message = message or obj.__class__.__name__
-    logger_.log(
+    model_data = obj.model_dump(mode='json', exclude={'label_data': ..., 'response': {'label_data'}})
+    msg = f'{message}:\n{pprint.pformat(model_data, indent=2)}'.replace('{', r'{{').replace('}', r'}}')
+    logger_.opt(depth=2).log(
         level,
-        message
-        + ':\n'
-        + pprint.pformat(
-            obj.model_dump(
-                mode='json',
-                exclude={
-                    'label_data': ...,
-                    'response': {'label_data'},
-                },
-            ),
-            indent=2,
-        ),
+        msg,
     )
 
 
