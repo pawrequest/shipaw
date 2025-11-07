@@ -86,7 +86,7 @@ class ShipawSettings(BaseSettings):
         if not env_path.exists():
             raise FileNotFoundError(f'Environment file {env_path} does not exist')
         logger.info(f'Loading ShipawSettings from env file: {env_path}')
-        return cls(_env_file = env_path)  # pycharm_pydantic false positive
+        return cls(_env_file=env_path)  # pycharm_pydantic false positive
 
     # SET UI/TEMPLATE DIRS #
     @model_validator(mode='after')
