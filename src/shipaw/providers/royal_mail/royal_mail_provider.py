@@ -14,7 +14,7 @@ from royal_mail_click_and_drop.v2.services import RoyalMailServiceCode
 from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.logging import log_obj
+from shipaw.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider

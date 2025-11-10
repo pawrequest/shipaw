@@ -16,7 +16,7 @@ from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shi
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
-from shipaw.models.logging import log_obj
+from shipaw.logging import log_obj
 from shipaw.models.shipment import Shipment
 from shipaw.providers.parcelforce.parcelforce_funcs import (
     address_from_agnostic,

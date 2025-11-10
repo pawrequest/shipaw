@@ -1,7 +1,7 @@
 from parcelforce_expresslink.config import ParcelforceSettings
 from parcelforce_expresslink.expresslink_client import ParcelforceClient
 
-from shipaw.models.logging import log_obj
+from shipaw.logging import log_obj
 
 
 def cancel_parcelforce(ship_number):
@@ -16,3 +16,6 @@ if __name__ == '__main__':
     # res = cancel_parcelforce()
 
     ...
+
+
+# def copy_logs_to_network_drive(log_dir_local: Path, log_dir_network: Path):

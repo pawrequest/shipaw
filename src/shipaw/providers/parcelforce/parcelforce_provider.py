@@ -20,7 +20,7 @@ from parcelforce_expresslink.models.shipment import Shipment as ShipmentPF
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.logging import log_obj
+from shipaw.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment, Shipment as ShipmentAgnost
 from shipaw.providers.parcelforce.parcelforce_funcs import (
