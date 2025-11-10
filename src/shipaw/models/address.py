@@ -5,7 +5,7 @@ from shipaw.models.base import ShipawBaseModel
 
 class Contact(ShipawBaseModel):
     contact_name: str
-    email_address: str | EmailStr
+    email_address: str
     mobile_phone: str
     phone_number: str | None = None
 
@@ -29,7 +29,7 @@ class Address(ShipawBaseModel):
     country: str = 'GB'
 
     def get_address_lines_dict(self, prefix='address_line') -> dict[str, str]:
-        return {f'{prefix}{i+1}': line for i, line in enumerate(self.address_lines) if line}
+        return {f'{prefix}{i + 1}': line for i, line in enumerate(self.address_lines) if line}
 
     @field_validator('address_lines', mode='after')
     def check_address_lines(cls, v):
@@ -61,7 +61,7 @@ class LongContact(ShipawBaseModel):
         return self
 
     def get_address_lines_dict(self, prefix='address_line') -> dict[str, str]:
-        return {f'{prefix}{i+1}': line for i, line in enumerate(self.address_lines) if line}
+        return {f'{prefix}{i + 1}': line for i, line in enumerate(self.address_lines) if line}
 
     @field_validator('address_lines', mode='after')
     def check_address_lines(cls, v):
