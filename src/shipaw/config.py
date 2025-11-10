@@ -45,6 +45,7 @@ class ShipawSettings(BaseSettings):
     label_dir: Path
     log_dir: Path
     ui_dir: Path = Field(default_factory=get_ui)
+    log_db_path: str | None = None
 
     # Provider env file dict (json string in .env)
     provider_env_dict: dict[str, Path]

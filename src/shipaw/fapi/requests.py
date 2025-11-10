@@ -17,7 +17,7 @@ class Authentication(ShipawBaseModel):
 
 
 class ShipmentRequest(ShipawBaseModel):
-    id: uuid.UUID = uuid.uuid4()
+    # id: uuid.UUID = uuid.uuid4()
     shipment: Shipment
     provider_name: ProviderName
     service_code: str
