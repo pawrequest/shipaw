@@ -62,6 +62,7 @@ class ShipmentResponse(BaseResponse):
         unsize = label_path.parent / 'original_size' / label_path.name
         unsize.parent.mkdir(parents=True, exist_ok=True)
         unsize.write_bytes(label_content)
+        logger.info(f'Resizing {unsize} to A4 at {label_path}')
         on_a4(input_file=unsize, output_file=label_path)
         logger.info(f'Wrote label to {label_path}')
 
