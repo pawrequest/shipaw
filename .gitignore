@@ -161,3 +161,4 @@ cython_debug/
 /docs/build/
 /play.py
 /.run/
+/uv.lock
