@@ -83,7 +83,7 @@ class ShipawSettings(BaseSettings):
     @classmethod
     @functools.lru_cache
     def from_env(cls, env_key='SHIPAW_ENV') -> ShipawSettings:
-        env_path = _env_file = get_path_from_environment(env_key)
+        env_path = get_path_from_environment(env_key)
         if not env_path.exists():
             raise FileNotFoundError(f'Environment file {env_path} does not exist')
         logger.info(f'Loading ShipawSettings from env file: {env_path}')
