@@ -148,7 +148,7 @@ async def get_addr_choices_api(
 
     parcelforce_ = PROVIDER_REGISTER.get(ProviderName.PARCELFORCE)
     if not parcelforce_:
-        raise HTTPError('Parcelforce Provider not available - unable to fetch address candidates')
+        raise HTTPException(status_code=503, detail='Parcelforce Provider not available - unable to fetch address candidates')
     p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, parcelforce_)
     client = p.client
     postcode = body.postcode
