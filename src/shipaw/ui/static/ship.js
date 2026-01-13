@@ -58,7 +58,7 @@ async function initShipForm(shipment) {
     await populateProviderDropdown();
     const contextjson = JSON.stringify(shipment.Context);
     await setContextJson(contextjson);
-    await loadAddrChoices();
+    await setAddrChoices();
     await providerChange()
     // setProvider();
     // checkToggleOwnLabel();
@@ -215,14 +215,19 @@ async function populateServicesDropdown() {
 }
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
-async function loadAddrChoices() {
-    // get address from form fields
+async function setAddrChoices() {
     const address = await addressFromForm();
     console.log('Loading AddressChoices for address:', address);
-    // fetch AddressChices from server
-    const addrChoicesJson = await fetchAddrChoices(address.Postcode, address);
-    // populate address-select options and 'click to insert' div
-    await handleAddrChoices(addrChoicesJson);
+    try {
+        const addrChoicesJson = await fetchAddrChoices(address.Postcode, address);
+        if (Array.isArray(addrChoicesJson)) {
+            await handleAddrChoices(addrChoicesJson);
+        }
+    } catch (error) {
+        console.error('Error fetching AddressChoices:', error);
+        return;
+    }
+
 }
 
 /**
@@ -245,6 +250,7 @@ async function fetchAddrChoices(Postcode, Address) {
         console.error('Error fetching candidates:', error);
     }
 }
+
 
 /**
  * Handles AddressChoices from server.
