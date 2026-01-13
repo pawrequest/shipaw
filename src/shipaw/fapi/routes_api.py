@@ -1,9 +1,8 @@
 from pathlib import Path
 from typing import cast
-from urllib.error import HTTPError
 
 from combadge.core.errors import BackendError
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from loguru import logger
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -15,8 +14,8 @@ from shipaw.fapi.backend import convert_choice, maybe_alert_apc, try_book_shipme
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import AddressRequest, ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
-from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.logging import log_obj
+from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.shipment import Shipment
 from shipaw.providers.parcelforce.parcelforce_funcs import (
     address_from_agnostic,
@@ -26,7 +25,13 @@ from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 
 router = APIRouter()
-router.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
+
+
+def get_settings() -> ShipawSettings:
+    return ShipawSettings.from_env()
+
+
+router.mount('/static', StaticFiles(directory=str(get_settings().static_dir)), name='static')
 
 
 def get_version():
