@@ -14,9 +14,9 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
-    "apc-hypaship>=0.1.10",
-    "parcelforce-expresslink>=0.1.10",
-    'royal-mail-click-and-drop>=0.0.9',
+    "apc-hypaship==0.1.10",
+    "parcelforce-expresslink==0.1.12",
+    'royal-mail-click-and-drop==0.0.9',
     "pawdf>=0.1.0",
     #
     "httpx>=0.28.1",
