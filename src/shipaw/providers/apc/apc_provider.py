@@ -29,7 +29,7 @@ class APCShippingProvider(ShippingProvider):
 
     name: ClassVar[ProviderName] = ProviderName.APC
 
-    settings_type: ClassVar[APCSettings] = APCSettings
+    settings_type: ClassVar[type[APCSettings]] = APCSettings
     service_codes_type: ClassVar[type[APCServiceCode]] = APCServiceCode
     default_service: ClassVar[APCServiceCode] = APCServiceCode.PARCEL_1600
     _client: APCClient | None = None
