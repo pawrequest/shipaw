@@ -32,8 +32,12 @@ async def lifespan(app_: FastAPI):
         ...
 
 
+def get_settings() -> ShipawSettings:
+    return ShipawSettings.from_env()
+
+
 app = FastAPI(lifespan=lifespan)
-app.mount('/static', StaticFiles(directory=str(ShipawSettings.from_env().static_dir)), name='static')
+app.mount('/static', StaticFiles(directory=str(get_settings().static_dir)), name='static')
 app.include_router(json_router, prefix='/api')
 app.include_router(html_router)
 app.ship_live = ShipawSettings.from_env().shipper_live
