@@ -57,7 +57,7 @@ class HasLabels(ABC):
                 pass
         raise RuntimeError(f'Label not ready after {tries} retries for {shipment_num}')
 
-    async def wait_fetch_label_as(self, shipment_num: str, tries=10) -> bytes:
+    async def wait_fetch_label_async(self, shipment_num: str, tries=10) -> bytes:
         for i in range(tries):
             try:
                 time.sleep(1)
@@ -86,13 +86,13 @@ class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
     @staticmethod
     @abstractmethod
     def provider_shipment(shipment: Shipment, service_code: StrEnum) -> BaseModel:
-        """Takes agnostic Shipment object and returns provider Shipment object"""
+        """Takes Shipaw's agnostic Shipment object and returns provider-specific Shipment object"""
         ...
 
     @staticmethod
     @abstractmethod
     def agnostic_shipment(shipment: BaseModel) -> Shipment:
-        """Takes provider Shipment object and returns agnostic Shipment object"""
+        """Takes provider-specific Shipment object and returns Shipaw's agnostic Shipment object"""
         ...
 
     @staticmethod

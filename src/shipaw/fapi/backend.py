@@ -40,7 +40,7 @@ async def try_get_label_data(request: ShipmentRequest, response: ShipmentRespons
             logger.info('Label data already present, not fetching')
         else:
             if response.shipment_num:
-                response.label_data = await request.provider.wait_fetch_label_as(response.shipment_num)
+                response.label_data = await request.provider.wait_fetch_label_async(response.shipment_num)
             else:
                 logger.warning('No shipment number to fetch label data')
 
