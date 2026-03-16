@@ -1,43 +1,74 @@
 from typing import ClassVar, override
 
-from loguru import logger
-from royal_mail_click_and_drop import (
+from royal_mail_combined import RoyalMailClient
+from royal_mail_combined.click_and_drop_api.models import (
+    CreateOrderRequest,
     CreateOrdersRequest,
     CreateOrdersResponse,
+    ReturnsRequest,
 )
-from royal_mail_click_and_drop.config import RoyalMailSettings
-from royal_mail_click_and_drop.models.create_orders_request import CreateOrderRequest
-from royal_mail_click_and_drop.models.shipment_package_request import PackageFormat
-from royal_mail_click_and_drop.v2.client import RoyalMailClient
-from royal_mail_click_and_drop.v2.services import RoyalMailServiceCode
+from royal_mail_combined.click_and_drop_api.models.return_models import ReturnResponseContainer
+from royal_mail_combined.config import RoyalMailSettingsGlobal
+from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
 
-from shipaw.config import ShipawSettings
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.logging import log_obj
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type
-from shipaw.providers.royal_mail.royal_mail_funcs import (
-    create_packages,
-    create_postage_details,
-    date_to_datetime,
+from shipaw.providers.royal_mail_combined.royal_mail_combined_funcs import (
     full_contact_from_rm,
-    rm_billing_details_from_fc,
-    rm_recipient_details_from_agnostic_fc,
+    inbound_shipment_from_agnostic, outbound_shipment_from_agnostic,
 )
 
 
+def build_booking_response_inbound(
+        rm_response: ReturnResponseContainer,
+        shipment: Shipment
+):
+    ids = ';'.join([order.shipment.unique_item_id for order in rm_response.created_orders])
+    links = ';'.join([order.shipment.tracking_number for order in rm_response.created_orders])
+
+    return ShipmentResponse(
+        shipment=shipment,
+        shipment_num=ids,
+        tracking_link=links,
+        data=rm_response.model_dump(),
+        status='Success',
+        success=True,
+    )
+
+
+def build_booking_response_outbound(
+        rm_response: CreateOrdersResponse,
+        shipment: Shipment
+):
+    if rm_response.errors_count > 0:
+        raise RuntimeError()
+    order = rm_response.created_orders[0]
+    track_num = order.tracking_number if order.tracking_number else ''
+    success = rm_response.errors_count == 0
+    return ShipmentResponse(
+        shipment=shipment,
+        shipment_num=str(order.order_identifier),
+        tracking_link='TRACKING LINKS NOT IMPLEMENTED',  # todo: implement tracking links
+        data=rm_response.model_dump(),
+        status='Success' if success else 'FAIL',
+        success=success,
+    )
+
+
 @register_provider_type
-class RoyalMailProvider(ShippingProvider):
-    settings: RoyalMailSettings
+class RoyalMailComboProvider(ShippingProvider):
+    settings: RoyalMailSettingsGlobal
 
     name: ClassVar[ProviderName] = ProviderName.ROYAL_MAIL
-    settings_type: ClassVar[type[RoyalMailSettings]] = RoyalMailSettings
-    service_codes_type: ClassVar[type[RoyalMailServiceCode]] = RoyalMailServiceCode
-    default_service: ClassVar[RoyalMailServiceCode] = RoyalMailServiceCode.EXPRESS_24
-    valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND]
+    settings_type: ClassVar[type[RoyalMailSettingsGlobal]] = RoyalMailSettingsGlobal
+    service_codes_type: ClassVar[type[RoyalMailServiceCodes]] = RoyalMailServiceCodes
+    default_service: ClassVar[RoyalMailServiceCodes] = RoyalMailServiceCodes.TRACKED_24
+    valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND, ShipDirection.INBOUND,
+                                                       ShipDirection.DROPOFF]
 
     _client: RoyalMailClient | None = None
 
@@ -68,61 +99,48 @@ class RoyalMailProvider(ShippingProvider):
         )
 
     @override
-    def provider_shipment(self, shipment: Shipment, service_code: RoyalMailServiceCode) -> CreateOrdersRequest:
-        if shipment.direction != ShipDirection.OUTBOUND:
-            # todo: implement inbound / dropoff
-            raise NotImplementedError('only outbound shipments are supported for Royal Mail')
-        shipaw_settings = ShipawSettings.from_env('SHIPAW_ENV')
-        billing_details = rm_billing_details_from_fc(shipaw_settings.full_contact)
-        postage_details = create_postage_details(shipment=shipment, service_code=service_code)
+    def provider_shipment(
+            self,
+            shipment: Shipment,
+            service_code: RoyalMailServiceCodes
+    ) -> CreateOrderRequest | ReturnsRequest:
+        provider_service = self.service_codes_type(service_code)
 
-        return CreateOrdersRequest(
-            items=[
-                CreateOrderRequest(
-                    order_reference=shipment.reference,
-                    postage_details=postage_details,
-                    billing=billing_details,
-                    recipient=rm_recipient_details_from_agnostic_fc(shipment.recipient),
-                    order_date=date_to_datetime(shipment.shipping_date),
-                    planned_despatch_date=date_to_datetime(shipment.shipping_date),
-                    subtotal=0,
-                    shipping_cost_charged=0,
-                    total=0,
-                    packages=create_packages(num_parcels=shipment.boxes, package_format=PackageFormat.PARCEL),
-                )
-            ]
-        )
-
-    def provider_shipment_request(self, shipment_request: ShipmentRequest) -> CreateOrdersRequest:
-        provider_service = self.service_codes_type(shipment_request.service_code)
-        shipment_rm = self.provider_shipment(shipment_request.shipment, provider_service)
-        log_obj(shipment_rm, 'Royal Mail Shipment Request')
-        return shipment_rm
+        if shipment.direction == ShipDirection.OUTBOUND:
+            return outbound_shipment_from_agnostic(shipment, provider_service)
+        else:
+            return inbound_shipment_from_agnostic(shipment, provider_service)
 
     @override
     def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> ShipmentResponse:
         shipment = shipment_request.shipment
-        provider_shipment_request = self.provider_shipment_request(shipment_request)
-        resp = self.client.book_shipment(provider_shipment_request)
-        logger.warning(f'BOOKED SHIPMENTS: {resp.created_orders_idents}')
-        return self.build_booking_response(resp, shipment)
+        service = self.service_codes_type(shipment_request.service_code)
 
-    def build_booking_response(self, rm_response: CreateOrdersResponse, shipment):
-        """without label data"""
-        if rm_response.errors_count > 0:
-            raise RuntimeError()
-        order = rm_response.created_orders[0]
-        track_num = order.tracking_number if order.tracking_number else ''
-        success = rm_response.errors_count == 0
-        return ShipmentResponse(
-            shipment=shipment,
-            shipment_num=str(order.order_identifier),
-            tracking_link=self.settings.tracking_link(track_num),
-            data=rm_response.model_dump(),
-            status='Success' if success else 'FAIL',
-            success=success,
-        )
+        resp = None
+        match shipment_request.shipment.direction:
+            case ShipDirection.OUTBOUND:
+                order_create = outbound_shipment_from_agnostic(shipment, service)
+                resp = self.client.book_outbound_shipment(order_create, num_boxes=shipment_request.shipment.boxes)
+            case ShipDirection.DROPOFF:
+                return_req = inbound_shipment_from_agnostic(shipment, service)
+                resp = self.client.book_inbound_shipment(return_req)
+            case ShipDirection.INBOUND:
+                return_req = inbound_shipment_from_agnostic(shipment, service)
+                resp = self.client.book_inbound_shipment_with_collection(
+                    return_req,
+                    collection_date=shipment.shipping_date,
+                    num_boxes=shipment.boxes
+                )
+            case _:
+                raise ValueError('Bad ShipDirection')
+
+        if isinstance(resp, CreateOrdersResponse):
+            return build_booking_response_outbound(resp, shipment)
+        elif isinstance(resp, ReturnResponseContainer):
+            return build_booking_response_inbound(resp, shipment)
+        else:
+            raise ValueError(f'Unexpected response type {type(resp)} from booking shipment')
 
     @override
     def fetch_label_content(self, shipment_num: str) -> bytes:
-        return self.client.get_label_content(shipment_num)
+        return self.client.get_label_data(shipment_num)

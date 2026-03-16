@@ -15,9 +15,8 @@ readme = "README.md"
 requires-python = ">= 3.13"
 dependencies = [
     "apc-hypaship==0.1.10",
-    #    "parcelforce-expresslink==0.1.12",
-    'royal-mail-click-and-drop==0.0.10',
     "pawdf>=0.1.0",
+    "royal-mail-combined",
     #
     "httpx>=0.28.1",
     "pygments>=2.19.2",
@@ -34,7 +33,6 @@ dependencies = [
     "phonenumbers>=9.0.15",
     "pywin32>=311",
     "uvicorn>=0.37.0",
-    "royal-mail-combined",
 ]
 
 
@@ -61,7 +59,7 @@ lint.flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
 format.quote-style = "single"
 
 [tool.uv.sources]
-royal-mail-combined = { path = "../royal-mail-combined" }
+royal-mail-combined = { path = "../royal-mail-combined", editable = true }
 # GIT
 #pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
 #pawdf = { git = 'https://github.com/pawrequest/pawdf' }

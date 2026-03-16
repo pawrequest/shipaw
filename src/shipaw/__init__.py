@@ -1,8 +1,8 @@
-from .providers import APCSettings, APCShippingProvider, ParcelforceSettings, ParcelforceShippingProvider
+from .providers import APCSettings, APCShippingProvider
 
 __all__ = [
     'APCSettings',
     'APCShippingProvider',
-    'ParcelforceSettings',
-    'ParcelforceShippingProvider',
+    # 'ParcelforceSettings',
+    # 'ParcelforceShippingProvider',
 ]
