@@ -1,8 +1,6 @@
 from pathlib import Path
-from typing import cast
 
-from combadge.core.errors import BackendError
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends
 from loguru import logger
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -10,17 +8,12 @@ from starlette.staticfiles import StaticFiles
 
 from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts, check_royal_mail, maybe_alert_phone_number
-from shipaw.fapi.backend import convert_choice, maybe_alert_apc, try_book_shipment, try_get_write_label
+from shipaw.fapi.backend import maybe_alert_apc, try_book_shipment, try_get_write_label
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
-from shipaw.fapi.requests import AddressRequest, ShipmentRequest
+from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.logging import log_obj
-from shipaw.models.address import Address, AddressChoice as AddressChoiceAgnost
 from shipaw.models.shipment import Shipment
-from shipaw.providers.parcelforce.parcelforce_funcs import (
-    address_from_agnostic,
-)
-from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 
@@ -138,44 +131,44 @@ async def errored_shipment(shipment_response):
     return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
 
 
-@router.post('/addr_choices', response_model=list[AddressChoiceAgnost], response_class=JSONResponse)
-async def get_addr_choices_api(
-    request: Request,
-    body: AddressRequest = Body(...),
-) -> list[AddressChoiceAgnost]:
-    """Fetch candidate address choices for a postcode, optionally scored by closeness to provided address.
-    Hardcoded to use Parcelforce provider for now - APC does not provide address lookup.
-
-    Args:
-        request: Request - FastAPI request object
-        body: Address - request body containing postcode and optional address
-    """
-
-    parcelforce_ = PROVIDER_REGISTER.get(ProviderName.PARCELFORCE)
-    if not parcelforce_:
-        raise HTTPException(status_code=503, detail='Parcelforce Provider not available - unable to fetch address candidates')
-    p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, parcelforce_)
-    client = p.client
-    postcode = body.postcode
-    address_agnost = body.address
-    pf_address = address_from_agnostic(address_agnost) if address_agnost else None
-    # log_obj(pf_address, 'Address received at /cand:')
-
-    try:
-        res_pf = client.get_choices(postcode=postcode, address=pf_address)
-        res = [await convert_choice(_) for _ in res_pf]
-        return res
-
-    except BackendError as e:
-        alert = Alert(
-            message=f'Error fetching candidates: {e}',
-            type=AlertType.ERROR,
-        )
-        request.app.alerts += alert
-        logger.warning(f'Error fetching candidates: {e}')
-        addr = Address(address_lines=['ERROR:', str(e)], town='Error', postcode='Error', business_name='Error')
-        chc = AddressChoiceAgnost(address=addr, score=0)
-        return [chc]
+# @router.post('/addr_choices', response_model=list[AddressChoiceAgnost], response_class=JSONResponse)
+# async def get_addr_choices_api(
+#     request: Request,
+#     body: AddressRequest = Body(...),
+# ) -> list[AddressChoiceAgnost]:
+#     """Fetch candidate address choices for a postcode, optionally scored by closeness to provided address.
+#     Hardcoded to use Parcelforce provider for now - APC does not provide address lookup.
+#
+#     Args:
+#         request: Request - FastAPI request object
+#         body: Address - request body containing postcode and optional address
+#     """
+#
+#     parcelforce_ = PROVIDER_REGISTER.get(ProviderName.PARCELFORCE)
+#     if not parcelforce_:
+#         raise HTTPException(status_code=503, detail='Parcelforce Provider not available - unable to fetch address candidates')
+#     p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, parcelforce_)
+#     client = p.client
+#     postcode = body.postcode
+#     address_agnost = body.address
+#     pf_address = address_from_agnostic(address_agnost) if address_agnost else None
+#     # log_obj(pf_address, 'Address received at /cand:')
+#
+#     try:
+#         res_pf = client.get_choices(postcode=postcode, address=pf_address)
+#         res = [await convert_choice(_) for _ in res_pf]
+#         return res
+#
+#     except BackendError as e:
+#         alert = Alert(
+#             message=f'Error fetching candidates: {e}',
+#             type=AlertType.ERROR,
+#         )
+#         request.app.alerts += alert
+#         logger.warning(f'Error fetching candidates: {e}')
+#         addr = Address(address_lines=['ERROR:', str(e)], town='Error', postcode='Error', business_name='Error')
+#         chc = AddressChoiceAgnost(address=addr, score=0)
+#         return [chc]
 
 
 @router.get('/providers', response_class=JSONResponse)

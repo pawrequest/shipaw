@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from shipaw.providers.apc.apc_provider import APCShippingProvider
-from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
+# from shipaw.providers.parcelforce.parcelforce_provider import ParcelforceShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER, PROVIDER_TYPE_REGISTER
 
 
@@ -17,9 +17,9 @@ def test_provider_has_settings(sample_provider):
 
 def test_provider_types_registered_by_code():
     provider_types = PROVIDER_TYPE_REGISTER
-    assert 'PARCELFORCE' in provider_types
+    # assert 'PARCELFORCE' in provider_types
     assert 'APC' in provider_types
-    assert ParcelforceShippingProvider in provider_types.values()
+    # assert ParcelforceShippingProvider in provider_types.values()
     assert APCShippingProvider in provider_types.values()
 
 

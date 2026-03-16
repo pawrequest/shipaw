@@ -9,7 +9,7 @@ from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.address import AddressChoice as AddressChoiceAgnost
 from shipaw.models.ship_types import ShipDirection
-from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
+# from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
 from shipaw.providers.provider_abc import ProviderName
 
 
