@@ -13,12 +13,15 @@ from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
+from shipaw.config_loguru import get_loguru
 
 
 @contextlib.asynccontextmanager
 async def lifespan(app_: FastAPI):
     try:
-        # app_.settings = ShipawSettings.from_env()
+        sets = ShipawSettings.from_env()
+        app_.settings = sets
+        get_loguru(log_file=sets.log_file, level=sets.log_level)
         # set_pf_env()
         # pythoncom.CoInitialize()
         # with sqm.Session(am_db.ENGINE) as session:
@@ -36,8 +39,10 @@ def get_settings() -> ShipawSettings:
     return ShipawSettings.from_env()
 
 
+STATIC_DIR_STR = str(get_settings().static_dir)
+print(f'(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA \n) Static dir: {STATIC_DIR_STR}')
 app = FastAPI(lifespan=lifespan)
-app.mount('/static', StaticFiles(directory=str(get_settings().static_dir)), name='static')
+app.mount('/static', StaticFiles(directory=STATIC_DIR_STR), name='static')
 app.include_router(json_router, prefix='/api')
 app.include_router(html_router)
 app.ship_live = ShipawSettings.from_env().shipper_live

@@ -26,3 +26,7 @@ def get_ui() -> Path:
     if not res.exists():
         raise FileNotFoundError(f'UI directory {res} does not exist')
     return res
+
+
+def make_nice_str(s: str) -> str:
+    return s.replace('_', ' ').title()

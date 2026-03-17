@@ -1,16 +1,23 @@
+from __future__ import annotations
+
+from pathlib import Path
+
 from apc_hypaship.error import apc_http_status_alerts
 from httpx import HTTPStatusError
 from loguru import logger
-from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
-from parcelforce_expresslink.models.contact import Contact as ContactPF
+from pawdf.array_pdf.array_p import on_a4
 
 from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.address import AddressChoice as AddressChoiceAgnost
 from shipaw.models.ship_types import ShipDirection
+
 # from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
 from shipaw.providers.provider_abc import ProviderName
+
+
+# from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
+# from parcelforce_expresslink.models.contact import Contact as ContactPF
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentResponse:
@@ -31,7 +38,8 @@ async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentRespon
 async def try_get_write_label(request: ShipmentRequest, response: ShipmentResponse):
     if not response.label_data:
         await try_get_label_data(request, response)
-    await try_write_label(response)
+    # await try_write_label(response)
+    await try_write_label2(response)
 
 
 async def try_get_label_data(request: ShipmentRequest, response: ShipmentResponse) -> None:
@@ -52,9 +60,20 @@ async def try_get_label_data(request: ShipmentRequest, response: ShipmentRespons
         response.alerts += Alert.from_exception(e)
 
 
-async def try_write_label(response: ShipmentResponse):
+# async def try_write_label(response: ShipmentResponse):
+#     try:
+#         await response.write_label_file()
+#     except Exception as e:
+#         logger.exception(f'Error writing label file: {e}')
+#         response.alerts += Alert.from_exception(e)
+
+
+async def try_write_label2(response: ShipmentResponse):
     try:
-        await response.write_label_file()
+        label_content = response.label_data
+        label_path = response.label_path
+        await array_write_label_content(label_content, label_path)
+
     except Exception as e:
         logger.exception(f'Error writing label file: {e}')
         response.alerts += Alert.from_exception(e)
@@ -82,6 +101,10 @@ async def maybe_alert_apc(shipment_request):
     return alerts
 
 
-async def convert_choice(choice: AddressChoicePF) -> AddressChoiceAgnost:
-    fc = parcelforce_full_contact(contact=ContactPF.empty(), address=choice.address)
-    return AddressChoiceAgnost(address=fc.address, score=choice.score)
+async def array_write_label_content(label_content: bytes, label_path: Path):
+    og_size_path = label_path.parent / 'original_size' / label_path.name
+    og_size_path.parent.mkdir(parents=True, exist_ok=True)
+    og_size_path.write_bytes(label_content)
+    logger.info(f'Resizing {og_size_path} to A4 at {label_path}')
+    on_a4(input_file=og_size_path, output_file=label_path)
+    logger.info(f'Wrote label to {label_path}')

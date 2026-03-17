@@ -55,11 +55,14 @@
 async function initShipForm(shipment) {
     console.log('Initializing ship form with shipment:', shipment);
     populateShipment(shipment);
-    await populateProviderDropdown();
+
+    const providerNames = await getJson(`api/providers`);
+    await populateDropdown('provider_name', providerNames);
+
     const contextjson = JSON.stringify(shipment.Context);
     await setContextJson(contextjson);
-    await setAddrChoices();
-    await providerChange()
+    // await setAddrChoices();
+    await providerChanged()
     // setProvider();
     // checkToggleOwnLabel();
     // toggleCollectionTimes();
@@ -107,17 +110,52 @@ function toggleDiv(idToToggle, toggleOn) {
 
 }
 
-
-async function providerChange() {
-    console.log('Provider changed, updating dependent fields');
-    await Promise.all([
-        populateServicesDropdown(),
-        populateDirectionsDropdown()
-    ]);
+async function populateDropdown(selectId, items) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = ''; // Clear existing options
+    Object.entries(items).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.textContent = key;
+        option.value = String(value);
+        select.appendChild(option);
+    });
 }
+
+async function changeDirection(providerName, direction) {
+    console.log('changeDirection', providerName, direction);
+    const services = await getJson(`api/provider_direction_services/${providerName}/${direction}`);
+    await populateDropdown('service', services);
+}
+
+async function changeProvider(providerName) {
+    console.log('changeProvider', providerName);
+    const providerDirections = await getJson(`api/provider_directions/${providerName}`);
+    await populateDropdown('direction', providerDirections);
+    const direction = document.getElementById('direction').value;
+
+}
+
+
+async function providerChanged() {
+    console.log('providerChanged');
+    const provider_name = document.getElementById('provider_name').value;
+    console.log('Selected provider:', provider_name);
+    await changeProvider(provider_name);
+    const direction = document.getElementById('direction').value;
+    await changeDirection(provider_name, direction);
+}
+
+async function directionChanged() {
+    console.log('directionChanged');
+    const provider_name = document.getElementById('provider_name').value;
+    const direction = document.getElementById('direction').value;
+    await changeDirection(provider_name, direction);
+}
+
 
 // GATHER FORM DATA
 async function contactFromForm() {
+    console.log('contactFromForm');
     return {
         ContactName: document.getElementById('contact_name').value,
         EmailAddress: document.getElementById('email').value,
@@ -126,6 +164,7 @@ async function contactFromForm() {
 }
 
 async function addressFromForm() {
+    console.log('addressFromForm');
     return {
         AddressLines: [document.getElementById('address_line1').value, document.getElementById('address_line2').value, document.getElementById('address_line3').value].filter(line => line),
         Town: document.getElementById('town').value,
@@ -167,52 +206,18 @@ async function shipmentRequestFromForm() {
 
 
 // API Requests
-// Provider Specific
-async function getSmth(url) {
+async function getJson(url) {
     try {
         const response = await fetch(url, {
             method: 'GET', headers: {'Content-Type': 'application/json'}
         });
         return await response.json();
     } catch (error) {
-        console.error('Error fetching providers:', error);
+        console.error('Error fetching json:', error);
     }
 }
 
 
-async function populateDropdown(element_id, url) {
-    const select = document.getElementById(element_id);
-    select.innerHTML = ''; // Clear existing options
-    const items = await getSmth(url);
-
-    Object.entries(items).forEach(([key, value]) => {
-        // console.log(`${element_id} AVAILABLE: `, key, value);
-        const option = document.createElement('option');
-        option.textContent = key;
-        option.value = String(value);
-        select.appendChild(option);
-    });
-}
-
-async function populateProviderDropdown() {
-    const url = `api/providers`;
-    await populateDropdown('provider_name', url);
-}
-
-async function populateDirectionsDropdown() {
-    const element = 'direction';
-    const provider_name = document.getElementById('provider_name').value;
-    const url = `api/provider_directions/${provider_name}`;
-    await populateDropdown(element, url);
-}
-
-
-async function populateServicesDropdown() {
-    const element_id = 'service';
-    const provider_name = document.getElementById('provider_name').value;
-    const url = `api/provider_services/${provider_name}`;
-    await populateDropdown(element_id, url);
-}
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
 async function setAddrChoices() {
@@ -225,7 +230,7 @@ async function setAddrChoices() {
         }
     } catch (error) {
         console.error('Error fetching AddressChoices:', error);
-        return;
+
     }
 
 }

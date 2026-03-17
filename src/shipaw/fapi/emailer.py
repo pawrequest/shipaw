@@ -76,7 +76,11 @@ async def send_label_email(shipment_request: ShipmentRequest, label_path: Path):
     body = (
         ShipawSettings.from_env()
         .templates.get_template('email_snips/label_email.html')
-        .render(label=label_path, shipment_request=shipment_request, home_business_name=ShipawSettings.from_env().business_name)
+        .render(
+            label=label_path,
+            shipment_request=shipment_request,
+            home_business_name=ShipawSettings.from_env().business_name,
+        )
     )
     email = Email(
         to_address=shipment_request.shipment.remote_full_contact.contact.email_address,
@@ -86,5 +90,3 @@ async def send_label_email(shipment_request: ShipmentRequest, label_path: Path):
     )
 
     OutlookHandler.create_open_email(email, html=True)
-
-

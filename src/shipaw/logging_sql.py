@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment
-from shipaw.sql_helpers import PydanticJSONColumn, optional_json_field, required_json_field
+from shipaw.sql_helpers import optional_json_field, required_json_field
 
 
 class TableModel(SQLModel):
@@ -39,5 +39,6 @@ class ShipmentTable(Shipment, TableModel, table=True):
 
 class ShipmentRequestTable(ShipmentRequest, TableModel, table=True):
     """SQLModel table for ShipmentRequest"""
+
     __tablename__ = 'shipment_request'
     shipment: Shipment = required_json_field(Shipment)

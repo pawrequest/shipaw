@@ -3,13 +3,11 @@ from __future__ import annotations
 from base64 import b64encode
 from pathlib import Path
 
-from loguru import logger
-from pawdf.array_pdf.array_p import on_a4
 from pydantic import ConfigDict, Field, model_validator
 
 from shipaw.config import ShipawSettings
-from shipaw.models.base import ShipawBaseModel
 from shipaw.fapi.alerts import Alerts
+from shipaw.models.base import ShipawBaseModel
 from shipaw.models.label_file import get_label_folder, get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
 
@@ -52,19 +50,8 @@ class ShipmentResponse(BaseResponse):
             self.label_path = unused_path(label_filepath)
         return self
 
-    async def write_label_file(self):
-        try:
-            label_content = self.label_data
-        except Exception as e:
-            logger.error(f'Error getting label content: {e}')
-            raise
-        label_path = self.label_path
-        unsize = label_path.parent / 'original_size' / label_path.name
-        unsize.parent.mkdir(parents=True, exist_ok=True)
-        unsize.write_bytes(label_content)
-        logger.info(f'Resizing {unsize} to A4 at {label_path}')
-        on_a4(input_file=unsize, output_file=label_path)
-        logger.info(f'Wrote label to {label_path}')
+    # async def write_label_file(self):
+    #     await array_write_label_content(self.label_data, self.label_path)
 
 
 class ShipawTemplateResponse(BaseResponse):

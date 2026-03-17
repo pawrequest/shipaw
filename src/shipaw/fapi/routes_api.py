@@ -2,12 +2,13 @@ from pathlib import Path
 
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
+from shipaw.fapi.ui_funcs import make_nice_str
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from shipaw.config import ShipawSettings
-from shipaw.fapi.alerts import Alert, AlertType, Alerts, check_royal_mail, maybe_alert_phone_number
+from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
 from shipaw.fapi.backend import maybe_alert_apc, try_book_shipment, try_get_write_label
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
@@ -88,9 +89,6 @@ async def order_summary_api(
     alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
     # check not apc + dropoff
     alerts += await maybe_alert_apc(shipment_request)
-    # check if royal mail and not standard service
-    alerts += await check_royal_mail(shipment_request)
-
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
         alerts=alerts,
@@ -103,7 +101,7 @@ async def order_results_api(
     shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
-    await try_get_write_label(shipment_request, shipment_response)
+    # await try_get_write_label(shipment_request, shipment_response)
 
     if shipment_response.alerts.errors:
         return await errored_shipment(shipment_response)
@@ -178,12 +176,12 @@ async def get_providers():
     return JSONResponse(provider_response)
 
 
-@router.get('/provider_services/{provider_name}', response_class=JSONResponse)
-async def provider_services(provider_name: str):
-    provider = await provider_from_form(provider_name)
-    services = provider.services_as_dict()
-    serv = {k.title(): v for k, v in services.items()}
-    return JSONResponse(serv)
+# @router.get('/provider_services/{provider_name}', response_class=JSONResponse)
+# async def provider_services(provider_name: str):
+#     provider = await provider_from_form(provider_name)
+#     services = provider.services_as_dict()
+#     serv = {k.title(): v for k, v in services.items()}
+#     return JSONResponse(serv)
 
 
 @router.get('/provider_directions/{provider_name}', response_class=JSONResponse)
@@ -192,3 +190,12 @@ async def provider_directions(provider_name: str):
     directions = provider.valid_directions
     dir_dict = {_.value: _.value for _ in directions}
     return JSONResponse(dir_dict)
+
+
+@router.get('/provider_direction_services/{provider_name}/{direction}', response_class=JSONResponse)
+async def provider_direction_services2(provider_name: str, direction: str):
+    logger.warning(f'Hit provider_direction_services with provider_name={provider_name} and direction={direction}')
+    provider = await provider_from_form(provider_name)
+    list_of_str_enums = provider.valid_direction_services.get(direction, list())
+    res_dir = {make_nice_str(_.name): _.value for _ in list_of_str_enums}
+    return JSONResponse(res_dir)

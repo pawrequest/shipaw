@@ -1,4 +1,3 @@
-
 from shipaw.fapi.responses import ShipawTemplateResponse
 
 

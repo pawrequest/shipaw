@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from enum import StrEnum
 from typing import ClassVar, TYPE_CHECKING
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 class ProviderName(StrEnum):
     # PARCELFORCE = 'PARCELFORCE'
     ROYAL_MAIL = 'ROYAL_MAIL'
-    ROYAL_MAIL_COMBO = 'ROYAL_MAIL_COMBO'
     APC = 'APC'
 
 
@@ -75,6 +74,8 @@ class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
     settings: BaseSettings
     settings_type: ClassVar[type[BaseSettings]]
     valid_directions: ClassVar[list[ShipDirection]]
+
+    valid_direction_services: ClassVar[dict[ShipDirection, list[StrEnum]]] = Field(default_factory=dict)
 
     @property
     @abstractmethod

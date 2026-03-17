@@ -1,3 +1,6 @@
-from .royal_mail_provider import RoyalMailProvider, RoyalMailSettings
+from .royal_mail_provider import RoyalMailProvider, RoyalMailSettingsGlobal
 
-__all__ = ['RoyalMailProvider', 'RoyalMailSettings']
+__all__ = [
+    'RoyalMailProvider',
+    'RoyalMailSettingsGlobal',
+]

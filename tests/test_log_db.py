@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlmodel import SQLModel, Session, select
+from sqlmodel import SQLModel, Session
 
 from shipaw.logging_sql import FullContactTable, ShipmentRequestTable
 
