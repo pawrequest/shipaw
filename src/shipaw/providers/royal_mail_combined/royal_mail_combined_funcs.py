@@ -5,7 +5,6 @@ from royal_mail_combined.click_and_drop_api.models import (
     AddressReturns,
     BillingDetailsRequest,
     CreateOrderRequest,
-    CreateOrdersRequest,
     CustomerReference,
     PostageDetailsRequest,
     RecipientDetailsRequest,
@@ -14,6 +13,7 @@ from royal_mail_combined.click_and_drop_api.models import (
     ShipmentPackageRequest,
     ReturnShipment as RMReturnShipment,
 )
+from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
 
 from shipaw.config import ShipawSettings
@@ -41,15 +41,19 @@ def outbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailS
     )
 
 
-def inbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailServiceCodes) -> ReturnsRequest:
-    return ReturnsRequest(
-        service=Service(service_code=service_code),
-        shipment=RMReturnShipment(
-            recipient_address=returns_address_from_agnostic_fc(shipment.recipient),
-            sender_address=returns_address_from_agnostic_fc(shipment.sender),
-            customer_reference=CustomerReference(reference=shipment.reference)
+def inbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailServiceCodes) -> ReturnRequestContainer:
+    reqs = [
+        ReturnsRequest(
+            service=Service(service_code=service_code),
+            shipment=RMReturnShipment(
+                recipient_address=returns_address_from_agnostic_fc(shipment.recipient),
+                sender_address=returns_address_from_agnostic_fc(shipment.sender),
+                customer_reference=CustomerReference(reference=shipment.reference),
+            ),
         )
-    )
+        for _ in range(shipment.boxes)
+    ]
+    return ReturnRequestContainer(return_requests=reqs)
 
 
 def returns_address_from_agnostic_fc(full_contact: FullContact):

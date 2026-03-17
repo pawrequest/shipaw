@@ -103,7 +103,7 @@ async def order_results_api(
     shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
-    await try_get_write_label(shipment_request, shipment_response)
+    # await try_get_write_label(shipment_request, shipment_response)
 
     if shipment_response.alerts.errors:
         return await errored_shipment(shipment_response)

@@ -1,8 +1,3 @@
-import uuid
-from typing import Annotated
-
-from pydantic import StringConstraints
-
 from shipaw.models.address import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment

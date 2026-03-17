@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 class ProviderName(StrEnum):
     # PARCELFORCE = 'PARCELFORCE'
     ROYAL_MAIL = 'ROYAL_MAIL'
-    ROYAL_MAIL_COMBO = 'ROYAL_MAIL_COMBO'
     APC = 'APC'
 
 

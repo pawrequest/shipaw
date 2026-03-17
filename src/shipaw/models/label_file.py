@@ -21,8 +21,8 @@ def get_label_folder(direction: ShipDirection):
 
 def get_label_stem(shipment: 'Shipment'):
     label_name = (
-        f'{'Dropoff' if shipment.direction == ShipDirection.DROPOFF else 'Shipping'} Label '
-        f'{f'FROM {shipment.sender.address.business_name} ' if shipment.sender else ''}'
+        f'{"Dropoff" if shipment.direction == ShipDirection.DROPOFF else "Shipping"} Label '
+        f'{f"FROM {shipment.sender.address.business_name} " if shipment.sender else ""}'
         f'TO {shipment.recipient.address.business_name} '
         f'ON {shipment.shipping_date}'
     )

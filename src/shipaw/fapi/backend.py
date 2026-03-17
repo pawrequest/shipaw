@@ -1,16 +1,18 @@
 from apc_hypaship.error import apc_http_status_alerts
 from httpx import HTTPStatusError
 from loguru import logger
-from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
-from parcelforce_expresslink.models.contact import Contact as ContactPF
 
 from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.address import AddressChoice as AddressChoiceAgnost
 from shipaw.models.ship_types import ShipDirection
+
 # from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
 from shipaw.providers.provider_abc import ProviderName
+
+
+# from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
+# from parcelforce_expresslink.models.contact import Contact as ContactPF
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentResponse:
@@ -82,6 +84,6 @@ async def maybe_alert_apc(shipment_request):
     return alerts
 
 
-async def convert_choice(choice: AddressChoicePF) -> AddressChoiceAgnost:
-    fc = parcelforce_full_contact(contact=ContactPF.empty(), address=choice.address)
-    return AddressChoiceAgnost(address=fc.address, score=choice.score)
+# async def convert_choice(choice: AddressChoicePF) -> AddressChoiceAgnost:
+#     fc = parcelforce_full_contact(contact=ContactPF.empty(), address=choice.address)
+#     return AddressChoiceAgnost(address=fc.address, score=choice.score)

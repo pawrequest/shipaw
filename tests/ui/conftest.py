@@ -8,4 +8,3 @@ from shipaw.fapi.app import app
 def test_client():
     with TestClient(app) as client:
         yield client
-

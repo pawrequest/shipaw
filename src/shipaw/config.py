@@ -103,6 +103,9 @@ class ShipawSettings(BaseSettings):
 
     @model_validator(mode='after')
     def log_self(self):
+        # if self.logger is None:
+        #     from config_loguru import get_loguru
+        #     self.logger = get_loguru(self.log_level, self.log_file)
         logger.info('ShipawSettings:\n' + pprint.pformat(self.model_dump(), indent=4))
         return self
 
