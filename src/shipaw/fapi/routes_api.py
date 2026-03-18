@@ -78,8 +78,8 @@ async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) ->
 
 @router.post('/order_summary', response_model=ShipawTemplateResponse)
 async def order_summary_api(
-    request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_form),
+        request: Request,
+        shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
     log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     context = {'shipment_request': shipment_request}
@@ -99,8 +99,8 @@ async def order_summary_api(
 
 @router.post('/order_results', response_model=ShipawTemplateResponse)
 async def order_results_api(
-    request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
+        request: Request,
+        shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
     # await try_get_write_label(shipment_request, shipment_response)
@@ -192,3 +192,9 @@ async def provider_directions(provider_name: str):
     directions = provider.valid_directions
     dir_dict = {_.value: _.value for _ in directions}
     return JSONResponse(dir_dict)
+
+
+@router.get('/provider_direction_services/{provider_name}', response_class=JSONResponse)
+async def provider_direction_services(provider_name: str):
+    provider = await provider_from_form(provider_name)
+    return JSONResponse(provider.valid_direction_services)
