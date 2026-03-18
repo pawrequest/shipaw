@@ -58,6 +58,12 @@ class RoyalMailProvider(ShippingProvider):
         ShipDirection.DROPOFF,
     ]
 
+    valid_direction_services = {
+        ShipDirection.OUTBOUND: {RoyalMailServiceCodes.TRACKED_24, RoyalMailServiceCodes.EXPRESS_24},
+        ShipDirection.INBOUND: {RoyalMailServiceCodes.TRACKED_24_RTN},
+        ShipDirection.DROPOFF: {RoyalMailServiceCodes.TRACKED_24_RTN},
+    }
+
     _client: RoyalMailClient | None = None
 
     @override
