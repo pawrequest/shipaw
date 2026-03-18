@@ -168,25 +168,21 @@ async function shipmentRequestFromForm() {
 
 // API Requests
 // Provider Specific
-async function getSmth(url) {
+async function getJson(url) {
     try {
         const response = await fetch(url, {
             method: 'GET', headers: {'Content-Type': 'application/json'}
         });
         return await response.json();
     } catch (error) {
-        console.error('Error fetching providers:', error);
+        console.error('Error fetching json:', error);
     }
 }
 
 
-async function populateDropdown(element_id, url) {
-    const select = document.getElementById(element_id);
+async function populateDropdown(select, items) {
     select.innerHTML = ''; // Clear existing options
-    const items = await getSmth(url);
-
     Object.entries(items).forEach(([key, value]) => {
-        // console.log(`${element_id} AVAILABLE: `, key, value);
         const option = document.createElement('option');
         option.textContent = key;
         option.value = String(value);
@@ -194,16 +190,31 @@ async function populateDropdown(element_id, url) {
     });
 }
 
+async function providerDirectionServices(provider_name) {
+    const url = `/provider_direction_services/${provider_name}`;
+    const directionServices = await getJson(url);
+    const directionsSelect = document.getElementById('direction');
+    const directions = Object.keys(directionServices);
+    await populateDropdown(directionsSelect, directions);
+}
+
+async function getPopulateDropdown(element_id, url) {
+    const select = document.getElementById(element_id);
+    const items = await getJson(url);
+    await populateDropdown(select, items);
+}
+
+
 async function populateProviderDropdown() {
     const url = `api/providers`;
-    await populateDropdown('provider_name', url);
+    await getPopulateDropdown('provider_name', url);
 }
 
 async function populateDirectionsDropdown() {
     const element = 'direction';
     const provider_name = document.getElementById('provider_name').value;
     const url = `api/provider_directions/${provider_name}`;
-    await populateDropdown(element, url);
+    await getPopulateDropdown(element, url);
 }
 
 
@@ -211,7 +222,7 @@ async function populateServicesDropdown() {
     const element_id = 'service';
     const provider_name = document.getElementById('provider_name').value;
     const url = `api/provider_services/${provider_name}`;
-    await populateDropdown(element_id, url);
+    await getPopulateDropdown(element_id, url);
 }
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
@@ -225,7 +236,7 @@ async function setAddrChoices() {
         }
     } catch (error) {
         console.error('Error fetching AddressChoices:', error);
-        return;
+
     }
 
 }
