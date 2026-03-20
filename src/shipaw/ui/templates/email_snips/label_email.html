@@ -28,7 +28,7 @@
                     where
                     provided.</p>
 
-                {% if shipment_request.provider_name in ['PARCELFORCE', 'ROYAL_MAIL'] %}
+                {% if shipment_request.provider_name in ['ROYAL_MAIL'] %}
                     <p>If for any reason the courier is missed you can drop the labelled box at any UK post office.</p>
                 {% endif %}
             {% elif shipment_request.shipment.direction == 'Dropoff' %}

@@ -1,8 +1,8 @@
-from .providers import APCSettings, APCShippingProvider
+from .providers import APCSettings, APCShippingProvider, RoyalMailProvider, RoyalMailSettingsGlobal
 
 __all__ = [
     'APCSettings',
     'APCShippingProvider',
-    # 'ParcelforceSettings',
-    # 'ParcelforceShippingProvider',
+    'RoyalMailProvider',
+    'RoyalMailSettingsGlobal',
 ]

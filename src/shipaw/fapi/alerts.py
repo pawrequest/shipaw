@@ -84,7 +84,7 @@ class Alerts(ShipawBaseModel):
 
 
 async def maybe_alert_phone_number(phone_num: str):
-    """Alert if phone number is not 11 digits or does not start with 01, 02 or 07. (parcelforce requirement)"""
+    """Alert if phone number is not 11 digits or does not start with 01, 02 or 07"""
     alerts = Alerts.empty()
     if len(phone_num) != 11 or not phone_num[0:2] == '07':
         alerts += Alert(

@@ -28,7 +28,7 @@ def sample_settings_rm():
 
 
 @pytest.fixture(
-    params=['APC', 'PARCELFORCE'],
+    params=['APC'],
     ids=lambda val: val,
 )
 def sample_provider(sample_settings, request):
@@ -38,21 +38,6 @@ def sample_provider(sample_settings, request):
     assert provider.is_sandbox(), f'Must use sandbox environment for tests, {provider.settings=}'
     return provider
 
-
-# @pytest.fixture(
-#     params=[
-#         ('APC', PROVIDER_TYPE_REGISTER['APC']),
-#         ('PARCELFORCE', PROVIDER_TYPE_REGISTER['PARCELFORCE']),
-#     ],
-#     ids=lambda val: val[0],
-# )
-# def sample_provider1(sample_settings, request):
-#     name = request.param[0]
-#     type_ = request.param[1]
-#     env_file = sample_settings.provider_env_dict[name]
-#     provider = type_.from_env(env_file)
-#     assert provider.is_sandbox(), f'Must use sandbox environment for tests, {provider.settings=}'
-#     return provider
 
 
 @pytest.fixture

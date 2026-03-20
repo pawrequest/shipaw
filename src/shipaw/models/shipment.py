@@ -14,7 +14,7 @@ class Shipment(ShipawBaseModel):
     boxes: int = 1
     shipping_date: dt.date
     direction: ShipDirection
-    own_label: bool | None = None  # print own label vs driver brings, Parcelforce Only
+    own_label: bool | None = None  # print own label vs driver brings
     # service: AgnostServiceName = AgnostServiceName.NEXT_DAY
     reference: str = ''
 

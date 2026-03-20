@@ -12,12 +12,7 @@ from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.ship_types import ShipDirection
 
-# from shipaw.providers.parcelforce.parcelforce_funcs import parcelforce_full_contact
 from shipaw.providers.provider_abc import ProviderName
-
-
-# from parcelforce_expresslink.models.address import AddressChoice as AddressChoicePF
-# from parcelforce_expresslink.models.contact import Contact as ContactPF
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> ShipmentResponse:
@@ -91,8 +86,8 @@ async def maybe_apc_response_error(e: HTTPStatusError, shipment_request, shipmen
 async def maybe_alert_apc(shipment_request):
     alerts = Alerts.empty()
     if (
-        shipment_request.provider_name == ProviderName.APC
-        and shipment_request.shipment.direction == ShipDirection.DROPOFF
+            shipment_request.provider_name == ProviderName.APC
+            and shipment_request.shipment.direction == ShipDirection.DROPOFF
     ):
         alerts += Alert(
             message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',

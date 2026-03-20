@@ -25,7 +25,6 @@ dependencies = [
     "fastapi[standard]>=0.117.1",
     "jinja2>=3.1.6",
     "hatchling>=1.27.0",
-    "combadge[zeep]>=4.8.2",
     "loguru>=0.7.3",
     "thefuzz>=0.22.1",
     "pydantic-extra-types>=2.10.5",
@@ -64,11 +63,9 @@ royal-mail-combined = { path = "../royal-mail-combined", editable = true }
 #pawdantic = { git = 'https://github.com/pawrequest/pawdantic' }
 #pawdf = { git = 'https://github.com/pawrequest/pawdf' }
 #royal_mail-click-and-drop = { git = 'https://github.com/pawrequest/royal-mail-click-and-drop' }
-#parcelforce-expresslink = { git = 'https://github.com/pawrequest/parcelforce_expresslink' }
 #apc-hypaship = { git = 'https://github.com/pawrequest/apc-hypaship' }
 
 #royal-mail-click-and-drop = { path = '../royal-mail-click-and-drop', editable=true}
-#parcelforce-expresslink = { path = '../parcelforce-expresslink', editable=true }
 #apc-hypaship = { path = '../apc-hypaship', editable=true }
 
 [tool.uv.build-backend]

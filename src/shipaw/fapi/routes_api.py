@@ -129,46 +129,6 @@ async def errored_shipment(shipment_response):
     return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
 
 
-# @router.post('/addr_choices', response_model=list[AddressChoiceAgnost], response_class=JSONResponse)
-# async def get_addr_choices_api(
-#     request: Request,
-#     body: AddressRequest = Body(...),
-# ) -> list[AddressChoiceAgnost]:
-#     """Fetch candidate address choices for a postcode, optionally scored by closeness to provided address.
-#     Hardcoded to use Parcelforce provider for now - APC does not provide address lookup.
-#
-#     Args:
-#         request: Request - FastAPI request object
-#         body: Address - request body containing postcode and optional address
-#     """
-#
-#     parcelforce_ = PROVIDER_REGISTER.get(ProviderName.PARCELFORCE)
-#     if not parcelforce_:
-#         raise HTTPException(status_code=503, detail='Parcelforce Provider not available - unable to fetch address candidates')
-#     p: ParcelforceShippingProvider = cast(ParcelforceShippingProvider, parcelforce_)
-#     client = p.client
-#     postcode = body.postcode
-#     address_agnost = body.address
-#     pf_address = address_from_agnostic(address_agnost) if address_agnost else None
-#     # log_obj(pf_address, 'Address received at /cand:')
-#
-#     try:
-#         res_pf = client.get_choices(postcode=postcode, address=pf_address)
-#         res = [await convert_choice(_) for _ in res_pf]
-#         return res
-#
-#     except BackendError as e:
-#         alert = Alert(
-#             message=f'Error fetching candidates: {e}',
-#             type=AlertType.ERROR,
-#         )
-#         request.app.alerts += alert
-#         logger.warning(f'Error fetching candidates: {e}')
-#         addr = Address(address_lines=['ERROR:', str(e)], town='Error', postcode='Error', business_name='Error')
-#         chc = AddressChoiceAgnost(address=addr, score=0)
-#         return [chc]
-
-
 @router.get('/providers', response_class=JSONResponse)
 async def get_providers():
     logger.warning('hit PROVIDERS')
