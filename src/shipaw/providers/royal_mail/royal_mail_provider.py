@@ -41,20 +41,23 @@ def merge_pdf_bytes(pdf_bytes_list: list[bytes]) -> bytes:
 
 
 def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipment: Shipment):
-    ids = ';'.join([order.shipment.unique_item_id for order in rm_response.created_orders])
-    links = ';'.join([order.shipment.tracking_number for order in rm_response.created_orders])
+    unique_item_ids_str = ';'.join([order.shipment.unique_item_id for order in rm_response.created_orders])
+    tracking_nums = [order.shipment.tracking_number for order in rm_response.created_orders]
+    tracking_links = [tracking_link(_) for _ in tracking_nums]
+    tracking_links_str = ';'.join(tracking_links)
 
-    label_data1 = rm_response.created_orders[0].label
-
-    # combine labels fomr multiple orders
-    stuff = [base64.b64decode(order.label) for order in rm_response.created_orders]
-    combined_pdf = merge_pdf_bytes(stuff)
+    # combine labels for multiple orders
+    labels_bytes = [base64.b64decode(order.label) for order in rm_response.created_orders]
+    combined_pdf = merge_pdf_bytes(labels_bytes)
 
     return ShipmentResponse(
+        tracking_links=tracking_links,
+        shipment_numbers=tracking_nums,
+
         label_data=combined_pdf,
         shipment=shipment,
-        shipment_num=ids,
-        tracking_link=links,
+        shipment_num=unique_item_ids_str,
+        tracking_link=tracking_links_str,
         data=rm_response.model_dump(),
         status='Success',
         success=True,
@@ -115,7 +118,7 @@ class RoyalMailProvider(ShippingProvider):
 
     @override
     def provider_shipment(
-        self, shipment: Shipment, service_code: RoyalMailServiceCodes
+            self, shipment: Shipment, service_code: RoyalMailServiceCodes
     ) -> CreateOrderRequest | ReturnRequestContainer:
         provider_service = self.service_codes_type(service_code)
 

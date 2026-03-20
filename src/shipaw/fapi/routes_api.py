@@ -86,9 +86,9 @@ async def order_summary_api(
     context = {'shipment_request': shipment_request}
 
     # check phone number
-    alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
+    # alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
     # check not apc + dropoff
-    alerts += await maybe_alert_apc(shipment_request)
+    alerts = await maybe_alert_apc(shipment_request)
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
         alerts=alerts,
