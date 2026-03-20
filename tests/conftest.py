@@ -39,7 +39,6 @@ def sample_provider(sample_settings, request):
     return provider
 
 
-
 @pytest.fixture
 def sample_remote_contact():
     yield Contact(

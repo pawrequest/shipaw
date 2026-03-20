@@ -86,8 +86,8 @@ async def maybe_apc_response_error(e: HTTPStatusError, shipment_request, shipmen
 async def maybe_alert_apc(shipment_request):
     alerts = Alerts.empty()
     if (
-            shipment_request.provider_name == ProviderName.APC
-            and shipment_request.shipment.direction == ShipDirection.DROPOFF
+        shipment_request.provider_name == ProviderName.APC
+        and shipment_request.shipment.direction == ShipDirection.DROPOFF
     ):
         alerts += Alert(
             message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
