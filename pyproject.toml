@@ -9,7 +9,7 @@ readme = "README.md"
 requires-python = ">= 3.12"
 dependencies = [
     'pawdantic @ git+https://github.com/pawrequest/pawdantic', # special pydantic types eg truncated strings
-    'combadge[zeep]', # xml client
+    'combadge[zeep] < 5', # xml client
     'thefuzz', # fuzzy search to match addresses
     'loguru', # logging
     'phonenumbers',
