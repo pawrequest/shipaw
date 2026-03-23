@@ -53,7 +53,6 @@ def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipmen
     return ShipmentResponse(
         tracking_links=tracking_links,
         shipment_numbers=tracking_nums,
-
         label_data=combined_pdf,
         shipment=shipment,
         shipment_num=unique_item_ids_str,
@@ -118,7 +117,7 @@ class RoyalMailProvider(ShippingProvider):
 
     @override
     def provider_shipment(
-            self, shipment: Shipment, service_code: RoyalMailServiceCodes
+        self, shipment: Shipment, service_code: RoyalMailServiceCodes
     ) -> CreateOrderRequest | ReturnRequestContainer:
         provider_service = self.service_codes_type(service_code)
 

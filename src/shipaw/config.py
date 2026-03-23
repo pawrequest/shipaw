@@ -2,27 +2,27 @@ from __future__ import annotations
 
 import functools
 import os
-import pprint
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import quote
 
 import pydantic as _p
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
-from pydantic import Field, computed_field, model_validator
+from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
 from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.models.base import ShipawBaseModel
 from shipaw.models.ship_types import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
 
+SHIPAW_ENV_KEY = 'SHIPAW_ENV'
 
-def get_path_from_environment(env_key: str) -> Path:
+
+def path_from_env_key(env_key: str) -> Path:
     env = os.getenv(env_key)
-    logger.warning(f'Getting env var {env_key}: {env}')
     if not env:
         raise ValueError(f'{env_key} not set')
     env_path = Path(env)
@@ -31,29 +31,42 @@ def get_path_from_environment(env_key: str) -> Path:
     return env_path
 
 
-class ProviderEnv(ShipawBaseModel):
+@dataclass
+class ProviderEnv:
     name: str
-    env_file: Path
+    env_path: Path
+
+
+ProviderEnvs = list[ProviderEnv]
+
+
+@functools.cache
+def get_templates_cached(template_dir: Path):
+    temps = Jinja2Templates(directory=str(template_dir))
+    temps.env.filters['jsonable'] = jsonable_encoder
+    temps.env.filters['urlencode'] = lambda value: quote(str(value))
+    temps.env.filters['sanitise_id'] = sanitise_id
+    temps.env.filters['ordinal_dt'] = ordinal_dt
+    return temps
 
 
 class ShipawSettings(BaseSettings):
     # toggles
-    shipper_live: bool
+    shipper_live: bool = True
     log_level: str = 'DEBUG'
 
     # dirs
-    label_dir: Path
-    log_dir: Path
     ui_dir: Path = Field(default_factory=get_ui)
     log_db_path: str | None = None
+    data_dir: Path = Path.home() / 'shipaw'
+    log_dir: Path = Path.home() / 'shipaw' / 'logs'
+    label_dir: Path = Path.home() / 'shipaw' / 'labels'
 
     # Provider env file dict (json string in .env)
     provider_env_dict: dict[str, Path]
 
     # auto dirs
-    static_dir: Path | None = None
-    template_dir: Path | None = None
-    templates: Jinja2Templates | None = None
+    # templates: Jinja2Templates | None = None
 
     # sender details
     address_line1: str
@@ -68,46 +81,39 @@ class ShipawSettings(BaseSettings):
     phone: str | None = None
     mobile_phone: str
 
-    model_config = SettingsConfigDict()
-
-    @model_validator(mode='after')
-    def populate_provider_registry(self):
-        for name, env_path in self.provider_env_dict.items():
-            logger.warning(f'Registering provider {name} from env file {env_path}')  # todo not a warning
-            if provider_type := PROVIDER_TYPE_REGISTER.get(name):
-                provider_settings = provider_type.settings_type(_env_file=env_path)
-                provider = provider_type(settings=provider_settings)
-                register_provider_instance(provider)
-        return self
+    model_config = SettingsConfigDict(frozen=True)
 
     @classmethod
-    @functools.lru_cache
-    def from_env(cls, env_key='SHIPAW_ENV') -> ShipawSettings:
-        env_path = get_path_from_environment(env_key)
-        if not env_path.exists():
-            raise FileNotFoundError(f'Environment file {env_path} does not exist')
-        logger.info(f'Loading ShipawSettings from env file: {env_path}')
+    @functools.cache
+    def from_env(cls) -> ShipawSettings:
+        logger.info('Loading ShipawSettings from env')
+        env_path = path_from_env_key(SHIPAW_ENV_KEY)
         return cls(_env_file=env_path)  # pycharm_pydantic false positive
 
-    # SET UI/TEMPLATE DIRS #
-    @model_validator(mode='after')
-    def set_ui(self):
-        self.static_dir = self.static_dir or self.ui_dir / 'static'
-        self.template_dir = self.template_dir or self.ui_dir / 'templates'
-        self.templates = self.templates or Jinja2Templates(directory=self.template_dir)
-        self.templates.env.filters['jsonable'] = jsonable_encoder
-        self.templates.env.filters['urlencode'] = lambda value: quote(str(value))
-        self.templates.env.filters['sanitise_id'] = sanitise_id
-        self.templates.env.filters['ordinal_dt'] = ordinal_dt
-        return self
+    #
+    # @model_validator(mode='after')
+    # def populate_provider_registry(self):
+    #     logger.debug('Populating provider registry with providers from env')
+    #     for name, env_path in self.provider_env_dict.items():
+    #         logger.debug(f'Loading provider {name} from env file {env_path}')
+    #         if provider_type := PROVIDER_TYPE_REGISTER.get(name):
+    #             logger.debug(f'Found provider type {provider_type} for name {name}')
+    #             provider_settings = provider_type.settings_type(_env_file=env_path)
+    #             provider = provider_type(shipaw_settings=provider_settings)
+    #             register_provider_instance(provider)
+    #     return self
 
-    @model_validator(mode='after')
-    def log_self(self):
-        # if self.logger is None:
-        #     from config_loguru import get_loguru
-        #     self.logger = get_loguru(self.log_level, self.log_file)
-        logger.info('ShipawSettings:\n' + pprint.pformat(self.model_dump(), indent=4))
-        return self
+    @property
+    def template_dir(self):
+        return self.ui_dir / 'templates'
+
+    @property
+    def static_dir(self):
+        return self.ui_dir / 'static'
+
+    @property
+    def templates(self):
+        return get_templates_cached(self.template_dir)
 
     ## SET LOGGING & LABELS ##
     @computed_field
@@ -170,3 +176,14 @@ def make_label_dirs(directions, v):
         apath = v / direction
         if not apath.exists():
             apath.mkdir(parents=True, exist_ok=True)
+
+
+SHIPAW_SETTINGS = ShipawSettings.from_env()
+
+
+def populate_providers(settings: ShipawSettings = None):
+    settings = settings or SHIPAW_SETTINGS
+    for name, env_path in settings.provider_env_dict.items():
+        if provider_type := PROVIDER_TYPE_REGISTER.get(name):
+            provider_settings = provider_type.settings_type(_env_file=env_path)
+            register_provider_instance(provider_type(settings=provider_settings))

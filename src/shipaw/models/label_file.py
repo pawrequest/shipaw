@@ -4,7 +4,6 @@ import re
 
 from loguru import logger
 
-from shipaw.config import ShipawSettings
 from shipaw.models.ship_types import ShipDirection
 
 if TYPE_CHECKING:
@@ -13,10 +12,6 @@ if TYPE_CHECKING:
 
 def make_filename_safe(name: str) -> str:
     return re.sub(r'[ <>:"/\\|?*\x00-\x1F]', '_', name)
-
-
-def get_label_folder(direction: ShipDirection):
-    return ShipawSettings.from_env().label_dir / direction
 
 
 def get_label_stem(shipment: 'Shipment'):

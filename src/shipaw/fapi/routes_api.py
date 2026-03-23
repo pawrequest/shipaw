@@ -2,30 +2,23 @@ from pathlib import Path
 
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
-from shipaw.fapi.ui_funcs import make_nice_str
 from starlette.requests import Request
 from starlette.responses import JSONResponse
-from starlette.staticfiles import StaticFiles
 
-from shipaw.config import ShipawSettings
-from shipaw.fapi.alerts import Alert, AlertType, Alerts, maybe_alert_phone_number
+from shipaw.fapi.ui_funcs import make_nice_str
+from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.backend import maybe_alert_apc, try_book_shipment, try_get_write_label
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.logging import log_obj
 from shipaw.models.shipment import Shipment
-from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 
 router = APIRouter()
 
 
-def get_settings() -> ShipawSettings:
-    return ShipawSettings.from_env()
-
-
-router.mount('/static', StaticFiles(directory=str(get_settings().static_dir)), name='static')
+# router.mount('/static', StaticFiles(directory=str(SHIPAW_SETTINGS.static_dir)), name='static')
 
 
 def get_version():
@@ -37,17 +30,14 @@ def get_version():
         return 'unknown'
 
 
-async def notify_version():
+async def notify_version(request):
     alerts = Alerts.empty()
-    live = ShipawSettings.from_env().shipper_live
-    if live:
-        live_msg = 'Live Mode - Real Shipments will be booked'
-        notification_type = AlertType.WARNING
-    else:
+    sandbox = request.app.shipaw_settings.shipper_live == False
+    if sandbox:
         live_msg = 'Test Mode - No Shipments will be booked'
         notification_type = AlertType.NOTIFICATION
-    if not live and ProviderName.ROYAL_MAIL in PROVIDER_REGISTER:
-        live_msg += ' EXCEPT ROYAL MAIL!!'
+    else:
+        live_msg = 'Live Mode - Real Shipments will be booked'
         notification_type = AlertType.WARNING
 
     msg = f'Shipaw Version {get_version()} is in {live_msg}'
@@ -71,7 +61,7 @@ async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) ->
 
     alerts: Alerts = request.app.alerts
     alerts += notify_dev()
-    alerts += await notify_version()
+    alerts += await notify_version(request)
 
     tmplt = ShipawTemplate(template_path='shipping_form_container.html', context={'shipment': shipment})
     return ShipawTemplateResponse(template=tmplt, alerts=alerts)
@@ -130,18 +120,9 @@ async def errored_shipment(shipment_response):
 
 
 @router.get('/providers', response_class=JSONResponse)
-async def get_providers():
-    logger.warning('hit PROVIDERS')
+async def providers():
     provider_response = {_.title(): _ for _ in PROVIDER_REGISTER.keys()}
     return JSONResponse(provider_response)
-
-
-# @router.get('/provider_services/{provider_name}', response_class=JSONResponse)
-# async def provider_services(provider_name: str):
-#     provider = await provider_from_form(provider_name)
-#     services = provider.services_as_dict()
-#     serv = {k.title(): v for k, v in services.items()}
-#     return JSONResponse(serv)
 
 
 @router.get('/provider_directions/{provider_name}', response_class=JSONResponse)
@@ -153,8 +134,7 @@ async def provider_directions(provider_name: str):
 
 
 @router.get('/provider_direction_services/{provider_name}/{direction}', response_class=JSONResponse)
-async def provider_direction_services2(provider_name: str, direction: str):
-    logger.warning(f'Hit provider_direction_services with provider_name={provider_name} and direction={direction}')
+async def provider_direction_services(provider_name: str, direction: str):
     provider = await provider_from_form(provider_name)
     list_of_str_enums = provider.valid_direction_services.get(direction, list())
     res_dir = {make_nice_str(_.name): _.value for _ in list_of_str_enums}

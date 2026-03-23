@@ -9,7 +9,6 @@ from loguru import logger
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 
-from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.emailer import send_label_email
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
@@ -29,13 +28,13 @@ def render_template_response(request: Request, resp: ShipawTemplateResponse) -> 
     context = resp.template.context
     context['alerts'] = context.get('alerts', Alerts.empty()) + resp.alerts
     if resp.alerts.errors:
-        return ShipawSettings.from_env().templates.TemplateResponse(
+        return request.app.shipaw_settings.templates.TemplateResponse(
             request=request,
             name='alerts.html',
             context=context,
         )
 
-    return ShipawSettings.from_env().templates.TemplateResponse(
+    return request.app.shipaw_settings.templates.TemplateResponse(
         request=request,
         name=resp.template.template_path,
         context=context,
@@ -47,7 +46,7 @@ def html_from_json(json_endpoint):
     async def wrapper(request: Request, *args, **kwargs):
         resp = await json_endpoint(request, *args, **kwargs)
 
-        return ShipawSettings.from_env().templates.TemplateResponse(
+        return request.app.shipaw_settings.templates.TemplateResponse(
             request=request, name=resp.template_path, context=resp.context
         )
 
@@ -79,8 +78,8 @@ async def order_results(
 
 
 @router.get('/home_mobile_phone', response_class=HTMLResponse)
-async def home_mobile_phone():
-    mobile_phone = ShipawSettings.from_env().mobile_phone
+async def home_mobile_phone(request):
+    mobile_phone = request.app.shipaw_settings.mobile_phone
     return f"""
     <input type="tel" id="mobile_phone" name="mobile_phone" value="{mobile_phone}" required>
     """

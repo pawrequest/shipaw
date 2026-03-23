@@ -17,7 +17,7 @@ if TEST_DATE.weekday() in (5, 6):
 @pytest.fixture
 def sample_settings():
     sett = ShipawSettings(_env_file=r'C:\prdev\envs\amdev\sandbox\shipaw.env')
-    sett.log_db_path = f'sqlite:///{sett.log_dir}/test_shipaw_logs.db'
+    sett.log_db_path = f'sqlite:///{sett.data_dir}/test_shipaw_logs.db'
     # sett.log_db_path = 'sqlite:///:memory:'
     return sett
 

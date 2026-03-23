@@ -5,11 +5,11 @@ from pathlib import Path
 
 from pydantic import ConfigDict, Field, model_validator
 
-from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alerts
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.label_file import get_label_folder, get_label_stem, unused_path
+from shipaw.models.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
+from shipaw.config import SHIPAW_SETTINGS
 
 
 class ShipawTemplate(ShipawBaseModel):
@@ -19,7 +19,7 @@ class ShipawTemplate(ShipawBaseModel):
     def render_template(self, request):
         if not self.template_path:
             raise ValueError('No template_path set')
-        return ShipawSettings.from_env().templates.TemplateResponse(
+        return request.app.shipaw_settings.templates.TemplateResponse(
             request=request, name=self.template_path, context=self.context
         )
 
@@ -38,8 +38,8 @@ class ShipmentResponse(BaseResponse):
     tracking_link: str | None = None
     label_data: bytes | None = None
     label_path: Path | None = None
-    tracking_links: list[str] | None = Field(default_factory=list)
-    shipment_numbers: list[str] | None = Field(default_factory=list)
+    tracking_links: list[str] = Field(default_factory=list)
+    shipment_numbers: list[str] = Field(default_factory=list)
 
     @model_validator(mode='after')
     def track_links_from_tracking_link(self):
@@ -54,7 +54,7 @@ class ShipmentResponse(BaseResponse):
     @model_validator(mode='after')
     def get_label_path(self):
         if self.label_path is None:
-            folder = get_label_folder(self.shipment.direction)
+            folder = SHIPAW_SETTINGS.label_dir / self.shipment.direction
             label_stem = get_label_stem(self.shipment)
             label_filepath = (folder / label_stem).with_suffix('.pdf')
             self.label_path = unused_path(label_filepath)

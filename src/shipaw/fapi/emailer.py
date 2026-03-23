@@ -7,7 +7,7 @@ import pythoncom
 from loguru import logger
 from win32com.client import Dispatch
 
-from shipaw.config import ShipawSettings
+from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.requests import ShipmentRequest
 
 
@@ -73,14 +73,10 @@ async def subject(*, invoice_num: str | None = None, missing: bool = False, labe
 
 
 async def send_label_email(shipment_request: ShipmentRequest, label_path: Path):
-    body = (
-        ShipawSettings.from_env()
-        .templates.get_template('email_snips/label_email.html')
-        .render(
-            label=label_path,
-            shipment_request=shipment_request,
-            home_business_name=ShipawSettings.from_env().business_name,
-        )
+    body = SHIPAW_SETTINGS.templates.get_template('email_snips/label_email.html').render(
+        label=label_path,
+        shipment_request=shipment_request,
+        home_business_name=SHIPAW_SETTINGS.business_name,
     )
     email = Email(
         to_address=shipment_request.shipment.remote_full_contact.contact.email_address,

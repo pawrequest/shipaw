@@ -5,28 +5,24 @@ from fastapi import FastAPI, Query, responses
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
+from pawlogger import configure_loguru
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
-from shipaw.config import ShipawSettings
 from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
-from shipaw.config_loguru import get_loguru
+from shipaw.config import SHIPAW_SETTINGS, populate_providers
 
 
 @contextlib.asynccontextmanager
 async def lifespan(app_: FastAPI):
     try:
-        sets = ShipawSettings.from_env()
-        app_.settings = sets
-        get_loguru(log_file=sets.log_file, level=sets.log_level)
-        # set_pf_env()
-        # pythoncom.CoInitialize()
-        # with sqm.Session(am_db.ENGINE) as session:
-        #     pf_shipper = ELClient()
-        #     populate_db_from_cmc(session, pf_shipper)
+        app_.shipaw_settings = SHIPAW_SETTINGS
+        log_file = SHIPAW_SETTINGS.log_file
+        configure_loguru(logger, log_file=log_file, level=SHIPAW_SETTINGS.log_level)
+        populate_providers(SHIPAW_SETTINGS)
         yield
 
     finally:
@@ -35,17 +31,11 @@ async def lifespan(app_: FastAPI):
         ...
 
 
-def get_settings() -> ShipawSettings:
-    return ShipawSettings.from_env()
-
-
-STATIC_DIR_STR = str(get_settings().static_dir)
-print(f'(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA \n) Static dir: {STATIC_DIR_STR}')
 app = FastAPI(lifespan=lifespan)
-app.mount('/static', StaticFiles(directory=STATIC_DIR_STR), name='static')
+app.mount('/static', StaticFiles(directory=str(SHIPAW_SETTINGS.static_dir)), name='static')
 app.include_router(json_router, prefix='/api')
 app.include_router(html_router)
-app.ship_live = ShipawSettings.from_env().shipper_live
+app.ship_live = SHIPAW_SETTINGS.shipper_live
 app.alerts = Alerts.empty()
 
 
@@ -54,8 +44,8 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
     errors = exc.errors()
     msg2 = ''
     for err in errors:
-        if type := err.get('type'):
-            msg2 += type + ' '
+        if err_type := err.get('type'):
+            msg2 += err_type + ' '
         if loc := err.get('loc'):
             msg2 += f'in {loc} '
         if ctx := err.get('ctx'):

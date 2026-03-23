@@ -9,6 +9,7 @@ from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipm
 from apc_hypaship.models.response.common import APCException
 from apc_hypaship.models.response.resp import BookingResponse
 
+from shipaw.providers.registry import register_provider_type
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
 from shipaw.logging import log_obj
@@ -20,7 +21,6 @@ from shipaw.providers.apc.apc_funcs import (
 )
 from shipaw.providers.apc.response import errored_booking
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
-from shipaw.providers.registry import register_provider_type
 
 
 @register_provider_type

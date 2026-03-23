@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date, datetime
 
 from royal_mail_combined.click_and_drop_api.models import (
     AddressRequest,
@@ -8,23 +8,22 @@ from royal_mail_combined.click_and_drop_api.models import (
     CustomerReference,
     PostageDetailsRequest,
     RecipientDetailsRequest,
+    ReturnShipment as RMReturnShipment,
     ReturnsRequest,
     Service,
     ShipmentPackageRequest,
-    ReturnShipment as RMReturnShipment,
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
 
-from shipaw.config import ShipawSettings
+from shipaw.config import SHIPAW_SETTINGS
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.ship_types import ShipDirection
 from shipaw.models.shipment import Shipment
 
 
 def outbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailServiceCodes) -> CreateOrderRequest:
-    shipaw_settings = ShipawSettings.from_env('SHIPAW_ENV')
-    billing_details = rm_billing_details_from_fc(shipaw_settings.full_contact)
+    billing_details = rm_billing_details_from_fc(SHIPAW_SETTINGS.full_contact)
     postage_details = create_postage_details(shipment=shipment, service_code=service_code)
 
     return CreateOrderRequest(

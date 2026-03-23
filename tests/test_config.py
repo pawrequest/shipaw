@@ -12,7 +12,7 @@ def test_settings(sample_settings):
 
 def test_provider_has_settings(sample_provider):
     assert sample_provider
-    assert sample_provider.settings
+    assert sample_provider.shipaw_settings
 
 
 def test_provider_types_registered_by_code():

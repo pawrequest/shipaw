@@ -14,5 +14,5 @@ def register_provider_type(cls):
 
 def register_provider_instance(instance: ShippingProvider):
     PROVIDER_REGISTER[instance.name] = instance
-    logger.info(f'Registered provider instance {instance.name}')
+    logger.info(f'Registered active provider instance {instance.name}')
     return instance
