@@ -56,11 +56,10 @@ class ShipawSettings(BaseSettings):
     log_level: str = 'DEBUG'
 
     # dirs
-    ui_dir: Path = Field(default_factory=get_ui)
-    log_db_path: str | None = None
     data_dir: Path = Path.home() / 'shipaw'
-    log_dir: Path = Path.home() / 'shipaw' / 'logs'
     label_dir: Path = Path.home() / 'shipaw' / 'labels'
+    log_db_path: str | None = None
+    ui_dir: Path = Field(default_factory=get_ui)
 
     # Provider env file dict (json string in .env)
     provider_env_dict: dict[str, Path]
@@ -86,7 +85,7 @@ class ShipawSettings(BaseSettings):
     @classmethod
     @functools.cache
     def from_env(cls) -> ShipawSettings:
-        logger.info('Loading ShipawSettings from env')
+        logger.info(f'Loading ShipawSettings from env key: {SHIPAW_ENV_KEY}')
         env_path = path_from_env_key(SHIPAW_ENV_KEY)
         return cls(_env_file=env_path)  # pycharm_pydantic false positive
 
@@ -102,6 +101,10 @@ class ShipawSettings(BaseSettings):
     #             provider = provider_type(shipaw_settings=provider_settings)
     #             register_provider_instance(provider)
     #     return self
+
+    @property
+    def log_dir(self):
+        return self.data_dir / 'logs'
 
     @property
     def template_dir(self):
