@@ -124,7 +124,7 @@ async def errored_shipment(shipment_response):
 async def providers():
     dflt = SHIPAW_SETTINGS.default_provider_name
     available = sorted(PROVIDER_REGISTER.keys(), key=lambda p: p != dflt)
-    provider_response = {_.title(): _ for _ in available}
+    provider_response = {make_nice_str(_): _ for _ in available}
     return JSONResponse(provider_response)
 
 
@@ -132,13 +132,14 @@ async def providers():
 async def provider_directions(provider_name: str):
     provider = await provider_from_form(provider_name)
     directions = provider.valid_directions
-    dir_dict = {_.value: _.value for _ in directions}
+    dir_dict = {make_nice_str(_.value): _.value for _ in directions}
     return JSONResponse(dir_dict)
 
 
 @router.get('/provider_direction_services/{provider_name}/{direction}', response_class=JSONResponse)
 async def provider_direction_services(provider_name: str, direction: str):
     provider = await provider_from_form(provider_name)
-    list_of_str_enums = provider.valid_direction_services.get(direction, list())
-    res_dir = {make_nice_str(_.name): _.value for _ in list_of_str_enums}
+    dflt = provider.default_service
+    available = sorted(provider.valid_direction_services.get(direction, []), key=lambda s: s.value != dflt)
+    res_dir = {make_nice_str(_.name): _.value for _ in available}
     return JSONResponse(res_dir)
