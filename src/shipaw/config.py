@@ -63,6 +63,7 @@ class ShipawSettings(BaseSettings):
 
     # Provider env file dict (json string in .env)
     provider_env_dict: dict[str, Path]
+    default_provider_name: str | None = None
 
     # auto dirs
     # templates: Jinja2Templates | None = None

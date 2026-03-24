@@ -5,6 +5,7 @@ from loguru import logger
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.ui_funcs import make_nice_str
 from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.backend import maybe_alert_apc, try_book_shipment, try_get_write_label
@@ -69,8 +70,8 @@ async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) ->
 
 @router.post('/order_summary', response_model=ShipawTemplateResponse)
 async def order_summary_api(
-    request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_form),
+        request: Request,
+        shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
     log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     context = {'shipment_request': shipment_request}
@@ -87,8 +88,8 @@ async def order_summary_api(
 
 @router.post('/order_results', response_model=ShipawTemplateResponse)
 async def order_results_api(
-    request: Request,
-    shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
+        request: Request,
+        shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
     # await try_get_write_label(shipment_request, shipment_response)
@@ -121,7 +122,9 @@ async def errored_shipment(shipment_response):
 
 @router.get('/providers', response_class=JSONResponse)
 async def providers():
-    provider_response = {_.title(): _ for _ in PROVIDER_REGISTER.keys()}
+    dflt = SHIPAW_SETTINGS.default_provider_name
+    available = sorted(PROVIDER_REGISTER.keys(), key=lambda p: p != dflt)
+    provider_response = {_.title(): _ for _ in available}
     return JSONResponse(provider_response)
 
 
