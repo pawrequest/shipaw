@@ -318,7 +318,11 @@ async function handleAddrChoices(addrSummaries) {
  */
 async function addrChoiceOption(addressSummary) {
     const option = document.createElement('option');
-    option.value = addressSummary.addressId;
+    if (addressSummary.type == 'Address') {
+        option.value = addressSummary.addressId;
+    } else {
+        option.value = '';
+    }
     option.textContent = addressSummary.addressSummary1 + ', ' + addressSummary.addressSummary2;
     return option;
 }
@@ -343,6 +347,10 @@ function updateAddressFields(addressRecord) {
 async function updateAddressFromSelect() {
     const selectedAddrID = document.getElementById('address-select').value;
     console.log('Selected address ID:', selectedAddrID);
+    if (!selectedAddrID) {
+        console.warn('Address ID is empty (i.e. was street etc) , skipping address update.');
+        return;
+    }
     const addressRecord = await getJson(`api/address_retrieve/${encodeURIComponent(selectedAddrID)}`);
     console.log('Retrieved address JSON:', addressRecord);
     updateAddressFields(addressRecord);
