@@ -18,6 +18,7 @@ class Shipment(ShipawBaseModel):
     # service: AgnostServiceName = AgnostServiceName.NEXT_DAY
     reference: str = ''
 
+    # todo is context still used?
     context: dict = Field(default_factory=dict)
 
     collect_ready: dt.time = dt.time(hour=9, minute=0)
