@@ -1,4 +1,5 @@
 from pathlib import Path
+from pprint import pformat
 
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
@@ -15,6 +16,8 @@ from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
 from shipaw.logging import log_obj
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
+from urllib.parse import unquote
+from royal_mail_combined.parcels_apis.address.models import AddressRecordDef, AddressSummaryDef
 
 router = APIRouter()
 
@@ -143,3 +146,24 @@ async def provider_direction_services(provider_name: str, direction: str):
     available = sorted(provider.valid_direction_services.get(direction, []), key=lambda s: s.value != dflt)
     res_dir = {make_nice_str(_.name): _.value for _ in available}
     return JSONResponse(res_dir)
+
+
+@router.get('/address_search/{search_text}', response_model=list[AddressSummaryDef])
+async def address_search(search_text: str):
+    provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+    res = provider.client.address_search(search_text)
+    # addresses = [_.model_dump(mode='json', by_alias=True) for _ in res.addresses]
+    addresses = [_.model_dump(mode='json', by_alias=True) for _ in res.addresses]
+    addr_string = pformat(res, indent=2)
+    logger.debug(f'Address search for "{search_text}" returned:\n{addr_string}')
+    return res.addresses
+
+
+@router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDef)
+async def address_retrieve(addr_id: str):
+    addr_id = unquote(addr_id)
+    provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+    res = provider.client.address_retrieve(addr_id)
+    addr_string = pformat(res, indent=2)
+    logger.debug(f'Address search for "{addr_id}" returned:\n{addr_string}')
+    return res
