@@ -153,6 +153,6 @@ async def address_search_pc(postcode: str, search_text: str):
 async def address_retrieve(addr_id: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     addr_id = unquote(addr_id)  # todo is this required?
-    res = provider.client.address_retrieve(addr_id)
-    logger.debug(f'Address search for "{addr_id}" returned:\n{pformat(res, indent=2)}')
+    res: AddressRecordDef = provider.client.address_retrieve(addr_id)
+    logger.debug(f'Address search for "{addr_id}" returned: {res.label}')
     return res
