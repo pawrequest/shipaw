@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "shipaw"
-version = "0.3.36"
+version = "0.3.38"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -16,7 +16,7 @@ requires-python = ">= 3.13"
 dependencies = [
     "apc-hypaship>=0.1.10",
     "pawdf>=0.1.0",
-    "royal-mail-combined>=0.0.5",
+    "royal-mail-combined>=0.0.6",
     "pawlogger>=0.1.4",
     #
     "httpx>=0.28.1",
@@ -55,8 +55,6 @@ dev = [
 [tool.ruff]
 line-length = 120
 format.quote-style = "single"
-#lint.flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
-
 
 #[tool.uv.sources]
 #royal-mail-combined = { path = "../royal-mail-combined", editable = true }
@@ -64,6 +62,3 @@ format.quote-style = "single"
 
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]
-
-#[tool.uv]
-#package = true
