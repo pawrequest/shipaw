@@ -117,7 +117,7 @@ def get_version():
 
 async def notify_version(request):
     alerts = Alerts.empty()
-    sandbox = request.app.shipaw_settings.shipper_live == False
+    sandbox = request.app.shipaw_settings.shipper_live is False
     if sandbox:
         live_msg = 'Test Mode - No Shipments will be booked'
         notification_type = AlertType.NOTIFICATION

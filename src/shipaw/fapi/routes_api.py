@@ -45,8 +45,8 @@ async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) ->
 
 @router.post('/order_summary', response_model=ShipawTemplateResponse)
 async def order_summary_api(
-        request: Request,
-        shipment_request: ShipmentRequest = Depends(shipment_request_form),
+    request: Request,
+    shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
     log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     context = {'shipment_request': shipment_request}
@@ -63,8 +63,8 @@ async def order_summary_api(
 
 @router.post('/order_results', response_model=ShipawTemplateResponse)
 async def order_results_api(
-        request: Request,
-        shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
+    request: Request,
+    shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response = await try_book_shipment(shipment_request)
     # await try_get_write_label(shipment_request, shipment_response)
@@ -129,7 +129,7 @@ def compare_texts(text1: str, text2: str):
 @router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDef])
 async def address_search_pc(postcode: str, search_text: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
-    res:AddressesDef = provider.client.address_search(search_text)
+    res: AddressesDef = provider.client.address_search(search_text)
     logger.debug(f'Address search for "{search_text}" returned:\n{len(res.addresses)} addresses')
     hits = []
     for addr in res.addresses:
