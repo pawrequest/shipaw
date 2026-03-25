@@ -78,7 +78,7 @@ async def order_results(
 
 
 @router.get('/home_mobile_phone', response_class=HTMLResponse)
-async def home_mobile_phone(request):
+async def home_mobile_phone(request: Request) -> HTMLResponse:
     mobile_phone = request.app.shipaw_settings.mobile_phone
     return f"""
     <input type="tel" id="mobile_phone" name="mobile_phone" value="{mobile_phone}" required>
