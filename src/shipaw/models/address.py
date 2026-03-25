@@ -1,3 +1,4 @@
+from loguru import logger
 from pydantic import EmailStr, conlist, constr, field_validator, model_validator
 
 from shipaw.models.base import ShipawBaseModel
@@ -36,10 +37,15 @@ class Address(ShipawBaseModel):
         if not v or len(v) == 0:
             raise ValueError('At least one address line is required')
         if len(v) > 3:
+            logger.debug('Address has more than 3 lines, joining extra lines into line 3')
             v[2] = ', '.join(v[2:])
         if len(v) < 3:
             v += [''] * (3 - len(v))
         return v[:3]
+
+    @property
+    def search_string(self):
+        return ', '.join([self.business_name] + self.address_lines + [self.town, self.postcode])
 
 
 class LongContact(ShipawBaseModel):
