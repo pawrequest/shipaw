@@ -23,7 +23,7 @@ from shipaw.logging import log_obj
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
 from urllib.parse import unquote
-from royal_mail_combined.parcels_apis.address.models import AddressRecordDef, AddressSummaryDef
+from royal_mail_combined.parcels_apis.address.models import AddressRecordDef, AddressSummaryDef, AddressesDef
 
 router = APIRouter()
 
@@ -114,18 +114,41 @@ async def provider_direction_services(provider_name: str, direction: str):
 async def address_search(search_text: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     res = provider.client.address_search(search_text)
-    # addresses = [_.model_dump(mode='json', by_alias=True) for _ in res.addresses]
-    addresses = [_.model_dump(mode='json', by_alias=True) for _ in res.addresses]
-    addr_string = pformat(res, indent=2)
-    logger.debug(f'Address search for "{search_text}" returned:\n{addr_string}')
+    logger.debug(f'Address search for "{search_text}" returned:\n{pformat(res, indent=2)}')
     return res.addresses
+
+
+def strip_text(text: str):
+    return text.replace(' ', '').lower()
+
+
+def compare_texts(text1: str, text2: str):
+    return strip_text(text1) == strip_text(text2)
+
+
+@router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDef])
+async def address_search_pc(postcode: str, search_text: str):
+    provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+    res:AddressesDef = provider.client.address_search(search_text)
+    logger.debug(f'Address search for "{search_text}" returned:\n{len(res.addresses)} addresses')
+    hits = []
+    for addr in res.addresses:
+        if not addr.type == 'Address':
+            logger.warning(f'Skipping non-address result: {addr}')
+            continue
+        retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
+        if retrieved.postal_code == postcode:
+            hits.append(retrieved)
+    logger.debug(
+        f'Address search for "{search_text}" with postcode "{postcode}" returned {len(hits)} hits:\n{pformat(hits, indent=2)}'
+    )
+    return hits
 
 
 @router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDef)
 async def address_retrieve(addr_id: str):
-    addr_id = unquote(addr_id)
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+    addr_id = unquote(addr_id)  # todo is this required?
     res = provider.client.address_retrieve(addr_id)
-    addr_string = pformat(res, indent=2)
-    logger.debug(f'Address search for "{addr_id}" returned:\n{addr_string}')
+    logger.debug(f'Address search for "{addr_id}" returned:\n{pformat(res, indent=2)}')
     return res
