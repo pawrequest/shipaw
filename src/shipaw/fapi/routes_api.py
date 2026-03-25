@@ -131,20 +131,20 @@ async def address_search_pc(postcode: str, search_text: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     res: AddressesDef = provider.client.address_search(search_text)
     logger.debug(
-        f'Address search returned {len(res.addresses)} addresses:\n'
-        f'{',\n'.join([addr.summary for addr in res.addresses])}'
+        f'Address search for {search_text} at postcode {postcode} returned {len(res.addresses)} addresses:\n'
+        f'{",\n".join([addr.summary for addr in res.addresses])}'
     )
     hits = []
     for addr in res.addresses:
         if not addr.type == 'Address':
-            logger.warning(f'Skipping non-address result: {addr.address_summary1 + addr.address_summary2}')
+            logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
             continue
         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
         if retrieved.postal_code == postcode:
             hits.append(retrieved)
     logger.debug(
         f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
-        f' {'\n'.join([addr.label.replace('\n', ',') for addr in hits])}'
+        f' {"\n".join([addr.label.replace("\n", ",") for addr in hits])}'
     )
     return hits
 
