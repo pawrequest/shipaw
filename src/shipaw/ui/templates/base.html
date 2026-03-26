@@ -17,7 +17,7 @@
 </button>
 <aside id="live-logs"
        hx-ext="sse"
-       sse-connect="/logs/stream"
+       sse-connect="{{ request.url_for('logs_stream') }}"
        sse-swap="log"
        hx-swap="beforeend">
     <div class="log-line"><em>Live logs connected...</em></div>

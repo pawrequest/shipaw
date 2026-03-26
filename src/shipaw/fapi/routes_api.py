@@ -3,7 +3,7 @@ from pprint import pformat
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, StreamingResponse
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.ui_funcs import make_nice_str
@@ -170,6 +170,27 @@ async def address_retrieve(addr_id: str):
     res: AddressRecordDef = provider.client.address_retrieve(addr_id)
     logger.debug(f'Address search for "{addr_id}" returned: {res.label}')
     return res
+
+
+@router.get('/logs/stream')
+async def logs_stream(request: Request):
+    stream = request.app.state.log_stream
+
+    async def event_source():
+        async for chunk in stream.stream(replay=100):
+            if await request.is_disconnected():
+                break
+            yield chunk
+
+    return StreamingResponse(
+        event_source(),
+        media_type='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'X-Accel-Buffering': 'no',
+        },
+    )
 
 
 # @router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDefPermissive])

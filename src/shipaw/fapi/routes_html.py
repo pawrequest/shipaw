@@ -21,6 +21,7 @@ from shipaw.fapi.routes_api import (
 )
 from shipaw.models.shipment import Shipment, sample_shipment
 from starlette.responses import StreamingResponse
+
 router = APIRouter()
 
 
@@ -119,31 +120,8 @@ async def test_route(request: Request) -> HTMLResponse:
     return render_template_response(request, res)
 
 
-@router.get('/logs/stream')
-async def logs_stream(request: Request):
-    stream = request.app.state.log_stream
-
-    async def event_source():
-        async for chunk in stream.stream(replay=100):
-            if await request.is_disconnected():
-                break
-            yield chunk
-
-    return StreamingResponse(
-        event_source(),
-        media_type='text/event-stream',
-        headers={
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'X-Accel-Buffering': 'no',
-        },
-    )
-
-
 @router.get('/', response_class=HTMLResponse)
 async def test_route2(request: Request) -> HTMLResponse:
     shipment = sample_shipment()
     res = await ship_form_json(request, shipment)
     return render_template_response(request, res)
-
-
