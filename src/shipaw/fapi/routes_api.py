@@ -148,6 +148,7 @@ async def address_search_pc(postcode: str, search_text: str):
             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
             continue
         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
+        logger.info(f'Comparing retrieved postal code "{retrieved.postal_code}" with search postcode "{postcode}"')
         if retrieved.postal_code.strip() == postcode:
             hits.append(retrieved)
     logger.debug(

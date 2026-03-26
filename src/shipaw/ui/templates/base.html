@@ -7,10 +7,18 @@
     <title>{% block title %}Shipaw Shipper{% endblock %}</title>
     <script src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.min.js"></script>
     <link href="{{ url_for('static', path='style.css') }}" rel="stylesheet">
+    <script src="https://unpkg.com/htmx-ext-sse@2.2.1/sse.js"></script>
 
     {% block head %}{% endblock %}
 </head>
 <body>
+<aside id="live-logs"
+       hx-ext="sse"
+       sse-connect="/logs/stream"
+       sse-swap="log"
+       hx-swap="beforeend">
+    <div class="log-line"><em>Live logs connected...</em></div>
+</aside>
 <main>
     {% if request.app.alerts.alert %}
         {% include "app_alerts.html" with context %}

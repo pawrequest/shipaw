@@ -28,10 +28,16 @@ html {
 
 body {
     background-color: var(--clr-body);
+    display: grid;
+    grid-template-columns: clamp(360px, 32vw, 520px) minmax(0, 1fr);
+    min-height: 100vh;
+    overflow: hidden;
 }
 
 main {
-    /*height: 100vh;*/
+    grid-column: 2;
+    min-width: 0;          /* prevents grid overflow */
+    overflow: auto;
 }
 
 input, select, textarea, button {
@@ -82,7 +88,7 @@ h1 {
         "content-top"
         "content-main";
     height: 100vh;
-    width: 100vw;
+    width: 100%;
 }
 
 
@@ -212,4 +218,25 @@ button:hover {
 
 .alert__WARNING {
     background-color: var(--clr-warning);
+}
+
+
+
+#live-logs {
+    grid-column: 1;
+    margin: 0;
+    padding: 0.75rem;
+    border-right: 1px solid #ddd;
+    background: #111;
+    color: #ddd;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+#live-logs .log-line {
+    white-space: pre-wrap;
+    line-height: 1.4;
 }

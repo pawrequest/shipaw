@@ -14,14 +14,16 @@ from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
 from shipaw.config import SHIPAW_SETTINGS, populate_providers
-
+from shipaw.fapi.log_stream import LogStream
 
 @contextlib.asynccontextmanager
 async def lifespan(app_: FastAPI):
     try:
+        app_.state.log_stream = LogStream(max_history=400, queue_size=200)
         app_.shipaw_settings = SHIPAW_SETTINGS
         log_file = SHIPAW_SETTINGS.log_file
         configure_loguru(logger, log_file=log_file, level=SHIPAW_SETTINGS.log_level)
+        logger.add(app_.state.log_stream.sink, level='INFO', enqueue=False)
         populate_providers(SHIPAW_SETTINGS)
         yield
 
