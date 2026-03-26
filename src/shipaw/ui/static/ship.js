@@ -262,27 +262,6 @@ async function getJson(url) {
 
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
-async function setAddrChoices() {
-    console.log('Setting address choices');
-    const address = await addressFromForm();
-    // const searchText = address.Postcode || address.AddressLines[0] || "";
-    const searchText = [address?.AddressLines?.[0] || '', address?.AddressLines?.[1] || '', address?.Postcode || '']
-        .filter(s => s && s.trim())
-        .join(' ')
-        .trim();
-
-    console.log('Loading AddressChoices for address:', address);
-    try {
-        const addrChoicesJson = await fetchAddrChoices(searchText);
-        if (Array.isArray(addrChoicesJson)) {
-            await handleAddrChoices(addrChoicesJson);
-        }
-    } catch (error) {
-        console.error('Error fetching AddressChoices:', error);
-
-    }
-
-}
 
 async function setAddrChoices2() {
     const address = await addressFromForm();
@@ -306,19 +285,6 @@ async function setAddrChoices2() {
 }
 
 
-async function fetchAddrChoices(SearchText) {
-    const addrChoiceUrl = `api/address_search/${encodeURIComponent(SearchText)}`;
-    console.log(`Posting searchtext ${SearchText} to ${addrChoiceUrl} `);
-    try {
-        const response = await fetch(addrChoiceUrl, {
-            method: 'GET', headers: {'Content-Type': 'application/json'}
-        })
-        return await response.json();
-    } catch (error) {
-        console.error('Error fetching candidates:', error);
-    }
-}
-
 async function fetchAddrRecords(postcode, searchText) {
     const addrChoiceUrl = `api/address_search_pc/${encodeURIComponent(postcode)}/${encodeURIComponent(searchText)}`;
     try {
@@ -332,18 +298,6 @@ async function fetchAddrRecords(postcode, searchText) {
 }
 
 
-/**
- * Handles AddressSummaries from server.
- * @param {AddrSummary[]} addrSummaries
- */
-async function handleAddrChoices(addrSummaries) {
-    const addressSelect = document.getElementById('address-select');
-    for (const choice of addrSummaries) {
-        const option = await addrChoiceOption(choice);
-        addressSelect.appendChild(option);
-    }
-}
-
 async function handleAddrRecordChoices(addrRecords) {
     console.log('Handling address record choices:', addrRecords);
     const addressSelect = document.getElementById('address-select');
@@ -354,21 +308,6 @@ async function handleAddrRecordChoices(addrRecords) {
     }
 }
 
-/**
- * Create an option element for an AddressChoice.
- * @param {AddrSummary} addressSummary
- * @returns {HTMLOptionElement}
- */
-async function addrChoiceOption(addressSummary) {
-    const option = document.createElement('option');
-    if (addressSummary.type === 'Address') {
-        option.value = addressSummary.addressId;
-    } else {
-        option.value = '';
-    }
-    option.textContent = addressSummary.addressSummary1 + ', ' + addressSummary.addressSummary2;
-    return option;
-}
 
 async function addrRecordOption(addressRecord) {
     console.log('Creating option for address record:', addressRecord);
@@ -438,3 +377,65 @@ async function logShipreq() {
     const shipreq = await shipmentRequestFromForm();
     console.log("SHIPREQ FROM FORM", shipreq);
 }
+
+
+// LEGACY
+
+
+// async function setAddrChoices() {
+//     console.log('Setting address choices');
+//     const address = await addressFromForm();
+//     // const searchText = address.Postcode || address.AddressLines[0] || "";
+//     const searchText = [address?.AddressLines?.[0] || '', address?.AddressLines?.[1] || '', address?.Postcode || '']
+//         .filter(s => s && s.trim())
+//         .join(' ')
+//         .trim();
+//
+//     console.log('Loading AddressChoices for address:', address);
+//     try {
+//         const addrChoicesJson = await fetchAddrChoices(searchText);
+//         if (Array.isArray(addrChoicesJson)) {
+//             await handleAddrChoices(addrChoicesJson);
+//         }
+//     } catch (error) {
+//         console.error('Error fetching AddressChoices:', error);
+//
+//     }
+//
+// }
+
+
+// async function fetchAddrChoices(SearchText) {
+//     const addrChoiceUrl = `api/address_search/${encodeURIComponent(SearchText)}`;
+//     console.log(`Posting searchtext ${SearchText} to ${addrChoiceUrl} `);
+//     try {
+//         const response = await fetch(addrChoiceUrl, {
+//             method: 'GET', headers: {'Content-Type': 'application/json'}
+//         })
+//         return await response.json();
+//     } catch (error) {
+//         console.error('Error fetching candidates:', error);
+//     }
+// }
+
+
+// async function handleAddrChoices(addrSummaries) {
+//     const addressSelect = document.getElementById('address-select');
+//     for (const choice of addrSummaries) {
+//         const option = await addrChoiceOption(choice);
+//         addressSelect.appendChild(option);
+//     }
+// }
+
+
+//
+// async function addrChoiceOption(addressSummary) {
+//     const option = document.createElement('option');
+//     if (addressSummary.type === 'Address') {
+//         option.value = addressSummary.addressId;
+//     } else {
+//         option.value = '';
+//     }
+//     option.textContent = addressSummary.addressSummary1 + ', ' + addressSummary.addressSummary2;
+//     return option;
+// }
