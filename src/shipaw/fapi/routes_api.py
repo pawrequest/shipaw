@@ -30,9 +30,6 @@ RM_UNAVAIL = 'Royal Mail Unavailable = No address searches.'
 router = APIRouter()
 
 
-# router.mount('/static', StaticFiles(directory=str(SHIPAW_SETTINGS.static_dir)), name='static')
-
-
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
 async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
     log_obj(shipment, 'Shipment received at /ship_form:')
