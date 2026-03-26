@@ -286,7 +286,9 @@ async function setAddrChoices2() {
 
 
 async function fetchAddrRecords(postcode, searchText) {
-    const addrChoiceUrl = `api/address_search_pc/${encodeURIComponent(postcode)}/${encodeURIComponent(searchText)}`;
+    const params = new URLSearchParams({postcode, search_text: searchText});
+    const addrChoiceUrl = `api/address_search_pc?${params.toString()}`;
+    // const addrChoiceUrl = `api/address_search_pc/${encodeURIComponent(postcode)}/${encodeURIComponent(searchText)}`;
     try {
         const response = await fetch(addrChoiceUrl, {
             method: 'GET', headers: {'Content-Type': 'application/json'}

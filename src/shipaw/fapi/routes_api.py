@@ -130,8 +130,9 @@ def compare_texts(text1: str, text2: str):
     return strip_text(text1) == strip_text(text2)
 
 
-@router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDefPermissive])
+@router.get('/address_search_pc', response_model=list[AddressRecordDefPermissive])
 async def address_search_pc(postcode: str, search_text: str):
+    postcode = postcode.strip()
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     if not provider:
         logger.info(RM_UNAVAIL)
@@ -147,12 +148,14 @@ async def address_search_pc(postcode: str, search_text: str):
             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
             continue
         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
-        if retrieved.postal_code == postcode:
+        if retrieved.postal_code.strip() == postcode:
             hits.append(retrieved)
     logger.debug(
         f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
         f' {"\n".join([addr.label.replace("\n", ",") for addr in hits])}'
     )
+    if len(hits) == 0:
+        hits = [AddressRecordDefPermissive(label='No matching results', address_id='')]
     return hits
 
 
@@ -166,3 +169,41 @@ async def address_retrieve(addr_id: str):
     res: AddressRecordDef = provider.client.address_retrieve(addr_id)
     logger.debug(f'Address search for "{addr_id}" returned: {res.label}')
     return res
+
+
+# @router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDefPermissive])
+# async def address_search_pc1(postcode: str, search_text: str):
+#     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+#     if not provider:
+#         logger.info(RM_UNAVAIL)
+#         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
+#     res: AddressesDef = provider.client.address_search(f'{search_text}, {postcode}')
+#     logger.debug(
+#         f'Address search for {search_text} at postcode {postcode} returned {len(res.addresses)} addresses:\n'
+#         f'{",\n".join([addr.summary for addr in res.addresses])}'
+#     )
+#     hits = []
+#     for addr in res.addresses:
+#         if not addr.type == 'Address':
+#             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
+#             continue
+#         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
+#         if retrieved.postal_code == postcode:
+#             hits.append(retrieved)
+#     logger.debug(
+#         f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
+#         f' {"\n".join([addr.label.replace("\n", ",") for addr in hits])}'
+#     )
+#     return hits
+#
+#
+# @router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDefPermissive)
+# async def address_retrieve1(addr_id: str):
+#     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+#     if not provider:
+#         logger.info(RM_UNAVAIL)
+#         return AddressRecordDef(label=RM_UNAVAIL, address_id='')
+#     addr_id = unquote(addr_id)  # todo is this required?
+#     res: AddressRecordDef = provider.client.address_retrieve(addr_id)
+#     logger.debug(f'Address search for "{addr_id}" returned: {res.label}')
+#     return res
