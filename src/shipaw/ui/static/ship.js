@@ -266,7 +266,7 @@ async function getJson(url) {
 async function setAddrChoices2() {
     const address = await addressFromForm();
     // const searchText = address.Postcode || address.AddressLines[0] || "";
-    const searchText = [address?.AddressLines?.[0] || '', address?.AddressLines?.[1] || '']
+    const searchText = [address?.BusinessName || '', address?.AddressLines?.[0] || '', address?.AddressLines?.[1] || '']
         .filter(s => s && s.trim())
         .join(' ')
         .trim();

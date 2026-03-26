@@ -23,7 +23,12 @@ from shipaw.logging import log_obj
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
 from urllib.parse import unquote
-from royal_mail_combined.parcels_apis.address.models import AddressRecordDef, AddressSummaryDef, AddressesDef
+from royal_mail_combined.parcels_apis.address.models import (
+    AddressRecordDef,
+    AddressRecordDefPermissive,
+    AddressSummaryDef,
+    AddressesDef,
+)
 
 RM_UNAVAIL = 'Royal Mail Unavailable = No address searches.'
 
@@ -125,13 +130,13 @@ def compare_texts(text1: str, text2: str):
     return strip_text(text1) == strip_text(text2)
 
 
-@router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDef])
+@router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDefPermissive])
 async def address_search_pc(postcode: str, search_text: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     if not provider:
         logger.info(RM_UNAVAIL)
         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
-    res: AddressesDef = provider.client.address_search(search_text)
+    res: AddressesDef = provider.client.address_search(f'{search_text}, {postcode}')
     logger.debug(
         f'Address search for {search_text} at postcode {postcode} returned {len(res.addresses)} addresses:\n'
         f'{",\n".join([addr.summary for addr in res.addresses])}'
@@ -151,7 +156,7 @@ async def address_search_pc(postcode: str, search_text: str):
     return hits
 
 
-@router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDef)
+@router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDefPermissive)
 async def address_retrieve(addr_id: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     if not provider:
