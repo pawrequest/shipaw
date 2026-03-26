@@ -19,7 +19,6 @@
     --clr-warning: rgba(255, 193, 7, 0.48);
     --score-color: black;
     --logs-width: clamp(360px, 32vw, 520px);
-
 }
 
 html {
@@ -32,21 +31,11 @@ body {
     background-color: var(--clr-body);
     min-height: 100vh;
     overflow-x: hidden;
-    /*background-color: var(--clr-body);*/
-    /*display: grid;*/
-    /*grid-template-columns: clamp(360px, 32vw, 520px) minmax(0, 1fr);*/
-    /*min-height: 100vh;*/
-    /*overflow: hidden;*/
 }
 
 main {
     min-height: 100vh;
     transition: margin-left 220ms ease;
-
-    /*grid-column: 2;*/
-    /*min-width: 0;          !* prevents grid overflow *!*/
-    /*overflow: auto;*/
-    /*transition: margin-left 220ms ease;*/
 }
 
 input, select, textarea, button {

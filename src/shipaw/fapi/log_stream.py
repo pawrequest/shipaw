@@ -12,6 +12,13 @@ if TYPE_CHECKING:
 else:
     Message = Any
 
+def _sse_event(event: str, data: str) -> str:
+    # SSE requires each payload line to be prefixed with "data: "
+    text = data.replace("\r\n", "\n").replace("\r", "\n")
+    data_lines = text.split("\n")
+    payload = "\n".join(f"data: {line}" for line in data_lines)
+    return f"event: {event}\n{payload}\n\n"
+
 
 class LogStream:
     def __init__(self, max_history: int = 300, queue_size: int = 200) -> None:
@@ -45,13 +52,15 @@ class LogStream:
             # Replay recent history when client connects.
             for level_name, line in list(self._history)[-replay:]:
                 safe = html.escape(line)
-                yield f"event: log\ndata: <div class='log-line log-{level_name}'>{safe}</div>\n\n"
+                yield _sse_event("log", f"<div class='log-line log-{level_name}'>{safe}</div>")
+                # yield f"event: log\ndata: <div class='log-line log-{level_name}'>{safe}</div>\n\n"
 
             while True:
                 try:
                     level_name, line = await asyncio.wait_for(q.get(), timeout=15)
                     safe = html.escape(line)
-                    yield f"event: log\ndata: <div class='log-line log-{level_name}'>{safe}</div>\n\n"
+                    yield _sse_event("log", f"<div class='log-line log-{level_name}'>{safe}</div>")
+                    # yield f"event: log\ndata: <div class='log-line log-{level_name}'>{safe}</div>\n\n"
                 except TimeoutError:
                     # Keep connection alive
                     yield ': ping\n\n'
