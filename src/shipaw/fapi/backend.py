@@ -126,7 +126,7 @@ async def notify_version(request):
         notification_type = AlertType.WARNING
 
     msg = f'Shipaw Version {get_version()} is in {live_msg}'
-    logger.warning(msg)
+    logger.info(msg)
     alerts += Alert(message=msg, type=notification_type)
     return alerts
 
@@ -135,7 +135,7 @@ def notify_dev() -> Alerts:
     alerts = Alerts.empty()
     if any(['prdev' in str(_).lower() for _ in Path(__file__).parents]):
         msg = '"prdev" in cwd tree - BETA MODE - This is a development version'
-        logger.warning(msg)
+        logger.info(msg)
         alerts += Alert(message=msg, type=AlertType.WARNING)
     return alerts
 

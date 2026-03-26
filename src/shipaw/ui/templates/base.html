@@ -12,6 +12,9 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+<button id="log-toggle" type="button" aria-expanded="false" aria-controls="live-logs">
+    Show Logs
+</button>
 <aside id="live-logs"
        hx-ext="sse"
        sse-connect="/logs/stream"
@@ -34,5 +37,18 @@
     {% block content_extra %}{% endblock %}
 </main>
 {% block scripts %}{% endblock %}
+<script>
+(() => {
+    const btn = document.getElementById("log-toggle");
+    const body = document.body;
+
+    btn.addEventListener("click", () => {
+        const open = body.classList.toggle("logs-open");
+        btn.setAttribute("aria-expanded", String(open));
+        btn.textContent = open ? "Hide Logs" : "Show Logs";
+    });
+})();
+</script>
+
 </body>
 </html>
