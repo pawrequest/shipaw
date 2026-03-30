@@ -16,6 +16,7 @@ from shipaw.fapi.routes_html import router as html_router
 from shipaw.config import SHIPAW_SETTINGS, populate_providers
 from shipaw.fapi.log_stream import LogStream
 
+
 @contextlib.asynccontextmanager
 async def lifespan(app_: FastAPI):
     try:

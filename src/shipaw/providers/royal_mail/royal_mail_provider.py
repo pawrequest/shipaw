@@ -169,7 +169,6 @@ class RoyalMailProvider(ShippingProvider):
             shipment_num=rm_response.success_idents_str,
             shipment_numbers=rm_response.success_ident_strs,
             tracking_links=tracking_links,
-
             data={_.order_identifier: _ for _ in fetched},
             status='Success' if success else 'FAIL',
             success=success,

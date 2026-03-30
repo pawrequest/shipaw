@@ -3,14 +3,12 @@ from __future__ import annotations
 import re
 import datetime as dt
 from enum import StrEnum
-from typing import Annotated, Awaitable, Callable
+from typing import Annotated
 
 import phonenumbers
 from loguru import logger
 from pydantic import AfterValidator, BeforeValidator, Field, ValidationError
 
-from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipawTemplateResponse
 
 #
 # class ShipDirection(StrEnum):
@@ -78,6 +76,3 @@ class ShipDirection(StrEnum):
     INBOUND = 'Inbound'
     OUTBOUND = 'Outbound'
     DROPOFF = 'Dropoff'
-
-
-ShipawCallbackFunc = Callable[[ShipmentRequest, ShipawTemplateResponse], Awaitable[None]]

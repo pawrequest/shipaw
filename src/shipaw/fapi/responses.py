@@ -5,11 +5,11 @@ from pathlib import Path
 
 from pydantic import ConfigDict, Field, model_validator
 
+from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
-from shipaw.config import SHIPAW_SETTINGS
 
 
 class ShipawTemplate(ShipawBaseModel):
