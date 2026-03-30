@@ -51,12 +51,12 @@ def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipmen
     combined_pdf = merge_pdf_bytes(labels_bytes)
 
     return ShipmentResponse(
-        tracking_links=tracking_links,
-        shipment_numbers=tracking_nums,
         label_data=combined_pdf,
         shipment=shipment,
         shipment_num=unique_item_ids_str,
-        tracking_link=tracking_links_str,
+        shipment_numbers=[order.shipment.unique_item_id for order in rm_response.created_orders],
+        # tracking_link=tracking_links_str,
+        tracking_links=tracking_links,
         data=rm_response.model_dump(),
         status='Success',
         success=True,
@@ -164,10 +164,12 @@ class RoyalMailProvider(ShippingProvider):
         tracking_numbers = [order.tracking_number for order in fetched]
         tracking_links = [tracking_link(_) for _ in tracking_numbers]
         res = ShipmentResponse(
-            label_data=label_data,
             shipment=shipment,
+            label_data=label_data,
             shipment_num=rm_response.success_idents_str,
-            tracking_link=', '.join(tracking_links),
+            shipment_numbers=rm_response.success_ident_strs,
+            tracking_links=tracking_links,
+
             data={_.order_identifier: _ for _ in fetched},
             status='Success' if success else 'FAIL',
             success=success,

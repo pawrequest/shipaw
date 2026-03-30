@@ -34,20 +34,11 @@ class BaseResponse(ShipawBaseModel):
 
 class ShipmentResponse(BaseResponse):
     shipment: Shipment
-    shipment_num: str | None = None
-    tracking_link: str | None = None
     label_data: bytes | None = None
     label_path: Path | None = None
-    tracking_links: list[str] = Field(default_factory=list)
+    shipment_num: str | None = None
     shipment_numbers: list[str] = Field(default_factory=list)
-
-    @model_validator(mode='after')
-    def track_links_from_tracking_link(self):
-        if self.tracking_link and not self.tracking_links:
-            self.tracking_links = [self.tracking_link]
-        if self.shipment_num and not self.shipment_numbers:
-            self.shipment_numbers = [self.shipment_num]
-        return self
+    tracking_links: list[str] = Field(default_factory=list)
 
     model_config = ConfigDict(json_encoders={bytes: lambda v: b64encode(v).decode('utf-8') if v else None})
 

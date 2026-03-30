@@ -23,7 +23,8 @@ def errored_response(fieldname: str, message: str, shipment: ShipmentAgnost, dat
         alerts=alerts,
         shipment=shipment,
         shipment_num='FAILED TO BOOK',
-        tracking_link='FAILED TO BOOK',
+        shipment_numbers=['FAILED TO BOOK'],
+        tracking_links=['FAILED TO BOOK'],
         data=data,
         success=False,
     )

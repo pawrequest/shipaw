@@ -120,7 +120,7 @@ class APCShippingProvider(ShippingProvider):
         return ShipmentResponse(
             shipment=shipment,
             shipment_num=order.order_number,
-            tracking_link=r'https://apc.hypaship.com/app/shared/customerordersoverview/index#search_form',
+            tracking_links=[r'https://apc.hypaship.com/app/shared/customerordersoverview/index#search_form'],
             data=resp.model_dump(mode='json'),
             status=(str(orders.messages.code)),
             success=(orders.messages.code == 'SUCCESS'),
