@@ -51,9 +51,11 @@ async def shipment_from_form(
     direction: ShipDirection = Form(...),
     reference: str = Form(...),
     context_json: str = Form(...),
-    collect_ready: int = Form(...),
-    collect_closed: int = Form(...),
+    collect_ready: int = Form(9),
+    collect_closed: int = Form(17),
     own_label: bool = Form(True),
+    package_format: PackageFormat = Form(PackageFormat.PARCEL),
+    weight_kg: int = Form(),
 ) -> Shipment:
     collect_ready = time(hour=collect_ready)
     collect_closed = time(hour=collect_closed)
@@ -82,6 +84,8 @@ async def shipment_from_form(
         collect_ready=collect_ready,
         collect_closed=collect_closed,
         own_label=own_label,
+        package_format=package_format,
+        weight_kg=weight_kg,
     )
     return shipment
 

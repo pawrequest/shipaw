@@ -36,8 +36,15 @@
 
 .inputs__extras {
     grid-area: extras;
-}
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap;
 
+}
+.inputs__extras > div {
+    flex: 1 1 0; /* Grow and shrink equally */
+    min-width: 0; /* Allows flex items to shrink below their content's minimum width */
+}
 .inputs__ship {
     /*width: 13rem;*/
     grid-area: shipment;
@@ -56,11 +63,6 @@
         /*text-align-last: center; !* For option alignment in most browsers *!*/
     }
 
-    #collect_times {
-        display: none;
-        /* todo make visible if inbound / wire up to providers*/
-        /*opacity: 0;*/
-    }
 }
 
 /*.inputs__ship label {*/
@@ -334,6 +336,12 @@ select:focus {
     max-width: 100%;
 }
 
-/*#boxes {*/
-/*    width: 3rem;*/
-/*}*/
+#collect_times {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+#weight_kg {
+    width: 4rem;
+}

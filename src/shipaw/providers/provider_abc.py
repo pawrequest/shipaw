@@ -73,8 +73,8 @@ class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
     settings: BaseSettings
     settings_type: ClassVar[type[BaseSettings]]
     valid_directions: ClassVar[list[ShipDirection]]
-
     valid_direction_services: ClassVar[dict[ShipDirection, list[StrEnum]]] = Field(default_factory=dict)
+    valid_direction_formats: ClassVar[dict[ShipDirection, PackageFormat]] = Field(default_factory=dict)
 
     @property
     @abstractmethod

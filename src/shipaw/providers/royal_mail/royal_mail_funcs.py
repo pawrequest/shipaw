@@ -36,7 +36,9 @@ def outbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailS
         subtotal=0,
         shipping_cost_charged=0,
         total=0,
-        packages=create_packages(num_parcels=shipment.boxes, package_format=PackageFormat.PARCEL),
+        packages=create_packages(
+            num_parcels=shipment.boxes, package_format=shipment.package_format, weight_kg=shipment.weight_kg
+        ),
     )
 
 
@@ -91,10 +93,10 @@ def create_postage_details(shipment: Shipment, service_code):
     )
 
 
-def create_packages(*, num_parcels: int, package_format: PackageFormat):
+def create_packages(*, num_parcels: int, package_format: PackageFormat, weight_kg: int):
     return [
         ShipmentPackageRequest(
-            weight_in_grams=10000,
+            weight_in_grams=weight_kg * 1000,
             package_format_identifier=package_format,
         )
         for _ in range(num_parcels)

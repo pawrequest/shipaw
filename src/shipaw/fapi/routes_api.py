@@ -111,6 +111,16 @@ async def provider_direction_services(provider_name: str, direction: str):
     dflt = provider.default_service
     available = sorted(provider.valid_direction_services.get(direction, []), key=lambda s: s.value != dflt)
     res_dir = {make_nice_str(_.name): _.value for _ in available}
+    logger.debug(f'Provider Services: {res_dir}')
+    return JSONResponse(res_dir)
+
+
+@router.get('/provider_direction_formats/{provider_name}/{direction}', response_class=JSONResponse)
+async def provider_direction_formats(provider_name: str, direction: str):
+    provider = await provider_from_form(provider_name)
+    available = provider.valid_direction_formats.get(direction, [None])
+    res_dir = {make_nice_str(_.name): _.value for _ in available}
+    logger.debug(f'Provider Formats: {res_dir}')
     return JSONResponse(res_dir)
 
 

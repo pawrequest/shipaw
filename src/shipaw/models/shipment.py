@@ -24,6 +24,9 @@ class Shipment(ShipawBaseModel):
     collect_ready: dt.time = dt.time(hour=9, minute=0)
     collect_closed: dt.time = dt.time(hour=17, minute=0)
 
+    package_format: PackageFormat = PackageFormat.PARCEL
+    weight_kg: int = 10
+
     @property
     def remote_full_contact(self) -> FullContact:
         match self.direction:

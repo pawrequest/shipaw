@@ -187,6 +187,9 @@ async function changeDirection(providerName, direction) {
     console.log('changeDirection', providerName, direction);
     const services = await getJson(`api/provider_direction_services/${providerName}/${direction}`);
     await populateDropdown('service', services);
+    const formats = await getJson(`api/provider_direction_formats/${providerName}/${direction}`);
+    console.log('Received formats:', formats);
+    await populateDropdown('package_format', formats);
 }
 
 async function directionChanged() {
@@ -216,37 +219,6 @@ async function addressFromForm() {
         BusinessName: document.getElementById('business_name').value || "",
     };
 }
-
-/**
- * @returns {Shipment}
- */
-async function shipmentFromForm() {
-    const contactPromise = contactFromForm();
-    const addressPromise = addressFromForm();
-
-    // Wait for both to finish
-    const [Contact, Address] = await Promise.all([contactPromise, addressPromise]);
-    return {
-        Recipient: {Contact, Address},
-        Boxes: parseInt(document.getElementById('boxes').value, 10) || 1,
-        ShippingDate: document.getElementById('ship_date').value,
-        Direction: document.getElementById('direction').value || "out",
-        Reference: document.getElementById('reference').value || "",
-    };
-}
-
-/**
- * Returns a Contact object.
- * @returns {ShipmentRequest}
- */
-async function shipmentRequestFromForm() {
-    return {
-        Shipment: await shipmentFromForm(),
-        ProviderName: document.getElementById('provider_name').value,
-        ServiceCode: document.getElementById('service').value
-    }
-}
-
 
 // API Requests
 async function getJson(url) {
@@ -375,10 +347,10 @@ async function getAddressLines(Address) {
 }
 
 
-async function logShipreq() {
-    const shipreq = await shipmentRequestFromForm();
-    console.log("SHIPREQ FROM FORM", shipreq);
-}
+// async function logShipreq() {
+//     const shipreq = await shipmentRequestFromForm();
+//     console.log("SHIPREQ FROM FORM", shipreq);
+// }
 
 
 // LEGACY
@@ -441,3 +413,24 @@ async function logShipreq() {
 //     option.textContent = addressSummary.addressSummary1 + ', ' + addressSummary.addressSummary2;
 //     return option;
 // }
+
+
+
+// /**
+//  * @returns {Shipment}
+//  */
+// async function shipmentFromForm() {
+//     const contactPromise = contactFromForm();
+//     const addressPromise = addressFromForm();
+//
+//     // Wait for both to finish
+//     const [Contact, Address] = await Promise.all([contactPromise, addressPromise]);
+//     return {
+//         Recipient: {Contact, Address},
+//         Boxes: parseInt(document.getElementById('boxes').value, 10) || 1,
+//         ShippingDate: document.getElementById('ship_date').value,
+//         Direction: document.getElementById('direction').value || "out",
+//         Reference: document.getElementById('reference').value || "",
+//     };
+// }
+
