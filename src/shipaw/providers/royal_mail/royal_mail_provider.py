@@ -137,7 +137,6 @@ class RoyalMailProvider(ShippingProvider):
         shipment = shipment_request.shipment
         service = self.service_codes_type(shipment_request.service_code)
 
-        resp = None
         match shipment_request.shipment.direction:
             case ShipDirection.OUTBOUND:
                 order_create = outbound_shipment_from_agnostic(shipment, service)
