@@ -27,7 +27,7 @@ def outbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailS
     postage_details = create_postage_details(shipment=shipment, service_code=service_code)
 
     return CreateOrderRequest(
-        order_reference=shipment.reference,
+        order_reference=shipment.shipping_date.strftime('%d/%m') + ' ' + shipment.reference[0:34],
         postage_details=postage_details,
         billing=billing_details,
         recipient=rm_recipient_details_from_agnostic_fc(shipment.recipient),
