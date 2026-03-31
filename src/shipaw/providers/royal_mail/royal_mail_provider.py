@@ -16,7 +16,7 @@ from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type

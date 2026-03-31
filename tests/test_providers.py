@@ -4,7 +4,7 @@ import pytest
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
 
 

@@ -13,7 +13,7 @@ from shipaw.providers.registry import register_provider_type
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
 from shipaw.logging import log_obj
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.consts_enums import ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
 from shipaw.providers.apc.apc_funcs import (
     address_from_agnostic_fc,

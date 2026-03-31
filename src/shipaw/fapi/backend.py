@@ -11,7 +11,7 @@ from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.logging import log_obj
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.consts_enums import ShipDirection
 
 from shipaw.providers.provider_abc import ProviderName
 

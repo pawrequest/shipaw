@@ -12,7 +12,7 @@ from pydantic import EmailStr
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.ship_types import ShipDirection, VALID_POSTCODE
+from shipaw.models.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
@@ -44,7 +44,7 @@ async def full_contact_form(
     )
 
 
-async def shipment_f_form(
+async def shipment_from_form(
     full_contact: FullContact = Depends(full_contact_form),
     shipping_date: date = Form(...),
     boxes: int = Form(...),
@@ -95,7 +95,7 @@ async def provider_from_form(provider_name: str = Form(...)):
 
 async def shipment_request_form(
     provider: ShippingProvider = Depends(provider_from_form),
-    shipment: Shipment = Depends(shipment_f_form),
+    shipment: Shipment = Depends(shipment_from_form),
     provider_name: ProviderName = Form(...),
     service: str = Form(...),
 ) -> ShipmentRequest:

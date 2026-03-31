@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:

@@ -4,7 +4,7 @@ import re
 
 from loguru import logger
 
-from shipaw.models.ship_types import ShipDirection
+from shipaw.models.consts_enums import ShipDirection
 
 if TYPE_CHECKING:
     from shipaw.models.shipment import Shipment
