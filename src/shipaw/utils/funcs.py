@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import date, datetime
 from typing import Any
 
 
@@ -32,3 +33,7 @@ def compare_texts(text1: str, text2: str, ignore_case: bool = True, ignore_white
     text1 = text1.replace(' ', '') if ignore_whitespace else text1
     text2 = text2.replace(' ', '') if ignore_whitespace else text2
     return text1 == text2
+
+
+def date_to_datetime(d: date) -> datetime:
+    return datetime.combine(d, datetime.min.time())

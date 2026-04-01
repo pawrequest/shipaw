@@ -111,7 +111,7 @@ class APCShippingProvider(ShippingProvider):
             label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number)
             return self.build_response(apc_response, shipment, label_data)
         except APCException as e:
-            return errored_booking(shipment, e)  # should be a response not exception?
+            return errored_booking(shipment, apc_response)
 
     def fetch_label_content(self, shipment_num: str) -> bytes:
         labl = self.client.fetch_label(shipment_num)

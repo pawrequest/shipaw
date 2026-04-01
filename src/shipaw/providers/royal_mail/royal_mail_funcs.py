@@ -1,10 +1,12 @@
-from datetime import date, datetime
+from pprint import pformat
 
+from loguru import logger
 from royal_mail_combined.click_and_drop_api.models import (
     AddressRequest,
     AddressReturns,
     BillingDetailsRequest,
     CreateOrderRequest,
+    CreateOrdersResponse,
     CustomerReference,
     PostageDetailsRequest,
     RecipientDetailsRequest,
@@ -13,13 +15,53 @@ from royal_mail_combined.click_and_drop_api.models import (
     Service,
     ShipmentPackageRequest,
 )
-from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
+from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer, ReturnResponseContainer
+from royal_mail_combined.converters_no_import import tracking_link
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
 
 from shipaw.config import SHIPAW_SETTINGS
+from shipaw.fapi.responses import CompletedShipmentResponse
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.models.shipment import Shipment
+from shipaw.utils.funcs import date_to_datetime
+
+
+def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipment: Shipment, label_data: bytes):
+    return CompletedShipmentResponse(
+        label_data=label_data,
+        shipment=shipment,
+        shipment_num=rm_response.unique_ids_str,
+        shipment_numbers=rm_response.unique_ids,
+        tracking_links=rm_response.tracking_links,
+        collection_id=rm_response.collection_response.collection_order_id,
+        data=rm_response.model_dump(),
+        status='Success',
+        success=True,
+    )
+
+
+def print_response_errors(rm_response: CreateOrdersResponse):
+    logger.error(f'Errors booking outbound shipment: {pformat(rm_response.failed_orders, indent=2, width=120)}')
+
+
+def build_booking_response_outbound(
+    rm_response: CreateOrdersResponse, shipment: Shipment, label_data: bytes
+) -> CompletedShipmentResponse:
+    success = rm_response.errors_count == 0
+    tracking_numbers = [order.tracking_number for order in rm_response.created_orders]
+    tracking_links = [tracking_link(_) for _ in tracking_numbers]
+    res = CompletedShipmentResponse(
+        shipment=shipment,
+        label_data=label_data,
+        shipment_num=rm_response.success_idents_str,
+        shipment_numbers=rm_response.success_ident_strs,
+        tracking_links=tracking_links,
+        data={_.order_identifier: _.model_dump() for _ in rm_response.created_orders},
+        status='Success' if success else 'FAIL',
+        success=success,
+    )
+    return res
 
 
 def outbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailServiceCodes) -> CreateOrderRequest:
@@ -75,10 +117,6 @@ def returns_address_from_agnostic_fc(full_contact: FullContact):
         country=full_contact.address.country,
         email=full_contact.contact.email_address,
     )
-
-
-def date_to_datetime(d: date) -> datetime:
-    return datetime.combine(d, datetime.min.time())
 
 
 def create_postage_details(shipment: Shipment, service_code):
