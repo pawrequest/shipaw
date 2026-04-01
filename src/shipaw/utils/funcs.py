@@ -1,13 +1,20 @@
+import time
 from collections.abc import Callable
 from datetime import date, datetime
 from typing import Any
 
 
-def wait_for(func: Callable, *args: Any, tries: int = 10, **kwargs: Any) -> Any:
+def wait_for(
+    func: Callable, *args: Any, tries: int = 10, wait_for_type: type = Any, is_not_none: bool = True, **kwargs
+) -> Any:
     for _ in range(tries):
+        time.sleep(1)
         try:
             result = func(*args, **kwargs)
-            assert result is not None, 'Data not ready, retrying...'
+            if is_not_none:
+                assert result is not None, 'Data not ready, retrying...'
+            if wait_for_type is not Any:
+                assert isinstance(result, wait_for_type), f'Expected type {wait_for_type}, got {type(result)}'
             return result
         except AssertionError:
             continue

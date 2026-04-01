@@ -108,7 +108,7 @@ class APCShippingProvider(ShippingProvider):
         log_obj(provider_shipment, 'APC Shipment Request')
         try:
             apc_response: BookingResponse = self.client.fetch_book_shipment(provider_shipment)
-            label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number)
+            label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number, wait_for_type=bytes)
             return self.build_response(apc_response, shipment, label_data)
         except APCException as e:
             return errored_booking(shipment, apc_response)
