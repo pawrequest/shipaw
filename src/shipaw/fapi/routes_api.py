@@ -139,7 +139,7 @@ async def address_search_pc(postcode: str, search_text: str):
         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
     addresses = await address_search(f'{search_text}, {postcode}')
     hits = []
-    for addr in addresses.addresses:
+    for addr in addresses:
         if not addr.type == 'Address':
             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
             continue
