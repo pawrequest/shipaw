@@ -65,7 +65,7 @@ class OutlookHandler:
 
 async def subject(*, invoice_num: str | None = None, missing: bool = False, label: bool = False):
     return (
-        f'Amherst Radios'
+        f'{SHIPAW_SETTINGS.business_name}'
         f'{f"- Invoice {invoice_num} Attached" if invoice_num else ""} '
         f'{"- We Are Missing Kit" if missing else ""} '
         f'{"- Shipping Label Attached" if label else ""}'

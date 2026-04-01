@@ -11,7 +11,7 @@ from apc_hypaship.models.response.resp import BookingResponse
 
 from shipaw.providers.registry import register_provider_type
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentResponse
+from shipaw.fapi.responses import CompletedShipmentResponse, ShipmentResponse
 from shipaw.logging import log_obj
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost
@@ -40,6 +40,12 @@ class APCShippingProvider(ShippingProvider):
     valid_direction_services = {
         ShipDirection.OUTBOUND: [APCServiceCode.PARCEL_1600, APCServiceCode.SATURDAY_PARCEL_1200],
         ShipDirection.INBOUND: [APCServiceCode.PARCEL_1600],
+    }
+
+    valid_direction_formats = {
+        ShipDirection.OUTBOUND: [PackageFormat.PARCEL],
+        ShipDirection.INBOUND: [PackageFormat.PARCEL],
+        ShipDirection.DROPOFF: [PackageFormat.PARCEL],
     }
 
     @override
@@ -93,7 +99,7 @@ class APCShippingProvider(ShippingProvider):
         )
 
     @override
-    def book_shipment_agnostic(self, shipment_request: ShipmentRequest) -> 'ShipmentResponse':
+    def book_shipment_request(self, shipment_request: ShipmentRequest) -> 'ShipmentResponse':
         """Takes provider ShipmnentDict, or ShipmentAgnost object"""
         # request_json = self.build_request_json(shipment)
         provider_service = self.service_codes_type(shipment_request.service_code)
@@ -102,25 +108,24 @@ class APCShippingProvider(ShippingProvider):
         log_obj(provider_shipment, 'APC Shipment Request')
         try:
             apc_response: BookingResponse = self.client.fetch_book_shipment(provider_shipment)
+            label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number)
+            return self.build_response(apc_response, shipment, label_data)
         except APCException as e:
             return errored_booking(shipment, e)  # should be a response not exception?
-        response = self.build_response(apc_response, shipment)
-        response.label_data = self.wait_fetch_label(response.shipment_num)
-        return response
 
-    @override
     def fetch_label_content(self, shipment_num: str) -> bytes:
         labl = self.client.fetch_label(shipment_num)
-        content = labl.content
-        return b64decode(content)
+        return b64decode(labl.content)
 
     @staticmethod
-    def build_response(resp: BookingResponse, shipment: ShipmentAgnost):
+    def build_response(resp: BookingResponse, shipment: ShipmentAgnost, label_data: bytes) -> CompletedShipmentResponse:
         orders = resp.orders
         order = orders.order
-        return ShipmentResponse(
+        return CompletedShipmentResponse(
+            label_data=label_data,
             shipment=shipment,
             shipment_num=order.order_number,
+            shipment_numbers=[order.order_number],
             tracking_links=[r'https://apc.hypaship.com/app/shared/customerordersoverview/index#search_form'],
             data=resp.model_dump(mode='json'),
             status=(str(orders.messages.code)),

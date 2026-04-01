@@ -1,43 +1,42 @@
 from pprint import pformat
+from urllib.parse import unquote
 
 from fastapi import APIRouter, Body, Depends
 from loguru import logger
-from starlette.requests import Request
-from starlette.responses import JSONResponse, StreamingResponse
-
-from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.ui_funcs import make_nice_str
-from shipaw.fapi.alerts import Alerts
-from shipaw.fapi.backend import (
-    errored_shipment,
-    maybe_alert_apc,
-    notify_dev,
-    notify_version,
-    try_book_shipment,
-    try_get_write_label,
-)
-from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
-from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse
-from shipaw.logging import log_obj
-from shipaw.models.shipment import Shipment
-from shipaw.providers.registry import PROVIDER_REGISTER
-from urllib.parse import unquote
 from royal_mail_combined.parcels_apis.address.models import (
     AddressRecordDef,
     AddressRecordDefPermissive,
     AddressSummaryDef,
     AddressesDef,
 )
+from starlette.requests import Request
+from starlette.responses import JSONResponse, StreamingResponse
 
-RM_UNAVAIL = 'Royal Mail Unavailable = No address searches.'
+from shipaw.config import SHIPAW_SETTINGS
+from shipaw.fapi.alerts import Alerts
+from shipaw.fapi.backend import (
+    errored_shipment,
+    maybe_alert_apc,
+    notify_dev,
+    notify_version,
+    resize_and_write_labels,
+    try_book_shipment,
+)
+from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
+from shipaw.fapi.requests import ShipmentRequest
+from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
+from shipaw.fapi.ui_funcs import make_nice_str
+from shipaw.logging import log_obj, log_obj_text
+from shipaw.models.shipment import Shipment
+from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.utils.consts_enums import RM_UNAVAIL
 
 router = APIRouter()
 
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
 async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
-    log_obj(shipment, 'Shipment received at /ship_form:')
+    log_obj_text(shipment, 'Shipment received at /ship_form:')
 
     alerts: Alerts = request.app.alerts
     alerts += notify_dev()
@@ -52,7 +51,7 @@ async def order_summary_api(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
-    log_obj(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
+    log_obj_text(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     context = {'shipment_request': shipment_request}
 
     # check phone number
@@ -70,14 +69,12 @@ async def order_results_api(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
-    shipment_response = await try_book_shipment(shipment_request)
-    # await try_get_write_label(shipment_request, shipment_response)
-
+    shipment_response: CompletedShipmentResponse = await try_book_shipment(shipment_request)
     if shipment_response.alerts.errors:
         return await errored_shipment(shipment_response)
-
     log_obj(shipment_response, 'Shipment Booked')
-    await try_get_write_label(shipment_request, shipment_response)
+
+    await resize_and_write_labels(shipment_response.label_data, shipment_response.label_path)
 
     if hasattr(request.app, 'callback'):
         await request.app.callback(shipment_request, shipment_response)
@@ -130,14 +127,6 @@ async def address_search(search_text: str):
     res = provider.client.address_search(search_text)
     logger.debug(f'Address search for "{search_text}" returned:\n{pformat(res, indent=2)}')
     return res.addresses
-
-
-def strip_text(text: str):
-    return text.replace(' ', '').lower()
-
-
-def compare_texts(text1: str, text2: str):
-    return strip_text(text1) == strip_text(text2)
 
 
 @router.get('/address_search_pc', response_model=list[AddressRecordDefPermissive])
@@ -201,41 +190,3 @@ async def logs_stream(request: Request):
             'X-Accel-Buffering': 'no',
         },
     )
-
-
-# @router.get('/address_search_pc/{postcode}/{search_text}', response_model=list[AddressRecordDefPermissive])
-# async def address_search_pc1(postcode: str, search_text: str):
-#     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
-#     if not provider:
-#         logger.info(RM_UNAVAIL)
-#         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
-#     res: AddressesDef = provider.client.address_search(f'{search_text}, {postcode}')
-#     logger.debug(
-#         f'Address search for {search_text} at postcode {postcode} returned {len(res.addresses)} addresses:\n'
-#         f'{",\n".join([addr.summary for addr in res.addresses])}'
-#     )
-#     hits = []
-#     for addr in res.addresses:
-#         if not addr.type == 'Address':
-#             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
-#             continue
-#         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
-#         if retrieved.postal_code == postcode:
-#             hits.append(retrieved)
-#     logger.debug(
-#         f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
-#         f' {"\n".join([addr.label.replace("\n", ",") for addr in hits])}'
-#     )
-#     return hits
-#
-#
-# @router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDefPermissive)
-# async def address_retrieve1(addr_id: str):
-#     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
-#     if not provider:
-#         logger.info(RM_UNAVAIL)
-#         return AddressRecordDef(label=RM_UNAVAIL, address_id='')
-#     addr_id = unquote(addr_id)  # todo is this required?
-#     res: AddressRecordDef = provider.client.address_retrieve(addr_id)
-#     logger.debug(f'Address search for "{addr_id}" returned: {res.label}')
-#     return res

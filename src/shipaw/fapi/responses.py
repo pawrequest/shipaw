@@ -3,7 +3,7 @@ from __future__ import annotations
 from base64 import b64encode
 from pathlib import Path
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, computed_field
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
@@ -35,24 +35,33 @@ class BaseResponse(ShipawBaseModel):
 class ShipmentResponse(BaseResponse):
     shipment: Shipment
     label_data: bytes | None = None
-    label_path: Path | None = None
+    _label_path: Path | None = None
     shipment_num: str | None = None
     shipment_numbers: list[str] = Field(default_factory=list)
     tracking_links: list[str] = Field(default_factory=list)
+    collection_id: str | None = None
 
     model_config = ConfigDict(json_encoders={bytes: lambda v: b64encode(v).decode('utf-8') if v else None})
 
-    @model_validator(mode='after')
-    def get_label_path(self):
-        if self.label_path is None:
+    @computed_field
+    @property
+    def label_path(self) -> Path:
+        if self._label_path is None:
             folder = SHIPAW_SETTINGS.label_dir / self.shipment.direction
             label_stem = get_label_stem(self.shipment)
             label_filepath = (folder / label_stem).with_suffix('.pdf')
-            self.label_path = unused_path(label_filepath)
-        return self
+            self._label_path = unused_path(label_filepath)
+        return self._label_path
 
-    # async def write_label_file(self):
-    #     await array_write_label_content(self.label_data, self.label_path)
+
+class CompletedShipmentResponse(ShipmentResponse):
+    # model_config = ConfigDict(frozen=True)
+    shipment: Shipment
+    label_data: bytes
+    shipment_num: str
+    shipment_numbers: list[str]
+    tracking_links: list[str]
+    collection_id: str | None = None
 
 
 class ShipawTemplateResponse(BaseResponse):

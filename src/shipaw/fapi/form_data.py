@@ -55,7 +55,7 @@ async def shipment_from_form(
     collect_closed: int = Form(17),
     own_label: bool = Form(True),
     package_format: PackageFormat = Form(PackageFormat.PARCEL),
-    weight_kg: int = Form(),
+    weight_kg: int = Form(10),
 ) -> Shipment:
     collect_ready = time(hour=collect_ready)
     collect_closed = time(hour=collect_closed)

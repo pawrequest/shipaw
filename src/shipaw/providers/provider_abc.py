@@ -1,4 +1,3 @@
-import time
 from abc import ABC, abstractmethod
 from enum import StrEnum
 from typing import ClassVar, TYPE_CHECKING
@@ -11,7 +10,7 @@ from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
-    from shipaw.fapi.responses import ShipmentResponse
+    from shipaw.fapi.responses import CompletedShipmentResponse
     from shipaw.fapi.requests import ShipmentRequest
 
 
@@ -41,40 +40,13 @@ class HasServiceCodes(ABC):
         return dict(cls.service_codes_type.__members__.items())
 
 
-class HasLabels(ABC):
-    @abstractmethod
-    def fetch_label_content(self, shipment_num: str) -> bytes: ...
-
-    def wait_fetch_label(self, shipment_num: str, tries=10) -> bytes:
-        for i in range(tries):
-            try:
-                time.sleep(1)  # let API process booking
-                label_data = self.fetch_label_content(shipment_num=shipment_num)
-                assert label_data is not None, f'Label not ready yet for {shipment_num}, retrying...'
-                return label_data
-            except AssertionError:
-                pass
-        raise RuntimeError(f'Label not ready after {tries} retries for {shipment_num}')
-
-    async def wait_fetch_label_async(self, shipment_num: str, tries=10) -> bytes:
-        for i in range(tries):
-            try:
-                time.sleep(1)
-                label_data = self.fetch_label_content(shipment_num=shipment_num)
-                assert label_data is not None
-                return label_data
-            except AssertionError:
-                print(f'Label not ready yet for {shipment_num}, retrying...')
-        raise RuntimeError(f'Label not ready after {tries}retries for {shipment_num}')
-
-
-class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
+class ShippingProvider(HasServiceCodes, ABC, ShipawBaseModel):
     name: ClassVar[ProviderName]
     settings: BaseSettings
     settings_type: ClassVar[type[BaseSettings]]
     valid_directions: ClassVar[list[ShipDirection]]
     valid_direction_services: ClassVar[dict[ShipDirection, list[StrEnum]]] = Field(default_factory=dict)
-    valid_direction_formats: ClassVar[dict[ShipDirection, PackageFormat]] = Field(default_factory=dict)
+    valid_direction_formats: ClassVar[dict[ShipDirection, list[PackageFormat]]] = Field(default_factory=dict)
 
     @property
     @abstractmethod
@@ -98,4 +70,4 @@ class ShippingProvider(HasServiceCodes, HasLabels, ABC, ShipawBaseModel):
 
     @staticmethod
     @abstractmethod
-    def book_shipment_agnostic(shipment_request: 'ShipmentRequest') -> 'ShipmentResponse': ...
+    def book_shipment_request(shipment_request: 'ShipmentRequest') -> 'CompletedShipmentResponse': ...

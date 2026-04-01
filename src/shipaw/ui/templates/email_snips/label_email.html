@@ -1,5 +1,4 @@
 {% extends "email_snips/email_base.html" %}
-
 {# CONTEXT =[shipment_request]#}
 {% block content %}
     <div>
@@ -20,7 +19,7 @@
                     the following day to:<br>
                     {{ shipment_request.shipment.recipient.address.business_name }}<br>{{ shipment_request.shipment.recipient.address.address_lines[0] }}
                 </p>
-            {% elif shipment.direction == 'Inbound' %}
+            {% elif shipment_request.shipment.direction == 'Inbound' %}
                 <p>Collection is booked from
                     {{ shipment_request.shipment.sender.address.business_name }} {{ shipment_request.shipment.sender.address.address_lines[0] }}
                     on {{ shipment_request.shipment.shipping_date | ordinal_dt }}.</p>

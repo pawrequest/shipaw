@@ -32,9 +32,7 @@ class Shipment(ShipawBaseModel):
         match self.direction:
             case ShipDirection.OUTBOUND:
                 return self.recipient
-            case ShipDirection.INBOUND:
-                return self.sender
-            case ShipDirection.DROPOFF:
+            case ShipDirection.INBOUND | ShipDirection.DROPOFF:
                 return self.sender
             case _:
                 raise ValueError('Bad ShipDirection')

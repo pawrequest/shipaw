@@ -4,7 +4,7 @@ import pytest
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.consts_enums import ShipDirection
+from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
 
 
@@ -26,7 +26,7 @@ def test_provider_makes_ship_dict(all_sample_shipment_requests: ShipmentRequest)
 def test_provider_books_shipment(all_sample_shipment_requests):
     provider = all_sample_shipment_requests.provider
     with provider_context(all_sample_shipment_requests):
-        response = provider.book_shipment_agnostic(all_sample_shipment_requests)
+        response = provider.book_shipment_request(all_sample_shipment_requests)
         assert isinstance(response, ShipmentResponse)
         assert response.shipment_num
         assert response.success

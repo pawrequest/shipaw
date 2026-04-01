@@ -1,4 +1,4 @@
-from shipaw.models.label_file import get_label_stem
+from shipaw.utils.label_file import get_label_stem
 
 
 def test_label_name(
