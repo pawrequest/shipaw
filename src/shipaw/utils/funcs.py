@@ -26,5 +26,9 @@ def strip_text(text: str):
     return text.replace(' ', '').lower()
 
 
-def compare_texts(text1: str, text2: str):
-    return strip_text(text1) == strip_text(text2)
+def compare_texts(text1: str, text2: str, ignore_case: bool = True, ignore_whitespace: bool = True) -> bool:
+    text1 = text1.lower() if ignore_case else text1
+    text2 = text2.lower() if ignore_case else text2
+    text1 = text1.replace(' ', '') if ignore_whitespace else text1
+    text2 = text2.replace(' ', '') if ignore_whitespace else text2
+    return text1 == text2

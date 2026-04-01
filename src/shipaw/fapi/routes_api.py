@@ -30,6 +30,7 @@ from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import RM_UNAVAIL
+from shipaw.utils.funcs import compare_texts
 
 router = APIRouter()
 
@@ -136,19 +137,14 @@ async def address_search_pc(postcode: str, search_text: str):
     if not provider:
         logger.info(RM_UNAVAIL)
         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
-    res: AddressesDef = provider.client.address_search(f'{search_text}, {postcode}')
-    logger.debug(
-        f'Address search for {search_text} at postcode {postcode} returned {len(res.addresses)} addresses:\n'
-        f'{",\n".join([addr.summary for addr in res.addresses])}'
-    )
+    addresses = await address_search(f'{search_text}, {postcode}')
     hits = []
-    for addr in res.addresses:
+    for addr in addresses.addresses:
         if not addr.type == 'Address':
             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
             continue
         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
-        logger.info(f'Comparing retrieved postal code "{retrieved.postal_code}" with search postcode "{postcode}"')
-        if retrieved.postal_code.strip() == postcode:
+        if compare_texts(retrieved.postal_code, postcode):
             hits.append(retrieved)
     logger.debug(
         f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
