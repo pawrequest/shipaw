@@ -18,7 +18,7 @@ from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServic
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.models.consts_enums import ShipDirection
+from shipaw.utils.consts_enums import ShipDirection
 from shipaw.models.shipment import Shipment
 
 

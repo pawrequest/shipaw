@@ -6,7 +6,7 @@ from shipaw.config import ShipawSettings  # FIRST!
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.models.consts_enums import ShipDirection
+from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_REGISTER, PROVIDER_TYPE_REGISTER
 
 TEST_DATE = date.today() + timedelta(days=2)

@@ -11,7 +11,7 @@ from shipaw.fapi.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.logging import log_obj
-from shipaw.models.consts_enums import ShipDirection
+from shipaw.utils.consts_enums import ShipDirection
 
 from shipaw.providers.provider_abc import ProviderName
 
@@ -97,7 +97,7 @@ async def maybe_alert_apc(shipment_request):
     return alerts
 
 
-async def array_write_label_content(label_content: bytes, label_path: Path):
+async def resize_and_write_labels(label_content: bytes, label_path: Path):
     og_size_path = label_path.parent / 'original_size' / label_path.name
     og_size_path.parent.mkdir(parents=True, exist_ok=True)
     og_size_path.write_bytes(label_content)

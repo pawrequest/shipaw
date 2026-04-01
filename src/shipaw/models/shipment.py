@@ -4,7 +4,7 @@ from pydantic import Field
 
 from shipaw.models.address import FullContact
 from shipaw.models.base import ShipawBaseModel
-from shipaw.models.consts_enums import PackageFormat, ShipDirection
+from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 
 
 class Shipment(ShipawBaseModel):

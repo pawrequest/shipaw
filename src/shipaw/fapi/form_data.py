@@ -12,7 +12,7 @@ from pydantic import EmailStr
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
+from shipaw.utils.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER

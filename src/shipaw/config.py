@@ -15,7 +15,7 @@ from starlette.templating import Jinja2Templates
 
 from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.models.consts_enums import ShipDirection
+from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
 
 SHIPAW_ENV_KEY = 'SHIPAW_ENV'

@@ -108,3 +108,6 @@ def enum_reverse_lookup(*, enum_type: type[StrEnum], attr_value: str) -> str:
     if not res:
         raise ValueError(f'Invalid service code: {attr_value}')
     return res
+
+
+RM_UNAVAIL = 'Royal Mail Unavailable = No address searches.'

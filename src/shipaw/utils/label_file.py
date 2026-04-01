@@ -1,10 +1,12 @@
+import io
 from pathlib import Path
 from typing import TYPE_CHECKING
 import re
 
 from loguru import logger
+from pypdf import PdfReader, PdfWriter
 
-from shipaw.models.consts_enums import ShipDirection
+from shipaw.utils.consts_enums import ShipDirection
 
 if TYPE_CHECKING:
     from shipaw.models.shipment import Shipment
@@ -44,3 +46,12 @@ def unused_path(filepath: Path):
 #     label_filepath = (folder / label_stem).with_suffix('.pdf')
 #     label_filepath = unused_path(label_filepath)
 #     return label_filepath
+def merge_pdf_bytes(pdf_bytes_list: list[bytes]) -> bytes:
+    writer = PdfWriter()
+    for pdf_bytes in pdf_bytes_list:
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        for page in reader.pages:
+            writer.add_page(page)
+    output = io.BytesIO()
+    writer.write(output)
+    return output.getvalue()

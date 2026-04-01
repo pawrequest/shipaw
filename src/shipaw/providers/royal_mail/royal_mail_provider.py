@@ -15,8 +15,8 @@ from royal_mail_combined.converters_no_import import tracking_link
 from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
 
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipmentResponse
-from shipaw.models.consts_enums import PackageFormat, ShipDirection
+from shipaw.fapi.responses import CompletedShipmentResponse, ShipmentResponse
+from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type
@@ -29,15 +29,7 @@ import io
 from pypdf import PdfWriter, PdfReader
 
 
-def merge_pdf_bytes(pdf_bytes_list: list[bytes]) -> bytes:
-    writer = PdfWriter()
-    for pdf_bytes in pdf_bytes_list:
-        reader = PdfReader(io.BytesIO(pdf_bytes))
-        for page in reader.pages:
-            writer.add_page(page)
-    output = io.BytesIO()
-    writer.write(output)
-    return output.getvalue()
+from shipaw.utils.label_file import merge_pdf_bytes
 
 
 def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipment: Shipment):
