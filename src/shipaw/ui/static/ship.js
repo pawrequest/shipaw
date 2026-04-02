@@ -105,7 +105,7 @@ async function initShipForm(shipment) {
 
     const contextjson = JSON.stringify(shipment.Context);
     await setContextJson(contextjson);
-    await setAddrChoices2();
+    await setAddrChoicesFull();
     await providerChanged()
     // setProvider();
     // checkToggleOwnLabel();
@@ -187,9 +187,9 @@ async function changeDirection(providerName, direction) {
     console.log('changeDirection', providerName, direction);
     const services = await getJson(`api/provider_direction_services/${providerName}/${direction}`);
     await populateDropdown('service', services);
-    const formats = await getJson(`api/provider_direction_formats/${providerName}/${direction}`);
-    console.log('Received formats:', formats);
-    await populateDropdown('package_format', formats);
+    // const formats = await getJson(`api/provider_direction_formats/${providerName}/${direction}`);
+    // console.log('Received formats:', formats);
+    // await populateDropdown('package_format', formats);
 }
 
 async function directionChanged() {
@@ -235,17 +235,11 @@ async function getJson(url) {
 
 // ADDRESS CHOICES / CANDIDATE LOOKUP
 
-async function setAddrChoices2() {
+async function setAddrChoicesFull() {
     const address = await addressFromForm();
-    // const searchText = address.Postcode || address.AddressLines[0] || "";
-    const searchText = [address?.BusinessName || '', address?.AddressLines?.[0] || '', address?.AddressLines?.[1] || '']
-        .filter(s => s && s.trim())
-        .join(' ')
-        .trim();
-
     console.log('Loading AddressChoices for address:', address);
     try {
-        const addrRecordChoices = await fetchAddrRecords(address.Postcode, searchText);
+        const addrRecordChoices = await fetchAddrRecordsFull(address);
         if (Array.isArray(addrRecordChoices)) {
             await handleAddrRecordChoices(addrRecordChoices);
         }
@@ -257,13 +251,13 @@ async function setAddrChoices2() {
 }
 
 
-async function fetchAddrRecords(postcode, searchText) {
-    const params = new URLSearchParams({postcode, search_text: searchText});
-    const addrChoiceUrl = `api/address_search_pc?${params.toString()}`;
-    // const addrChoiceUrl = `api/address_search_pc/${encodeURIComponent(postcode)}/${encodeURIComponent(searchText)}`;
+
+async function fetchAddrRecordsFull(address) {
+    const addrSearchUrl = `api/address_search_full`;
     try {
-        const response = await fetch(addrChoiceUrl, {
-            method: 'GET', headers: {'Content-Type': 'application/json'}
+        const response = await fetch(addrSearchUrl, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(address)
         })
         return await response.json();
     } catch (error) {
@@ -309,6 +303,7 @@ function updateAddressFields(addressRecord) {
 }
 
 async function updateAddressFromSelect() {
+    console.log('Address select changed, updating address fields');
     const selectedAddrID = document.getElementById('address-select').value;
     console.log('Selected address ID:', selectedAddrID);
     if (!selectedAddrID) {
@@ -415,7 +410,6 @@ async function getAddressLines(Address) {
 // }
 
 
-
 // /**
 //  * @returns {Shipment}
 //  */
@@ -434,3 +428,17 @@ async function getAddressLines(Address) {
 //     };
 // }
 
+
+// async function fetchAddrRecords(postcode, searchText) {
+//     const params = new URLSearchParams({postcode, search_text: searchText});
+//     const addrChoiceUrl = `api/address_search_pc?${params.toString()}`;
+//     // const addrChoiceUrl = `api/address_search_pc/${encodeURIComponent(postcode)}/${encodeURIComponent(searchText)}`;
+//     try {
+//         const response = await fetch(addrChoiceUrl, {
+//             method: 'GET', headers: {'Content-Type': 'application/json'}
+//         })
+//         return await response.json();
+//     } catch (error) {
+//         console.error('Error fetching candidates:', error);
+//     }
+// }

@@ -1,4 +1,4 @@
-from pprint import pformat
+from typing import Any
 from urllib.parse import unquote
 
 from fastapi import APIRouter, Body, Depends
@@ -7,7 +7,6 @@ from royal_mail_combined.parcels_apis.address.models import (
     AddressRecordDef,
     AddressRecordDefPermissive,
     AddressSummaryDef,
-    AddressesDef,
 )
 from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
@@ -27,12 +26,14 @@ from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
 from shipaw.fapi.ui_funcs import make_nice_str
 from shipaw.logging import log_obj, log_obj_text
+from shipaw.models.address import Address
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import RM_UNAVAIL
 from shipaw.utils.funcs import compare_texts
 
 router = APIRouter()
+NoAddressFound = AddressRecordDefPermissive(label='No matching results', address_id='')
 
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
@@ -126,33 +127,57 @@ async def provider_direction_formats(provider_name: str, direction: str):
 async def address_search(search_text: str):
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     res = provider.client.address_search(search_text)
-    logger.debug(f'Address search for "{search_text}" returned:\n{pformat(res, indent=2)}')
+    addresses = [_ for _ in res.addresses if _.type == 'Address']
+    other = [_ for _ in res.addresses if _.type != 'Address']
+    logger.debug(f'Search for "{search_text}" returned {len(addresses)} addresses and {len(other)} other results')
     return res.addresses
 
 
-@router.get('/address_search_pc', response_model=list[AddressRecordDefPermissive])
-async def address_search_pc(postcode: str, search_text: str):
-    postcode = postcode.strip()
+def address_search_text(address: Address) -> str:
+    fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
+    return ', '.join([_ for _ in fields if _])
+
+
+def match_addr_type(addr: AddressSummaryDef, expected_type='Address') -> bool:
+    if addr.type != expected_type:
+        logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
+        return False
+    return True
+
+
+@router.post('/address_search_full', response_model=list[AddressRecordDefPermissive])
+async def address_search_full(address: Address):
+    search_text = address_search_text(address)
+    if hits := await get_hits(address.postcode, search_text):
+        return hits
+    address.business_name = ''
+    if hits := await get_hits(address.postcode, address_search_text(address)):
+        return hits
+    else:
+        return [NoAddressFound]
+
+
+async def get_hits(postcode: str, search_text: str) -> list[Any]:
     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     if not provider:
         logger.info(RM_UNAVAIL)
         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
-    addresses = await address_search(f'{search_text}, {postcode}')
+    addresses = await address_search(search_text)
     hits = []
     for addr in addresses:
-        if not addr.type == 'Address':
-            logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
-            continue
-        retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
-        if compare_texts(retrieved.postal_code, postcode):
-            hits.append(retrieved)
-    logger.debug(
-        f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
-        f' {"\n".join([addr.label.replace("\n", ",") for addr in hits])}'
-    )
-    if len(hits) == 0:
-        hits = [AddressRecordDefPermissive(label='No matching results', address_id='')]
+        if match_addr_type(addr, 'Address'):
+            retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
+            if compare_texts(retrieved.postal_code, postcode):
+                hits.append(retrieved)
+    await log_address_hits(postcode, hits)
     return hits
+
+
+async def log_address_hits(postcode: str, hits: list[Any]):
+    logger.debug(
+        f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}"'
+        f' {"\n\t".join([addr.label.replace("\n", ",") for addr in hits])}'
+    )
 
 
 @router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDefPermissive)
@@ -163,7 +188,7 @@ async def address_retrieve(addr_id: str):
         return AddressRecordDef(label=RM_UNAVAIL, address_id='')
     addr_id = unquote(addr_id)  # todo is this required?
     res: AddressRecordDef = provider.client.address_retrieve(addr_id)
-    logger.debug(f'Address search for "{addr_id}" returned: {res.label}')
+    logger.debug(f'Address Retrieval for "{addr_id}" returned: {res.label.replace("\n", ",")}')
     return res
 
 
@@ -186,3 +211,28 @@ async def logs_stream(request: Request):
             'X-Accel-Buffering': 'no',
         },
     )
+
+
+# @router.get('/address_search_pc', response_model=list[AddressRecordDefPermissive])
+# async def address_search_pc(postcode: str, search_text: str):
+#     postcode = postcode.strip()
+#     provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+#     if not provider:
+#         logger.info(RM_UNAVAIL)
+#         return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
+#     addresses = await address_search(f'{search_text}, {postcode}')
+#     hits = []
+#     for addr in addresses:
+#         if not addr.type == 'Address':
+#             logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
+#             continue
+#         retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
+#         if compare_texts(retrieved.postal_code, postcode):
+#             hits.append(retrieved)
+#     logger.debug(
+#         f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}":\n'
+#         f' {"\n".join([addr.label.replace("\n", ",") for addr in hits])}'
+#     )
+#     if len(hits) == 0:
+#         hits = [AddressRecordDefPermissive(label='No matching results', address_id='')]
+#     return hits
