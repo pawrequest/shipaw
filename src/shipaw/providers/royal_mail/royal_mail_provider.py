@@ -8,7 +8,7 @@ from royal_mail_combined.click_and_drop_api.models import (
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
 from royal_mail_combined.config import RoyalMailSettingsGlobal
-from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
+from royal_mail_combined.core.consts_types import RoyalMailServiceCodes, RoyalMailOutboundServiceCodes
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse
@@ -42,7 +42,11 @@ class RoyalMailProvider(ShippingProvider):
     ]
 
     valid_direction_services = {
-        ShipDirection.OUTBOUND: [RoyalMailServiceCodes.TRACKED_24, RoyalMailServiceCodes.EXPRESS_24],
+        ShipDirection.OUTBOUND: [
+            RoyalMailServiceCodes.TRACKED_24,
+            RoyalMailServiceCodes.EXPRESS_24,
+            RoyalMailOutboundServiceCodes.SPECIAL_1PM,
+        ],
         ShipDirection.INBOUND: [RoyalMailServiceCodes.TRACKED_24_RTN],
         ShipDirection.DROPOFF: [RoyalMailServiceCodes.TRACKED_24_RTN],
     }
