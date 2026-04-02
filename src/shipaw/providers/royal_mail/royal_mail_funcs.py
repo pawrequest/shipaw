@@ -8,6 +8,7 @@ from royal_mail_combined.click_and_drop_api.models import (
     CreateOrderRequest,
     CreateOrdersResponse,
     CustomerReference,
+    GetOrderInfoResource,
     PostageDetailsRequest,
     RecipientDetailsRequest,
     ReturnShipment as RMReturnShipment,
@@ -43,6 +44,27 @@ def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipmen
 
 def print_response_errors(rm_response: CreateOrdersResponse):
     logger.error(f'Errors booking outbound shipment: {pformat(rm_response.failed_orders, indent=2, width=120)}')
+
+
+def build_booking_response_outbound_f_fetched(
+    fetched: list[GetOrderInfoResource], shipment: Shipment, label_data: bytes
+) -> CompletedShipmentResponse:
+    tracking_numbers = [order.tracking_number for order in fetched]
+    tracking_links = [tracking_link(_) for _ in tracking_numbers]
+    idents = [_.order_identifier for _ in fetched]
+    idents_s = map(str, idents)
+    res = CompletedShipmentResponse(
+        order_identifiers=idents,
+        shipment=shipment,
+        label_data=label_data,
+        shipment_num=';'.join(idents_s),
+        shipment_numbers=tracking_numbers,
+        tracking_links=tracking_links,
+        data={_.order_identifier: _.model_dump() for _ in fetched},
+        status='Success',
+        success=True,
+    )
+    return res
 
 
 def build_booking_response_outbound(

@@ -38,6 +38,7 @@ class ShipmentResponse(BaseResponse):
     _label_path: Path | None = None
     shipment_num: str | None = None
     shipment_numbers: list[str] = Field(default_factory=list)
+    order_identifiers: list[int] = Field(default_factory=list)
     tracking_links: list[str] = Field(default_factory=list)
     collection_id: str | None = None
 

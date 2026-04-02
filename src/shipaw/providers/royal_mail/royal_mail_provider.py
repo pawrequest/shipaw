@@ -12,19 +12,18 @@ from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse
-from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type
 from shipaw.providers.royal_mail.royal_mail_funcs import (
     build_booking_response_inbound,
-    build_booking_response_outbound,
+    build_booking_response_outbound_f_fetched,
     full_contact_from_rm,
     inbound_shipment_from_agnostic,
     outbound_shipment_from_agnostic,
     print_response_errors,
 )
-
+from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.utils.label_file import merge_pdf_bytes
 
 
@@ -117,8 +116,10 @@ class RoyalMailProvider(ShippingProvider):
 
     def _book_outbound(self, service: RoyalMailServiceCodes, shipment: Shipment) -> CompletedShipmentResponse:
         order_create = outbound_shipment_from_agnostic(shipment, service)
-        resp = self.client.book_outbound(order_create)
-        label_data: bytearray = self.client.get_label_data(resp.success_idents_str)
-        if resp.errors_count > 0:
-            print_response_errors(resp)
-        return build_booking_response_outbound(resp, shipment, label_data)
+        booking_response = self.client.book_outbound(order_create)
+        if booking_response.errors_count > 0:
+            print_response_errors(booking_response)
+        label_data: bytearray = self.client.get_label_data(booking_response.success_idents_str)
+        fetched_response = self.client.fetch_specific_orders(booking_response.success_idents_str)
+        return build_booking_response_outbound_f_fetched(fetched_response, shipment, label_data)
+        # return build_booking_response_outbound(resp, shipment, label_data)
