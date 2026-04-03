@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "shipaw"
-version = "0.3.50"
+version = "0.3.55"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -16,7 +16,7 @@ requires-python = ">= 3.13"
 dependencies = [
     "apc-hypaship>=0.1.10",
     "pawdf>=0.1.0",
-    "royal-mail-combined>=0.0.13",
+    "royal-mail-combined>=0.0.16",
     "pawlogger>=0.1.4",
     #
     "httpx>=0.28.1",
