@@ -1,5 +1,7 @@
+from typing import Annotated
+
 from loguru import logger
-from pydantic import EmailStr, conlist, constr, field_validator, model_validator
+from pydantic import EmailStr, StringConstraints, conlist, field_validator, model_validator
 
 from shipaw.models.base import ShipawBaseModel
 
@@ -24,8 +26,8 @@ class Contact(ShipawBaseModel):
 class Address(ShipawBaseModel):
     business_name: str
     address_lines: list[str] = conlist(item_type=str, max_length=3, min_length=1)
-    town: constr(max_length=25)
-    postcode: constr(max_length=16)
+    town: Annotated[str, StringConstraints(max_length=25)]
+    postcode: Annotated[str, StringConstraints(max_length=16)]
     county: str | None = None
     country: str = 'GB'
 
@@ -56,8 +58,8 @@ class LongContact(ShipawBaseModel):
 
     business_name: str
     address_lines: list[str] = conlist(item_type=str, max_length=3, min_length=1)
-    town: constr(max_length=25)
-    postcode: constr(max_length=16)
+    town: Annotated[str, StringConstraints(max_length=25)]
+    postcode: Annotated[str, StringConstraints(max_length=16)]
     country: str = 'GB'
 
     @model_validator(mode='after')
