@@ -38,7 +38,7 @@ async def full_contact_form(
         ),
         contact=Contact(
             name=contact_name,
-            email_address=email_address,
+            email=email_address,
             mobile_phone=mobile_phone.strip().replace(' ', ''),
         ),
     )

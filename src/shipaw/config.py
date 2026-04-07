@@ -153,7 +153,7 @@ class ShipawSettings(BaseSettings):
     def contact(self):
         return Contact(
             name=self.contact_name,
-            email_address=self.email,
+            email=self.email,
             mobile_phone=self.mobile_phone,
         )
 

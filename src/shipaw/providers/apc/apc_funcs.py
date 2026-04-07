@@ -15,7 +15,7 @@ def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_cont
         country_code=full_contact.address.country,
         contact=Contact(
             person_name=full_contact.contact.name,
-            email=full_contact.contact.email_address,
+            email=full_contact.contact.email,
             mobile_number=full_contact.contact.mobile_phone,
             phone_number=full_contact.contact.phone_number or full_contact.contact.mobile_phone,
         ),
@@ -25,7 +25,7 @@ def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_cont
 def contact_from_agnostic_fc[contact_type: Contact](cls: type[contact_type], full_contact: FullContact) -> contact_type:
     return cls(
         person_name=full_contact.contact.name,
-        email=full_contact.contact.email_address,
+        email=full_contact.contact.email,
         mobile_number=full_contact.contact.mobile_phone,
         phone_number=full_contact.contact.phone_number,
     )

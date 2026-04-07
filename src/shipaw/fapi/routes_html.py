@@ -103,7 +103,7 @@ async def email_label(
     label_path: str = Form(...), shipment_request: ShipmentRequest = Depends(shipment_request_form_json)
 ):
     label_path = Path(unquote(label_path))
-    logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email_address}')
+    logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email}')
     await send_label_email(shipment_request, label_path)
     return HTMLResponse(content='<span>Re</span>')
 

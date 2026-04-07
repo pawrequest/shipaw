@@ -137,7 +137,7 @@ def returns_address_from_agnostic_fc(full_contact: FullContact):
         county=full_contact.address.county,
         postcode=full_contact.address.postcode,
         country=full_contact.address.country,
-        email=full_contact.contact.email_address,
+        email=full_contact.contact.email,
     )
 
 
@@ -181,7 +181,7 @@ def rm_recipient_details_from_agnostic_fc(full_contact: FullContact) -> Recipien
     return RecipientDetailsRequest(
         address=rm_address_from_agnostic_fc(full_contact),
         phone_number=full_contact.contact.mobile_phone or full_contact.contact.phone_number,
-        email_address=full_contact.contact.email_address,
+        email_address=full_contact.contact.email,
     )
 
 
@@ -189,7 +189,7 @@ def rm_billing_details_from_fc(full_contact: FullContact):
     return BillingDetailsRequest(
         address=rm_address_from_agnostic_fc(full_contact),
         phone_number=full_contact.contact.phone_number,
-        email_address=full_contact.contact.email_address,
+        email_address=full_contact.contact.email,
     )
 
 
@@ -198,7 +198,7 @@ def full_contact_from_rm(recipient: RecipientDetailsRequest) -> FullContact:
         contact=Contact(
             name=recipient.address.full_name,
             phone_number=recipient.phone_number,
-            email_address=recipient.email_address,
+            email=recipient.email_address,
             mobile_phone=recipient.phone_number,
         ),
         address=Address(
