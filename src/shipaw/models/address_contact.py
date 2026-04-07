@@ -9,16 +9,9 @@ from shipaw.models.base import ShipawBaseModel
 class Contact(ShipawBaseModel):
     name: str
     email: str
-    mobile_phone: str
-    phone_number: str | None = None
+    phone: str
 
-    @model_validator(mode='after')
-    def phone_is_none(self):
-        if not self.phone_number:
-            self.phone_number = self.mobile_phone
-        return self
-
-    @field_validator('mobile_phone', mode='after')
+    @field_validator('phone', mode='after')
     def clean_mobile_phone(cls, v):
         return v.replace(' ', '').replace('-', '')
 

@@ -16,8 +16,7 @@ def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_cont
         contact=Contact(
             person_name=full_contact.contact.name,
             email=full_contact.contact.email,
-            mobile_number=full_contact.contact.mobile_phone,
-            phone_number=full_contact.contact.phone_number or full_contact.contact.mobile_phone,
+            mobile_number=full_contact.contact.phone,
         ),
     )
 
@@ -26,8 +25,7 @@ def contact_from_agnostic_fc[contact_type: Contact](cls: type[contact_type], ful
     return cls(
         person_name=full_contact.contact.name,
         email=full_contact.contact.email,
-        mobile_number=full_contact.contact.mobile_phone,
-        phone_number=full_contact.contact.phone_number,
+        mobile_number=full_contact.contact.phone,
     )
 
 
@@ -41,9 +39,8 @@ def full_contact_from_apc_contact_address(contact: Contact, address: Address) ->
             country=address.country_code,
         ),
         contact=ContactAgnost(
-            contact_name=contact.person_name,
-            email_address=contact.email,
-            mobile_phone=contact.mobile_number,
-            phone_number=contact.phone_number or contact.mobile_number,
+            name=contact.person_name,
+            email=contact.email,
+            phone=contact.mobile_number,
         ),
     )
