@@ -5,7 +5,7 @@ import pytest
 from shipaw.config import ShipawSettings  # FIRST!
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_REGISTER, PROVIDER_TYPE_REGISTER
 
@@ -46,7 +46,7 @@ def sample_provider(sample_settings, request):
 @pytest.fixture
 def sample_remote_contact():
     yield Contact(
-        contact_name='Test Remote Contact Name',
+        name='Test Remote Contact Name',
         mobile_phone='07666666666',
         email_address='remote@dzv.com',
     )
@@ -74,7 +74,7 @@ def sample_remote_fc(sample_remote_contact, sample_remote_address):
 @pytest.fixture
 def sample_home_contact():
     yield Contact(
-        contact_name='Home Contact name',
+        name='Home Contact name',
         mobile_phone='07555555555',
         email_address='home@sdagfdasg.com',
     )

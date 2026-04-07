@@ -14,7 +14,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
 from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
 
@@ -152,7 +152,7 @@ class ShipawSettings(BaseSettings):
     @property
     def contact(self):
         return Contact(
-            contact_name=self.contact_name,
+            name=self.contact_name,
             email_address=self.email,
             mobile_phone=self.mobile_phone,
         )

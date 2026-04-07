@@ -1,4 +1,4 @@
-from shipaw.models.address import Address, Contact
+from shipaw.models.address_contact import Address, Contact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider

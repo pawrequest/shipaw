@@ -22,7 +22,7 @@ from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServic
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.responses import CompletedShipmentResponse
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.models.shipment import Shipment
 from shipaw.utils.funcs import date_to_datetime
@@ -122,7 +122,7 @@ def inbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailSe
 
 
 def returns_address_from_agnostic_fc(full_contact: FullContact):
-    names = full_contact.contact.contact_name.split()
+    names = full_contact.contact.name.split()
     first = names[0]
     last = ' '.join(names[1:]) if len(names) > 1 else ''
     return AddressReturns(
@@ -165,7 +165,7 @@ def create_packages(*, num_parcels: int, package_format: PackageFormat, weight_k
 
 def rm_address_from_agnostic_fc(full_contact: FullContact) -> AddressRequest:
     return AddressRequest(
-        full_name=full_contact.contact.contact_name,
+        full_name=full_contact.contact.name,
         company_name=full_contact.address.business_name,
         address_line1=full_contact.address.address_lines[0],
         address_line2=full_contact.address.address_lines[1] if len(full_contact.address.address_lines) > 1 else None,
@@ -196,7 +196,7 @@ def rm_billing_details_from_fc(full_contact: FullContact):
 def full_contact_from_rm(recipient: RecipientDetailsRequest) -> FullContact:
     return FullContact(
         contact=Contact(
-            contact_name=recipient.address.full_name,
+            name=recipient.address.full_name,
             phone_number=recipient.phone_number,
             email_address=recipient.email_address,
             mobile_phone=recipient.phone_number,

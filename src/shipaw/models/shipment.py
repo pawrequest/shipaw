@@ -2,7 +2,7 @@ import datetime as dt
 
 from pydantic import Field
 
-from shipaw.models.address import FullContact
+from shipaw.models.address_contact import FullContact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 
@@ -39,10 +39,10 @@ class Shipment(ShipawBaseModel):
 
 
 def sample_shipment() -> Shipment:
-    from shipaw.models.address import Address, Contact
+    from shipaw.models.address_contact import Address, Contact
 
     contact = Contact(
-        contact_name='Test Contact name',
+        name='Test Contact name',
         mobile_phone='07666666666',
         email_address='sdgsdg@sdgsdg.com',
     )
