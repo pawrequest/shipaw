@@ -35,7 +35,7 @@ def build_booking_response_inbound(rm_response: ReturnResponseContainer, shipmen
         shipment_num=rm_response.unique_ids_str,
         shipment_numbers=rm_response.unique_ids,
         tracking_links=rm_response.tracking_links,
-        collection_id=rm_response.collection_response.collection_order_id,
+        collection_id=rm_response.collection_response.collection_order_id if rm_response.collection_response else None,
         data=rm_response.model_dump(),
         status='Success',
         success=True,
@@ -67,23 +67,23 @@ def build_booking_response_outbound_f_fetched(
     return res
 
 
-def build_booking_response_outbound(
-    rm_response: CreateOrdersResponse, shipment: Shipment, label_data: bytes
-) -> CompletedShipmentResponse:
-    success = rm_response.errors_count == 0
-    tracking_numbers = [order.tracking_number for order in rm_response.created_orders]
-    tracking_links = [tracking_link(_) for _ in tracking_numbers]
-    res = CompletedShipmentResponse(
-        shipment=shipment,
-        label_data=label_data,
-        shipment_num=rm_response.success_idents_str,
-        shipment_numbers=rm_response.success_ident_strs,
-        tracking_links=tracking_links,
-        data={_.order_identifier: _.model_dump() for _ in rm_response.created_orders},
-        status='Success' if success else 'FAIL',
-        success=success,
-    )
-    return res
+# def build_booking_response_outbound(
+#     rm_response: CreateOrdersResponse, shipment: Shipment, label_data: bytes
+# ) -> CompletedShipmentResponse:
+#     success = rm_response.errors_count == 0
+#     tracking_numbers = [order.tracking_number for order in rm_response.created_orders]
+#     tracking_links = [tracking_link(_) for _ in tracking_numbers]
+#     res = CompletedShipmentResponse(
+#         shipment=shipment,
+#         label_data=label_data,
+#         shipment_num=rm_response.success_idents_str,
+#         shipment_numbers=rm_response.success_ident_strs,
+#         tracking_links=tracking_links,
+#         data={_.order_identifier: _.model_dump() for _ in rm_response.created_orders},
+#         status='Success' if success else 'FAIL',
+#         success=success,
+#     )
+#     return res
 
 
 def outbound_shipment_from_agnostic(shipment: Shipment, service_code: RoyalMailServiceCodes) -> CreateOrderRequest:

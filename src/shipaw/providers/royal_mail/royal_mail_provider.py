@@ -8,7 +8,7 @@ from royal_mail_combined.click_and_drop_api.models import (
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
 from royal_mail_combined.config import RoyalMailSettingsGlobal
-from royal_mail_combined.core.consts_types import RoyalMailServiceCodes, RoyalMailInboundServiceCodes
+from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse
