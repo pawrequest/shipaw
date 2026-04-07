@@ -8,16 +8,14 @@ from royal_mail_combined.parcels_apis.address.models import (
     AddressRecordDefPermissive,
     AddressSummaryDef,
 )
-from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
+from shipaw.fapi.app_custom import ShipawRequest
 from shipaw.fapi.backend import (
     errored_shipment,
     maybe_alert_apc,
-    notify_dev,
-    notify_version,
     resize_and_write_labels,
     try_book_shipment,
 )
@@ -37,28 +35,24 @@ NoAddressFound = AddressRecordDefPermissive(label='No matching results', address
 
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
-async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
+async def shipping_form_api(request: ShipawRequest, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
     log_obj_text(shipment, 'Shipment received at /ship_form:')
 
-    alerts: Alerts = request.app.alerts
-    alerts += notify_dev()
-    alerts += await notify_version(request)
+    # alerts: Alerts = request.app.state.alerts
+    # alerts += notify_dev()
+    # alerts += await notify_version(request)
 
+    alerts: Alerts = request.app.state.alerts
     tmplt = ShipawTemplate(template_path='shipping_form_container.html', context={'shipment': shipment})
     return ShipawTemplateResponse(template=tmplt, alerts=alerts)
 
 
 @router.post('/order_summary', response_model=ShipawTemplateResponse)
 async def order_summary_api(
-    request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
     log_obj_text(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
     context = {'shipment_request': shipment_request}
-
-    # check phone number
-    # alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
-    # check not apc + dropoff
     alerts = await maybe_alert_apc(shipment_request)
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
@@ -68,7 +62,7 @@ async def order_summary_api(
 
 @router.post('/order_results', response_model=ShipawTemplateResponse)
 async def order_results_api(
-    request: Request,
+    request: ShipawRequest,
     shipment_request: ShipmentRequest = Depends(shipment_request_form_json),
 ) -> ShipawTemplateResponse:
     shipment_response: CompletedShipmentResponse = await try_book_shipment(shipment_request)
@@ -193,7 +187,7 @@ async def address_retrieve(addr_id: str):
 
 
 @router.get('/logs/stream')
-async def logs_stream(request: Request):
+async def logs_stream(request: ShipawRequest):
     stream = request.app.state.log_stream
 
     async def event_source():

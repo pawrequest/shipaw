@@ -154,7 +154,7 @@ class ShipawSettings(BaseSettings):
         return Contact(
             name=self.contact_name,
             email=self.email,
-            mobile_phone=self.mobile_phone,
+            phone=self.mobile_phone,
         )
 
     @property
@@ -185,8 +185,8 @@ def make_label_dirs(directions, v):
 SHIPAW_SETTINGS = ShipawSettings.from_env()
 
 
-def populate_providers(settings: ShipawSettings = None):
-    settings = settings or SHIPAW_SETTINGS
+def populate_providers(settings: ShipawSettings):
+    settings = settings
     for name, env_path in settings.provider_env_dict.items():
         if provider_type := PROVIDER_TYPE_REGISTER.get(name):
             provider_settings = provider_type.settings_type(_env_file=env_path)

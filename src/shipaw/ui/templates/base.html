@@ -23,7 +23,7 @@
     <div class="log-line"><em>Live logs connected...</em></div>
 </aside>
 <main>
-    {% if request.app.alerts.alert %}
+    {% if request.app.state.alerts.alert %}
         {% include "app_alerts.html" with context %}
     {% endif %}
     <div class="main_div">
@@ -38,16 +38,16 @@
 </main>
 {% block scripts %}{% endblock %}
 <script>
-(() => {
-    const btn = document.getElementById("log-toggle");
-    const body = document.body;
+    (() => {
+        const btn = document.getElementById("log-toggle");
+        const body = document.body;
 
-    btn.addEventListener("click", () => {
-        const open = body.classList.toggle("logs-open");
-        btn.setAttribute("aria-expanded", String(open));
-        btn.textContent = open ? "Hide Logs" : "Show Logs";
-    });
-})();
+        btn.addEventListener("click", () => {
+            const open = body.classList.toggle("logs-open");
+            btn.setAttribute("aria-expanded", String(open));
+            btn.textContent = open ? "Hide Logs" : "Show Logs";
+        });
+    })();
 </script>
 
 </body>

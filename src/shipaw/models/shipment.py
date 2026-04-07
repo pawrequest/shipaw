@@ -43,7 +43,7 @@ def sample_shipment() -> Shipment:
 
     contact = Contact(
         name='Test Contact name',
-        mobile_phone='07666666666',
+        phone='07666666666',
         email='sdgsdg@sdgsdg.com',
     )
     address = Address(

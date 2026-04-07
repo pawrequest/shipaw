@@ -47,7 +47,7 @@ def sample_provider(sample_settings, request):
 def sample_remote_contact():
     yield Contact(
         name='Test Remote Contact Name',
-        mobile_phone='07666666666',
+        phone='07666666666',
         email='remote@dzv.com',
     )
 
@@ -75,7 +75,7 @@ def sample_remote_fc(sample_remote_contact, sample_remote_address):
 def sample_home_contact():
     yield Contact(
         name='Home Contact name',
-        mobile_phone='07555555555',
+        phone='07555555555',
         email='home@sdagfdasg.com',
     )
 

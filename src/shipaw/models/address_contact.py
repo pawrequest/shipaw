@@ -17,7 +17,7 @@ class Contact(ShipawBaseModel):
 
 
 class Address(ShipawBaseModel):
-    business_name: str
+    business_name: str | None = None
     address_lines: list[str] = conlist(item_type=str, max_length=3, min_length=1)
     town: Annotated[str, StringConstraints(max_length=25)]
     postcode: Annotated[str, StringConstraints(max_length=16)]

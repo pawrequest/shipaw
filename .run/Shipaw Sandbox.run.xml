@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Shipaw Sandbox" type="Python.FastAPI">
     <option name="additionalOptions" />
+    <option name="appName" value="app" />
     <option name="file" value="C:\prdev\amdev\shipaw\src\shipaw\fapi\app.py" />
     <module name="shipaw" />
     <option name="ENV_FILES" value="" />

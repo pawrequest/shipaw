@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 import sys
 from pathlib import Path
-from typing import Literal
+from typing import Callable, Literal
 
 import loguru
 from loguru import logger
@@ -23,7 +23,7 @@ def get_loguru(
     log_file: Path | None = None,
     profile: Literal['local', 'remote', 'default'] = 'local',
     color_dict: dict | None = None,
-) -> logger:
+) -> loguru.Logger:
     """
     Configure loguru logger
 
@@ -99,7 +99,7 @@ def log_fmt_server_terminal(record) -> str:
     return f'<lvl>{record["level"]: <7} </lvl>| {bot_says} | {file_line}\n'
 
 
-def logger_wraps(*, entries=True, exits=True, level='DEBUG') -> callable:
+def logger_wraps(*, entries=True, exits=True, level='DEBUG') -> Callable:
     """
     Decorator to log function entry and exit
 

@@ -7,6 +7,7 @@ from pydantic import ConfigDict, Field, computed_field
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
+from shipaw.fapi.app_custom import ShipawRequest
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
@@ -16,10 +17,12 @@ class ShipawTemplate(ShipawBaseModel):
     template_path: str
     context: dict = Field(default_factory=dict)
 
-    def render_template(self, request):
+    def render_template(self, request: ShipawRequest):
         if not self.template_path:
             raise ValueError('No template_path set')
-        return request.app.shipaw_settings.templates.TemplateResponse(
+        # return request.app.state.settings.shipaw.templates.TemplateResponse(
+        # return request.ship_setting('templates').TemplateResponse(
+        return request.app.state.settings.shipaw.templates.TemplateResponse(
             request=request, name=self.template_path, context=self.context
         )
 

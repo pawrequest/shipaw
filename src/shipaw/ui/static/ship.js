@@ -1,8 +1,8 @@
 /**
  * @typedef {Object} Contact
- * @property {string} ContactName
- * @property {string} EmailAddress
- * @property {string} MobilePhone
+ * @property {string} Name
+ * @property {string} Address
+ * @property {string} Phone
  */
 /**
  * @typedef {Object} Address
@@ -107,9 +107,6 @@ async function initShipForm(shipment) {
     await setContextJson(contextjson);
     await setAddrChoicesFull();
     await providerChanged()
-    // setProvider();
-    // checkToggleOwnLabel();
-    // toggleCollectionTimes();
 }
 
 async function setContextJson(contextJson) {
@@ -126,14 +123,13 @@ async function setContextJson(contextJson) {
  */
 function populateShipment(shipment) {
     console.log('Populating form from shipment');
-
     document.getElementById('ship_date').value = shipment.ShippingDate;
     document.getElementById('boxes').value = shipment.Boxes || 1;
     document.getElementById('reference').value = shipment.Reference || "";
     document.getElementById('business_name').value = shipment.Recipient.Address.BusinessName || "";
-    document.getElementById('contact_name').value = shipment.Recipient.Contact.ContactName || "";
-    document.getElementById('email').value = shipment.Recipient.Contact.EmailAddress || "";
-    document.getElementById('mobile_phone').value = shipment.Recipient.Contact.MobilePhone || "";
+    document.getElementById('contact_name').value = shipment.Recipient.Contact.Name || "";
+    document.getElementById('email').value = shipment.Recipient.Contact.Email || "";
+    document.getElementById('mobile_phone').value = shipment.Recipient.Contact.Phone || "";
     document.getElementById('address_line1').value = shipment.Recipient.Address.AddressLines[0] || "";
     document.getElementById('address_line2').value = shipment.Recipient.Address.AddressLines[1] || "";
     document.getElementById('address_line3').value = shipment.Recipient.Address.AddressLines[2] || "";
@@ -204,9 +200,9 @@ async function directionChanged() {
 async function contactFromForm() {
     console.log('contactFromForm');
     return {
-        ContactName: document.getElementById('contact_name').value,
-        EmailAddress: document.getElementById('email').value,
-        MobilePhone: document.getElementById('mobile_phone').value,
+        Name: document.getElementById('contact_name').value,
+        Email: document.getElementById('email').value,
+        Phone: document.getElementById('mobile_phone').value,
     };
 }
 

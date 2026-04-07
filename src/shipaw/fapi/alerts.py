@@ -75,6 +75,14 @@ class Alerts(ShipawBaseModel):
         diff = set(self.alert) - set(other.alert)
         return Alerts(alert=list(diff))
 
+    def __isub__(self, other: Alerts | Alert):
+        if not isinstance(other, Alerts) and not isinstance(other, Alert):
+            raise TypeError(f'Expected Alerts or Alert instance, got {type(other)}')
+        if isinstance(other, Alert):
+            other = Alerts(alert=[other])
+        self.alert = list(set(self.alert) - set(other.alert))
+        return self
+
     def __contains__(self, alert: Alert):
         return alert in set(self.alert)
 

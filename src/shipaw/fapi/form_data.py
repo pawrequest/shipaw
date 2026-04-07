@@ -9,8 +9,8 @@ from loguru import logger
 # from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
 
+from shipaw.fapi.app_custom import ShipawRequest
 from shipaw.models.address_contact import Address, Contact, FullContact
-from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
@@ -39,12 +39,13 @@ async def full_contact_form(
         contact=Contact(
             name=contact_name,
             email=email_address,
-            mobile_phone=mobile_phone.strip().replace(' ', ''),
+            phone=mobile_phone.strip().replace(' ', ''),
         ),
     )
 
 
 async def shipment_from_form(
+    request: ShipawRequest,
     full_contact: FullContact = Depends(full_contact_form),
     shipping_date: date = Form(...),
     boxes: int = Form(...),
@@ -68,7 +69,7 @@ async def shipment_from_form(
         own_label = None
     elif direction in {ShipDirection.INBOUND, ShipDirection.DROPOFF}:
         sender = full_contact
-        recipient = SHIPAW_SETTINGS.full_contact
+        recipient = request.app.state.settings.shipaw.full_contact
         own_label = own_label
     else:
         raise ValueError(f'Unknown direction: {direction}')

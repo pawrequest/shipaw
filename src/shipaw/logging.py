@@ -19,11 +19,11 @@ def ndlog_dict(data: dict, ndjson_file: Path | None = None):
         print(json.dumps(data, separators=(',', ':')), file=jf)
 
 
-def log_obj_text(obj: BaseModel, message: str = '', *, level: str = 'DEBUG', logger_=logger):
+def log_obj_text(obj: BaseModel, message: str = '', *, level: str = 'DEBUG', logger_=logger, depth=1):
     message = message or obj.__class__.__name__
     model_data = obj.model_dump(mode='json', exclude={'label_data': ..., 'response': {'label_data'}})
     msg = f'{message}:\n{pprint.pformat(model_data, indent=2)}'.replace('{', r'{{').replace('}', r'}}')
-    logger_.opt(depth=2).log(
+    logger_.opt(depth=depth).log(
         level,
         msg,
     )
@@ -47,6 +47,7 @@ def log_obj(
     level: str = 'DEBUG',
     logger_=logger,
     ndjson_file=None,
+    depth=2,
 ):
-    log_obj_text(obj, message, level=level, logger_=logger_)
+    log_obj_text(obj, message, level=level, logger_=logger_, depth=depth)
     log_obj_json(obj, message, ndjson_file=ndjson_file)

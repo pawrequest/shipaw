@@ -4,8 +4,8 @@ from shipaw.config import populate_providers
 from shipaw.providers.registry import PROVIDER_REGISTER
 
 
-def test_address_search(sample_remote_address):
-    populate_providers()
+def test_address_search(sample_remote_address, sample_settings):
+    populate_providers(sample_settings)
     provider: RoyalMailProvider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     # search_text = sample_remote_address.search_string
     search_text = 'East Avenue, Hayes, Middlesex'

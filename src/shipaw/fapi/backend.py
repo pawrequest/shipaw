@@ -92,40 +92,6 @@ async def resize_and_write_labels(label_content: bytes, label_path: Path):
     logger.info(f'Wrote label to {label_path}')
 
 
-def get_version():
-    from importlib.metadata import version, PackageNotFoundError
-
-    try:
-        return version('shipaw')
-    except PackageNotFoundError:
-        return 'unknown'
-
-
-async def notify_version(request):
-    alerts = Alerts.empty()
-    sandbox = request.app.shipaw_settings.shipper_live is False
-    if sandbox:
-        live_msg = 'Test Mode - No Shipments will be booked'
-        notification_type = AlertType.NOTIFICATION
-    else:
-        live_msg = 'Live Mode - Real Shipments will be booked'
-        notification_type = AlertType.WARNING
-
-    msg = f'Shipaw Version {get_version()} is in {live_msg}'
-    logger.info(msg)
-    alerts += Alert(message=msg, type=notification_type)
-    return alerts
-
-
-def notify_dev() -> Alerts:
-    alerts = Alerts.empty()
-    if any(['prdev' in str(_).lower() for _ in Path(__file__).parents]):
-        msg = '"prdev" in cwd tree - BETA MODE - This is a development version'
-        logger.info(msg)
-        alerts += Alert(message=msg, type=AlertType.WARNING)
-    return alerts
-
-
 async def errored_shipment(shipment_response):
     log_obj(shipment_response.alerts, 'Errors booking shipment:')
     alerts = shipment_response.alerts

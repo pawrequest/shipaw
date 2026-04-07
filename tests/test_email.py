@@ -1,1 +1,0 @@
-from royal_mail_combined.temp_client import temporary_client
