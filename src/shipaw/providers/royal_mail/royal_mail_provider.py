@@ -34,14 +34,15 @@ class RoyalMailProvider(ShippingProvider):
     name: ClassVar[ProviderName] = ProviderName.ROYAL_MAIL
     settings_type: ClassVar[type[RoyalMailSettingsGlobal]] = RoyalMailSettingsGlobal
     service_codes_type: ClassVar[type[RoyalMailServiceCodes]] = RoyalMailServiceCodes
-    default_service: ClassVar[RoyalMailServiceCodes] = RoyalMailServiceCodes.EXPRESS_24
+
     valid_directions: ClassVar[list[ShipDirection]] = [
         ShipDirection.OUTBOUND,
         ShipDirection.INBOUND,
         ShipDirection.DROPOFF,
     ]
 
-    valid_direction_services: ClassVar[ShipDirection, RoyalMailServiceCodes] = {
+    default_service: ClassVar[RoyalMailServiceCodes] = RoyalMailServiceCodes.EXPRESS_24
+    valid_direction_services: ClassVar[dict[ShipDirection, list[RoyalMailServiceCodes]]] = {
         ShipDirection.OUTBOUND: [
             RoyalMailServiceCodes.TRACKED_24,
             RoyalMailServiceCodes.EXPRESS_24,
@@ -53,7 +54,7 @@ class RoyalMailProvider(ShippingProvider):
         ShipDirection.DROPOFF: [RoyalMailServiceCodes.TRACKED_24_RTN],
     }
 
-    valid_direction_formats: ClassVar[ShipDirection, PackageFormat] = {
+    valid_direction_formats: ClassVar[dict[ShipDirection, list[PackageFormat]]] = {
         ShipDirection.OUTBOUND: [PackageFormat.PARCEL, PackageFormat.SMALL_PARCEL],
         ShipDirection.INBOUND: [PackageFormat.PARCEL],
         ShipDirection.DROPOFF: [PackageFormat.PARCEL],
