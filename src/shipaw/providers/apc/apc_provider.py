@@ -38,12 +38,12 @@ class APCShippingProvider(ShippingProvider):
 
     valid_directions: ClassVar[list[ShipDirection]] = [ShipDirection.OUTBOUND, ShipDirection.INBOUND]
 
-    valid_direction_services = {
+    valid_direction_services: ClassVar[dict[ShipDirection, APCServiceCode]] = {
         ShipDirection.OUTBOUND: [APCServiceCode.PARCEL_1600, APCServiceCode.SATURDAY_PARCEL_1200],
         ShipDirection.INBOUND: [APCServiceCode.PARCEL_1600],
     }
 
-    valid_direction_formats = {
+    valid_direction_formats: ClassVar[dict[ShipDirection, PackageFormat]] = {
         ShipDirection.OUTBOUND: [PackageFormat.PARCEL],
         ShipDirection.INBOUND: [PackageFormat.PARCEL],
         ShipDirection.DROPOFF: [PackageFormat.PARCEL],

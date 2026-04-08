@@ -41,7 +41,7 @@ class RoyalMailProvider(ShippingProvider):
         ShipDirection.DROPOFF,
     ]
 
-    valid_direction_services = {
+    valid_direction_services: ClassVar[ShipDirection, RoyalMailServiceCodes] = {
         ShipDirection.OUTBOUND: [
             RoyalMailServiceCodes.TRACKED_24,
             RoyalMailServiceCodes.EXPRESS_24,
@@ -53,7 +53,7 @@ class RoyalMailProvider(ShippingProvider):
         ShipDirection.DROPOFF: [RoyalMailServiceCodes.TRACKED_24_RTN],
     }
 
-    valid_direction_formats = {
+    valid_direction_formats: ClassVar[ShipDirection, PackageFormat] = {
         ShipDirection.OUTBOUND: [PackageFormat.PARCEL, PackageFormat.SMALL_PARCEL],
         ShipDirection.INBOUND: [PackageFormat.PARCEL],
         ShipDirection.DROPOFF: [PackageFormat.PARCEL],
