@@ -9,8 +9,8 @@ from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.app_custom import ShipawRequest
 from shipaw.models.base import ShipawBaseModel
-from shipaw.utils.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
+from shipaw.utils.label_file import get_label_stem, unused_path
 
 
 class ShipawTemplate(ShipawBaseModel):

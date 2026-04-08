@@ -1,6 +1,5 @@
-import sys
 import inspect
-
+import sys
 
 # README needs copying from index.rst manually
 

@@ -4,7 +4,6 @@ from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
 
-
 # class Authentication(ShipawBaseModel):
 #     # todo SecretStr!!!!
 #     user_name: Annotated[str, StringConstraints(max_length=80)]

@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
-from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
+from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 
 if TYPE_CHECKING:
-    from shipaw.fapi.responses import CompletedShipmentResponse
     from shipaw.fapi.requests import ShipmentRequest
+    from shipaw.fapi.responses import CompletedShipmentResponse
 
 
 class ProviderName(StrEnum):

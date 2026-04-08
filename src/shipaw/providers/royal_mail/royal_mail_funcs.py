@@ -11,10 +11,12 @@ from royal_mail_combined.click_and_drop_api.models import (
     GetOrderInfoResource,
     PostageDetailsRequest,
     RecipientDetailsRequest,
-    ReturnShipment as RMReturnShipment,
     ReturnsRequest,
     Service,
     ShipmentPackageRequest,
+)
+from royal_mail_combined.click_and_drop_api.models import (
+    ReturnShipment as RMReturnShipment,
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer, ReturnResponseContainer
 from royal_mail_combined.converters_no_import import tracking_link
@@ -23,8 +25,8 @@ from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServic
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.responses import CompletedShipmentResponse
 from shipaw.models.address_contact import Address, Contact, FullContact
-from shipaw.utils.consts_enums import ShipDirection
 from shipaw.models.shipment import Shipment
+from shipaw.utils.consts_enums import ShipDirection
 from shipaw.utils.funcs import date_to_datetime
 
 

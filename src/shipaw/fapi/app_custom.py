@@ -1,21 +1,17 @@
 from __future__ import annotations
 
+from _collections_abc import Callable
 from pathlib import Path
-from typing import Any
 
 from fastapi import FastAPI
 from loguru import logger
-from pawlogger import configure_loguru
 from pydantic import BaseModel, Field
 from starlette.datastructures import State
 from starlette.requests import Request
-from starlette.staticfiles import StaticFiles
 
-from shipaw.config import ShipawSettings, populate_providers
-from shipaw.fapi.alerts import Alert, AlertType, Alerts
+from shipaw.config import FapiConfig, ShipawSettings
+from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.log_stream import LogStream
-# from shipaw.fapi.routes_api import router as json_router
-# from shipaw.fapi.routes_html import router as html_router
 
 
 def notify_version(state: AppState) -> Alerts:
@@ -51,6 +47,9 @@ class AppState(State):
     log_stream: LogStream
     alerts: Alerts
     version: str
+    config: FapiConfig
+    callback: Callable
+    # callback: Callable[[ShipawRequest, ShipmentRequest, ShipmentResponse], Awaitable[None]]
 
     @classmethod
     def create(cls):
@@ -59,6 +58,8 @@ class AppState(State):
         state.settings = AppSettings()
         state.version = get_version()
         state.alerts = get_alerts(state)
+        state.config = FapiConfig()
+
         return state
 
 
@@ -80,7 +81,7 @@ class ShipawRequest(Request):
 
 
 def get_version():
-    from importlib.metadata import version, PackageNotFoundError
+    from importlib.metadata import PackageNotFoundError, version
 
     try:
         return version('shipaw')

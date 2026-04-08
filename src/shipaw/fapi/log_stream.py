@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import html
 from collections import deque
-from typing import AsyncIterator, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, AsyncIterator
 
 LogLineTup = tuple[str, str]
 

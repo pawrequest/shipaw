@@ -1,5 +1,6 @@
-from shipaw.config_loguru import get_loguru
 from loguru import logger
+
+from shipaw.config_loguru import get_loguru
 
 
 def test_log():

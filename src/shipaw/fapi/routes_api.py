@@ -72,8 +72,8 @@ async def order_results_api(
 
     await resize_and_write_labels(shipment_response.label_data, shipment_response.label_path)
 
-    if hasattr(request.app, 'callback'):
-        await request.app.callback(shipment_request, shipment_response)
+    if getattr(request.app.state, 'callback'):
+        await request.app.state.callback(request, shipment_request, shipment_response)
 
     shipment_response.template = ShipawTemplate(
         template_path='/order_results.html',

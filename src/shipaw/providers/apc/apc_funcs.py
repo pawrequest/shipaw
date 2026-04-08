@@ -1,6 +1,8 @@
 from apc_hypaship.models.request.address import Address, Contact
 
-from shipaw.models.address_contact import Address as AddressAgnost, Contact as ContactAgnost, FullContact
+from shipaw.models.address_contact import Address as AddressAgnost
+from shipaw.models.address_contact import Contact as ContactAgnost
+from shipaw.models.address_contact import FullContact
 
 
 def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_contact: FullContact) -> addr_type:

@@ -10,12 +10,12 @@ from loguru import logger
 from pydantic import EmailStr
 
 from shipaw.fapi.app_custom import ShipawRequest
-from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.utils.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.utils.consts_enums import VALID_POSTCODE, PackageFormat, ShipDirection
 
 
 async def full_contact_form(

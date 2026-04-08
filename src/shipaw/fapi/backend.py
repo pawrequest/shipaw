@@ -7,13 +7,12 @@ from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
 
-from shipaw.fapi.alerts import Alert, AlertType, Alerts
+from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.logging import log_obj
-from shipaw.utils.consts_enums import ShipDirection
-
 from shipaw.providers.provider_abc import ProviderName
+from shipaw.utils.consts_enums import ShipDirection
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipmentResponse:

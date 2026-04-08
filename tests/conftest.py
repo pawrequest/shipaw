@@ -4,10 +4,10 @@ import pytest
 
 from shipaw.config import ShipawSettings  # FIRST!
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.shipment import Shipment
 from shipaw.models.address_contact import Address, Contact, FullContact
-from shipaw.utils.consts_enums import ShipDirection
+from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER, PROVIDER_TYPE_REGISTER
+from shipaw.utils.consts_enums import ShipDirection
 
 TEST_DATE = date.today() + timedelta(days=2)
 if TEST_DATE.weekday() in (5, 6):

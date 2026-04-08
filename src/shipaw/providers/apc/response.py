@@ -1,6 +1,6 @@
 from apc_hypaship.models.response.resp import BookingResponse
 
-from shipaw.fapi.alerts import Alerts, Alert
+from shipaw.fapi.alerts import Alert, Alerts
 from shipaw.fapi.responses import ShipmentResponse
 from shipaw.models.shipment import Shipment as ShipmentAgnost
 
