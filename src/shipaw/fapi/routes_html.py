@@ -20,7 +20,6 @@ from shipaw.fapi.routes_api import (
     shipping_form_api as ship_form_json,
 )
 from shipaw.models.shipment import Shipment, sample_shipment
-from starlette.responses import StreamingResponse
 
 router = APIRouter()
 

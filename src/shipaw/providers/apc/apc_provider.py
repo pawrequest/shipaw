@@ -110,7 +110,7 @@ class APCShippingProvider(ShippingProvider):
             apc_response: BookingResponse = self.client.fetch_book_shipment(provider_shipment)
             label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number, wait_for_type=bytes)
             return self.build_response(apc_response, shipment, label_data)
-        except APCException as e:
+        except APCException:
             return errored_booking(shipment, apc_response)
 
     def fetch_label_content(self, shipment_num: str) -> bytes:
