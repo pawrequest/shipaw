@@ -34,7 +34,7 @@ class RoyalMailProvider(ShippingProvider):
     name: ClassVar[ProviderName] = ProviderName.ROYAL_MAIL
     settings_type: ClassVar[type[RoyalMailSettingsGlobal]] = RoyalMailSettingsGlobal
     service_codes_type: ClassVar[type[RoyalMailServiceCodes]] = RoyalMailServiceCodes
-    default_service: ClassVar[RoyalMailServiceCodes] = RoyalMailServiceCodes.EXPRESS_24
+    default_service: ClassVar[RoyalMailServiceCodes] = RoyalMailServiceCodes.TRACKED_24
     valid_directions: ClassVar[list[ShipDirection]] = [
         ShipDirection.OUTBOUND,
         ShipDirection.INBOUND,
