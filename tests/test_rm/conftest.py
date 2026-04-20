@@ -1,5 +1,5 @@
 from pprint import pprint
-from typing import Any, Generator
+from typing import Generator
 
 import pytest
 from royal_mail_combined import RoyalMailClient
