@@ -17,7 +17,6 @@ from shipaw.fapi.backend import (
     errored_shipment,
     maybe_alert_apc,
     notify_dev,
-    notify_version,
     resize_and_write_labels,
     try_book_shipment,
 )
