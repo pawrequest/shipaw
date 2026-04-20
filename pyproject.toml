@@ -16,7 +16,7 @@ requires-python = ">= 3.13"
 dependencies = [
     "apc-hypaship>=0.1.10",
     "pawdf>=0.1.0",
-    "royal-mail-combined>=0.0.19",
+    "royal-mail-combined>=0.0.21",
     "pawlogger>=0.1.4",
     #
     "httpx>=0.28.1",
