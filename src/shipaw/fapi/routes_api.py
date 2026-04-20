@@ -42,7 +42,7 @@ async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) ->
 
     alerts: Alerts = request.app.alerts
     alerts += notify_dev()
-    alerts += await notify_version(request)
+    # alerts += await notify_version(request)
 
     tmplt = ShipawTemplate(template_path='shipping_form_container.html', context={'shipment': shipment})
     return ShipawTemplateResponse(template=tmplt, alerts=alerts)

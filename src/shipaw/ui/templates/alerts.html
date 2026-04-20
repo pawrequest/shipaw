@@ -4,7 +4,7 @@
     <div class="wrapper">
         {% for alert in alerts.alert %}
             <div class="alert alert__{{ alert.type }}">
-                <strong>{{ alert.type.title() }}:&nbsp;</strong> {{ alert.message }} {{ "ErrorCode: " + alert.code|string if alert.code else "" }}
+                {{ alert.message }} {{ "ErrorCode: " + alert.code|string if alert.code else "" }}
             </div>
         {% endfor %}
         {% if alerts.errors %}
