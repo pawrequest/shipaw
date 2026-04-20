@@ -1,9 +1,9 @@
 import base64
+from pprint import pprint
 from typing import ClassVar, override
 
 from royal_mail_combined import RoyalMailClient
 from royal_mail_combined.click_and_drop_api.models import (
-    CreateOrderRequest,
     CreateOrdersRequest,
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
@@ -16,11 +16,11 @@ from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type
 from shipaw.providers.royal_mail.royal_mail_funcs import (
-    build_booking_response_inbound,
-    build_booking_response_outbound_f_fetched,
-    full_contact_from_rm,
-    inbound_shipment_from_agnostic,
-    outbound_shipment_from_agnostic,
+    booking_response_inbound,
+    booking_response_outbound,
+    fullcontact_from_recipient,
+    inbound_shipment,
+    outbound_shipment,
     print_response_errors,
 )
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
@@ -80,7 +80,7 @@ class RoyalMailProvider(ShippingProvider):
     def agnostic_shipment(cls, orders_req: CreateOrdersRequest) -> Shipment:
         order = orders_req.items[0]
         return Shipment(
-            recipient=full_contact_from_rm(order.recipient),
+            recipient=fullcontact_from_recipient(order.recipient),
             boxes=len(order.packages),
             shipping_date=order.planned_despatch_date.date(),
             direction=ShipDirection.OUTBOUND,
@@ -90,13 +90,13 @@ class RoyalMailProvider(ShippingProvider):
     @override
     def provider_shipment(
         self, shipment: Shipment, service_code: RoyalMailServiceCodes
-    ) -> CreateOrderRequest | ReturnRequestContainer:
+    ) -> CreateOrdersRequest | ReturnRequestContainer:
         provider_service = self.service_codes_type(service_code)
         match shipment.direction:
             case ShipDirection.OUTBOUND:
-                return outbound_shipment_from_agnostic(shipment, provider_service)
+                return outbound_shipment(shipment, provider_service)
             case ShipDirection.DROPOFF | ShipDirection.INBOUND:
-                return inbound_shipment_from_agnostic(shipment, provider_service)
+                return inbound_shipment(shipment, provider_service)
 
     @override
     def book_shipment_request(self, shipment_request: ShipmentRequest) -> CompletedShipmentResponse:
@@ -111,21 +111,21 @@ class RoyalMailProvider(ShippingProvider):
             raise ValueError(f'Invalid shipment direction "{shipdir}"')
 
     def _book_inbound_or_dropoff(self, service: RoyalMailServiceCodes, shipment: Shipment) -> CompletedShipmentResponse:
-        returns_container = inbound_shipment_from_agnostic(shipment, service)
+        returns_container = inbound_shipment(shipment, service)
         if shipment.direction == ShipDirection.INBOUND:
             resp = self.client.book_inbound_collection(returns_container, collection_date=shipment.shipping_date)
         else:
             resp = self.client.book_inbound_dropoff(returns_container)
         labels_bytes = [base64.b64decode(order.label) for order in resp.created_orders]
         combined_label_bytes = merge_pdf_bytes(labels_bytes)
-        return build_booking_response_inbound(resp, shipment, combined_label_bytes)
+        return booking_response_inbound(resp, shipment, combined_label_bytes)
 
     def _book_outbound(self, service: RoyalMailServiceCodes, shipment: Shipment) -> CompletedShipmentResponse:
-        order_create = outbound_shipment_from_agnostic(shipment, service)
-        booking_response = self.client.book_outbound(order_create)
+        orders_request = outbound_shipment(shipment, service)
+        booking_response = self.client.book_outbound(orders_request)
         if booking_response.errors_count > 0:
             print_response_errors(booking_response)
         label_data: bytearray = self.client.get_label_data(booking_response.success_idents_str)
         fetched_response = self.client.fetch_specific_orders(booking_response.success_idents_str)
-        return build_booking_response_outbound_f_fetched(fetched_response, shipment, label_data)
+        return booking_response_outbound(fetched_response, shipment, label_data)
         # return build_booking_response_outbound(resp, shipment, label_data)
