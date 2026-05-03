@@ -2,16 +2,15 @@ from abc import ABC, abstractmethod
 from enum import StrEnum
 from typing import ClassVar, TYPE_CHECKING
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
-from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
     from shipaw.models.responses import CompletedShipmentResponse
-    from shipaw.fapi.requests import ShipmentRequest
+    from shipaw.models.requests import ShipmentRequest
 
 
 class ProviderName(StrEnum):
@@ -21,7 +20,8 @@ class ProviderName(StrEnum):
 
 class HasServiceCodes(ABC):
     service_codes_type: ClassVar[type[StrEnum]]
-    default_service: ClassVar[StrEnum]
+
+    # default_service: ClassVar[StrEnum]
 
     @classmethod
     def lookup_service(cls, service_name: str):
@@ -44,9 +44,12 @@ class ShippingProvider(HasServiceCodes, ABC, ShipawBaseModel):
     name: ClassVar[ProviderName]
     settings: BaseSettings
     settings_type: ClassVar[type[BaseSettings]]
-    valid_directions: ClassVar[list[ShipDirection]]
-    valid_direction_services: ClassVar[dict[ShipDirection, list[StrEnum]]] = Field(default_factory=dict)
+    available_services: ClassVar[dict[ShipDirection, list[StrEnum]]] = Field(default_factory=dict)
     valid_direction_formats: ClassVar[dict[ShipDirection, list[PackageFormat]]] = Field(default_factory=dict)
+
+    @property
+    def valid_directions(self) -> list[ShipDirection]:
+        return list(self.available_services.keys())
 
     @property
     @abstractmethod
@@ -55,18 +58,6 @@ class ShippingProvider(HasServiceCodes, ABC, ShipawBaseModel):
 
     @abstractmethod
     def is_sandbox(self) -> bool: ...
-
-    @staticmethod
-    @abstractmethod
-    def provider_shipment(shipment: Shipment, service_code: StrEnum) -> BaseModel:
-        """Takes Shipaw's agnostic Shipment object and returns provider-specific Shipment object"""
-        ...
-
-    @staticmethod
-    @abstractmethod
-    def agnostic_shipment(shipment: BaseModel) -> Shipment:
-        """Takes provider-specific Shipment object and returns Shipaw's agnostic Shipment object"""
-        ...
 
     @staticmethod
     @abstractmethod

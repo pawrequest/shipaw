@@ -9,9 +9,9 @@ from loguru import logger
 # from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
 
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
@@ -37,8 +37,8 @@ async def full_contact_form(
             business_name=business_name,
         ),
         contact=Contact(
-            contact_name=contact_name,
-            email_address=email_address,
+            name=contact_name,
+            email=email_address,
             mobile_phone=mobile_phone.strip().replace(' ', ''),
         ),
     )

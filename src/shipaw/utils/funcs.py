@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 from collections.abc import Callable
 from datetime import date, datetime
@@ -21,15 +23,6 @@ def wait_for(
     raise RuntimeError(f'Data not ready after {tries} retries')
 
 
-# def wait_for[T: Any](func: Callable[Any, T], *args, tries=10) -> T:
-#     for i in range(tries):
-#         try:
-#             return_data = func(*args)
-#             assert return_data is not None, 'Data not ready , retrying...'
-#             return return_data
-#         except AssertionError:
-#             pass
-#     raise RuntimeError(f'Data not ready after {tries} retries')
 def strip_text(text: str):
     return text.replace(' ', '').lower()
 

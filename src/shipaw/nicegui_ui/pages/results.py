@@ -4,6 +4,7 @@ Step 3 — Order results page.
 Shows success (shipment number + label path + open/print buttons) or a failure
 card listing the errors.  The only navigation is back to the form.
 """
+
 from __future__ import annotations
 
 import os
@@ -11,8 +12,9 @@ from typing import Callable
 
 from nicegui import ui
 
+from shipaw.models.requests import ShipmentRequest
+from shipaw.models.responses import ShipmentResponse
 from shipaw.nicegui_ui import theme
-from shipaw.nicegui_ui.logic import ShipmentRequest
 
 
 class ResultsPage:
@@ -26,7 +28,7 @@ class ResultsPage:
     goto_form: Callback to start a new booking.
     """
 
-    def __init__(self, ship_req: ShipmentRequest, response, goto_form: Callable) -> None:
+    def __init__(self, ship_req: ShipmentRequest, response: ShipmentResponse, goto_form: Callable) -> None:
         self._ship_req = ship_req
         self._response = response
         self._goto_form = goto_form
@@ -43,7 +45,7 @@ class ResultsPage:
 
     # ── Failure ───────────────────────────────────────────────────────────────
 
-    def _build_failure(self, response) -> None:
+    def _build_failure(self, response: ShipmentResponse) -> None:
         with ui.card().classes('w-full q-pa-xl result-fail text-center'):
             ui.icon('error', size='3rem').classes('text-negative')
             ui.label('Booking Failed').classes('text-h5 text-negative q-mt-sm')
@@ -53,7 +55,7 @@ class ResultsPage:
 
     # ── Success ───────────────────────────────────────────────────────────────
 
-    def _build_success(self, response) -> None:
+    def _build_success(self, response: ShipmentResponse) -> None:
         label_path = response.label_path
 
         with ui.card().classes('w-full q-pa-xl result-success text-center'):
@@ -63,7 +65,9 @@ class ResultsPage:
             ui.label(f'Label: {label_path}').classes('text-caption text-grey-7 q-mt-xs')
 
         with ui.row().classes('w-full justify-center q-gutter-lg q-mt-lg'):
-            ui.button('Open Label', icon='open_in_new', on_click=lambda: self._open(label_path)).props(theme.BTN_PRIMARY)
+            ui.button('Open Label', icon='open_in_new', on_click=lambda: self._open(label_path)).props(
+                theme.BTN_PRIMARY
+            )
             ui.button('Print Label', icon='print', on_click=lambda: self._print(label_path)).props(theme.BTN_PRIMARY)
             # Stage 3 TODO: email label button
 
@@ -87,4 +91,3 @@ class ResultsPage:
             ui.notify('Label sent to printer', type='positive')
         except Exception as exc:
             ui.notify(str(exc), type='negative')
-

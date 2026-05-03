@@ -4,7 +4,7 @@ from shipaw.models.base import ShipawBaseModel
 
 if TYPE_CHECKING:
     ...
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import ShipmentResponse
 
 

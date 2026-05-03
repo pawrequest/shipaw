@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from pprint import pformat
+from typing import Any
 
 from loguru import logger
 from royal_mail_combined.click_and_drop_api.models import (
     AddressRequest,
     AddressReturns,
-    BillingDetailsRequest,
     CreateOrderRequest,
     CreateOrdersRequest,
     CreateOrdersResponse,
@@ -12,44 +14,70 @@ from royal_mail_combined.click_and_drop_api.models import (
     GetOrderInfoResource,
     PostageDetailsRequest,
     RecipientDetailsRequest,
+    ReturnShipment as RMReturnShipment,
     ReturnsRequest,
     Service,
     ShipmentPackageRequest,
-)
-from royal_mail_combined.click_and_drop_api.models import (
-    ReturnShipment as RMReturnShipment,
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer, ReturnResponseContainer
 from royal_mail_combined.converters_no_import import tracking_link
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
 from royal_mail_combined.core.helpers import should_split_rm_tracked_24
+from royal_mail_combined.parcels_apis.collection_order.models import SenderDetailsPostDef
 
-from shipaw.config import SHIPAW_SETTINGS
 from shipaw.models.responses import CompletedShipmentResponse
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment, build_reference
+from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.utils.funcs import date_to_datetime
+from shipaw.utils.ui_funcs import address_search_text
+
+# Calls
+async def address_lookup(address: Address) -> list[Any]:
+    """Return list of AddressRecordDef matching the address / postcode."""
+    from shipaw.utils.funcs import compare_texts
+
+    royalmail_provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
+    if not royalmail_provider:
+        return []
+    search_text = address_search_text(address)
+    if not search_text.strip():
+        return []
+
+    postcode = address.postcode.strip()
+
+    summaries = royalmail_provider.client.address_search(search_text).addresses
+
+    hits = []
+    for summary in summaries:
+        if summary.type != 'Address':
+            continue
+        try:
+            rec = royalmail_provider.client.address_retrieve(summary.address_id)
+            if compare_texts(rec.postal_code, postcode):
+                hits.append(rec)
+        except Exception as exc:
+            logger.warning(f'Address retrieve failed for {summary.address_id}: {exc}')
+    return hits
 
 
-# Outbound Shipment
+# Converters
 def outbound_shipment(shipment: Shipment, service_code: RoyalMailServiceCodes) -> CreateOrdersRequest:
-    billing_details = billing_details_from_fullcontact(SHIPAW_SETTINGS.full_contact)
     postage_details = create_postage_details(shipment=shipment, service_code=service_code)
     if should_split_rm_tracked_24(service_code, shipment.boxes):
-        return _create_orders_request_split(billing_details, postage_details, shipment)
+        return _create_outbound_split(postage_details, shipment)
     else:
-        return _create_orders_request_unsplit(billing_details, postage_details, shipment)
+        return _create_outbound_unsplit(postage_details, shipment)
 
 
-def _create_orders_request_unsplit(
-    billing_details: BillingDetailsRequest, postage_details: PostageDetailsRequest, shipment: Shipment
+def _create_outbound_unsplit(
+        postage_details: PostageDetailsRequest, shipment: Shipment
 ) -> CreateOrdersRequest:
     order = CreateOrderRequest(
         order_reference=build_reference(shipment.reference, 40, shipment.boxes, shipment.shipping_date),
-        # order_reference=shipment.reference_with_date_and_total_boxes,
         postage_details=postage_details,
-        billing=billing_details,
+        # billing_details = billing_details_from_fullcontact(SHIPAW_SETTINGS.full_contact)
         recipient=recipient_from_fullcontact(shipment.recipient),
         order_date=date_to_datetime(shipment.shipping_date),
         planned_despatch_date=date_to_datetime(shipment.shipping_date),
@@ -63,9 +91,7 @@ def _create_orders_request_unsplit(
     return CreateOrdersRequest(items=[order])
 
 
-def _create_orders_request_split(
-    billing_details: BillingDetailsRequest, postage_details: PostageDetailsRequest, shipment: Shipment
-) -> CreateOrdersRequest:
+def _create_outbound_split(postage_details: PostageDetailsRequest, shipment: Shipment) -> CreateOrdersRequest:
     orders = [
         CreateOrderRequest(
             order_reference=build_reference(
@@ -75,9 +101,7 @@ def _create_orders_request_split(
                 shipment.shipping_date,
                 box=i + 1,
             ),
-            # order_reference=shipment.reference_with_date_and_numbered_boxes(i + 1),
             postage_details=postage_details,
-            billing=billing_details,
             recipient=recipient_from_fullcontact(shipment.recipient),
             order_date=date_to_datetime(shipment.shipping_date),
             planned_despatch_date=date_to_datetime(shipment.shipping_date),
@@ -94,13 +118,15 @@ def _create_orders_request_split(
 
 
 # Inbound Shipment
-def inbound_shipment(shipment: Shipment, service_code: RoyalMailServiceCodes) -> ReturnRequestContainer:
+def create_remote_shipment(shipment: Shipment, service_code: RoyalMailServiceCodes) -> ReturnRequestContainer:
+    sender = returns_address_from_agnostic_fc(shipment.sender)
+    recipient = returns_address_from_agnostic_fc(shipment.recipient)
     reqs = [
         ReturnsRequest(
             service=Service(service_code=service_code),
             shipment=RMReturnShipment(
-                recipient_address=returns_address_from_agnostic_fc(shipment.recipient),
-                sender_address=returns_address_from_agnostic_fc(shipment.sender),
+                recipient_address=recipient,
+                sender_address=sender,
                 customer_reference=CustomerReference(
                     reference=build_reference(shipment.reference, 40, shipment.boxes, shipment.shipping_date, box=i + 1)
                 ),
@@ -127,7 +153,7 @@ def booking_response_inbound(rm_response: ReturnResponseContainer, shipment: Shi
 
 
 def booking_response_outbound(
-    fetched: list[GetOrderInfoResource], shipment: Shipment, label_data: bytes
+        fetched: list[GetOrderInfoResource], shipment: Shipment, label_data: bytes
 ) -> CompletedShipmentResponse:
     tracking_numbers = [order.tracking_number for order in fetched]
     tracking_links = [tracking_link(_) for _ in tracking_numbers]
@@ -153,7 +179,7 @@ def print_response_errors(rm_response: CreateOrdersResponse):
 
 
 def returns_address_from_agnostic_fc(full_contact: FullContact):
-    names = full_contact.contact.contact_name.split()
+    names = full_contact.contact.name.split()
     first = names[0]
     last = ' '.join(names[1:]) if len(names) > 1 else ''
     return AddressReturns(
@@ -168,13 +194,14 @@ def returns_address_from_agnostic_fc(full_contact: FullContact):
         county=full_contact.address.county,
         postcode=full_contact.address.postcode,
         country=full_contact.address.country,
-        email=full_contact.contact.email_address,
+        email=full_contact.contact.email,
     )
 
 
 def create_postage_details(shipment: Shipment, service_code):
     send_to = (
-        SendNotifcationsTo.RECIPIENT if shipment.direction == ShipDirection.OUTBOUND else SendNotifcationsTo.BILLING
+        SendNotifcationsTo.RECIPIENT if shipment.direction in [ShipDirection.OUTBOUND,
+                                                               ShipDirection.THIRD_PARTY] else SendNotifcationsTo.BILLING
     )
     return PostageDetailsRequest(
         service_code=service_code,
@@ -196,7 +223,7 @@ def create_packages(*, num_parcels: int, package_format: PackageFormat, weight_k
 
 def address_from_fullcontact(full_contact: FullContact) -> AddressRequest:
     return AddressRequest(
-        full_name=full_contact.contact.contact_name,
+        full_name=full_contact.contact.name,
         company_name=full_contact.address.business_name,
         address_line1=full_contact.address.address_lines[0],
         address_line2=full_contact.address.address_lines[1] if len(full_contact.address.address_lines) > 1 else None,
@@ -212,24 +239,31 @@ def recipient_from_fullcontact(full_contact: FullContact) -> RecipientDetailsReq
     return RecipientDetailsRequest(
         address=address_from_fullcontact(full_contact),
         phone_number=full_contact.contact.mobile_phone or full_contact.contact.phone_number,
-        email_address=full_contact.contact.email_address,
+        email_address=full_contact.contact.email,
     )
 
 
-def billing_details_from_fullcontact(full_contact: FullContact):
-    return BillingDetailsRequest(
-        address=address_from_fullcontact(full_contact),
-        phone_number=full_contact.contact.phone_number,
-        email_address=full_contact.contact.email_address,
+# def billing_details_from_fullcontact(full_contact: FullContact):
+#     return BillingDetailsRequest(
+#         address=address_from_fullcontact(full_contact),
+#         phone_number=full_contact.contact.phone_number,
+#         email_address=full_contact.contact.email,
+#     )
+
+
+def sender_details_from_fullcontact(full_contact: FullContact):
+    return SenderDetailsPostDef(
+        sender_name=full_contact.contact.name,
+        sender_email=full_contact.contact.email,
     )
 
 
 def fullcontact_from_recipient(recipient: RecipientDetailsRequest) -> FullContact:
     return FullContact(
         contact=Contact(
-            contact_name=recipient.address.full_name,
+            name=recipient.address.full_name,
             phone_number=recipient.phone_number,
-            email_address=recipient.email_address,
+            email=recipient.email_address,
             mobile_phone=recipient.phone_number,
         ),
         address=Address(

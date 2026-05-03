@@ -20,4 +20,4 @@ def test_setup(sample_settings, sample_sql_home_contact, sample_full_home_contac
     # with Session(engine) as session:
     #     result = session.exec(select(ContactTable)).first()
     #     assert result is not None
-    #     assert result.contact_name == sample_full_home_contact.contact.contact_name
+    #     assert result.name == sample_full_home_contact.contact.name

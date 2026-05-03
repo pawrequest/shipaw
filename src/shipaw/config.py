@@ -13,8 +13,8 @@ from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
-from shipaw.fapi.ui_funcs import get_ui, ordinal_dt, sanitise_id
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.utils.ui_funcs import get_ui, ordinal_dt, sanitise_id
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
 
@@ -86,8 +86,8 @@ class ShipawSettings(BaseSettings):
     @classmethod
     @functools.cache
     def from_env(cls) -> ShipawSettings:
-        logger.info(f'Loading ShipawSettings from env key: {SHIPAW_ENV_KEY}')
         env_path = path_from_env_key(SHIPAW_ENV_KEY)
+        logger.info(f'Loading ShipawSettings from env file {env_path}')
         return cls(_env_file=env_path)  # pycharm_pydantic false positive
 
     #
@@ -152,8 +152,8 @@ class ShipawSettings(BaseSettings):
     @property
     def contact(self):
         return Contact(
-            contact_name=self.contact_name,
-            email_address=self.email,
+            name=self.contact_name,
+            email=self.email,
             mobile_phone=self.mobile_phone,
         )
 

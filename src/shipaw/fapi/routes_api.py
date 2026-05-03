@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse, StreamingResponse
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.models.alerts import Alerts
-from shipaw.fapi.backend import (
+from shipaw.utils.backend import (
     errored_shipment,
     maybe_alert_apc,
     notify_dev,
@@ -21,11 +21,11 @@ from shipaw.fapi.backend import (
     try_book_shipment,
 )
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
-from shipaw.fapi.ui_funcs import make_nice_str
+from shipaw.utils.ui_funcs import address_search_text, make_nice_str
 from shipaw.logging import log_obj, log_obj_text
-from shipaw.models.address import Address
+from shipaw.models.address_contact import Address
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import RM_UNAVAIL
@@ -98,7 +98,8 @@ async def providers():
 @router.get('/provider_directions/{provider_name}', response_class=JSONResponse)
 async def provider_directions(provider_name: str):
     provider = await provider_from_form(provider_name)
-    directions = provider.valid_directions
+    # directions = provider.valid_directions
+    directions = provider.available_services.keys()
     dir_dict = {make_nice_str(_.value): _.value for _ in directions}
     return JSONResponse(dir_dict)
 
@@ -106,8 +107,7 @@ async def provider_directions(provider_name: str):
 @router.get('/provider_direction_services/{provider_name}/{direction}', response_class=JSONResponse)
 async def provider_direction_services(provider_name: str, direction: str):
     provider = await provider_from_form(provider_name)
-    dflt = provider.default_service
-    available = sorted(provider.valid_direction_services.get(direction, []), key=lambda s: s.value != dflt)
+    available = provider.available_services.get(direction, [])
     res_dir = {make_nice_str(_.name): _.value for _ in available}
     logger.debug(f'Provider Services: {res_dir}')
     return JSONResponse(res_dir)
@@ -132,9 +132,9 @@ async def address_search(search_text: str):
     return res.addresses
 
 
-def address_search_text(address: Address) -> str:
-    fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
-    return ', '.join([_ for _ in fields if _])
+# def address_search_text(address: Address) -> str:
+#     fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
+#     return ', '.join([_ for _ in fields if _])
 
 
 def match_addr_type(addr: AddressSummaryDef, expected_type='Address') -> bool:

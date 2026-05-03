@@ -8,11 +8,10 @@ from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
 
 from shipaw.models.alerts import Alert, AlertType, Alerts
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.logging import log_obj
 from shipaw.utils.consts_enums import ShipDirection
-
 from shipaw.providers.provider_abc import ProviderName
 
 
@@ -29,36 +28,6 @@ async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipm
         shipment_response.alerts += Alert.from_exception(e)
 
     return shipment_response
-
-
-# async def try_get_write_label(request: ShipmentRequest, response: ShipmentResponse):
-#     if not response.label_data:
-#         await try_get_label_data(request, response)
-#
-#     try:
-#         await resize_and_write_labels(response.label_data, response.label_path)
-#
-#     except Exception as e:
-#         logger.exception(f'Error writing label file: {e}')
-#         response.alerts += Alert.from_exception(e)
-
-
-# async def try_get_label_data(request: ShipmentRequest, response: ShipmentResponse) -> None:
-#     if response.label_data is not None:
-#         logger.info('Label data already present, not fetching')
-#         return
-#     try:
-#         if response.shipment_num:
-#             response.label_data = await request.provider.wait_fetch_label_async(response.shipment_num)
-#         else:
-#             logger.warning('No shipment number to fetch label data')
-#
-#     except HTTPStatusError as e:
-#         await maybe_apc_response_error(e, request, response)
-#
-#     except Exception as e:
-#         logger.exception('Error getting label data')
-#         response.alerts += Alert.from_exception(e)
 
 
 async def maybe_apc_response_error(e: HTTPStatusError, shipment_request, shipment_response):

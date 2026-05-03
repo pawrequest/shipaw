@@ -12,7 +12,7 @@ from starlette.responses import HTMLResponse, JSONResponse
 from shipaw.models.alerts import Alerts
 from shipaw.fapi.emailer import send_label_email
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import ShipawTemplateResponse
 from shipaw.fapi.routes_api import (
     order_results_api as order_confirm_json,
@@ -102,7 +102,7 @@ async def email_label(
     label_path: str = Form(...), shipment_request: ShipmentRequest = Depends(shipment_request_form_json)
 ):
     label_path = Path(unquote(label_path))
-    logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email_address}')
+    logger.info(f'Emailing {label_path=} to {shipment_request.shipment.remote_full_contact.contact.email}')
     await send_label_email(shipment_request, label_path)
     return HTMLResponse(content='<span>Re</span>')
 

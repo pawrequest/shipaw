@@ -8,7 +8,7 @@ from loguru import logger
 from win32com.client import Dispatch
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 
 
 @dataclass
@@ -79,7 +79,7 @@ async def send_label_email(shipment_request: ShipmentRequest, label_path: Path):
         home_business_name=SHIPAW_SETTINGS.business_name,
     )
     email = Email(
-        to_address=shipment_request.shipment.remote_full_contact.contact.email_address,
+        to_address=shipment_request.shipment.remote_full_contact.contact.email,
         subject='Amherst Radios Shipping - Shipping Label Attached',
         body=body,
         attachment_paths=[label_path],

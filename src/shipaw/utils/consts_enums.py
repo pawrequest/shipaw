@@ -76,6 +76,7 @@ class ShipDirection(StrEnum):
     INBOUND = 'Inbound'
     OUTBOUND = 'Outbound'
     DROPOFF = 'Dropoff'
+    THIRD_PARTY = 'Third Party'
 
 
 class PackageFormat(StrEnum):

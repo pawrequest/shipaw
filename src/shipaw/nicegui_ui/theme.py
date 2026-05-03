@@ -4,11 +4,12 @@ Style constants and shared UI helpers for the NiceGUI frontend.
 Import this module (as `from shipaw.nicegui_ui import theme`) rather than
 scattering raw class/prop strings throughout page code.
 """
+
 from __future__ import annotations
 
 from nicegui import ui
 
-from shipaw.nicegui_ui.logic import AlertType, Alerts
+from shipaw.models.alerts import AlertType, Alerts
 
 # ── Global CSS ────────────────────────────────────────────────────────────────
 
@@ -28,15 +29,16 @@ body { background-color: #9da8ab !important; font-family: Roboto, sans-serif; }
 
 # ── Reusable class / prop strings ─────────────────────────────────────────────
 
-CARD = 'w-full q-pa-md ship-card'          # full-width section card
-CARD_SM = 'col-auto q-pa-sm ship-card'     # compact info card in summary row
-ROW = 'w-full q-gutter-md'                 # standard horizontal row
+CARD = 'w-full q-pa-md ship-card'  # full-width section card
+CARD_SM = 'col-auto q-pa-sm ship-card'  # compact info card in summary row
+ROW = 'w-full q-gutter-md'  # standard horizontal row
 CENTER_ROW = 'w-full justify-center q-gutter-md q-mt-sm'
 
 INPUT_PROPS = 'outlined dense'
 BTN_PRIMARY = 'color=blue-8'
 BTN_POSITIVE = 'color=positive'
 BTN_FLAT = 'flat color=blue-8'
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -61,4 +63,3 @@ def render_alerts_inline(alerts: Alerts) -> None:
     """Render alert messages as coloured inline labels (for results page)."""
     for alert in alerts.alert:
         ui.label(alert.message).classes(f'alert-{alert.type.value} w-full q-mt-xs')
-

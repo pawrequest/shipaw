@@ -1,7 +1,7 @@
 import datetime as dt
 from typing import Protocol
 
-from shipaw.models.address import FullContact
+from shipaw.models.address_contact import FullContact
 from shipaw.utils.consts_enums import ShipDirection
 
 

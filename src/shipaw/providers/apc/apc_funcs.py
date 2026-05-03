@@ -1,6 +1,6 @@
 from apc_hypaship.models.request.address import Address, Contact
 
-from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
+from shipaw.models.address_contact import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 
 
 def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_contact: FullContact) -> addr_type:
@@ -14,8 +14,8 @@ def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_cont
         postal_code=full_contact.address.postcode,
         country_code=full_contact.address.country,
         contact=Contact(
-            person_name=full_contact.contact.contact_name,
-            email=full_contact.contact.email_address,
+            person_name=full_contact.contact.name,
+            email=full_contact.contact.email,
             mobile_number=full_contact.contact.mobile_phone,
             phone_number=full_contact.contact.phone_number or full_contact.contact.mobile_phone,
         ),
@@ -24,8 +24,8 @@ def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_cont
 
 def contact_from_agnostic_fc[contact_type: Contact](cls: type[contact_type], full_contact: FullContact) -> contact_type:
     return cls(
-        person_name=full_contact.contact.contact_name,
-        email=full_contact.contact.email_address,
+        person_name=full_contact.contact.name,
+        email=full_contact.contact.email,
         mobile_number=full_contact.contact.mobile_phone,
         phone_number=full_contact.contact.phone_number,
     )

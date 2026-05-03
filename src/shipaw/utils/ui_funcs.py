@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, date
+from datetime import date, datetime
 from importlib.resources import files
 from pathlib import Path
+from typing import Sequence
+
+from shipaw.models.address_contact import Address
 
 
 def sanitise_id(value):
@@ -30,3 +33,12 @@ def get_ui() -> Path:
 
 def make_nice_str(s: str) -> str:
     return s.replace('_', ' ').title()
+
+
+def str_to_nice_str_dict(items: Sequence[str]) -> dict[str, str]:
+    return {i: make_nice_str(i) for i in items}
+
+
+def address_search_text(address: Address) -> str:
+    fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
+    return ', '.join(f for f in fields if f)

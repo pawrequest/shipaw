@@ -5,6 +5,7 @@ Builds the provider/direction/service dropdowns, contact fields, address
 search, and submit button.  Navigation is injected via `on_submit` so this
 module has no knowledge of the other pages.
 """
+
 from __future__ import annotations
 
 import datetime as dt
@@ -12,252 +13,23 @@ from typing import Callable
 
 from loguru import logger
 from nicegui import ui
+from nicegui.elements.select import Select
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.alerts import Alerts
+from shipaw.models.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment, sample_shipment
+from shipaw.nicegui_ui.pages.address import AddressPanel
+from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.nicegui_ui import theme
-from shipaw.nicegui_ui.logic import (
-    ShipmentRequest,
-    address_lookup,
-    build_shipment,
-    make_nice_str,
-    maybe_alert_apc,
-)
+from shipaw.utils.consts_enums import ShipDirection
+from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
 
 
-# ── Provider / direction / service option helpers ─────────────────────────────
-
-
-def _provider_options() -> tuple[dict[str, str], str | None]:
-    """Return ({value: label}, default_value) for provider select."""
+def provider_names_sorted() -> list[str]:
     dflt = SHIPAW_SETTINGS.default_provider_name
-    keys = sorted(PROVIDER_REGISTER.keys(), key=lambda p: p != dflt)
-    opts = {p: make_nice_str(p) for p in keys}
-    return opts, next(iter(opts), None)
-
-
-def _direction_options(provider_name: str) -> tuple[dict[str, str], str | None]:
-    provider = PROVIDER_REGISTER.get(provider_name)
-    if not provider:
-        return {}, None
-    opts = {d.value: make_nice_str(d.value) for d in provider.valid_directions}
-    return opts, next(iter(opts), None)
-
-
-def _service_options(provider_name: str, direction: str) -> tuple[dict[str, str], str | None]:
-    provider = PROVIDER_REGISTER.get(provider_name)
-    if not provider:
-        return {}, None
-    dflt = provider.default_service
-    available = sorted(
-        provider.valid_direction_services.get(direction, []),
-        key=lambda s: s.value != dflt,
-    )
-    opts = {s.value: make_nice_str(s.name) for s in available}
-    return opts, next(iter(opts), None)
-
-
-# ── Reusable contact + address panel ─────────────────────────────────────────
-
-
-class AddressPanel:
-    """
-    A pair of NiceGUI cards — Contact (left) and Address (right) — with
-    an address-check button that confirms whether the entered address exists
-    in the Royal Mail database and displays the matched record(s) as text.
-
-    Parameters
-    ----------
-    initial_contact:    Pre-fill contact fields (optional).
-    initial_address:    Pre-fill address fields (optional).
-    show_use_own_phone: Add a "Use Own" shortcut button next to phone field.
-    bind_switch:        If given, all widgets are bound to this switch's
-                        ``value`` so they are disabled when the switch is off.
-    """
-
-    def __init__(
-            self,
-            *,
-            initial_contact: Contact | None = None,
-            initial_address: Address | None = None,
-            show_use_own_phone: bool = False,
-            bind_switch: ui.switch | None = None,
-    ) -> None:
-        self._bind = bind_switch
-        self._build(initial_contact, initial_address, show_use_own_phone)
-
-    # ── Binding helper ────────────────────────────────────────────────────────
-
-    def _w(self, widget):
-        """Optionally bind widget enabled-state to the panel's switch."""
-        if self._bind is not None:
-            widget.bind_enabled_from(self._bind, 'value')
-        return widget
-
-    # ── Layout ────────────────────────────────────────────────────────────────
-
-    def _build(self, contact: Contact | None, addr: Address | None, show_use_own_phone: bool) -> None:
-        lines = addr.address_lines if addr else []
-        rm_available = 'ROYAL_MAIL' in PROVIDER_REGISTER
-
-        with ui.row().classes(theme.ROW):
-            # Contact card
-            with ui.card().classes('col q-pa-md ship-card'):
-                ui.label('Contact').classes('text-subtitle2 text-weight-bold q-mb-xs')
-                self.contact_in = self._w(
-                    ui.input(label='Contact Name', value=contact.contact_name if contact else '')
-                    .props(theme.INPUT_PROPS)
-                )
-                self.business_in = self._w(
-                    ui.input(label='Business Name', value=addr.business_name if addr else '')
-                    .props(theme.INPUT_PROPS)
-                )
-                self.email_in = self._w(
-                    ui.input(label='Email', value=contact.email_address if contact else '')
-                    .props(f'{theme.INPUT_PROPS} type=email')
-                )
-                with ui.row().classes('items-end w-full no-wrap'):
-                    self.phone_in = self._w(
-                        ui.input(label='Mobile Phone', value=contact.mobile_phone if contact else '')
-                        .props(theme.INPUT_PROPS)
-                        .classes('col')
-                    )
-                    if show_use_own_phone:
-                        ui.button('Use Own', on_click=self._use_own_phone).props(f'flat dense {theme.BTN_PRIMARY}')
-
-            # Address card
-            with ui.card().classes('col q-pa-md ship-card'):
-                ui.label('Address').classes('text-subtitle2 text-weight-bold q-mb-xs')
-                self.addr1_in = self._w(
-                    ui.input(label='Address Line 1', value=lines[0] if lines else '').props(theme.INPUT_PROPS)
-                )
-                self.addr2_in = self._w(
-                    ui.input(label='Address Line 2', value=lines[1] if len(lines) > 1 else '').props(theme.INPUT_PROPS)
-                )
-                self.addr3_in = self._w(
-                    ui.input(label='Address Line 3', value=lines[2] if len(lines) > 2 else '').props(theme.INPUT_PROPS)
-                )
-                self.town_in = self._w(
-                    ui.input(label='Town', value=addr.town if addr else '').props(theme.INPUT_PROPS)
-                )
-                with ui.row().classes('items-end w-full no-wrap q-gutter-xs'):
-                    self.postcode_in = self._w(
-                        ui.input(label='Postcode', value=addr.postcode if addr else '')
-                        .props(theme.INPUT_PROPS)
-                        .classes('col')
-                    )
-                    if rm_available:
-                        self.check_btn = self._w(
-                            ui.button('Check Address', icon='search', on_click=self._do_check)
-                            .props(f'{theme.BTN_PRIMARY} dense')
-                        )
-                    else:
-                        self.check_btn = None
-
-                # Read-only result display — only created when RM is available
-                if rm_available:
-                    self.addr_result = (
-                        ui.label('')
-                        .classes('w-full text-caption q-mt-xs')
-                        .style('white-space: pre-wrap; font-family: monospace;')
-                    )
-                    self.addr_result.set_visibility(False)
-                else:
-                    self.addr_result = None
-
-    # ── Address check ─────────────────────────────────────────────────────────
-
-    async def _do_check(self) -> None:
-        if self.check_btn is None or self.addr_result is None:
-            return  # Royal Mail not available
-        from shipaw.utils.funcs import compare_texts
-
-        self.check_btn.props('loading')
-        self.addr_result.set_visibility(False)
-        try:
-            # business_name omitted — causes misses when it doesn't match RM records exactly
-            probe = Address(
-                business_name='',
-                address_lines=[self.addr1_in.value or '.'],
-                town=self.town_in.value or '.',
-                postcode=self.postcode_in.value or '',
-            )
-            hits = await address_lookup(probe)
-            entered_company = self.business_in.value.strip()
-
-            if not hits:
-                self.addr_result.text = '✗  No matching address found — please check postcode and address line'
-                colour = '#a00'
-            else:
-                result_lines = []
-                any_company_match = False
-
-                for rec in hits:
-                    addr_lbl = (getattr(rec, 'label', None) or '').replace('\n', ', ')
-                    rm_company = (getattr(rec, 'company', '') or '').strip()
-                    company_match = entered_company and compare_texts(entered_company, rm_company)
-
-                    if company_match:
-                        any_company_match = True
-                        result_lines.append(f'✓  {addr_lbl}')
-                    elif entered_company:
-                        rm_note = f'Result="{rm_company or 'None'}"'
-                        result_lines.append(
-                            f'⚠  {addr_lbl}\n   Company mismatch:  Search="{entered_company}" — {rm_note}'
-                        )
-                    else:
-                        result_lines.append(f'✓  {addr_lbl}')
-
-                self.addr_result.text = '\n'.join(result_lines)
-
-                if not entered_company or any_company_match:
-                    colour = '#1a7a1a'  # green — full match (or no company to check)
-                else:
-                    colour = '#b85c00'  # amber — address found but company name differs
-
-            self.addr_result.style(
-                f'color: {colour}; white-space: pre-wrap; font-family: monospace;'
-            )
-            self.addr_result.set_visibility(True)
-
-        except Exception as exc:
-            logger.exception(f'Address check error: {exc}')
-            ui.notify(str(exc), type='negative')
-        finally:
-            self.check_btn.props(remove='loading')
-
-    # ── Contact helper ────────────────────────────────────────────────────────
-
-    def _use_own_phone(self) -> None:
-        self.phone_in.value = SHIPAW_SETTINGS.mobile_phone
-        self.phone_in.update()
-
-    # ── Data extraction ───────────────────────────────────────────────────────
-
-    def to_full_contact(self) -> FullContact:
-        """Build a :class:`FullContact` from the current widget values."""
-        return FullContact(
-            address=Address(
-                business_name=self.business_in.value,
-                address_lines=[
-                    self.addr1_in.value,
-                    self.addr2_in.value or '',
-                    self.addr3_in.value or '',
-                ],
-                town=self.town_in.value,
-                postcode=self.postcode_in.value,
-            ),
-            contact=Contact(
-                contact_name=self.contact_in.value,
-                email_address=self.email_in.value,
-                mobile_phone=self.phone_in.value.strip().replace(' ', ''),
-            ),
-        )
-
-
-# ── Form page ─────────────────────────────────────────────────────────────────
+    return sorted(PROVIDER_REGISTER.keys(), key=lambda p: p != dflt)
 
 
 class FormPage:
@@ -267,15 +39,18 @@ class FormPage:
     """
 
     def __init__(self, on_submit: Callable[[ShipmentRequest], None], initial: Shipment | None = None) -> None:
-        initial = initial or sample_shipment()
+        self._current_provider: ShippingProvider | None = None
+        initial = initial or sample_shipment()  # todo: remove this default once we have real data flowing through
         self._on_submit_cb = on_submit
         self._build(initial)
 
-    def _build(self, initial) -> None:
-        prov_opts, default_prov = _provider_options()
-        dir_opts, default_dir = _direction_options(default_prov) if default_prov else ({}, None)
-        svc_opts, default_svc = _service_options(default_prov, default_dir) if default_dir else ({}, None)
+    @property
+    def current_provider(self) -> ShippingProvider:
+        if not self._current_provider or self._current_provider.name != self.provider_select.value:
+            self._current_provider = PROVIDER_REGISTER[self.provider_select.value]
+        return self._current_provider
 
+    def _build(self, initial) -> None:
         # ── Shipment options ──────────────────────────────────────────────────
         with ui.card().classes(theme.CARD + ' q-mb-md'):
             ui.label('Shipment Options').classes('text-subtitle2 text-weight-bold q-mb-xs')
@@ -291,43 +66,33 @@ class FormPage:
                     .classes('col-auto')
                     .style('width: 90px')
                 )
-                self.ref_in = (
+                self.reference_in = (
                     ui.input(label='Reference', value=initial.reference)
                     .props(f'{theme.INPUT_PROPS} maxlength=40')
                     .classes('col')
                 )
-                self.provider_sel = (
-                    ui.select(options=prov_opts, label='Provider', value=default_prov)
-                    .props(theme.INPUT_PROPS)
-                    .classes('col')
-                )
-                self.dir_sel = (
-                    ui.select(options=dir_opts, label='Direction', value=default_dir)
-                    .props(theme.INPUT_PROPS)
-                    .classes('col')
-                )
-                self.svc_sel = (
-                    ui.select(options=svc_opts, label='Service', value=default_svc)
-                    .props(theme.INPUT_PROPS)
-                    .classes('col')
-                )
+                self.provider_select = self.provider_selector()
+                self.direction_select = self.direction_selector()
+                self.service_select = self.service_selector()
 
-        self.provider_sel.on_value_change(self._on_provider_change)
-        self.dir_sel.on_value_change(self._on_direction_change)
+        # ── Recipient — shown for outbound only ───────────────────────────────
+        with ui.expansion('Recipient', icon='person', value=True).classes(
+                'w-full q-mt-sm ship-card'
+        ) as self.recipient_expansion:
+            self.recipient_panel = AddressPanel(
+                initial_contact=initial.recipient.contact,
+                initial_address=initial.recipient.address,
+                show_use_own_phone=True,
+            )
 
-        # ── Recipient ─────────────────────────────────────────────────────────
-        ui.label('Recipient').classes('text-subtitle1 text-weight-bold q-mt-sm q-mb-xs')
-        self.recipient = AddressPanel(
-            initial_contact=initial.recipient.contact,
-            initial_address=initial.recipient.address,
-            show_use_own_phone=True,
-        )
+        # ── Sender — shown for inbound / dropoff only ─────────────────────────
+        with ui.expansion('Sender', icon='person_add', value=True).classes(
+                'w-full q-mt-sm ship-card'
+        ) as self.sender_expansion:
+            self.sender_panel = AddressPanel()
 
-        # ── Sender override (collapsed by default) ────────────────────────────
-        with ui.expansion('Sender override (optional)', icon='person_add').classes('w-full q-mt-sm ship-card'):
-            self.sender_switch = ui.switch('Use custom sender', value=False)
-            ui.label('Enable to override the default sender from settings.').classes('text-caption text-grey-6 q-mb-xs')
-            self.sender = AddressPanel(bind_switch=self.sender_switch)
+        # Apply initial visibility based on the default direction
+        self._expand_addresses(self.direction_select.value or '')
 
         # ── Submit ────────────────────────────────────────────────────────────
         with ui.row().classes('w-full justify-center q-mt-lg'):
@@ -337,48 +102,93 @@ class FormPage:
                 .classes('text-subtitle1 q-px-xl q-py-sm')
             )
 
+    def provider_selector(self):
+        prov_names = provider_names_sorted()
+        default_provider_name = prov_names[0]
+        prov_options = str_to_nice_str_dict(prov_names)
+        selector = (
+            ui.select(
+                options=prov_options, label='Provider', value=default_provider_name, on_change=self._on_provider_change
+            )
+            .props(theme.INPUT_PROPS)
+            .classes('col')
+        )
+        return selector
+
+    def service_selector(self) -> Select:
+        service_options, value = self._service_options()
+        return ui.select(options=service_options, label='Service', value=value).props(theme.INPUT_PROPS).classes('col')
+
+    def direction_selector(self) -> Select:
+        valid_directions = list(self.current_provider.available_services.keys())
+        default_dir = valid_directions[0]
+        direction_options = str_to_nice_str_dict(valid_directions)
+        selector = (
+            ui.select(options=direction_options, label='Direction', value=default_dir)
+            .props(theme.INPUT_PROPS)
+            .classes('col')
+        )
+        selector.on_value_change(self._on_direction_change)
+        return selector
+
     # ── Dropdown cascade ──────────────────────────────────────────────────────
 
+    def _expand_addresses(self, direction: str) -> None:
+        """Show the relevant address panel based on direction."""
+        view_recip = direction in [ShipDirection.OUTBOUND, ShipDirection.THIRD_PARTY]
+        view_sender = direction in [ShipDirection.INBOUND, ShipDirection.DROPOFF, ShipDirection.THIRD_PARTY]
+        self.recipient_expansion.set_visibility(view_recip)
+        self.sender_expansion.set_visibility(view_sender)
+
     async def _on_provider_change(self, e) -> None:
-        dir_opts, default_dir = _direction_options(e.value)
-        self.dir_sel.options = dir_opts
-        self.dir_sel.value = default_dir
-        self.dir_sel.update()
-        await self._refresh_services(e.value, default_dir)
+        self._current_provider = None  # refresh provider
+        self._refresh_directions()
+        await self._refresh_services()
 
     async def _on_direction_change(self, e) -> None:
-        await self._refresh_services(self.provider_sel.value, e.value)
+        self._expand_addresses(e.value or '')
+        await self._refresh_services()
+        # await self._refresh_services(self.provider_select.value, e.value)
 
-    async def _refresh_services(self, prov: str, dirn: str | None) -> None:
-        if not dirn:
-            return
-        svc_opts, default_svc = _service_options(prov, dirn)
-        self.svc_sel.options = svc_opts
-        self.svc_sel.value = default_svc
-        self.svc_sel.update()
+    def _refresh_directions(self):
+        directions = self.current_provider.valid_directions
+        dir_opts = str_to_nice_str_dict(directions)
+        self.direction_select.options = dir_opts
+        if self.direction_select.value not in directions:
+            self.direction_select.value = directions[0] if directions else None
+        self.direction_select.update()
 
-    # ── Submit ────────────────────────────────────────────────────────────────
+    async def _refresh_services(self) -> None:
+        opts, dflt_service = self._service_options()
+        self.service_select.options = opts
+        self.service_select.value = dflt_service
+        self.service_select.update()
+
+    def _service_options(self) -> tuple[dict[str, str], str | None]:
+        direction = self.direction_select.value or ''
+        available = self.current_provider.available_services.get(direction, [])
+        opts = {s.value: make_nice_str(s.name) for s in available}
+        return opts, available[0].value if available else None
 
     async def _do_submit(self) -> None:
         self.submit_btn.props('loading')
         try:
             raw_date = self.date_in.value
             ship_date = dt.date.fromisoformat(raw_date) if isinstance(raw_date, str) else raw_date
-            custom_sender_fc = self.sender.to_full_contact() if self.sender_switch.value else None
-            shipment = build_shipment(
-                remote_fc=self.recipient.to_full_contact(),
-                reference=self.ref_in.value,
+            shipment = Shipment(
+                recipient=self.recipient_panel.to_full_contact() if self.recipient_expansion.visible else None,
+                sender=self.sender_panel.to_full_contact() if self.sender_expansion.visible else None,
                 boxes=self.boxes_in.value,
                 shipping_date=ship_date,
-                direction=self.dir_sel.value,
-                custom_sender_fc=custom_sender_fc,
+                direction=self.direction_select.value,
+                reference=self.reference_in.value,
             )
             ship_req = ShipmentRequest(
                 shipment=shipment,
-                provider_name=self.provider_sel.value,
-                service_code=self.svc_sel.value,
+                provider_name=self.provider_select.value,
+                service_code=self.service_select.value,
             )
-            alerts = await maybe_alert_apc(ship_req)
+            alerts = Alerts()  # todo:  real alerts
             theme.show_alerts(alerts)
             if not alerts.errors:
                 self._on_submit_cb(ship_req)

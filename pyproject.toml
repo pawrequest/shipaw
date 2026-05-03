@@ -34,6 +34,7 @@ dependencies = [
     "pywin32>=311",
     "uvicorn>=0.37.0",
     "nicegui>=3.11.1",
+    "pywebview>=6.2.1",
 ]
 
 
@@ -53,8 +54,8 @@ dev = [
 line-length = 120
 format.quote-style = "single"
 
-#[tool.uv.sources]
-#royal-mail-combined = { path = "../royal-mail-combined", editable = true }
+[tool.uv.sources]
+royal-mail-combined = { path = "../royal-mail-combined", editable = true }
 #pawlogger = { path = '../../pawlogger', editable = true }
 
 [tool.uv.build-backend]

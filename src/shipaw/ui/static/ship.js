@@ -131,7 +131,7 @@ function populateShipment(shipment) {
     document.getElementById('boxes').value = shipment.Boxes || 1;
     document.getElementById('reference').value = shipment.Reference || "";
     document.getElementById('business_name').value = shipment.Recipient.Address.BusinessName || "";
-    document.getElementById('contact_name').value = shipment.Recipient.Contact.ContactName || "";
+    document.getElementById('name').value = shipment.Recipient.Contact.ContactName || "";
     document.getElementById('email').value = shipment.Recipient.Contact.EmailAddress || "";
     document.getElementById('mobile_phone').value = shipment.Recipient.Contact.MobilePhone || "";
     document.getElementById('address_line1').value = shipment.Recipient.Address.AddressLines[0] || "";
@@ -204,7 +204,7 @@ async function directionChanged() {
 async function contactFromForm() {
     console.log('contactFromForm');
     return {
-        ContactName: document.getElementById('contact_name').value,
+        ContactName: document.getElementById('name').value,
         EmailAddress: document.getElementById('email').value,
         MobilePhone: document.getElementById('mobile_phone').value,
     };

@@ -1,8 +1,8 @@
 import datetime as dt
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
-from shipaw.models.address import FullContact
+from shipaw.models.address_contact import FullContact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 
@@ -33,7 +33,6 @@ class Shipment(ShipawBaseModel):
     shipping_date: dt.date
     direction: ShipDirection
     own_label: bool | None = None  # print own label vs driver brings
-    # service: AgnostServiceName = AgnostServiceName.NEXT_DAY
     reference: str = ''
 
     # todo is context still used?
@@ -44,6 +43,22 @@ class Shipment(ShipawBaseModel):
 
     package_format: PackageFormat = PackageFormat.PARCEL
     weight_kg: int = 10
+
+    @model_validator(mode='after')
+    def val_direction(self):
+        match self.direction:
+            case ShipDirection.OUTBOUND:
+                if not self.recipient:
+                    raise ValueError('Recipient must be provided for OUTBOUND shipments')
+            case ShipDirection.INBOUND | ShipDirection.DROPOFF:
+                if not self.sender:
+                    raise ValueError('Sender must be provided for INBOUND and DROPOFF shipments')
+            case ShipDirection.THIRD_PARTY:
+                if not self.recipient or not self.sender:
+                    raise ValueError('Both sender and recipient must be provided for THIRD_PARTY shipments')
+            case _:
+                raise ValueError('Invalid ShipDirection')
+        return self
 
     @property
     def remote_full_contact(self) -> FullContact:
@@ -57,16 +72,16 @@ class Shipment(ShipawBaseModel):
 
 
 def sample_shipment() -> Shipment:
-    from shipaw.models.address import Address, Contact
+    from shipaw.models.address_contact import Address, Contact
 
     contact = Contact(
-        contact_name='Test Contact name',
+        name='Test Contact name',
         mobile_phone='07666666666',
-        email_address='sdgsdg@sdgsdg.com',
+        email='sdgsdg@sdgsdg.com',
     )
     address = Address(
         postcode='DA16 3HU',
-        address_lines=['25 Bennet Close'],
+        address_lines=['Test Street', 'Test Area'],
         town='Welling',
         country='GB',
         business_name='Test Company',
@@ -78,5 +93,4 @@ def sample_shipment() -> Shipment:
         shipping_date=dt.date.today() + dt.timedelta(days=2),
         direction=ShipDirection.OUTBOUND,
         reference='Test Reference',
-        # service=AgnostServiceName.NEXT_DAY,
     )

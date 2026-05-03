@@ -2,14 +2,14 @@ import contextlib
 
 import pytest
 
-from shipaw.fapi.requests import ShipmentRequest
+from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import ShipmentResponse
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
 
 
 def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_shipment):
-    assert sample_remote_contact.contact_name == 'Test Remote Contact Name'
+    assert sample_remote_contact.name == 'Test Remote Contact Name'
     assert sample_remote_address.postcode == 'DA16 3HU'
     assert sample_shipment.direction == ShipDirection.OUTBOUND
 
@@ -17,7 +17,9 @@ def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_sh
 def test_provider_makes_ship_dict(all_sample_shipment_requests: ShipmentRequest):
     provider = all_sample_shipment_requests.provider
     with provider_context(all_sample_shipment_requests):
-        service_code = provider.default_service
+        # service_code = provider.default_service
+        service_code = provider.available_services[all_sample_shipment_requests.shipment.direction][0]
+
         ship = provider.provider_shipment(all_sample_shipment_requests.shipment, service_code=service_code)
         ship = ship.model_dump(by_alias=True)
         assert isinstance(ship, dict)

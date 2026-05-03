@@ -2,8 +2,8 @@ import sqlalchemy
 from sqlalchemy import Column
 from sqlmodel import Field, SQLModel
 
-from shipaw.fapi.requests import ShipmentRequest
-from shipaw.models.address import Address, Contact, FullContact
+from shipaw.models.requests import ShipmentRequest
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment
 from shipaw.sql_helpers import optional_json_field, required_json_field
 

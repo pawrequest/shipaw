@@ -4,6 +4,7 @@ Step 2 — Order summary page.
 Shows a read-only review of sender/recipient/details before confirming.
 Calls *goto_results* on success or *goto_form* on back/error.
 """
+
 from __future__ import annotations
 
 from typing import Callable
@@ -11,9 +12,11 @@ from typing import Callable
 from loguru import logger
 from nicegui import ui
 
-from shipaw.models.address import FullContact
+from shipaw.models.address_contact import FullContact
+from shipaw.models.requests import ShipmentRequest
 from shipaw.nicegui_ui import theme
-from shipaw.nicegui_ui.logic import ShipmentRequest, resize_and_write_labels, try_book_shipment
+from shipaw.utils.backend import resize_and_write_labels, try_book_shipment
+from shipaw.utils.callbacks import ShipmentCallbackFn
 
 
 def _fc_card(title: str, fc: FullContact) -> None:
@@ -21,7 +24,7 @@ def _fc_card(title: str, fc: FullContact) -> None:
     with ui.card().classes(theme.CARD_SM):
         ui.label(title).classes('text-subtitle2 text-weight-bold')
         ui.separator()
-        ui.label(fc.contact.contact_name)
+        ui.label(fc.contact.name)
         ui.label(fc.address.business_name).classes('text-grey-7')
         for line in fc.address.address_lines:
             if line:
@@ -42,14 +45,16 @@ class SummaryPage:
     """
 
     def __init__(
-        self,
-        ship_req: ShipmentRequest,
-        goto_form: Callable,
-        goto_results: Callable,
+            self,
+            ship_req: ShipmentRequest,
+            goto_form: Callable,
+            goto_results: Callable,
+            on_booking: ShipmentCallbackFn | None = None
     ) -> None:
         self._ship_req = ship_req
         self._goto_form = goto_form
         self._goto_results = goto_results
+        self._on_complete = on_booking
         self._build()
 
     def _build(self) -> None:
@@ -57,8 +62,7 @@ class SummaryPage:
 
         with ui.card().classes(theme.CARD + ' q-mb-md'):
             ui.label(
-                f'{shipment.direction.title()} — '
-                f'{self._ship_req.provider_name.replace("_", " ").title()} Shipment'
+                f'{shipment.direction.title()} — {self._ship_req.provider_name.replace("_", " ").title()} Shipment'
             ).classes('text-h6 text-weight-bold text-center q-mb-md')
 
             with ui.row().classes('w-full q-gutter-md justify-center'):
@@ -88,6 +92,8 @@ class SummaryPage:
         navigated = False
         try:
             response = await try_book_shipment(self._ship_req)
+            if self._on_complete and callable(self._on_complete):
+                self._on_complete(self._ship_req, response)
             theme.show_alerts(response.alerts)
             if not response.alerts.errors:
                 if response.label_data:
@@ -101,5 +107,3 @@ class SummaryPage:
             if not navigated:
                 self._confirm_btn.props(remove='loading')
                 self._confirm_btn.enable()
-
-

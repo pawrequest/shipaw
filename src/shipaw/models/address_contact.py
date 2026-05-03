@@ -5,8 +5,8 @@ from shipaw.models.base import ShipawBaseModel
 
 
 class Contact(ShipawBaseModel):
-    contact_name: str
-    email_address: str
+    name: str
+    email: str
     mobile_phone: str
     phone_number: str | None = None
 
