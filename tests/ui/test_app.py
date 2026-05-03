@@ -1,4 +1,4 @@
-from shipaw.fapi.responses import ShipawTemplateResponse
+from shipaw.models.responses import ShipawTemplateResponse
 
 
 def test_app(test_client):

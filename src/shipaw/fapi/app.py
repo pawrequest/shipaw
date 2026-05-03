@@ -10,7 +10,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
-from shipaw.fapi.alerts import Alert, AlertType, Alerts
+from shipaw.models.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
 from shipaw.config import SHIPAW_SETTINGS, populate_providers

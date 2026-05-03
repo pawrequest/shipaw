@@ -25,7 +25,7 @@ from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServic
 from royal_mail_combined.core.helpers import should_split_rm_tracked_24
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.responses import CompletedShipmentResponse
+from shipaw.models.responses import CompletedShipmentResponse
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment, build_reference
 from shipaw.utils.consts_enums import ShipDirection

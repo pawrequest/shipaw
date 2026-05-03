@@ -12,7 +12,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.alerts import Alerts
+from shipaw.models.alerts import Alerts
 from shipaw.fapi.backend import (
     errored_shipment,
     maybe_alert_apc,
@@ -22,7 +22,7 @@ from shipaw.fapi.backend import (
 )
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
+from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
 from shipaw.fapi.ui_funcs import make_nice_str
 from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.address import Address

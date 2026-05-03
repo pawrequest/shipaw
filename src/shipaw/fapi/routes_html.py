@@ -9,11 +9,11 @@ from loguru import logger
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 
-from shipaw.fapi.alerts import Alerts
+from shipaw.models.alerts import Alerts
 from shipaw.fapi.emailer import send_label_email
 from shipaw.fapi.form_data import shipment_request_form, shipment_request_form_json
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import ShipawTemplateResponse
+from shipaw.models.responses import ShipawTemplateResponse
 from shipaw.fapi.routes_api import (
     order_results_api as order_confirm_json,
     order_summary_api as order_review_json,

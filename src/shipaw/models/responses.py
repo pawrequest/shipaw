@@ -6,7 +6,7 @@ from pathlib import Path
 from pydantic import ConfigDict, Field, computed_field
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.alerts import Alerts
+from shipaw.models.alerts import Alerts
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment

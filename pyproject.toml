@@ -33,8 +33,12 @@ dependencies = [
     "phonenumbers>=9.0.15",
     "pywin32>=311",
     "uvicorn>=0.37.0",
+    "nicegui>=3.11.1",
 ]
 
+
+[project.scripts]
+shipaw-ng = "shipaw.nicegui_ui.app:main"
 
 [project.urls]
 Homepage = "https://github.com/pawrequest/shipaw"

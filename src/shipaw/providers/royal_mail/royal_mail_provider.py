@@ -10,7 +10,7 @@ from royal_mail_combined.config import RoyalMailSettingsGlobal
 from royal_mail_combined.core.consts_types import RoyalMailServiceCodes
 
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import CompletedShipmentResponse
+from shipaw.models.responses import CompletedShipmentResponse
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type

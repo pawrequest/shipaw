@@ -7,9 +7,9 @@ from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
 
-from shipaw.fapi.alerts import Alert, AlertType, Alerts
+from shipaw.models.alerts import Alert, AlertType, Alerts
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
+from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.logging import log_obj
 from shipaw.utils.consts_enums import ShipDirection
 

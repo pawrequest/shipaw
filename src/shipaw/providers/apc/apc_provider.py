@@ -11,7 +11,7 @@ from apc_hypaship.models.response.resp import BookingResponse
 
 from shipaw.providers.registry import register_provider_type
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.fapi.responses import CompletedShipmentResponse, ShipmentResponse
+from shipaw.models.responses import CompletedShipmentResponse, ShipmentResponse
 from shipaw.logging import log_obj
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment as ShipmentAgnost

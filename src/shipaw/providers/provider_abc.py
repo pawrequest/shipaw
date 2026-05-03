@@ -10,7 +10,7 @@ from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.models.shipment import Shipment
 
 if TYPE_CHECKING:
-    from shipaw.fapi.responses import CompletedShipmentResponse
+    from shipaw.models.responses import CompletedShipmentResponse
     from shipaw.fapi.requests import ShipmentRequest
 
 
