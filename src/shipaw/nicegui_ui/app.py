@@ -19,6 +19,7 @@ from loguru import logger
 from nicegui import ui
 
 from shipaw.config import SHIPAW_SETTINGS, populate_providers
+from shipaw.models.shipment import Shipment
 from shipaw.nicegui_ui import theme
 from shipaw.nicegui_ui.logic import ShipmentRequest, notify_dev
 from shipaw.nicegui_ui.pages.form import FormPage
@@ -26,7 +27,7 @@ from shipaw.nicegui_ui.pages.results import ResultsPage
 from shipaw.nicegui_ui.pages.summary import SummaryPage
 
 
-def _build_page() -> None:
+def _build_page(initial: Shipment | None = None) -> None:
     """Called once per browser-tab connection."""
     theme.apply_page_styles()
 
@@ -44,7 +45,7 @@ def _build_page() -> None:
     def goto_form() -> None:
         content.clear()
         with content:
-            FormPage(on_submit=goto_summary)
+            FormPage(on_submit=goto_summary, initial=initial)
 
     def goto_summary(ship_req: ShipmentRequest) -> None:
         content.clear()
@@ -65,6 +66,11 @@ def _build_page() -> None:
 @ui.page('/')
 def index() -> None:
     _build_page()
+
+
+@ui.page('/shipping_form')
+def ship_form(shipment: Shipment) -> None:
+    _build_page(initial=shipment)
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

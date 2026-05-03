@@ -15,7 +15,7 @@ from nicegui import ui
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.models.shipment import sample_shipment
+from shipaw.models.shipment import Shipment, sample_shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.nicegui_ui import theme
 from shipaw.nicegui_ui.logic import (
@@ -25,7 +25,6 @@ from shipaw.nicegui_ui.logic import (
     make_nice_str,
     maybe_alert_apc,
 )
-
 
 
 # ── Provider / direction / service option helpers ─────────────────────────────
@@ -79,12 +78,12 @@ class AddressPanel:
     """
 
     def __init__(
-        self,
-        *,
-        initial_contact: Contact | None = None,
-        initial_address: Address | None = None,
-        show_use_own_phone: bool = False,
-        bind_switch: ui.switch | None = None,
+            self,
+            *,
+            initial_contact: Contact | None = None,
+            initial_address: Address | None = None,
+            show_use_own_phone: bool = False,
+            bind_switch: ui.switch | None = None,
     ) -> None:
         self._bind = bind_switch
         self._build(initial_contact, initial_address, show_use_own_phone)
@@ -205,16 +204,18 @@ class AddressPanel:
                         result_lines.append(f'✓  {addr_lbl}')
                     elif entered_company:
                         rm_note = f'Result="{rm_company or 'None'}"'
-                        result_lines.append(f'⚠  {addr_lbl}\n   Company mismatch:  Search="{entered_company}" — {rm_note}')
+                        result_lines.append(
+                            f'⚠  {addr_lbl}\n   Company mismatch:  Search="{entered_company}" — {rm_note}'
+                        )
                     else:
                         result_lines.append(f'✓  {addr_lbl}')
 
                 self.addr_result.text = '\n'.join(result_lines)
 
                 if not entered_company or any_company_match:
-                    colour = '#1a7a1a'   # green — full match (or no company to check)
+                    colour = '#1a7a1a'  # green — full match (or no company to check)
                 else:
-                    colour = '#b85c00'   # amber — address found but company name differs
+                    colour = '#b85c00'  # amber — address found but company name differs
 
             self.addr_result.style(
                 f'color: {colour}; white-space: pre-wrap; font-family: monospace;'
@@ -265,9 +266,9 @@ class FormPage:
     :class:`~shipaw.nicegui_ui.logic.ShipmentRequest` when the user submits.
     """
 
-    def __init__(self, on_submit: Callable[[ShipmentRequest], None]) -> None:
+    def __init__(self, on_submit: Callable[[ShipmentRequest], None], initial: Shipment | None = None) -> None:
+        initial = initial or sample_shipment()
         self._on_submit_cb = on_submit
-        initial = sample_shipment()
         self._build(initial)
 
     def _build(self, initial) -> None:
@@ -386,4 +387,3 @@ class FormPage:
             ui.notify(str(exc), type='negative', timeout=0)
         finally:
             self.submit_btn.props(remove='loading')
-
