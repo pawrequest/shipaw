@@ -1,42 +1,57 @@
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
 [project]
 name = "shipaw"
-version = "0.1.17"
+version = "0.3.70"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
 ]
+license = "MIT"
+
 readme = "README.md"
-requires-python = ">= 3.12"
+requires-python = ">= 3.13"
 dependencies = [
-    'pawdantic @ git+https://github.com/pawrequest/pawdantic', # special pydantic types eg truncated strings
-    'combadge[zeep] < 5', # xml client
-    'thefuzz', # fuzzy search to match addresses
-    'loguru', # logging
-    'phonenumbers',
-    'pydantic-settings',
+    "apc-hypaship>=0.1.10",
+    "pawdf>=0.1.0",
+    "royal-mail-combined==0.0.22",
+    "pawlogger>=0.1.4",
+    #
+    "httpx>=0.28.1",
+    "pygments>=2.19.2",
+    "pydantic[email]>=2.11.9",
+    "pytest>=8.4.2",
+    "fastapi[standard]>=0.117.1",
+    "jinja2>=3.1.6",
+    "hatchling>=1.27.0",
+    "loguru>=0.7.3",
+    "thefuzz>=0.22.1",
+    "pydantic-extra-types>=2.10.5",
+    "pydantic-settings>=2.11.0",
+    "phonenumbers>=9.0.15",
+    "pywin32>=311",
+    "uvicorn>=0.37.0",
 ]
 
-[project.optional-dependencies]
+
+[project.urls]
+Homepage = "https://github.com/pawrequest/shipaw"
+
+[dependency-groups]
 dev = [
-    'pytest',
-    'autodoc_pydantic',
-    "sphinx",
-    "sphinx-autodoc-typehints",
-    "sphinx-rtd-theme",
-    "myst-parser",
-    "sphinx-readme",
-    "sphinx_rtd_dark_mode",
+    "pytest>=9.0.2",
 ]
-#[build-system]
-#requires = ["hatchling"]
-#build-backend = "hatchling.build"
 
-
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [tool.ruff]
 line-length = 120
-extend-select = ["Q", "RUF100", "UP"]
-flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
-format.quote-style="single"
+format.quote-style = "single"
+
+#[tool.uv.sources]
+#royal-mail-combined = { path = "../royal-mail-combined", editable = true }
+#pawlogger = { path = '../../pawlogger', editable = true }
+
+[tool.uv.build-backend]
+source-includes = ["src/shipaw/ui/**"]

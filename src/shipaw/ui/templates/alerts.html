@@ -1,0 +1,17 @@
+<!-- templates/alerts.html -->
+{# ctx=    {{ alerts }}#}
+{% if alerts %}
+    <div class="wrapper">
+        {% for alert in alerts.alert %}
+            <div class="alert alert__{{ alert.type }}">
+                {{ alert.message }} {{ "ErrorCode: " + alert.code|string if alert.code else "" }}
+            </div>
+        {% endfor %}
+        {% if alerts.errors %}
+            <p>Try refreshing the page to start again.</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+
+

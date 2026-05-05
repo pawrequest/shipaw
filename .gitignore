@@ -120,7 +120,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+*.env
 .venv
 env/
 venv/
@@ -128,11 +128,11 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
+# Spyder project shipaw_settings
 .spyderproject
 .spyproject
 
-# Rope project settings
+# Rope project shipaw_settings
 .ropeproject
 
 # mkdocs documentation
@@ -159,4 +159,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 /docs/build/
+/play.py
 /uv.lock
+/tests/dumped*
