@@ -16,7 +16,7 @@ requires-python = ">= 3.13"
 dependencies = [
     "apc-hypaship>=0.1.10",
     "pawdf>=0.1.0",
-    "royal-mail-combined>=0.0.22",
+    "royal-mail-combined>=0.0.24",
     "pawlogger>=0.1.4",
     #
     "httpx>=0.28.1",
@@ -39,7 +39,7 @@ dependencies = [
 
 
 [project.scripts]
-shipaw-ng = "shipaw.nicegui_ui.app:main"
+shipaw = "shipaw.nicegui_ui.app:main"
 
 [project.urls]
 Homepage = "https://github.com/pawrequest/shipaw"
@@ -54,8 +54,8 @@ dev = [
 line-length = 120
 format.quote-style = "single"
 
-[tool.uv.sources]
-royal-mail-combined = { path = "../royal-mail-combined", editable = true }
+#[tool.uv.sources]
+#royal-mail-combined = { path = "../royal-mail-combined", editable = true }
 #pawlogger = { path = '../../pawlogger', editable = true }
 
 [tool.uv.build-backend]
