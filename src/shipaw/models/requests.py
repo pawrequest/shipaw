@@ -5,12 +5,6 @@ from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
 
 
-# class Authentication(ShipawBaseModel):
-#     # todo SecretStr!!!!
-#     user_name: Annotated[str, StringConstraints(max_length=80)]
-#     password: Annotated[str, StringConstraints(max_length=80)]
-
-
 class ShipmentRequest(ShipawBaseModel):
     # id: uuid.UUID = uuid.uuid4()
     shipment: Shipment

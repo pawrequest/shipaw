@@ -12,24 +12,11 @@ from shipaw.utils.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
 
 
-class ShipawTemplate(ShipawBaseModel):
-    template_path: str
-    context: dict = Field(default_factory=dict)
-
-    def render_template(self, request):
-        if not self.template_path:
-            raise ValueError('No template_path set')
-        return request.app.shipaw_settings.templates.TemplateResponse(
-            request=request, name=self.template_path, context=self.context
-        )
-
-
 class BaseResponse(ShipawBaseModel):
     alerts: Alerts = Alerts.empty()
     data: dict | None = None
     success: bool | None = None
     status: str | None = None
-    template: ShipawTemplate | None = None
 
 
 class ShipmentResponse(BaseResponse):
@@ -63,7 +50,3 @@ class CompletedShipmentResponse(ShipmentResponse):
     shipment_numbers: list[str]
     tracking_links: list[str]
     collection_id: str | None = None
-
-
-class ShipawTemplateResponse(BaseResponse):
-    template: ShipawTemplate

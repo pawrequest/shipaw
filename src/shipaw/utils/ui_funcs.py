@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import re
 from datetime import date, datetime
-from importlib.resources import files
-from pathlib import Path
 from typing import Sequence
 
 from shipaw.models.address_contact import Address
@@ -21,14 +19,6 @@ def date_int_w_ordinal(n: int):
 def ordinal_dt(dt: datetime | date) -> str:
     """Convert a datetime or date to a string with an ordinal day, e.g. 'Mon 1st Jan 2020'."""
     return dt.strftime(f'%a {date_int_w_ordinal(dt.day)} %b %Y')
-
-
-def get_ui() -> Path:
-    res = Path(files('shipaw'))
-    res = res / 'ui'
-    if not res.exists():
-        raise FileNotFoundError(f'UI directory {res} does not exist')
-    return res
 
 
 def make_nice_str(s: str) -> str:

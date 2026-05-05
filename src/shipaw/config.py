@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
-from shipaw.utils.ui_funcs import get_ui, ordinal_dt, sanitise_id
+from shipaw.utils.ui_funcs import ordinal_dt, sanitise_id
 from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
@@ -59,7 +59,6 @@ class ShipawSettings(BaseSettings):
     data_dir: Path = Path.home() / 'shipaw'
     label_dir: Path = Path.home() / 'shipaw' / 'labels'
     log_db_path: str | None = None
-    ui_dir: Path = Field(default_factory=get_ui)
 
     # Provider env file dict (json string in .env)
     provider_env_dict: dict[str, Path]
@@ -107,18 +106,6 @@ class ShipawSettings(BaseSettings):
     def log_dir(self):
         return self.data_dir / 'logs'
 
-    @property
-    def template_dir(self):
-        return self.ui_dir / 'templates'
-
-    @property
-    def static_dir(self):
-        return self.ui_dir / 'static'
-
-    @property
-    def templates(self):
-        return get_templates_cached(self.template_dir)
-
     ## SET LOGGING & LABELS ##
     @computed_field
     @property
@@ -139,7 +126,6 @@ class ShipawSettings(BaseSettings):
 
     @_p.field_validator('label_dir', mode='after')
     def create_label_dirs(cls, v, values):
-        # todo bad path crashes progqram - try/except + fallback label path?
         directions = [_ for _ in ShipDirection]
         try:
             make_label_dirs(directions, v)
@@ -178,9 +164,9 @@ class ShipawSettings(BaseSettings):
         )
 
 
-def make_label_dirs(directions, v):
+def make_label_dirs(directions, parent):
     for direction in directions:
-        apath = v / direction
+        apath = parent / direction
         if not apath.exists():
             apath.mkdir(parents=True, exist_ok=True)
 

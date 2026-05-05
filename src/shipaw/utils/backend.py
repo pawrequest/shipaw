@@ -9,8 +9,7 @@ from pawdf.array_pdf.array_p import on_a4
 
 from shipaw.models.alerts import Alert, AlertType, Alerts
 from shipaw.models.requests import ShipmentRequest
-from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
-from shipaw.logging import log_obj
+from shipaw.models.responses import CompletedShipmentResponse, ShipmentResponse
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
 
@@ -93,13 +92,3 @@ def notify_dev() -> Alerts:
         logger.info(msg)
         alerts += Alert(message=msg, type=AlertType.WARNING)
     return alerts
-
-
-async def errored_shipment(shipment_response):
-    log_obj(shipment_response.alerts, 'Errors booking shipment:')
-    alerts = shipment_response.alerts
-    shipment_response.template = ShipawTemplate(
-        template_path='/alerts.html',
-        context={'alerts': alerts},
-    )
-    return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
