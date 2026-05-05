@@ -40,5 +40,6 @@ def str_to_nice_str_dict(items: Sequence[str]) -> dict[str, str]:
 
 
 def address_search_text(address: Address) -> str:
-    fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
+    # business_name omitted — causes misses when it doesn't match RM records exactly
+    fields = address.address_lines + [address.town, address.postcode]
     return ', '.join(f for f in fields if f)

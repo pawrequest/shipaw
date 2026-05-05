@@ -31,23 +31,19 @@ from shipaw.models.shipment import Shipment, build_reference
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.utils.funcs import date_to_datetime
-from shipaw.utils.ui_funcs import address_search_text
+
 
 # Calls
-async def address_lookup(address: Address) -> list[Any]:
+async def address_lookup(postcode: str, search_string: str) -> list[Any]:
     """Return list of AddressRecordDef matching the address / postcode."""
     from shipaw.utils.funcs import compare_texts
 
     royalmail_provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
     if not royalmail_provider:
         return []
-    search_text = address_search_text(address)
-    if not search_text.strip():
-        return []
+    postcode = postcode.strip()
 
-    postcode = address.postcode.strip()
-
-    summaries = royalmail_provider.client.address_search(search_text).addresses
+    summaries = royalmail_provider.client.address_search(search_string).addresses
 
     hits = []
     for summary in summaries:
@@ -71,9 +67,7 @@ def outbound_shipment(shipment: Shipment, service_code: RoyalMailServiceCodes) -
         return _create_outbound_unsplit(postage_details, shipment)
 
 
-def _create_outbound_unsplit(
-        postage_details: PostageDetailsRequest, shipment: Shipment
-) -> CreateOrdersRequest:
+def _create_outbound_unsplit(postage_details: PostageDetailsRequest, shipment: Shipment) -> CreateOrdersRequest:
     order = CreateOrderRequest(
         order_reference=build_reference(shipment.reference, 40, shipment.boxes, shipment.shipping_date),
         postage_details=postage_details,
@@ -153,7 +147,7 @@ def booking_response_inbound(rm_response: ReturnResponseContainer, shipment: Shi
 
 
 def booking_response_outbound(
-        fetched: list[GetOrderInfoResource], shipment: Shipment, label_data: bytes
+    fetched: list[GetOrderInfoResource], shipment: Shipment, label_data: bytes
 ) -> CompletedShipmentResponse:
     tracking_numbers = [order.tracking_number for order in fetched]
     tracking_links = [tracking_link(_) for _ in tracking_numbers]
@@ -200,8 +194,9 @@ def returns_address_from_agnostic_fc(full_contact: FullContact):
 
 def create_postage_details(shipment: Shipment, service_code):
     send_to = (
-        SendNotifcationsTo.RECIPIENT if shipment.direction in [ShipDirection.OUTBOUND,
-                                                               ShipDirection.THIRD_PARTY] else SendNotifcationsTo.BILLING
+        SendNotifcationsTo.RECIPIENT
+        if shipment.direction in [ShipDirection.OUTBOUND, ShipDirection.THIRD_PARTY]
+        else SendNotifcationsTo.BILLING
     )
     return PostageDetailsRequest(
         service_code=service_code,

@@ -1,6 +1,27 @@
 from apc_hypaship.models.request.address import Address, Contact
+from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
+from apc_hypaship.models.request.services import APCServiceCode
 
 from shipaw.models.address_contact import Address as AddressAgnost, Contact as ContactAgnost, FullContact
+from shipaw.models.shipment import Shipment as ShipmentAgnost
+from shipaw.utils.consts_enums import ShipDirection
+
+
+def to_apc_shipment(shipment: ShipmentAgnost, service_code: APCServiceCode) -> ShipmentAPC:
+    if shipment.direction not in [ShipDirection.OUTBOUND, ShipDirection.INBOUND]:
+        raise NotImplementedError('Only OUTBOUND and INBOUND shipments are supported for APC provider')
+    order = Order(
+        ready_at=shipment.collect_ready,
+        closed_at=shipment.collect_closed,
+        collection_date=shipment.shipping_date,
+        product_code=service_code,
+        reference=shipment.reference,
+        delivery=address_from_agnostic_fc(Address, shipment.recipient),
+        collection=address_from_agnostic_fc(Address, shipment.sender) if shipment.sender else None,
+        goods_info=GoodsInfo(),
+        shipment_details=ShipmentDetails(number_of_pieces=shipment.boxes),
+    )
+    return ShipmentAPC(orders=Orders(order=order))
 
 
 def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_contact: FullContact) -> addr_type:

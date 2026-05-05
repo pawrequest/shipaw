@@ -14,8 +14,12 @@ from typing import Callable
 from loguru import logger
 from nicegui import ui
 from nicegui.elements.select import Select
+from nicegui.observables import ObservableDict
 
 from shipaw.config import SHIPAW_SETTINGS
+from shipaw.models.address_contact import FullContact
+
+# from shipaw.models.address_contact import FullContact
 from shipaw.models.alerts import Alerts
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment, sample_shipment
@@ -25,6 +29,14 @@ from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.nicegui_ui import theme
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
+
+SubTitleClasses2 = 'text-subtitle2 text-weight-bold q-mb-xs'
+
+ExpansionClasses1 = 'w-full q-mt-sm ship-card'
+
+SubtitleClasses1 = 'text-subtitle1 q-px-xl q-py-sm'
+
+RowClasses1 = 'w-full justify-center q-mt-lg'
 
 
 def provider_names_sorted() -> list[str]:
@@ -38,11 +50,17 @@ class FormPage:
     :class:`~shipaw.nicegui_ui.logic.ShipmentRequest` when the user submits.
     """
 
-    def __init__(self, on_submit: Callable[[ShipmentRequest], None], initial: Shipment | None = None) -> None:
+    def __init__(self, on_submit: Callable[[ShipmentRequest], None], initial_shipment: Shipment | None = None) -> None:
         self._current_provider: ShippingProvider | None = None
-        initial = initial or sample_shipment()  # todo: remove this default once we have real data flowing through
+        initial_shipment = initial_shipment or sample_shipment()
+        self.initial_shipment = initial_shipment.model_copy(deep=True)
+        self.initial_fc = initial_shipment.recipient.model_copy(deep=True)
         self._on_submit_cb = on_submit
-        self._build(initial)
+        sender = self.initial_shipment.sender or SHIPAW_SETTINGS.full_contact
+        self.sender_ = ObservableDict(sender)
+        recipient = self.initial_shipment.recipient or SHIPAW_SETTINGS.full_contact
+        self.recipient_ = ObservableDict(recipient)
+        self._build()
 
     @property
     def current_provider(self) -> ShippingProvider:
@@ -50,10 +68,17 @@ class FormPage:
             self._current_provider = PROVIDER_REGISTER[self.provider_select.value]
         return self._current_provider
 
-    def _build(self, initial) -> None:
+    def swap_addresses(self):
+        old_recip = self.recipient_panel.to_full_contact()
+        old_sender = self.sender_panel.to_full_contact()
+        self.sender_panel.full_contact.update(old_recip)
+        self.recipient_panel.full_contact.update(old_sender)
+
+    def _build(self) -> None:
+        initial = self.initial_shipment
         # ── Shipment options ──────────────────────────────────────────────────
         with ui.card().classes(theme.CARD + ' q-mb-md'):
-            ui.label('Shipment Options').classes('text-subtitle2 text-weight-bold q-mb-xs')
+            ui.label('Shipment Options').classes(SubTitleClasses2)
             with ui.row().classes('w-full items-end q-gutter-sm flex-wrap'):
                 self.date_in = (
                     ui.input(label='Date', value=initial.shipping_date.isoformat())
@@ -75,31 +100,30 @@ class FormPage:
                 self.direction_select = self.direction_selector()
                 self.service_select = self.service_selector()
 
-        # ── Recipient — shown for outbound only ───────────────────────────────
+        # ── Sender —
+        with ui.expansion('Sender', icon='person_add', value=True).classes(ExpansionClasses1) as self.sender_expansion:
+            self.sender_panel = AddressPanel(full_contact_obs=self.sender_)
+        # ── Recipient —
         with ui.expansion('Recipient', icon='person', value=True).classes(
-                'w-full q-mt-sm ship-card'
+            ExpansionClasses1
         ) as self.recipient_expansion:
-            self.recipient_panel = AddressPanel(
-                initial_contact=initial.recipient.contact,
-                initial_address=initial.recipient.address,
-                show_use_own_phone=True,
-            )
-
-        # ── Sender — shown for inbound / dropoff only ─────────────────────────
-        with ui.expansion('Sender', icon='person_add', value=True).classes(
-                'w-full q-mt-sm ship-card'
-        ) as self.sender_expansion:
-            self.sender_panel = AddressPanel()
-
-        # Apply initial visibility based on the default direction
-        self._expand_addresses(self.direction_select.value or '')
+            self.recipient_panel = AddressPanel(full_contact_obs=self.recipient_)
+        self._expand_addresses(self.direction_select.value)
 
         # ── Submit ────────────────────────────────────────────────────────────
-        with ui.row().classes('w-full justify-center q-mt-lg'):
+        with ui.row().classes(RowClasses1):
+            self.swap_btn = (
+                ui.button('SWAP', on_click=self.swap_addresses, icon='arrow_forward')
+                .props(theme.BTN_PRIMARY)
+                .classes(SubtitleClasses1)
+            )
+
+        # ── Submit ────────────────────────────────────────────────────────────
+        with ui.row().classes(RowClasses1):
             self.submit_btn = (
                 ui.button('Review Booking →', on_click=self._do_submit, icon='arrow_forward')
                 .props(theme.BTN_PRIMARY)
-                .classes('text-subtitle1 q-px-xl q-py-sm')
+                .classes(SubtitleClasses1)
             )
 
     def provider_selector(self):
@@ -145,9 +169,27 @@ class FormPage:
         self._refresh_directions()
         await self._refresh_services()
 
+    async def set_sender_recip_data(self, direction: ShipDirection):
+        hq = SHIPAW_SETTINGS.full_contact
+        init_recipient = self.initial_shipment.recipient
+        match direction:
+            case ShipDirection.OUTBOUND:
+                self.recipient_.update(init_recipient)
+                self.sender_.update(hq)
+            case ShipDirection.INBOUND | ShipDirection.DROPOFF:
+                self.recipient_.update(hq)
+                self.sender_.update(init_recipient)
+            case ShipDirection.THIRD_PARTY:
+                self.sender_.update(init_recipient)
+                self.recipient_.update(FullContact.empty())
+            case _:
+                raise ValueError('Bad Ship Direction')
+
     async def _on_direction_change(self, e) -> None:
-        self._expand_addresses(e.value or '')
+        new_direction = e.value
+        await self.set_sender_recip_data(new_direction)
         await self._refresh_services()
+        self._expand_addresses(new_direction)
         # await self._refresh_services(self.provider_select.value, e.value)
 
     def _refresh_directions(self):
@@ -176,8 +218,8 @@ class FormPage:
             raw_date = self.date_in.value
             ship_date = dt.date.fromisoformat(raw_date) if isinstance(raw_date, str) else raw_date
             shipment = Shipment(
-                recipient=self.recipient_panel.to_full_contact() if self.recipient_expansion.visible else None,
-                sender=self.sender_panel.to_full_contact() if self.sender_expansion.visible else None,
+                recipient=self.recipient_panel.to_full_contact(),
+                sender=self.sender_panel.to_full_contact(),
                 boxes=self.boxes_in.value,
                 shipping_date=ship_date,
                 direction=self.direction_select.value,

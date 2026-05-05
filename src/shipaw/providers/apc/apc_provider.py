@@ -7,6 +7,7 @@ from apc_hypaship.models.request.services import APCServiceCode
 from apc_hypaship.models.response.common import APCException
 from apc_hypaship.models.response.resp import BookingResponse
 
+from shipaw.providers.apc.apc_funcs import to_apc_shipment
 from shipaw.providers.registry import register_provider_type
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import CompletedShipmentResponse, ShipmentResponse
@@ -57,12 +58,12 @@ class APCShippingProvider(ShippingProvider):
         """Takes provider ShipmnentDict, or ShipmentAgnost object"""
         # request_json = self.build_request_json(shipment)
         apc_response: BookingResponse | None = None
-        provider_service = self.service_codes_type(shipment_request.service_code)
+        apc_service_code = self.service_codes_type(shipment_request.service_code)
         shipment = shipment_request.shipment
-        provider_shipment = self.provider_shipment(shipment, provider_service)
-        log_obj(provider_shipment, 'APC Shipment Request')
+        apc_shipment = to_apc_shipment(shipment, apc_service_code)
+        log_obj(apc_shipment, 'APC Shipment Request')
         try:
-            apc_response: BookingResponse = self.client.fetch_book_shipment(provider_shipment)
+            apc_response: BookingResponse = self.client.fetch_book_shipment(apc_shipment)
             label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number, wait_for_type=bytes)
             return self.build_response(apc_response, shipment, label_data)
         except APCException as e:

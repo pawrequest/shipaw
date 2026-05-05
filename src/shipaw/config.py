@@ -9,7 +9,7 @@ from urllib.parse import quote
 import pydantic as _p
 from fastapi.encoders import jsonable_encoder
 from loguru import logger
-from pydantic import Field, computed_field
+from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
@@ -160,7 +160,10 @@ class ShipawSettings(BaseSettings):
     @property
     def address(self):
         return Address(
-            address_lines=[_ for _ in [self.address_line1, self.address_line2, self.address_line3] if _],
+            # address_lines=[_ for _ in [self.address_line1, self.address_line2, self.address_line3] if _],
+            address_line1=self.address_line1,
+            address_line2=self.address_line2,
+            address_line3=self.address_line3,
             town=self.town,
             postcode=self.postcode,
             country=self.country,
@@ -191,3 +194,10 @@ def populate_providers(settings: ShipawSettings = None):
         if provider_type := PROVIDER_TYPE_REGISTER.get(name):
             provider_settings = provider_type.settings_type(_env_file=env_path)
             register_provider_instance(provider_type(settings=provider_settings))
+
+
+class FapiConfig(BaseModel):
+    port: int = 8000
+    post_body: dict = {}
+    url_for_: str = ''
+    context: dict = Field(default_factory=dict)

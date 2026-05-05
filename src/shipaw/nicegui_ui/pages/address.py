@@ -2,74 +2,59 @@ from __future__ import annotations
 
 from loguru import logger
 from nicegui import ui
+from nicegui.observables import ObservableDict
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.models.address_contact import Contact, Address, FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.nicegui_ui import theme
 from shipaw.providers.royal_mail.royal_mail_funcs import address_lookup
 from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.utils.ui_funcs import address_search_text
 
 AddressCardClasses = 'col q-pa-md ship-card'
 
 
 class AddressPanel:
-    """
-    A pair of NiceGUI cards — Contact (left) and Address (right) — with
-    an address-check button that confirms whether the entered address exists
-    in the Royal Mail database and displays the matched record(s) as text.
-
-    Parameters
-    ----------
-    initial_contact:    Pre-fill contact fields (optional).
-    initial_address:    Pre-fill address fields (optional).
-    show_use_own_phone: Add a "Use Own" shortcut button next to phone field.
-    bind_switch:        If given, all widgets are bound to this switch's
-                        ``value`` so they are disabled when the switch is off.
-    """
-
     def __init__(
         self,
         *,
-        initial_contact: Contact | None = None,
-        initial_address: Address | None = None,
+        full_contact_obs: ObservableDict,
         show_use_own_phone: bool = False,
-        bind_switch: ui.switch | None = None,
     ) -> None:
-        self._bind = bind_switch
-        self._build(initial_contact, initial_address, show_use_own_phone)
-
-    def _switched(self, widget):
-        """Optionally bind widget enabled-state to the panel's switch."""
-        if self._bind is not None:
-            widget.bind_enabled_from(self._bind, 'value')
-        return widget
+        self.full_contact = full_contact_obs
+        self._build(show_use_own_phone)
 
     # ── Layout ────────────────────────────────────────────────────────────────
 
-    def _build(self, contact: Contact | None, addr: Address | None, show_use_own_phone: bool) -> None:
-        lines = addr.address_lines if addr else []
+    def _build(self, show_use_own_phone: bool) -> None:
         rm_available = 'ROYAL_MAIL' in PROVIDER_REGISTER
 
         with ui.row().classes(theme.ROW):
             # Contact card
-            with ui.card().classes(AddressCardClasses):
+            with ui.card().classes(AddressCardClasses) as self.card_ctx:
                 ui.label('Contact').classes('text-subtitle2 text-weight-bold q-mb-xs')
-                self.contact_in = self._switched(
-                    ui.input(label='Contact Name', value=contact.name if contact else '').props(theme.INPUT_PROPS)
+                self.contact_in = (
+                    ui.input(label='Contact Name')
+                    .props(theme.INPUT_PROPS)
+                    .bind_value(self.full_contact, ('contact', 'name'))
                 )
-                self.business_in = self._switched(
-                    ui.input(label='Business Name', value=addr.business_name if addr else '').props(theme.INPUT_PROPS)
+                self.business_in = (
+                    ui.input(label='Business Name')
+                    .props(theme.INPUT_PROPS)
+                    .bind_value(self.full_contact, ('address', 'business_name'))
                 )
-                self.email_in = self._switched(
-                    ui.input(label='Email', value=contact.email if contact else '').props(
-                        f'{theme.INPUT_PROPS} type=email'
-                    )
+                self.email_in = (
+                    ui.input(label='Email')
+                    .props(f'{theme.INPUT_PROPS} type=email')
+                    .bind_value(self.full_contact, ('contact', 'email'))
                 )
+
                 with ui.row().classes('items-end w-full no-wrap'):
-                    self.phone_in = self._switched(
-                        ui.input(label='Mobile Phone', value=contact.mobile_phone if contact else '')
+                    self.phone_in = (
+                        ui.input(label='Mobile Phone')
                         .props(theme.INPUT_PROPS)
                         .classes('col')
+                        .bind_value(self.full_contact, ('contact', 'mobile_phone'))
                     )
                     if show_use_own_phone:
                         ui.button('Use Own', on_click=self._use_own_phone).props(f'flat dense {theme.BTN_PRIMARY}')
@@ -77,29 +62,35 @@ class AddressPanel:
             # Address card
             with ui.card().classes(AddressCardClasses):
                 ui.label('Address').classes('text-subtitle2 text-weight-bold q-mb-xs')
-                self.addr1_in = self._switched(
-                    ui.input(label='Address Line 1', value=lines[0] if lines else '').props(theme.INPUT_PROPS)
+                self.addr1_in = (
+                    ui.input(label='Address Line 1')
+                    .props(theme.INPUT_PROPS)
+                    .bind_value(self.full_contact, ('address', 'address_line1'))
                 )
-                self.addr2_in = self._switched(
-                    ui.input(label='Address Line 2', value=lines[1] if len(lines) > 1 else '').props(theme.INPUT_PROPS)
+                self.addr2_in = (
+                    ui.input(label='Address Line 2')
+                    .props(theme.INPUT_PROPS)
+                    .bind_value(self.full_contact, ('address', 'address_line2'))
                 )
-                self.addr3_in = self._switched(
-                    ui.input(label='Address Line 3', value=lines[2] if len(lines) > 2 else '').props(theme.INPUT_PROPS)
+                self.addr3_in = (
+                    ui.input(label='Address Line 3')
+                    .props(theme.INPUT_PROPS)
+                    .bind_value(self.full_contact, ('address', 'address_line3'))
                 )
-                self.town_in = self._switched(
-                    ui.input(label='Town', value=addr.town if addr else '').props(theme.INPUT_PROPS)
+                self.town_in = (
+                    ui.input(label='Town').props(theme.INPUT_PROPS).bind_value(self.full_contact, ('address', 'town'))
                 )
+
                 with ui.row().classes('items-end w-full no-wrap q-gutter-xs'):
-                    self.postcode_in = self._switched(
-                        ui.input(label='Postcode', value=addr.postcode if addr else '')
+                    self.postcode_in = (
+                        ui.input(label='Postcode')
                         .props(theme.INPUT_PROPS)
                         .classes('col')
+                        .bind_value(self.full_contact, ('address', 'postcode'))
                     )
                     if rm_available:
-                        self.check_btn = self._switched(
-                            ui.button('Check Address', icon='search', on_click=self._do_check).props(
-                                f'{theme.BTN_PRIMARY} dense'
-                            )
+                        self.check_btn = ui.button('Check Address', icon='search', on_click=self._do_check).props(
+                            f'{theme.BTN_PRIMARY} dense'
                         )
                     else:
                         self.check_btn = None
@@ -125,16 +116,8 @@ class AddressPanel:
         self.check_btn.props('loading')
         self.addr_result.set_visibility(False)
         try:
-            # business_name omitted — causes misses when it doesn't match RM records exactly
-            probe = Address(
-                business_name='',
-                # address_lines=[self.addr1_in.value or '.'],
-                address_lines=[_.value for _ in (self.addr1_in, self.addr2_in, self.addr3_in) if _.value.strip()]
-                or ['.'],
-                town=self.town_in.value or '.',
-                postcode=self.postcode_in.value or '',
-            )
-            hits = await address_lookup(probe)
+            address = self.full_contact['address']
+            hits = await address_lookup(search_string=address_search_text(address), postcode=address.postcode)
             entered_company = self.business_in.value.strip()
 
             if not hits:
@@ -187,19 +170,6 @@ class AddressPanel:
     def to_full_contact(self) -> FullContact:
         """Build a :class:`FullContact` from the current widget values."""
         return FullContact(
-            address=Address(
-                business_name=self.business_in.value,
-                address_lines=[
-                    self.addr1_in.value,
-                    self.addr2_in.value or '',
-                    self.addr3_in.value or '',
-                ],
-                town=self.town_in.value,
-                postcode=self.postcode_in.value,
-            ),
-            contact=Contact(
-                name=self.contact_in.value,
-                email=self.email_in.value,
-                mobile_phone=self.phone_in.value.strip().replace(' ', ''),
-            ),
+            address=Address.model_validate(self.full_contact['address']),
+            contact=Contact.model_validate(self.full_contact['contact']),
         )

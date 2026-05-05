@@ -45,11 +45,11 @@ class SummaryPage:
     """
 
     def __init__(
-            self,
-            ship_req: ShipmentRequest,
-            goto_form: Callable,
-            goto_results: Callable,
-            on_booking: ShipmentCallbackFn | None = None
+        self,
+        ship_req: ShipmentRequest,
+        goto_form: Callable,
+        goto_results: Callable,
+        on_booking: ShipmentCallbackFn | None = None,
     ) -> None:
         self._ship_req = ship_req
         self._goto_form = goto_form
@@ -87,6 +87,9 @@ class SummaryPage:
             )
 
     async def _on_confirm(self) -> None:
+        await self.on_confirm_cb()
+
+    async def on_confirm_cb(self):
         self._confirm_btn.props('loading')
         self._confirm_btn.disable()
         navigated = False

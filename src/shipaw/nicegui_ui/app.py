@@ -23,6 +23,7 @@ from shipaw.config import SHIPAW_SETTINGS, populate_providers
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment
 from shipaw.nicegui_ui import theme
+
 # from shipaw.nicegui_ui.logic import ShipmentRequest, notify_dev
 from shipaw.nicegui_ui.pages.form import FormPage
 from shipaw.nicegui_ui.pages.results import ResultsPage
@@ -49,7 +50,7 @@ def build_shipper(initial: Shipment | None = None, on_booking: ShipmentCallbackF
     def goto_form() -> None:
         content.clear()
         with content:
-            FormPage(on_submit=goto_summary, initial=initial)
+            FormPage(on_submit=goto_summary, initial_shipment=initial)
 
     def goto_summary(ship_req: ShipmentRequest) -> None:
         content.clear()
@@ -64,13 +65,9 @@ def build_shipper(initial: Shipment | None = None, on_booking: ShipmentCallbackF
     goto_form()
 
 
-# ── Page route ────────────────────────────────────────────────────────────────
-
-
 @ui.page('/')
 def index() -> None:
     build_shipper()
-    # ui.navigate.to('/test')
 
 
 @ui.page('/shipping_form')

@@ -2,7 +2,7 @@ import datetime as dt
 
 from pydantic import Field, model_validator
 
-from shipaw.models.address_contact import FullContact
+from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 
@@ -72,17 +72,16 @@ class Shipment(ShipawBaseModel):
 
 
 def sample_shipment() -> Shipment:
-    from shipaw.models.address_contact import Address, Contact
-
     contact = Contact(
         name='Test Contact name',
         mobile_phone='07666666666',
         email='sdgsdg@sdgsdg.com',
     )
     address = Address(
-        postcode='DA16 3HU',
-        address_lines=['Test Street', 'Test Area'],
-        town='Welling',
+        postcode='NW11 8AA',
+        address_line1='Test Street',
+        address_line2='Test Area',
+        town='Test Town',
         country='GB',
         business_name='Test Company',
     )
