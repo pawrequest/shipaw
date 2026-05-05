@@ -22,10 +22,10 @@ from shipaw.utils.callbacks import ShipmentCallbackFn
 def _fc_card(title: str, fc: FullContact) -> None:
     """Render a compact contact/address card."""
     with ui.card().classes(theme.CARD_SM):
-        ui.label(title).classes('text-subtitle2 text-weight-bold')
-        ui.separator()
+        ui.label(title).classes(theme.SUBTITLE)
+        ui.separator().classes('ship-separator')
         ui.label(fc.contact.name)
-        ui.label(fc.address.business_name).classes('text-grey-7')
+        ui.label(fc.address.business_name)
         for line in fc.address.address_lines:
             if line:
                 ui.label(line)
@@ -71,19 +71,17 @@ class SummaryPage:
                 _fc_card('Recipient', shipment.recipient)
 
                 with ui.card().classes(theme.CARD_SM):
-                    ui.label('Details').classes('text-subtitle2 text-weight-bold')
-                    ui.separator()
+                    ui.label('Details').classes(theme.SUBTITLE)
+                    ui.separator().classes('ship-separator')
                     ui.label(f'Boxes: {shipment.boxes}')
                     ui.label(f'Date: {shipment.shipping_date}')
                     ui.label(f'Service: {self._ship_req.service_code}')
                     ui.label(f'Reference: {shipment.reference or "—"}')
 
         with ui.row().classes(theme.CENTER_ROW):
-            ui.button('← Back', on_click=self._goto_form).props(theme.BTN_FLAT)
-            self._confirm_btn = (
-                ui.button('Confirm Booking ✓', on_click=self._on_confirm, icon='check')
-                .props(theme.BTN_POSITIVE)
-                .classes('text-subtitle1 q-px-xl q-py-sm')
+            ui.button('← Back', on_click=self._goto_form).classes(theme.BTN_FLAT)
+            self._confirm_btn = ui.button('Confirm Booking ✓', on_click=self._on_confirm, icon='check').classes(
+                f'{theme.BTN_POSITIVE} {theme.SUBTITLE_LG}'
             )
 
     async def _on_confirm(self) -> None:

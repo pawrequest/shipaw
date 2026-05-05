@@ -30,14 +30,6 @@ from shipaw.nicegui_ui import theme
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
 
-SubTitleClasses2 = 'text-subtitle2 text-weight-bold q-mb-xs'
-
-ExpansionClasses1 = 'w-full q-mt-sm ship-card'
-
-SubtitleClasses1 = 'text-subtitle1 q-px-xl q-py-sm'
-
-RowClasses1 = 'w-full justify-center q-mt-lg'
-
 
 def provider_names_sorted() -> list[str]:
     dflt = SHIPAW_SETTINGS.default_provider_name
@@ -78,52 +70,46 @@ class FormPage:
         initial = self.initial_shipment
         # ── Shipment options ──────────────────────────────────────────────────
         with ui.card().classes(theme.CARD + ' q-mb-md'):
-            ui.label('Shipment Options').classes(SubTitleClasses2)
+            ui.label('Shipment Options').classes(theme.SUBTITLE)
             with ui.row().classes('w-full items-end q-gutter-sm flex-wrap'):
                 self.date_in = (
                     ui.input(label='Date', value=initial.shipping_date.isoformat())
                     .props(f'type=date {theme.INPUT_PROPS}')
-                    .classes('col-auto')
+                    .classes(f'col-auto {theme.INPUT_CLASS}')
                 )
                 self.boxes_in = (
                     ui.number(label='Boxes', value=initial.boxes, min=1, max=12, precision=0)
                     .props(theme.INPUT_PROPS)
-                    .classes('col-auto')
+                    .classes(f'col-auto {theme.INPUT_CLASS}')
                     .style('width: 90px')
                 )
                 self.reference_in = (
                     ui.input(label='Reference', value=initial.reference)
                     .props(f'{theme.INPUT_PROPS} maxlength=40')
-                    .classes('col')
+                    .classes(f'col {theme.INPUT_CLASS}')
                 )
                 self.provider_select = self.provider_selector()
                 self.direction_select = self.direction_selector()
                 self.service_select = self.service_selector()
 
         # ── Sender —
-        with ui.expansion('Sender', icon='person_add', value=True).classes(ExpansionClasses1) as self.sender_expansion:
+        with ui.expansion('Sender', icon='person_add', value=True).classes(theme.EXPANSION) as self.sender_expansion:
             self.sender_panel = AddressPanel(full_contact_obs=self.sender_)
         # ── Recipient —
-        with ui.expansion('Recipient', icon='person', value=True).classes(
-            ExpansionClasses1
-        ) as self.recipient_expansion:
+        with ui.expansion('Recipient', icon='person', value=True).classes(theme.EXPANSION) as self.recipient_expansion:
             self.recipient_panel = AddressPanel(full_contact_obs=self.recipient_)
         self._expand_addresses(self.direction_select.value)
 
-        # ── Submit ────────────────────────────────────────────────────────────
-        with ui.row().classes(RowClasses1):
-            self.swap_btn = (
-                ui.button('SWAP', on_click=self.swap_addresses, icon='arrow_forward')
-                .props(theme.BTN_PRIMARY)
-                .classes(SubtitleClasses1)
+        # ── Swap ──────────────────────────────────────────────────────────────
+        with ui.row().classes(theme.CENTER_ROW):
+            self.swap_btn = ui.button('SWAP', on_click=self.swap_addresses, icon='swap_horiz').classes(
+                f'{theme.BTN_PRIMARY} {theme.SUBTITLE_LG}'
             )
 
         # ── Submit ────────────────────────────────────────────────────────────
-        with ui.row().classes(RowClasses1):
-            self.submit_btn = (
-                ui.button('Review Booking →', on_click=self._do_submit, icon='arrow_forward')
-                .props(theme.BTN_PRIMARY)
-                .classes(SubtitleClasses1)
+        with ui.row().classes(theme.CENTER_ROW):
+            self.submit_btn = ui.button('Review Booking →', on_click=self._do_submit, icon='arrow_forward').classes(
+                f'{theme.BTN_PRIMARY} {theme.SUBTITLE_LG}'
             )
 
     def provider_selector(self):
@@ -135,13 +121,17 @@ class FormPage:
                 options=prov_options, label='Provider', value=default_provider_name, on_change=self._on_provider_change
             )
             .props(theme.INPUT_PROPS)
-            .classes('col')
+            .classes(f'col {theme.INPUT_CLASS}')
         )
         return selector
 
     def service_selector(self) -> Select:
         service_options, value = self._service_options()
-        return ui.select(options=service_options, label='Service', value=value).props(theme.INPUT_PROPS).classes('col')
+        return (
+            ui.select(options=service_options, label='Service', value=value)
+            .props(theme.INPUT_PROPS)
+            .classes(f'col {theme.INPUT_CLASS}')
+        )
 
     def direction_selector(self) -> Select:
         valid_directions = list(self.current_provider.available_services.keys())
@@ -150,7 +140,7 @@ class FormPage:
         selector = (
             ui.select(options=direction_options, label='Direction', value=default_dir)
             .props(theme.INPUT_PROPS)
-            .classes('col')
+            .classes(f'col {theme.INPUT_CLASS}')
         )
         selector.on_value_change(self._on_direction_change)
         return selector
@@ -190,7 +180,6 @@ class FormPage:
         await self.set_sender_recip_data(new_direction)
         await self._refresh_services()
         self._expand_addresses(new_direction)
-        # await self._refresh_services(self.provider_select.value, e.value)
 
     def _refresh_directions(self):
         directions = self.current_provider.valid_directions

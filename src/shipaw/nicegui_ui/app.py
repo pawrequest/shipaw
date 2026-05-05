@@ -36,12 +36,13 @@ def build_shipper(initial: Shipment | None = None, on_booking: ShipmentCallbackF
     """Called once per browser-tab connection."""
     theme.apply_page_styles()
 
-    with ui.header(elevated=True).classes('bg-blue-grey-8 text-white row items-center q-py-sm q-px-md'):
+    with ui.header(elevated=True).classes(theme.HEADER):
         ui.icon('local_shipping').classes('q-mr-sm text-h6')
-        ui.label('Shipaw Shipper').classes('text-h6')
+        ui.label('Shipaw Shipper').classes('text-h6 text-weight-bold')
         ui.space()
         for a in notify_dev().warnings:
             ui.badge(a.message[:70], color='orange').classes('q-ml-sm text-caption')
+        theme.theme_switcher()
 
     content = ui.column().classes('w-full q-pa-md').style('max-width: 1100px; margin: 0 auto;')
 

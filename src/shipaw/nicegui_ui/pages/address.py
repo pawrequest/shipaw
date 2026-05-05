@@ -32,20 +32,23 @@ class AddressPanel:
         with ui.row().classes(theme.ROW):
             # Contact card
             with ui.card().classes(AddressCardClasses) as self.card_ctx:
-                ui.label('Contact').classes('text-subtitle2 text-weight-bold q-mb-xs')
+                ui.label('Contact').classes(theme.SUBTITLE)
                 self.contact_in = (
                     ui.input(label='Contact Name')
                     .props(theme.INPUT_PROPS)
+                    .classes(theme.INPUT_CLASS)
                     .bind_value(self.full_contact, ('contact', 'name'))
                 )
                 self.business_in = (
                     ui.input(label='Business Name')
                     .props(theme.INPUT_PROPS)
+                    .classes(theme.INPUT_CLASS)
                     .bind_value(self.full_contact, ('address', 'business_name'))
                 )
                 self.email_in = (
                     ui.input(label='Email')
                     .props(f'{theme.INPUT_PROPS} type=email')
+                    .classes(theme.INPUT_CLASS)
                     .bind_value(self.full_contact, ('contact', 'email'))
                 )
 
@@ -53,44 +56,52 @@ class AddressPanel:
                     self.phone_in = (
                         ui.input(label='Mobile Phone')
                         .props(theme.INPUT_PROPS)
-                        .classes('col')
+                        .classes(f'col {theme.INPUT_CLASS}')
                         .bind_value(self.full_contact, ('contact', 'mobile_phone'))
                     )
                     if show_use_own_phone:
-                        ui.button('Use Own', on_click=self._use_own_phone).props(f'flat dense {theme.BTN_PRIMARY}')
+                        ui.button('Use Own', on_click=self._use_own_phone).props('flat dense').classes(theme.BTN_FLAT)
 
             # Address card
             with ui.card().classes(AddressCardClasses):
-                ui.label('Address').classes('text-subtitle2 text-weight-bold q-mb-xs')
+                ui.label('Address').classes(theme.SUBTITLE)
                 self.addr1_in = (
                     ui.input(label='Address Line 1')
                     .props(theme.INPUT_PROPS)
+                    .classes(theme.INPUT_CLASS)
                     .bind_value(self.full_contact, ('address', 'address_line1'))
                 )
                 self.addr2_in = (
                     ui.input(label='Address Line 2')
                     .props(theme.INPUT_PROPS)
+                    .classes(theme.INPUT_CLASS)
                     .bind_value(self.full_contact, ('address', 'address_line2'))
                 )
                 self.addr3_in = (
                     ui.input(label='Address Line 3')
                     .props(theme.INPUT_PROPS)
+                    .classes(theme.INPUT_CLASS)
                     .bind_value(self.full_contact, ('address', 'address_line3'))
                 )
                 self.town_in = (
-                    ui.input(label='Town').props(theme.INPUT_PROPS).bind_value(self.full_contact, ('address', 'town'))
+                    ui.input(label='Town')
+                    .props(theme.INPUT_PROPS)
+                    .classes(theme.INPUT_CLASS)
+                    .bind_value(self.full_contact, ('address', 'town'))
                 )
 
                 with ui.row().classes('items-end w-full no-wrap q-gutter-xs'):
                     self.postcode_in = (
                         ui.input(label='Postcode')
                         .props(theme.INPUT_PROPS)
-                        .classes('col')
+                        .classes(f'col {theme.INPUT_CLASS}')
                         .bind_value(self.full_contact, ('address', 'postcode'))
                     )
                     if rm_available:
-                        self.check_btn = ui.button('Check Address', icon='search', on_click=self._do_check).props(
-                            f'{theme.BTN_PRIMARY} dense'
+                        self.check_btn = (
+                            ui.button('Check Address', icon='search', on_click=self._do_check)
+                            .props('dense')
+                            .classes(theme.BTN_PRIMARY)
                         )
                     else:
                         self.check_btn = None

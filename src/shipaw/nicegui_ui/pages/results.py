@@ -51,7 +51,7 @@ class ResultsPage:
             ui.label('Booking Failed').classes('text-h5 text-negative q-mt-sm')
             theme.render_alerts_inline(response.alerts)
         with ui.row().classes('w-full justify-center q-mt-md'):
-            ui.button('← Try Again', on_click=self._goto_form).props(theme.BTN_PRIMARY)
+            ui.button('← Try Again', on_click=self._goto_form).classes(theme.BTN_PRIMARY)
 
     # ── Success ───────────────────────────────────────────────────────────────
 
@@ -62,17 +62,17 @@ class ResultsPage:
             ui.icon('check_circle', size='3rem').classes('text-positive')
             ui.label('Shipment Confirmed!').classes('text-h5 text-positive q-mt-sm')
             ui.label(f'Shipment Number: {response.shipment_num}').classes('text-h6 q-mt-sm')
-            ui.label(f'Label: {label_path}').classes('text-caption text-grey-7 q-mt-xs')
+            ui.label(f'Label: {label_path}').classes('text-caption ship-muted q-mt-xs')
 
         with ui.row().classes('w-full justify-center q-gutter-lg q-mt-lg'):
-            ui.button('Open Label', icon='open_in_new', on_click=lambda: self._open(label_path)).props(
+            ui.button('Open Label', icon='open_in_new', on_click=lambda: self._open(label_path)).classes(
                 theme.BTN_PRIMARY
             )
-            ui.button('Print Label', icon='print', on_click=lambda: self._print(label_path)).props(theme.BTN_PRIMARY)
+            ui.button('Print Label', icon='print', on_click=lambda: self._print(label_path)).classes(theme.BTN_PRIMARY)
             # Stage 3 TODO: email label button
 
         with ui.row().classes('w-full justify-center q-mt-xl'):
-            ui.button('← New Booking', on_click=self._goto_form, icon='add').props(f'flat {theme.BTN_PRIMARY}')
+            ui.button('← New Booking', on_click=self._goto_form, icon='add').classes(theme.BTN_FLAT)
 
     # ── Label actions ─────────────────────────────────────────────────────────
 
