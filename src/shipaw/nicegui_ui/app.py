@@ -1,19 +1,3 @@
-"""
-NiceGUI standalone frontend for Shipaw.
-Completely independent of shipaw.fapi — the fapi module is not required.
-
-Run:
-    python -m shipaw.nicegui_ui.app
-or via the script entry point:
-    shipaw-ng
-
-Stages:
-    Stage 1 ✓  Shipping form → order summary → order results
-    Stage 2    Live log panel  (ui.log sidebar with loguru sink)
-    Stage 3    Email label button (Outlook integration)
-    Stage 4    Post-booking callback hook
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
