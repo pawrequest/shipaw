@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import os
 from dataclasses import dataclass
+from importlib.resources import files
 from pathlib import Path
 from urllib.parse import quote
 
@@ -13,12 +14,20 @@ from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
-from shipaw.utils.ui_funcs import ordinal_dt, sanitise_id
 from shipaw.models.address_contact import Address, Contact, FullContact
-from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
+from shipaw.utils.consts_enums import ShipDirection
+from shipaw.utils.ui_funcs import ordinal_dt, sanitise_id
 
 SHIPAW_ENV_KEY = 'SHIPAW_ENV'
+
+
+def get_ui() -> Path:
+    res = Path(files('shipaw'))
+    res = res / 'ui'
+    if not res.exists():
+        raise FileNotFoundError(f'UI directory {res} does not exist')
+    return res
 
 
 def path_from_env_key(env_key: str) -> Path:
@@ -59,6 +68,21 @@ class ShipawSettings(BaseSettings):
     data_dir: Path = Path.home() / 'shipaw'
     label_dir: Path = Path.home() / 'shipaw' / 'labels'
     log_db_path: str | None = None
+    ui_dir: Path = get_ui()
+    static_dir: Path = ui_dir / 'static'
+    template_dir: Path = ui_dir / 'templates'
+
+    # @property
+    # def template_dir(self):
+    #     return self.ui_dir / 'templates'
+    #
+    # @property
+    # def static_dir(self):
+    #     return self.ui_dir / 'static'
+
+    @property
+    def templates(self):
+        return get_templates_cached(self.template_dir)
 
     # Provider env file dict (json string in .env)
     provider_env_dict: dict[str, Path]

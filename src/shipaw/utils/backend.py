@@ -7,11 +7,22 @@ from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
 
-from shipaw.models.alerts import Alert, AlertType, Alerts
+from shipaw.logging import log_obj
+from shipaw.models.alerts import Alert, Alerts, AlertType
 from shipaw.models.requests import ShipmentRequest
-from shipaw.models.responses import CompletedShipmentResponse, ShipmentResponse
-from shipaw.utils.consts_enums import ShipDirection
+from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.providers.provider_abc import ProviderName
+from shipaw.utils.consts_enums import ShipDirection
+
+
+async def errored_shipment(shipment_response):
+    log_obj(shipment_response.alerts, 'Errors booking shipment:')
+    alerts = shipment_response.alerts
+    shipment_response.template = ShipawTemplate(
+        template_path='/alerts.html',
+        context={'alerts': alerts},
+    )
+    return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipmentResponse:
@@ -61,7 +72,7 @@ async def resize_and_write_labels(label_content: bytes, label_path: Path):
 
 
 def get_version():
-    from importlib.metadata import version, PackageNotFoundError
+    from importlib.metadata import PackageNotFoundError, version
 
     try:
         return version('shipaw')
