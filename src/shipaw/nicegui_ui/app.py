@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 
 from loguru import logger
 from nicegui import ui
@@ -72,7 +71,7 @@ def main(host: str = '127.0.0.1', port: int = 9080) -> None:
         host=host,
         port=port,
         title='Shipaw Shipper',
-        favicon=Path(r'C:\prdev\amdev\shipaw\src\shipaw\nicegui_ui\favicon.ico'),
+        # favicon=Path(r'C:\prdev\amdev\shipaw\src\shipaw\nicegui_ui\favicon.ico'),
         reload=False,
         window_size=(1200, 900),  # implies native
     )
