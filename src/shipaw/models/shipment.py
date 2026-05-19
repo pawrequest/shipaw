@@ -47,7 +47,7 @@ def build_reference(
     total_boxes: int,
     send_date: dt.date,
     box: int | None = None,
-    max_chars: int = 38,
+    max_chars: int = 37,
 ) -> str:
     if max_chars < 14:
         raise ValueError('max_chars must be at least 14 to fit date and box info')
