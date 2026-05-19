@@ -25,7 +25,7 @@ def build_reference1(
     return ref_str + ' ' * num_spaces + date_str + box_str
 
 
-def build_reference(
+def build_reference2(
     reference: str, max_chars: int, total_boxes: int, send_date: dt.date, box: int | None = None
 ) -> str:
     if max_chars < 14:
@@ -40,6 +40,27 @@ def build_reference(
     max_ref_len = max_chars - date_str_len - box_str_len  # n-14 or n-16 chars left
     ref_str = reference[:max_ref_len] if max_ref_len > 0 else ''
     return '\n' + ref_str + '\n\n' + box_str + '\n' + date_str
+
+
+def build_reference(
+    reference: str,
+    total_boxes: int,
+    send_date: dt.date,
+    box: int | None = None,
+    max_chars: int = 38,
+) -> str:
+    if max_chars < 14:
+        raise ValueError('max_chars must be at least 14 to fit date and box info')
+    if max_chars < 16 and box is not None:
+        raise ValueError('max_chars must be at least 16 to include box numbering')
+    date_str = send_date.strftime('%d/%m')  # 5 chars
+    box_str_ = 'box' if total_boxes == 1 else 'boxes'  # 5
+    box_str = f'{box}/{total_boxes} {box_str_}' if box else f' {total_boxes} {box_str_}'  # 9 or 11 chars
+    box_str_len = len(box_str)
+    date_str_len = len(date_str)
+    max_ref_len = max_chars - date_str_len - box_str_len  # n-14 or n-16 chars left
+    ref_str = reference[:max_ref_len] if max_ref_len > 0 else ''
+    return ref_str + '\n' + box_str + '\n' + date_str
 
 
 class Shipment(ShipawBaseModel):
