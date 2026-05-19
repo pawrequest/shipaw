@@ -112,9 +112,9 @@ class RoyalMailProvider(ShippingProvider):
     def _book_inbound_or_dropoff(self, service: RoyalMailServiceCodes, shipment: Shipment) -> CompletedShipmentResponse:
         returns_container = inbound_shipment(shipment, service)
         if shipment.direction == ShipDirection.INBOUND:
-            resp = self.client.book_inbound_collection(returns_container, collection_date=shipment.shipping_date)
+            resp = self.client.book_inbound_with_collection(returns_container, collection_date=shipment.shipping_date)
         else:
-            resp = self.client.book_inbound_dropoff(returns_container)
+            resp = self.client.book_inbound_shipping(returns_container)
         labels_bytes = [base64.b64decode(order.label) for order in resp.created_orders]
         combined_label_bytes = merge_pdf_bytes(labels_bytes)
         return booking_response_inbound(resp, shipment, combined_label_bytes)
