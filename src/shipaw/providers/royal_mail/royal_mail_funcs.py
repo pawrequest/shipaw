@@ -46,7 +46,11 @@ def _create_orders_request_unsplit(
     billing_details: BillingDetailsRequest, postage_details: PostageDetailsRequest, shipment: Shipment
 ) -> CreateOrdersRequest:
     order = CreateOrderRequest(
-        order_reference=build_reference(shipment.reference, 40, shipment.boxes, shipment.shipping_date),
+        order_reference=build_reference(
+            shipment.reference,
+            shipment.boxes,
+            shipment.shipping_date,
+        ),
         # order_reference=shipment.reference_with_date_and_total_boxes,
         postage_details=postage_details,
         billing=billing_details,
@@ -70,7 +74,6 @@ def _create_orders_request_split(
         CreateOrderRequest(
             order_reference=build_reference(
                 shipment.reference,
-                40,
                 shipment.boxes,
                 shipment.shipping_date,
                 box=i + 1,
@@ -102,7 +105,12 @@ def inbound_shipment(shipment: Shipment, service_code: RoyalMailServiceCodes) ->
                 recipient_address=returns_address_from_agnostic_fc(shipment.recipient),
                 sender_address=returns_address_from_agnostic_fc(shipment.sender),
                 customer_reference=CustomerReference(
-                    reference=build_reference(shipment.reference, 40, shipment.boxes, shipment.shipping_date, box=i + 1)
+                    reference=build_reference(
+                        shipment.reference,
+                        shipment.boxes,
+                        shipment.shipping_date,
+                        box=i + 1,
+                    )
                 ),
             ),
         )
