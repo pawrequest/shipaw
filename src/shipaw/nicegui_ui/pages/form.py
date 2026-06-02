@@ -17,16 +17,15 @@ from nicegui.elements.select import Select
 from nicegui.observables import ObservableDict
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.models.address_contact import FullContact
 
 # from shipaw.models.address_contact import FullContact
 from shipaw.models.alerts import Alerts
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.shipment import Shipment, sample_shipment
+from shipaw.nicegui_ui import theme
 from shipaw.nicegui_ui.pages.address import AddressPanel
 from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
-from shipaw.nicegui_ui import theme
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
 
@@ -149,8 +148,10 @@ class FormPage:
 
     def _expand_addresses(self, direction: str) -> None:
         """Show the relevant address panel based on direction."""
-        view_recip = direction in [ShipDirection.OUTBOUND, ShipDirection.THIRD_PARTY]
-        view_sender = direction in [ShipDirection.INBOUND, ShipDirection.DROPOFF, ShipDirection.THIRD_PARTY]
+        # view_recip = direction in [ShipDirection.OUTBOUND, ShipDirection.THIRD_PARTY]
+        view_recip = True
+        view_sender = True
+        # view_sender = direction in [ShipDirection.INBOUND, ShipDirection.DROPOFF, ShipDirection.THIRD_PARTY]
         self.recipient_expansion.set_visibility(view_recip)
         self.sender_expansion.set_visibility(view_sender)
 
@@ -160,20 +161,21 @@ class FormPage:
         await self._refresh_services()
 
     async def set_sender_recip_data(self, direction: ShipDirection):
-        hq = SHIPAW_SETTINGS.full_contact
-        init_recipient = self.initial_shipment.recipient
-        match direction:
-            case ShipDirection.OUTBOUND:
-                self.recipient_.update(init_recipient)
-                self.sender_.update(hq)
-            case ShipDirection.INBOUND | ShipDirection.DROPOFF:
-                self.recipient_.update(hq)
-                self.sender_.update(init_recipient)
-            case ShipDirection.THIRD_PARTY:
-                self.sender_.update(init_recipient)
-                self.recipient_.update(FullContact.empty())
-            case _:
-                raise ValueError('Bad Ship Direction')
+        pass
+        # hq = SHIPAW_SETTINGS.full_contact
+        # init_recipient = self.initial_shipment.recipient
+        # match direction:
+        #     case ShipDirection.OUTBOUND:
+        #         self.recipient_.update(init_recipient)
+        #         self.sender_.update(hq)
+        #     case ShipDirection.INBOUND | ShipDirection.DROPOFF:
+        #         self.recipient_.update(hq)
+        #         self.sender_.update(init_recipient)
+        #     case ShipDirection.THIRD_PARTY:
+        #         self.sender_.update(init_recipient)
+        #         self.recipient_.update(FullContact.empty())
+        #     case _:
+        #         raise ValueError('Bad Ship Direction')
 
     async def _on_direction_change(self, e) -> None:
         new_direction = e.value
