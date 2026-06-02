@@ -27,11 +27,11 @@ class Contact(ShipawBaseModel):
 class Address(ShipawBaseModel):
     business_name: str
     address_line1: str
-    address_line2: str | None = None
-    address_line3: str | None = None
+    address_line2: str = ''
+    address_line3: str = ''
     town: constr(max_length=25)
     postcode: constr(max_length=16)
-    county: str | None = None
+    county: str = ''
     country: str = 'GB'
 
     @classmethod
