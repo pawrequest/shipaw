@@ -1,4 +1,5 @@
 import json
+import logging
 import pprint
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +12,13 @@ from shipaw.config import SHIPAW_SETTINGS
 
 if TYPE_CHECKING:
     pass
+
+
+def set_deps_log_level():
+    for name in ('flaskwebgui', 'httpx', 'httpcore'):
+        lg = logging.getLogger(name)
+        lg.setLevel(logging.WARNING)
+        lg.propagate = False
 
 
 def ndlog_dict(data: dict, ndjson_file: Path | None = None):
