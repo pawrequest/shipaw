@@ -1,6 +1,16 @@
-from apc_hypaship.models.request.address import Address, Contact
+from __future__ import annotations
 
-from shipaw.models.address import Address as AddressAgnost, Contact as ContactAgnost, FullContact
+from apc_hypaship.error import apc_http_status_alerts
+from apc_hypaship.models.request.address import Address, Contact
+from httpx import HTTPStatusError
+from loguru import logger
+
+from shipaw.fapi.alerts import Alert, Alerts, AlertType
+from shipaw.models.address import Address as AddressAgnost
+from shipaw.models.address import Contact as ContactAgnost
+from shipaw.models.address import FullContact
+from shipaw.providers.provider_abc import ProviderName
+from shipaw.utils.consts_enums import ShipDirection
 
 
 def address_from_agnostic_fc[addr_type: Address](cls: type[addr_type], full_contact: FullContact) -> addr_type:
@@ -47,3 +57,25 @@ def full_contact_from_apc_contact_address(contact: Contact, address: Address) ->
             phone_number=contact.phone_number or contact.mobile_number,
         ),
     )
+
+
+async def apc_shipment_request_alerts(shipment_request) -> Alerts:
+    alerts = Alerts.empty()
+    if (
+        shipment_request.provider_name == ProviderName.APC
+        and shipment_request.shipment.direction == ShipDirection.DROPOFF
+    ):
+        alerts += Alert(
+            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
+            type=AlertType.ERROR,
+        )
+    return alerts
+
+
+async def add_apc_response_errors_to_shipment_response_alerts(e: HTTPStatusError, shipment_request, shipment_response):
+    if shipment_request.provider_name == ProviderName.APC:
+        for alert in await apc_http_status_alerts(e):
+            shipment_response.alerts += alert
+    else:
+        logger.exception(e)
+        shipment_response.alerts += Alert.from_exception(e)

@@ -5,8 +5,8 @@ from enum import StrEnum
 from pydantic import Field
 
 from shipaw.models.base import ShipawBaseModel
-from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
+from shipaw.utils.consts_enums import ShipDirection
 
 
 class AlertType(StrEnum):
@@ -91,13 +91,4 @@ async def maybe_alert_phone_number(phone_num: str):
             type=AlertType.ERROR,
             message=f'The Mobile phone number ({phone_num}) must be 11 digits and begin with 07. Unable to send with no phone number (try "Use Home Base Mobile").',
         )
-    return alerts
-
-
-async def check_royal_mail(shipment_request) -> Alerts:
-    alerts = Alerts.empty()
-    if shipment_request.provider_name == ProviderName.ROYAL_MAIL:
-        if shipment_request.shipment.direction != ShipDirection.OUTBOUND:
-            msg = f'Royal Mail only supports OUTBOUND shipments at this time. Please use another provider for {shipment_request.shipment.direction} shipments.'
-            alerts += Alert(message=msg, type=AlertType.ERROR)
     return alerts

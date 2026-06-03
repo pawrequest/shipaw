@@ -1,4 +1,5 @@
 import base64
+from datetime import date
 from typing import ClassVar, override
 
 from royal_mail_combined import RoyalMailClient
@@ -22,6 +23,7 @@ from shipaw.providers.royal_mail.royal_mail_funcs import (
     outbound_shipment,
     print_response_errors,
 )
+from shipaw.providers.validators import validate_shipment_request
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.utils.label_file import merge_pdf_bytes
 
@@ -99,15 +101,15 @@ class RoyalMailProvider(ShippingProvider):
 
     @override
     def book_shipment_request(self, shipment_request: ShipmentRequest) -> CompletedShipmentResponse:
+        validate_shipment_request(shipment_request)
         shipment = shipment_request.shipment
         service = self.service_codes_type(shipment_request.service_code)
-        shipdir = shipment_request.shipment.direction
-        if shipdir == ShipDirection.OUTBOUND:
+        if shipment.direction == ShipDirection.OUTBOUND:
             return self._book_outbound(service, shipment)
-        elif shipdir in [ShipDirection.INBOUND, ShipDirection.DROPOFF]:
+        elif shipment.direction in [ShipDirection.INBOUND, ShipDirection.DROPOFF]:
             return self._book_inbound_or_dropoff(service, shipment)
         else:
-            raise ValueError(f'Invalid shipment direction "{shipdir}"')
+            raise ValueError(f'Invalid shipment direction "{shipment.direction}"')
 
     def _book_inbound_or_dropoff(self, service: RoyalMailServiceCodes, shipment: Shipment) -> CompletedShipmentResponse:
         returns_container = inbound_shipment(shipment, service)

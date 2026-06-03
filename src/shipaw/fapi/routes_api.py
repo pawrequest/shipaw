@@ -15,7 +15,6 @@ from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.backend import (
     errored_shipment,
-    maybe_alert_apc,
     notify_dev,
     resize_and_write_labels,
     try_book_shipment,
@@ -28,6 +27,7 @@ from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.address import Address
 from shipaw.models.shipment import Shipment
 from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.providers.validators import get_shipment_request_alerts
 from shipaw.utils.consts_enums import RM_UNAVAIL
 from shipaw.utils.funcs import compare_texts
 
@@ -56,9 +56,7 @@ async def order_summary_api(
     context = {'shipment_request': shipment_request}
 
     # check phone number
-    # alerts = await maybe_alert_phone_number(shipment_request.shipment.remote_full_contact.contact.mobile_phone)
-    # check not apc + dropoff
-    alerts = await maybe_alert_apc(shipment_request)
+    alerts = await get_shipment_request_alerts(shipment_request)
     return ShipawTemplateResponse(
         template=ShipawTemplate(template_path='/order_summary.html', context=context),
         alerts=alerts,

@@ -2,18 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from apc_hypaship.error import apc_http_status_alerts
 from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
 
-from shipaw.fapi.alerts import Alert, AlertType, Alerts
+from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.logging import log_obj
-from shipaw.utils.consts_enums import ShipDirection
-
-from shipaw.providers.provider_abc import ProviderName
+from shipaw.providers.apc.apc_funcs import add_apc_response_errors_to_shipment_response_alerts
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipmentResponse:
@@ -22,7 +19,7 @@ async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipm
         shipment_response = shipment_request.provider.book_shipment_request(shipment_request)
 
     except HTTPStatusError as e:
-        await maybe_apc_response_error(e, shipment_request, shipment_response)
+        await add_apc_response_errors_to_shipment_response_alerts(e, shipment_request, shipment_response)
 
     except Exception as e:
         logger.exception(f'Error booking shipment: {e}')
@@ -61,28 +58,6 @@ async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipm
 #         response.alerts += Alert.from_exception(e)
 
 
-async def maybe_apc_response_error(e: HTTPStatusError, shipment_request, shipment_response):
-    if shipment_request.provider_name == ProviderName.APC:
-        for alert in await apc_http_status_alerts(e):
-            shipment_response.alerts += alert
-    else:
-        logger.exception(e)
-        shipment_response.alerts += Alert.from_exception(e)
-
-
-async def maybe_alert_apc(shipment_request):
-    alerts = Alerts.empty()
-    if (
-        shipment_request.provider_name == ProviderName.APC
-        and shipment_request.shipment.direction == ShipDirection.DROPOFF
-    ):
-        alerts += Alert(
-            message='APC does not support drop-off shipments - please select Outbound or Inbound Collection',
-            type=AlertType.ERROR,
-        )
-    return alerts
-
-
 async def resize_and_write_labels(label_content: bytes, label_path: Path):
     og_size_path = label_path.parent / 'original_size' / label_path.name
     og_size_path.parent.mkdir(parents=True, exist_ok=True)
@@ -93,7 +68,7 @@ async def resize_and_write_labels(label_content: bytes, label_path: Path):
 
 
 def get_version():
-    from importlib.metadata import version, PackageNotFoundError
+    from importlib.metadata import PackageNotFoundError, version
 
     try:
         return version('shipaw')
