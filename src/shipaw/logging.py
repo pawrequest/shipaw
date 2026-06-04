@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def set_deps_log_level():
-    for name in ('flaskwebgui', 'httpx', 'httpcore'):
+    for name in ('flaskwebgui',):
         lg = logging.getLogger(name)
         lg.setLevel(logging.WARNING)
         lg.propagate = False

@@ -25,7 +25,6 @@ async def lifespan(app_: FastAPI):
         app_.shipaw_settings = SHIPAW_SETTINGS
         log_file = SHIPAW_SETTINGS.log_file
         configure_loguru(logger, log_file=log_file, level=SHIPAW_SETTINGS.log_level)
-        set_deps_log_level()
         logger.add(app_.state.log_stream.sink, level='DEBUG', enqueue=False)
         populate_providers(SHIPAW_SETTINGS)
         yield
