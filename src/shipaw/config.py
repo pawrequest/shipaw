@@ -13,7 +13,7 @@ from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.templating import Jinja2Templates
 
-from shipaw.fapi.ui_funcs import get_ui, lookup_shipreq_service_name, ordinal_dt, sanitise_id
+from shipaw.fapi.ui_funcs import get_ui, lookup_shipreq_service_name, make_nice_str, ordinal_dt, sanitise_id
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
@@ -48,6 +48,7 @@ def get_templates_cached(template_dir: Path):
     temps.env.filters['sanitise_id'] = sanitise_id
     temps.env.filters['ordinal_dt'] = ordinal_dt
     temps.env.filters['lookup_shipreq_service_name'] = lookup_shipreq_service_name
+    temps.env.filters['make_nice_str'] = make_nice_str
     return temps
 
 
