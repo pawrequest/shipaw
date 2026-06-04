@@ -15,7 +15,6 @@ from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.log_stream import LogStream
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
-from shipaw.logging import set_deps_log_level
 
 
 @contextlib.asynccontextmanager

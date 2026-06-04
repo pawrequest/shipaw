@@ -1,5 +1,4 @@
 import base64
-from datetime import date
 from typing import ClassVar, override
 
 from royal_mail_combined import RoyalMailClient
