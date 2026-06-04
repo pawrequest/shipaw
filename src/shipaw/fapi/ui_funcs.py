@@ -5,6 +5,8 @@ from datetime import datetime, date
 from importlib.resources import files
 from pathlib import Path
 
+from shipaw.fapi.requests import ShipmentRequest
+
 
 def sanitise_id(value):
     return re.sub(r'\W|^(?=\d)', '_', value).lower()
@@ -30,3 +32,9 @@ def get_ui() -> Path:
 
 def make_nice_str(s: str) -> str:
     return s.replace('_', ' ').title()
+
+
+def lookup_shipreq_service_name(shipreq: ShipmentRequest) -> str:
+    serv_code = shipreq.service_code
+    serv_name = shipreq.provider.reverse_lookup_service(serv_code)
+    return serv_name

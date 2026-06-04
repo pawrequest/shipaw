@@ -67,7 +67,7 @@
     <section class="requested requested__details">
         <p><strong>Boxes:</strong> {{ shipment.boxes }}</p>
         <p><strong>Date:</strong> {{ shipment.shipping_date }}</p>
-        <p><strong> Code:</strong> {{ shipment_request.service_code }}</p>
+        <p><strong>Service Name:</strong> {{ shipment_request | lookup_shipreq_service_name }}</p>
         <p><strong>Reference:</strong> {{ shipment.reference }}</p>
     </section>
 </div>
