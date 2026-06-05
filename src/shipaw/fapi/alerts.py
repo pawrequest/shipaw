@@ -79,14 +79,3 @@ class Alerts(ShipawBaseModel):
     @classmethod
     def empty(cls):
         return cls(alert=[])
-
-
-async def maybe_alert_phone_number(phone_num: str):
-    """Alert if phone number is not 11 digits or does not start with 01, 02 or 07"""
-    alerts = Alerts.empty()
-    if len(phone_num) != 11 or not phone_num[0:2] == '07':
-        alerts += Alert(
-            type=AlertType.ERROR,
-            message=f'The Mobile phone number ({phone_num}) must be 11 digits and begin with 07. Unable to send with no phone number (try "Use Home Base Mobile").',
-        )
-    return alerts
