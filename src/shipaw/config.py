@@ -15,8 +15,8 @@ from starlette.templating import Jinja2Templates
 
 from shipaw.fapi.ui_funcs import get_ui, lookup_shipreq_service_name, make_nice_str, ordinal_dt, sanitise_id
 from shipaw.models.address import Address, Contact, FullContact
-from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
+from shipaw.utils.consts_enums import ShipDirection
 
 SHIPAW_ENV_KEY = 'SHIPAW_ENV'
 
@@ -53,6 +53,8 @@ def get_templates_cached(template_dir: Path):
 
 
 class ShipawSettings(BaseSettings):
+    model_config = SettingsConfigDict(frozen=True)
+
     # toggles
     shipper_live: bool = True
     log_level: str = 'DEBUG'
@@ -82,8 +84,7 @@ class ShipawSettings(BaseSettings):
     email: str
     phone: str | None = None
     mobile_phone: str
-
-    model_config = SettingsConfigDict(frozen=True)
+    mobile_phone2: str = '07666666666'
 
     @classmethod
     @functools.cache
