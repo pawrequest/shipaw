@@ -4,6 +4,7 @@ from typing import ClassVar, override
 from royal_mail_combined import RoyalMailClient
 from royal_mail_combined.click_and_drop_api.models import (
     CreateOrdersRequest,
+    CreateOrdersResponse,
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer
 from royal_mail_combined.config import RoyalMailSettingsGlobal
@@ -122,7 +123,7 @@ class RoyalMailProvider(ShippingProvider):
 
     def _book_outbound(self, service: RoyalMailServiceCodes, shipment: Shipment) -> CompletedShipmentResponse:
         orders_request = outbound_shipment(shipment, service)
-        booking_response = self.client.book_outbound(orders_request)
+        booking_response: CreateOrdersResponse = self.client.book_outbound(orders_request)
         if booking_response.errors_count > 0:
             print_response_errors(booking_response)
         label_data: bytearray = self.client.get_label_data(booking_response.success_idents_str)
