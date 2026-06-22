@@ -1,3 +1,5 @@
+import base64
+from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
@@ -12,7 +14,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.alerts import Alerts
+from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.backend import (
     errored_shipment,
     notify_dev,
@@ -26,10 +28,12 @@ from shipaw.fapi.ui_funcs import make_nice_str
 from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.address import Address
 from shipaw.models.shipment import Shipment
+from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.providers.validators import get_shipment_request_alerts
-from shipaw.utils.consts_enums import RM_UNAVAIL
+from shipaw.utils.consts_enums import RM_UNAVAIL, ShipDirection
 from shipaw.utils.funcs import compare_texts
+from shipaw.utils.label_file import merge_pdf_bytes, unused_path
 
 router = APIRouter()
 NoAddressFound = AddressRecordDefPermissive(label='No matching results', address_id='')
@@ -73,7 +77,14 @@ async def order_results_api(
         return await errored_shipment(shipment_response)
     log_obj(shipment_response, 'Shipment Booked')
 
-    await resize_and_write_labels(shipment_response.label_data, shipment_response.label_path)
+    label_path = shipment_response.label_path
+    await resize_and_write_labels(shipment_response.label_data, label_path)
+
+    if (
+        shipment_request.shipment.direction in [ShipDirection.INBOUND, ShipDirection.DROPOFF]
+        and shipment_request.provider_name == ProviderName.ROYAL_MAIL
+    ):
+        await save_qr_codes(label_path, shipment_response)
 
     if hasattr(request.app, 'callback'):
         await request.app.callback(shipment_request, shipment_response)
@@ -83,6 +94,23 @@ async def order_results_api(
         context={'shipment_request': shipment_request, 'response': shipment_response},
     )
     return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
+
+
+async def save_qr_codes(label_path: Path, shipment_response: CompletedShipmentResponse):
+    try:
+        orders = shipment_response.data['created_orders']
+        qr_codes = [order['qrCode'] for order in orders]
+        qr_bytes = [base64.b64decode(qr) for qr in qr_codes]  # png not pdf
+        for i, png_bytes in enumerate(qr_bytes, start=1):
+            # qr_dir = label_path.parent / 'QR_CODES'
+            # qr_dir.mkdir(parents=True, exist_ok=True)
+            # out_file = unused_path(qr_dir / shipment_response.label_path.name / f'qr_{i}.png')
+            out_file = unused_path(label_path.with_name(f'{label_path.stem}_qr_{i}.png'))
+            out_file.write_bytes(png_bytes)
+    except KeyError as e:
+        shipment_response.alerts += Alert(message='Key Error getting QRCode', type=AlertType.WARNING)
+    except Exception as e:
+        shipment_response.alerts += Alert(message='Unknown Error getting QRCode', type=AlertType.WARNING)
 
 
 @router.get('/providers', response_class=JSONResponse)
