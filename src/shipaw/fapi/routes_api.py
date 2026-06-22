@@ -33,7 +33,7 @@ from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.providers.validators import get_shipment_request_alerts
 from shipaw.utils.consts_enums import RM_UNAVAIL, ShipDirection
 from shipaw.utils.funcs import compare_texts
-from shipaw.utils.label_file import merge_pdf_bytes, unused_path
+from shipaw.utils.label_file import unused_path
 
 router = APIRouter()
 NoAddressFound = AddressRecordDefPermissive(label='No matching results', address_id='')
@@ -107,9 +107,9 @@ async def save_qr_codes(label_path: Path, shipment_response: CompletedShipmentRe
             # out_file = unused_path(qr_dir / shipment_response.label_path.name / f'qr_{i}.png')
             out_file = unused_path(label_path.with_name(f'{label_path.stem}_qr_{i}.png'))
             out_file.write_bytes(png_bytes)
-    except KeyError as e:
+    except KeyError:
         shipment_response.alerts += Alert(message='Key Error getting QRCode', type=AlertType.WARNING)
-    except Exception as e:
+    except Exception:
         shipment_response.alerts += Alert(message='Unknown Error getting QRCode', type=AlertType.WARNING)
 
 
