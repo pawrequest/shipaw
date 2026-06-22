@@ -1,6 +1,3 @@
-import base64
-from pathlib import Path
-from typing import Any
 from urllib.parse import unquote
 
 from fastapi import APIRouter, Body, Depends
@@ -14,7 +11,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.alerts import Alert, Alerts, AlertType
+from shipaw.fapi.alerts import Alerts
 from shipaw.fapi.backend import (
     errored_shipment,
     notify_dev,
@@ -26,14 +23,13 @@ from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
 from shipaw.fapi.ui_funcs import make_nice_str
 from shipaw.logging import log_obj, log_obj_text
-from shipaw.models.address import Address
+from shipaw.models.address import Address, address_search_text
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.providers.royal_mail.royal_mail_funcs import get_hits, save_qr_codes
 from shipaw.providers.validators import get_shipment_request_alerts
 from shipaw.utils.consts_enums import RM_UNAVAIL, ShipDirection
-from shipaw.utils.funcs import compare_texts
-from shipaw.utils.label_file import unused_path
 
 router = APIRouter()
 NoAddressFound = AddressRecordDefPermissive(label='No matching results', address_id='')
@@ -96,23 +92,6 @@ async def order_results_api(
     return ShipawTemplateResponse.model_validate(shipment_response, from_attributes=True)
 
 
-async def save_qr_codes(label_path: Path, shipment_response: CompletedShipmentResponse):
-    try:
-        orders = shipment_response.data['created_orders']
-        qr_codes = [order['qrCode'] for order in orders]
-        qr_bytes = [base64.b64decode(qr) for qr in qr_codes]  # png not pdf
-        for i, png_bytes in enumerate(qr_bytes, start=1):
-            # qr_dir = label_path.parent / 'QR_CODES'
-            # qr_dir.mkdir(parents=True, exist_ok=True)
-            # out_file = unused_path(qr_dir / shipment_response.label_path.name / f'qr_{i}.png')
-            out_file = unused_path(label_path.with_name(f'{label_path.stem}_qr_{i}.png'))
-            out_file.write_bytes(png_bytes)
-    except KeyError:
-        shipment_response.alerts += Alert(message='Key Error getting QRCode', type=AlertType.WARNING)
-    except Exception:
-        shipment_response.alerts += Alert(message='Unknown Error getting QRCode', type=AlertType.WARNING)
-
-
 @router.get('/providers', response_class=JSONResponse)
 async def providers():
     dflt = SHIPAW_SETTINGS.default_provider_name
@@ -158,18 +137,6 @@ async def address_search(search_text: str):
     return res.addresses
 
 
-def address_search_text(address: Address) -> str:
-    fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
-    return ', '.join([_ for _ in fields if _])
-
-
-def match_addr_type(addr: AddressSummaryDef, expected_type='Address') -> bool:
-    if addr.type != expected_type:
-        logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
-        return False
-    return True
-
-
 @router.post('/address_search_full', response_model=list[AddressRecordDefPermissive])
 async def address_search_full(address: Address):
     search_text = address_search_text(address)
@@ -180,29 +147,6 @@ async def address_search_full(address: Address):
         return hits
     else:
         return [NoAddressFound]
-
-
-async def get_hits(postcode: str, search_text: str) -> list[Any]:
-    provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
-    if not provider:
-        logger.info(RM_UNAVAIL)
-        return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
-    addresses = await address_search(search_text)
-    hits = []
-    for addr in addresses:
-        if match_addr_type(addr, 'Address'):
-            retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
-            if compare_texts(retrieved.postal_code, postcode):
-                hits.append(retrieved)
-    await log_address_hits(postcode, hits)
-    return hits
-
-
-async def log_address_hits(postcode: str, hits: list[Any]):
-    logger.debug(
-        f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}"'
-        f' {"\n\t".join([addr.label.replace("\n", ",") for addr in hits])}'
-    )
 
 
 @router.get('/address_retrieve/{addr_id}', response_model=AddressRecordDefPermissive)
