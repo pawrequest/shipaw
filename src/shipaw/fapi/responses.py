@@ -8,8 +8,8 @@ from pydantic import ConfigDict, Field, computed_field
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alerts
 from shipaw.models.base import ShipawBaseModel
-from shipaw.utils.label_file import get_label_stem, unused_path
 from shipaw.models.shipment import Shipment
+from shipaw.utils.label_file import get_label_stem, unused_path
 
 
 class ShipawTemplate(ShipawBaseModel):
@@ -41,6 +41,7 @@ class ShipmentResponse(BaseResponse):
     order_identifiers: list[int] = Field(default_factory=list)
     tracking_links: list[str] = Field(default_factory=list)
     collection_id: str | None = None
+    data: dict = Field(default_factory=dict)
 
     model_config = ConfigDict(json_encoders={bytes: lambda v: b64encode(v).decode('utf-8') if v else None})
 
