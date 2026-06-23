@@ -88,8 +88,3 @@ class FullContact(ShipawBaseModel):
 class AddressChoice(ShipawBaseModel):
     address: Address
     score: int
-
-
-def address_search_text(address: Address) -> str:
-    fields = [address.business_name] + address.address_lines + [address.town, address.postcode]
-    return ', '.join([_ for _ in fields if _])

@@ -1,7 +1,4 @@
-import base64
-from pathlib import Path
 from pprint import pformat
-from typing import Any
 
 from loguru import logger
 from royal_mail_combined.click_and_drop_api.models import (
@@ -26,18 +23,13 @@ from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRe
 from royal_mail_combined.converters_no_import import tracking_link
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
 from royal_mail_combined.core.helpers import should_split_rm_tracked_24
-from royal_mail_combined.parcels_apis.address.models import AddressRecordDef, AddressSummaryDef
 
 from shipaw.config import SHIPAW_SETTINGS
-from shipaw.fapi.alerts import Alert, AlertType
 from shipaw.fapi.responses import CompletedShipmentResponse
-from shipaw.fapi.routes_api import address_search
 from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment, build_reference
-from shipaw.providers.registry import PROVIDER_REGISTER
-from shipaw.utils.consts_enums import RM_UNAVAIL, ShipDirection
-from shipaw.utils.funcs import compare_texts, date_to_datetime
-from shipaw.utils.label_file import unused_path
+from shipaw.utils.consts_enums import ShipDirection
+from shipaw.utils.funcs import date_to_datetime
 
 
 # Outbound Shipment
@@ -264,48 +256,4 @@ def fullcontact_from_recipient(recipient: RecipientDetailsRequest) -> FullContac
             postcode=recipient.address.postcode,
             country=recipient.address.country_code,
         ),
-    )
-
-
-async def save_qr_codes(label_path: Path, shipment_response: CompletedShipmentResponse):
-    try:
-        orders = shipment_response.data['created_orders']
-        qr_codes = [order['qrCode'] for order in orders]
-        qr_bytes = [base64.b64decode(qr) for qr in qr_codes]  # png not pdf
-        for i, png_bytes in enumerate(qr_bytes, start=1):
-            out_file = unused_path(label_path.with_name(f'{label_path.stem}_qr_{i}.png'))
-            out_file.write_bytes(png_bytes)
-    except KeyError:
-        shipment_response.alerts += Alert(message='Key Error getting QRCode', type=AlertType.WARNING)
-    except Exception:
-        shipment_response.alerts += Alert(message='Unknown Error getting QRCode', type=AlertType.WARNING)
-
-
-def match_addr_type(addr: AddressSummaryDef, expected_type='Address') -> bool:
-    if addr.type != expected_type:
-        logger.warning(f'Skipping "{addr.type}" type: {addr.summary}')
-        return False
-    return True
-
-
-async def get_hits(postcode: str, search_text: str) -> list[Any]:
-    provider = PROVIDER_REGISTER.get('ROYAL_MAIL')
-    if not provider:
-        logger.info(RM_UNAVAIL)
-        return [AddressRecordDef(label=RM_UNAVAIL, address_id='')]
-    addresses = await address_search(search_text)
-    hits = []
-    for addr in addresses:
-        if match_addr_type(addr, 'Address'):
-            retrieved: AddressRecordDef = provider.client.address_retrieve(addr.address_id)
-            if compare_texts(retrieved.postal_code, postcode):
-                hits.append(retrieved)
-    await log_address_hits(postcode, hits)
-    return hits
-
-
-async def log_address_hits(postcode: str, hits: list[Any]):
-    logger.debug(
-        f'{len(hits)} Address{"es" if len(hits) != 1 else ""} matched postcode "{postcode}"'
-        f' {"\n\t".join([addr.label.replace("\n", ",") for addr in hits])}'
     )
