@@ -51,7 +51,11 @@ class RoyalMailProvider(ShippingProvider):
             RoyalMailServiceCodes.EXPRESS_AM,
         ],
         ShipDirection.INBOUND: [RoyalMailServiceCodes.TRACKED_24_RTN],
-        ShipDirection.DROPOFF: [RoyalMailServiceCodes.TRACKED_24_RTN],
+        ShipDirection.DROPOFF: [
+            RoyalMailServiceCodes.TRACKED_24_RTN,
+            RoyalMailServiceCodes.EXPRESS_24_RTN,
+            RoyalMailServiceCodes.EXPRESS_48_RTN,
+        ],
     }
 
     valid_direction_formats = {
