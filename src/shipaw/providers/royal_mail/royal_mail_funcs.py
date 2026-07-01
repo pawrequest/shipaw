@@ -20,8 +20,8 @@ from royal_mail_combined.click_and_drop_api.models import (
     ReturnShipment as RMReturnShipment,
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer, ReturnResponseContainer
-from royal_mail_combined.converters_no_import import tracking_link
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
+from royal_mail_combined.core.endpoints import tracking_link
 from royal_mail_combined.core.helpers import should_split_rm_tracked_24
 
 from shipaw.config import SHIPAW_SETTINGS

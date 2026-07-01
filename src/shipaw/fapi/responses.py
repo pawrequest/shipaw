@@ -61,7 +61,7 @@ class CompletedShipmentResponse(ShipmentResponse):
     shipment: Shipment
     label_data: bytes
     shipment_num: str
-    shipment_numbers: list[str]
+    shipment_numbers: list[str | None]
     tracking_links: list[str]
     collection_id: str | None = None
 
