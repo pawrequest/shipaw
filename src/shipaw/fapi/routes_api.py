@@ -25,12 +25,12 @@ from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shi
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
 from shipaw.fapi.ui_funcs import make_nice_str
-from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.address import Address
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.providers.validators import get_shipment_request_alerts
+from shipaw.shipaw_logging import log_obj, log_obj_text
 from shipaw.utils.consts_enums import RM_UNAVAIL, ShipDirection
 from shipaw.utils.funcs import compare_texts
 from shipaw.utils.label_file import unused_path

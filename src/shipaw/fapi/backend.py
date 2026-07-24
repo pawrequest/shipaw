@@ -9,8 +9,8 @@ from pawdf.array_pdf.array_p import on_a4
 from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
-from shipaw.logging import log_obj
 from shipaw.providers.apc.apc_funcs import add_apc_response_errors_to_shipment_response_alerts
+from shipaw.shipaw_logging import log_obj
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipmentResponse:
