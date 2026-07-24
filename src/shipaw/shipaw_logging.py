@@ -1,6 +1,7 @@
 import json
 import logging
 import pprint
+import sys
 from copy import copy
 from datetime import datetime
 from pathlib import Path
@@ -92,3 +93,36 @@ def remove_keys_from_dict(data: Any, keys_to_remove: set[str] | None = None) -> 
         data = {remove_keys_from_dict(item, keys_to_remove) for item in data}
 
     return data
+
+
+def configure_logging(ndjson_file):
+    logger.remove()
+
+    logger.add(
+        sys.stderr,
+        level='DEBUG',
+        format='{time:YYYY-MM-DD HH:mm:ss} | {level} | {message} | {extra}',
+    )
+
+    logger.add(
+        ndjson_file,
+        level='DEBUG',
+        serialize=True,
+        rotation='10 MB',
+        retention=10,
+    )
+
+
+def normalize_log_value(value: Any) -> Any:
+    if isinstance(value, BaseModel | dict):
+        return prep_logable_dict(value)
+    if isinstance(value, (list, tuple, set)):
+        return [normalize_log_value(v) for v in value]
+    return value
+
+
+def log_event(message: str, *, level: str = 'INFO', event: str | None = None, **fields: Any):
+    fields = {k: normalize_log_value(v) for k, v in fields.items()}
+    if event is not None:
+        fields['event'] = event
+    logger.bind(**fields).log(level.upper(), message)
