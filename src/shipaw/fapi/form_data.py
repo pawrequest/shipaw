@@ -9,13 +9,13 @@ from loguru import logger
 # from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
 
-from shipaw.models.address import Address, Contact, FullContact
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.requests import ShipmentRequest
-from shipaw.utils.consts_enums import PackageFormat, ShipDirection, VALID_POSTCODE
+from shipaw.models.address import Address, Contact, FullContact
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.utils.consts_enums import VALID_POSTCODE, PackageFormat, ShipDirection
 
 
 async def full_contact_form(
@@ -60,7 +60,7 @@ async def shipment_from_form(
     collect_ready = time(hour=collect_ready)
     collect_closed = time(hour=collect_closed)
     context = json.loads(context_json)
-    logger.debug('Creating Shipment Request from form')
+    logger.info('Creating Shipment Request from form')
 
     if direction == ShipDirection.OUTBOUND:
         sender = None
