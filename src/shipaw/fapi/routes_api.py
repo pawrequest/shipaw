@@ -30,7 +30,6 @@ from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.providers.validators import get_shipment_request_alerts
-from shipaw.shipaw_logging import log_obj, log_obj_text
 from shipaw.utils.consts_enums import RM_UNAVAIL, ShipDirection
 from shipaw.utils.funcs import compare_texts
 from shipaw.utils.label_file import unused_path
@@ -41,7 +40,8 @@ NoAddressFound = AddressRecordDefPermissive(label='No matching results', address
 
 @router.post('/shipping_form', response_model=ShipawTemplateResponse)
 async def shipping_form_api(request: Request, shipment: Shipment = Body(...)) -> ShipawTemplateResponse:
-    log_obj_text(shipment, 'Shipment received at /ship_form:')
+    logger.info('Shipment received at /ship_form', extra=shipment.model_dump(mode='json'))
+    # log_obj_text(shipment, 'Shipment received at /ship_form:')
 
     alerts: Alerts = request.app.alerts
     alerts += notify_dev()
@@ -56,7 +56,7 @@ async def order_summary_api(
     request: Request,
     shipment_request: ShipmentRequest = Depends(shipment_request_form),
 ) -> ShipawTemplateResponse:
-    log_obj_text(shipment_request, 'ShipmentRequest received at shipaw/order_summary:')
+    logger.info('ShipmentRequest received at shipaw/order_summary', extra=shipment_request.model_dump(mode='json'))
     context = {'shipment_request': shipment_request}
 
     # check phone number
@@ -75,7 +75,8 @@ async def order_results_api(
     shipment_response: CompletedShipmentResponse = await try_book_shipment(shipment_request)
     if shipment_response.alerts.errors:
         return await errored_shipment(shipment_response)
-    log_obj(shipment_response, 'Shipment Booked')
+    logger.info('Shipment Booked', extra=shipment_response.model_dump(mode='json'))
+    # log_obj(shipment_response, 'Shipment Booked')
 
     label_path = shipment_response.label_path
     await resize_and_write_labels(shipment_response.label_data, label_path)
@@ -217,25 +218,25 @@ async def address_retrieve(addr_id: str):
     return res
 
 
-@router.get('/logs/stream')
-async def logs_stream(request: Request):
-    stream = request.app.state.log_stream
-
-    async def event_source():
-        async for chunk in stream.stream(replay=100):
-            if await request.is_disconnected():
-                break
-            yield chunk
-
-    return StreamingResponse(
-        event_source(),
-        media_type='text/event-stream',
-        headers={
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'X-Accel-Buffering': 'no',
-        },
-    )
+# @router.get('/logs/stream')
+# async def logs_stream(request: Request):
+#     stream = request.app.state.log_stream
+#
+#     async def event_source():
+#         async for chunk in stream.stream(replay=100):
+#             if await request.is_disconnected():
+#                 break
+#             yield chunk
+#
+#     return StreamingResponse(
+#         event_source(),
+#         media_type='text/event-stream',
+#         headers={
+#             'Cache-Control': 'no-cache',
+#             'Connection': 'keep-alive',
+#             'X-Accel-Buffering': 'no',
+#         },
+#     )
 
 
 # @router.get('/address_search_pc', response_model=list[AddressRecordDefPermissive])

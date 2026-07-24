@@ -5,12 +5,12 @@ from pathlib import Path
 from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
+from pydantic import BaseModel
 
 from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
 from shipaw.providers.apc.apc_funcs import add_apc_response_errors_to_shipment_response_alerts
-from shipaw.shipaw_logging import log_obj
 
 
 async def try_book_shipment(shipment_request: ShipmentRequest) -> CompletedShipmentResponse:
@@ -102,7 +102,8 @@ def notify_dev() -> Alerts:
 
 
 async def errored_shipment(shipment_response):
-    log_obj(shipment_response.alerts, 'Errors booking shipment:')
+    logger.error('Errors booking shipment:', extra=shipment_response.alerts.model_dump(mode='json'))
+    # log_obj(shipment_response.alerts, 'Errors booking shipment:')
     alerts = shipment_response.alerts
     shipment_response.template = ShipawTemplate(
         template_path='/alerts.html',

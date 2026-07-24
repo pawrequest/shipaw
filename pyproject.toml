@@ -18,7 +18,7 @@ dependencies = [
     "apc-hypaship>=0.1.10",
     "pawdf>=0.1.0",
     "royal-mail-combined==0.0.32",
-    "pawlogger>=0.1.4",
+    "pawlogger>=0.1.7",
     #
     "httpx>=0.28.1",
     "pygments>=2.19.2",
@@ -50,9 +50,9 @@ dev = [
 line-length = 120
 format.quote-style = "single"
 
-#[tool.uv.sources]
+[tool.uv.sources]
 #royal-mail-combined = { path = "../royal-mail-combined", editable = true }
-#pawlogger = { path = '../../pawlogger', editable = true }
+pawlogger = { path = '../../pawlogger', editable = true }
 
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]

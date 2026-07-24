@@ -5,14 +5,17 @@ from fastapi import FastAPI, Query, responses
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
-from pawlogger import configure_loguru
+from pawlogger.config_loguru3 import loguru_ndjson_and_terminal
+
+# from pawlogger import configure_loguru
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from shipaw.config import SHIPAW_SETTINGS, populate_providers
 from shipaw.fapi.alerts import Alert, Alerts, AlertType
-from shipaw.fapi.log_stream import LogStream
+
+# from shipaw.fapi.log_stream import LogStream
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
 
@@ -20,10 +23,11 @@ from shipaw.fapi.routes_html import router as html_router
 @contextlib.asynccontextmanager
 async def lifespan(app_: FastAPI):
     try:
-        app_.state.log_stream = LogStream(max_history=400, queue_size=200)
+        # app_.state.log_stream = LogStream(max_history=400, queue_size=200)
         app_.shipaw_settings = SHIPAW_SETTINGS
         log_file = SHIPAW_SETTINGS.log_file
-        configure_loguru(logger, log_file=log_file, level=SHIPAW_SETTINGS.log_level)
+        loguru_ndjson_and_terminal(level='DEBUG', log_file=log_file)
+        # configure_loguru(logger, log_file=log_file, level=SHIPAW_SETTINGS.log_level)
         logger.add(app_.state.log_stream.sink, level='DEBUG', enqueue=False)
         populate_providers(SHIPAW_SETTINGS)
         yield

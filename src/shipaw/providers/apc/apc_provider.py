@@ -9,6 +9,7 @@ from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipm
 from apc_hypaship.models.request.shipment import Shipment as ShipmentAPC
 from apc_hypaship.models.response.common import APCException
 from apc_hypaship.models.response.resp import BookingResponse
+from loguru import logger
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import CompletedShipmentResponse, ShipmentResponse
@@ -20,7 +21,6 @@ from shipaw.providers.apc.apc_funcs import (
 from shipaw.providers.apc.response import errored_booking
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import register_provider_type
-from shipaw.shipaw_logging import log_obj
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 from shipaw.utils.funcs import wait_for
 
@@ -106,7 +106,8 @@ class APCShippingProvider(ShippingProvider):
         provider_service = self.service_codes_type(shipment_request.service_code)
         shipment = shipment_request.shipment
         provider_shipment = self.provider_shipment(shipment, provider_service)
-        log_obj(provider_shipment, 'APC Shipment Request')
+        logger.info('APC Shipment Request', extra=provider_shipment.model_dump(mode='json'))
+        # log_obj(provider_shipment, 'APC Shipment Request')
         try:
             apc_response: BookingResponse = self.client.fetch_book_shipment(provider_shipment)
             label_data = wait_for(self.fetch_label_content, apc_response.orders.order.order_number, wait_for_type=bytes)
