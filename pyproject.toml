@@ -5,7 +5,7 @@ build-backend = "uv_build"
 
 [project]
 name = "shipaw"
-version = "0.3.89"
+version = "0.3.90"
 description = "Shipping client"
 authors = [
     { name = "pawrequest", email = "shipaw+pawrequest@users.noreply.github.com" }
@@ -50,9 +50,9 @@ dev = [
 line-length = 120
 format.quote-style = "single"
 
-[tool.uv.sources]
+#[tool.uv.sources]
 #royal-mail-combined = { path = "../royal-mail-combined", editable = true }
-pawlogger = { path = '../../pawlogger', editable = true }
+#pawlogger = { path = '../../pawlogger', editable = true }
 
 [tool.uv.build-backend]
 source-includes = ["src/shipaw/ui/**"]

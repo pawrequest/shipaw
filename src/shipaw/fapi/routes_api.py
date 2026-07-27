@@ -11,7 +11,7 @@ from royal_mail_combined.parcels_apis.address.models import (
     AddressSummaryDef,
 )
 from starlette.requests import Request
-from starlette.responses import JSONResponse, StreamingResponse
+from starlette.responses import JSONResponse
 
 from shipaw.config import SHIPAW_SETTINGS
 from shipaw.fapi.alerts import Alert, Alerts, AlertType

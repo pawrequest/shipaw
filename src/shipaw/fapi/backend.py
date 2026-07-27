@@ -5,7 +5,6 @@ from pathlib import Path
 from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
-from pydantic import BaseModel
 
 from shipaw.fapi.alerts import Alert, Alerts, AlertType
 from shipaw.fapi.requests import ShipmentRequest
