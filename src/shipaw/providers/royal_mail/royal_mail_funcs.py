@@ -21,7 +21,7 @@ from royal_mail_combined.click_and_drop_api.models import (
 )
 from royal_mail_combined.click_and_drop_api.models.return_models import ReturnRequestContainer, ReturnResponseContainer
 from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServiceCodes, SendNotifcationsTo
-from royal_mail_combined.core.endpoints import tracking_link
+from royal_mail_combined.core.endpoints import build_tracking_link
 from royal_mail_combined.core.helpers import should_split_rm_tracked_24
 
 from shipaw.config import SHIPAW_SETTINGS
@@ -138,7 +138,7 @@ def booking_response_outbound(
     fetched: list[GetOrderInfoResource], shipment: Shipment, label_data: bytes
 ) -> CompletedShipmentResponse:
     tracking_numbers = [order.tracking_number for order in fetched]
-    tracking_links = [tracking_link(_) for _ in tracking_numbers]
+    tracking_links = [build_tracking_link(_) for _ in tracking_numbers]
     idents = [_.order_identifier for _ in fetched]
     idents_s = map(str, idents)
     res = CompletedShipmentResponse(
