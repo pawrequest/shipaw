@@ -229,4 +229,7 @@ class FormPage:
             logger.exception(f'Submit error: {exc}')
             ui.notify(str(exc), type='negative', timeout=0)
         finally:
-            self.submit_btn.props(remove='loading')
+            try:
+                self.submit_btn.props(remove='loading')
+            except Exception:
+                logger.warning('failed to remove loading prop from submit button')
