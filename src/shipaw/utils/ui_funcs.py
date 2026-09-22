@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from datetime import date, datetime
-from typing import Sequence
 
 from shipaw.models.address_contact import Address
 

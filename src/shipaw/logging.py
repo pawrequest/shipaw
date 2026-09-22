@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING
 from loguru import logger
 from pydantic import BaseModel
 
-from shipaw.config import SHIPAW_SETTINGS
+from shipaw.config import get_shipaw_settings
 
 if TYPE_CHECKING:
     pass
 
 
 def ndlog_dict(data: dict, ndjson_file: Path | None = None):
-    ndjson_file = ndjson_file or SHIPAW_SETTINGS.ndjson_log_file
+    ndjson_file = ndjson_file or get_shipaw_settings().ndjson_log_file
     with open(ndjson_file, 'a') as jf:
         print(json.dumps(data, separators=(',', ':')), file=jf)
 
@@ -30,7 +30,7 @@ def log_obj_text(obj: BaseModel, message: str = '', *, level: str = 'DEBUG', log
 
 
 def log_obj_json(obj: BaseModel, message: str = '', *, ndjson_file=None):
-    ndjson_file = ndjson_file or SHIPAW_SETTINGS.ndjson_log_file
+    ndjson_file = ndjson_file or get_shipaw_settings().ndjson_log_file
     timestamp = datetime.now().isoformat(timespec='seconds')
     logdict = {
         'data_type': type(obj).__name__,

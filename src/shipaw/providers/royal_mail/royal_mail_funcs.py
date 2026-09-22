@@ -75,7 +75,7 @@ def _create_outbound_unsplit(postage_details: PostageDetailsRequest, shipment: S
     order = CreateOrderRequest(
         order_reference=build_reference(shipment.reference, 40, shipment.boxes, shipment.shipping_date),
         postage_details=postage_details,
-        # billing_details = billing_details_from_fullcontact(SHIPAW_SETTINGS.full_contact)
+        # billing_details = billing_details_from_fullcontact(get_shipaw_settings().full_contact)
         recipient=recipient_from_fullcontact(shipment.recipient),
         order_date=date_to_datetime(shipment.shipping_date),
         planned_despatch_date=date_to_datetime(shipment.shipping_date),

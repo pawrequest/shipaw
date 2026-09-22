@@ -4,11 +4,11 @@ from loguru import logger
 from nicegui import ui
 from nicegui.observables import ObservableDict
 
-from shipaw.config import SHIPAW_SETTINGS
+from shipaw.config import get_shipaw_settings
 from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.nicegui_ui import theme
-from shipaw.providers.royal_mail.royal_mail_funcs import address_lookup
 from shipaw.providers.registry import PROVIDER_REGISTER
+from shipaw.providers.royal_mail.royal_mail_funcs import address_lookup
 from shipaw.utils.ui_funcs import address_search_text
 
 AddressCardClasses = 'col q-pa-md ship-card'
@@ -173,7 +173,7 @@ class AddressPanel:
     # ── Contact helper ────────────────────────────────────────────────────────
 
     def _use_own_phone(self) -> None:
-        self.phone_in.value = SHIPAW_SETTINGS.mobile_phone
+        self.phone_in.value = get_shipaw_settings().mobile_phone
         self.phone_in.update()
 
     # ── Data extraction ───────────────────────────────────────────────────────

@@ -17,7 +17,7 @@ dependencies = [
     "apc-hypaship>=0.1.10",
     "pawdf>=0.1.0",
     "royal-mail-combined>=0.0.24",
-    "pawlogger>=0.1.4",
+    "pawlogger>=0.1.10",
     #
     "httpx>=0.28.1",
     "pygments>=2.19.2",
@@ -54,7 +54,10 @@ dev = [
 line-length = 120
 format.quote-style = "single"
 
-#[tool.uv.sources]
+[tool.ruff.lint]
+ignore = ["B008"] # Do not perform function call `Form` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+
+[tool.uv.sources]
 #royal-mail-combined = { path = "../royal-mail-combined", editable = true }
 #pawlogger = { path = '../../pawlogger', editable = true }
 

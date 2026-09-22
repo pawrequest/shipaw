@@ -93,8 +93,8 @@ class ShipawSettings(BaseSettings):
 
     # sender details
     address_line1: str
-    address_line2: str | None = None
-    address_line3: str | None = None
+    address_line2: str = ''
+    address_line3: str = ''
     town: str
     postcode: str
     country: str = 'GB'
@@ -112,19 +112,6 @@ class ShipawSettings(BaseSettings):
         env_path = path_from_env_key(SHIPAW_ENV_KEY)
         logger.info(f'Loading ShipawSettings from env file {env_path}')
         return cls(_env_file=env_path)  # pycharm_pydantic false positive
-
-    #
-    # @model_validator(mode='after')
-    # def populate_provider_registry(self):
-    #     logger.debug('Populating provider registry with providers from env')
-    #     for name, env_path in self.provider_env_dict.items():
-    #         logger.debug(f'Loading provider {name} from env file {env_path}')
-    #         if provider_type := PROVIDER_TYPE_REGISTER.get(name):
-    #             logger.debug(f'Found provider type {provider_type} for name {name}')
-    #             provider_settings = provider_type.settings_type(_env_file=env_path)
-    #             provider = provider_type(shipaw_settings=provider_settings)
-    #             register_provider_instance(provider)
-    #     return self
 
     @property
     def log_dir(self):
@@ -195,11 +182,21 @@ def make_label_dirs(directions, parent):
             apath.mkdir(parents=True, exist_ok=True)
 
 
-SHIPAW_SETTINGS = ShipawSettings.from_env()
+_SHIPAW_SETTINGS: ShipawSettings | None = None
 
 
-def populate_providers(settings: ShipawSettings = None):
-    settings = settings or SHIPAW_SETTINGS
+@functools.cache
+def get_shipaw_settings() -> ShipawSettings:
+    global _SHIPAW_SETTINGS
+    if _SHIPAW_SETTINGS is None:
+        _shipaw_settings = ShipawSettings.from_env()
+        _SHIPAW_SETTINGS = _shipaw_settings
+        return _shipaw_settings
+    return _SHIPAW_SETTINGS
+
+
+def populate_providers(settings: ShipawSettings | None = None):
+    settings: ShipawSettings = settings or get_shipaw_settings()
     for name, env_path in settings.provider_env_dict.items():
         if provider_type := PROVIDER_TYPE_REGISTER.get(name):
             provider_settings = provider_type.settings_type(_env_file=env_path)

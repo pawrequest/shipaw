@@ -11,7 +11,7 @@ from royal_mail_combined.parcels_apis.address.models import (
 from starlette.requests import Request
 from starlette.responses import JSONResponse, StreamingResponse
 
-from shipaw.config import SHIPAW_SETTINGS
+from shipaw.config import get_shipaw_settings
 from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.address_contact import Address
@@ -89,7 +89,7 @@ async def order_results_api(
 
 @router.get('/providers', response_class=JSONResponse)
 async def providers():
-    dflt = SHIPAW_SETTINGS.default_provider_name
+    dflt = get_shipaw_settings().default_provider_name
     available = sorted(PROVIDER_REGISTER.keys(), key=lambda p: p != dflt)
     provider_response = {make_nice_str(_): _ for _ in available}
     return JSONResponse(provider_response)

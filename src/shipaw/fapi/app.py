@@ -10,7 +10,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
-from shipaw.config import SHIPAW_SETTINGS, populate_providers
+from shipaw.config import get_shipaw_settings, populate_providers
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
 from shipaw.models.alerts import Alert, Alerts, AlertType
@@ -20,11 +20,12 @@ from shipaw.models.alerts import Alert, Alerts, AlertType
 async def lifespan(app_: FastAPI):
     try:
         # app_.state.log_stream = LogStream(max_history=400, queue_size=200)
-        app_.shipaw_settings = SHIPAW_SETTINGS
-        log_file = SHIPAW_SETTINGS.log_file
-        configure_loguru(logger, log_file=log_file, level=SHIPAW_SETTINGS.log_level)
+        shipaw_sets = get_shipaw_settings()
+        app_.shipaw_settings = shipaw_sets
+        log_file = shipaw_sets.log_file
+        # configure_loguru(logger, log_file=log_file, level=get_shipaw_settings().log_level)
         # logger.add(app_.state.log_stream.sink, level='DEBUG', enqueue=False)
-        populate_providers(SHIPAW_SETTINGS)
+        populate_providers(shipaw_sets)
         yield
 
     finally:
@@ -34,10 +35,10 @@ async def lifespan(app_: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.mount('/static', StaticFiles(directory=str(SHIPAW_SETTINGS.static_dir)), name='static')
+app.mount('/static', StaticFiles(directory=str(get_shipaw_settings().static_dir)), name='static')
 app.include_router(json_router, prefix='/api')
 app.include_router(html_router)
-app.ship_live = SHIPAW_SETTINGS.shipper_live
+app.ship_live = get_shipaw_settings().shipper_live
 app.alerts = Alerts.empty()
 
 

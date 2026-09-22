@@ -5,7 +5,7 @@ from pathlib import Path
 
 from pydantic import ConfigDict, Field, computed_field
 
-from shipaw.config import SHIPAW_SETTINGS
+from shipaw.config import get_shipaw_settings
 from shipaw.models.alerts import Alerts
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
@@ -52,7 +52,7 @@ class ShipmentResponse(BaseResponse):
     @property
     def label_path(self) -> Path:
         if self._label_path is None:
-            folder = SHIPAW_SETTINGS.label_dir / self.shipment.direction
+            folder = get_shipaw_settings().label_dir / self.shipment.direction
             label_stem = get_label_stem(self.shipment)
             label_filepath = (folder / label_stem).with_suffix('.pdf')
             self._label_path = unused_path(label_filepath)

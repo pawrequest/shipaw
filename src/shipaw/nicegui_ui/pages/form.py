@@ -6,18 +6,17 @@ search, and submit button.  Navigation is injected via `on_submit` so this
 module has no knowledge of the other pages.
 """
 
-from __future__ import annotations
-
 import datetime as dt
-from typing import Callable
+from collections.abc import Callable
 
 from loguru import logger
 from nicegui import ui
 from nicegui.elements.select import Select
 from nicegui.observables import ObservableDict
 
-from shipaw.config import SHIPAW_SETTINGS
+from shipaw.config import get_shipaw_settings
 
+# from shipaw.config import get_shipaw_settings
 # from shipaw.models.address_contact import FullContact
 from shipaw.models.alerts import Alerts
 from shipaw.models.requests import ShipmentRequest
@@ -31,7 +30,7 @@ from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
 
 
 def provider_names_sorted() -> list[str]:
-    dflt = SHIPAW_SETTINGS.default_provider_name
+    dflt = get_shipaw_settings().default_provider_name
     return sorted(PROVIDER_REGISTER.keys(), key=lambda p: p != dflt)
 
 
@@ -47,9 +46,9 @@ class FormPage:
         self.initial_shipment = initial_shipment.model_copy(deep=True)
         self.initial_fc = initial_shipment.recipient.model_copy(deep=True)
         self._on_submit_cb = on_submit
-        sender = self.initial_shipment.sender or SHIPAW_SETTINGS.full_contact
+        sender = self.initial_shipment.sender or get_shipaw_settings().full_contact
         self.sender_ = ObservableDict(sender)
-        recipient = self.initial_shipment.recipient or SHIPAW_SETTINGS.full_contact
+        recipient = self.initial_shipment.recipient or get_shipaw_settings().full_contact
         self.recipient_ = ObservableDict(recipient)
         self._build()
 
@@ -162,7 +161,7 @@ class FormPage:
 
     async def set_sender_recip_data(self, direction: ShipDirection):
         pass
-        # hq = SHIPAW_SETTINGS.full_contact
+        # hq = get_shipaw_settings().full_contact
         # init_recipient = self.initial_shipment.recipient
         # match direction:
         #     case ShipDirection.OUTBOUND:
