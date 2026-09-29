@@ -23,7 +23,6 @@ dependencies = [
     "httpx>=0.28.1",
     "pygments>=2.19.2",
     "pydantic[email]>=2.11.9",
-    "pytest>=8.4.2",
     "fastapi[standard]>=0.117.1",
     "jinja2>=3.1.6",
     "hatchling>=1.27.0",
@@ -36,6 +35,13 @@ dependencies = [
     "uvicorn>=0.37.0",
 ]
 
+[project.optional-dependencies]
+v4 = [
+    "pawlogger>=0.1.11",
+    #
+    "nicegui>=3.11.1",
+    "pywebview>=6.2.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/pawrequest/shipaw"
