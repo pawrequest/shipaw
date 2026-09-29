@@ -1,0 +1,210 @@
+from __future__ import annotations
+
+import functools
+import os
+from dataclasses import dataclass
+from importlib.resources import files
+from pathlib import Path
+from urllib.parse import quote
+
+import pydantic as _p
+from fastapi.encoders import jsonable_encoder
+from loguru import logger
+from pydantic import BaseModel, Field, computed_field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from starlette.templating import Jinja2Templates
+
+from shipaw.models.address_contact import Address, Contact, FullContact
+from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
+from shipaw.utils.consts_enums import ShipDirection
+from shipaw.utils.ui_funcs import ordinal_dt, sanitise_id
+
+SHIPAW_ENV_KEY = 'SHIPAW_ENV'
+
+
+def get_ui() -> Path:
+    res = Path(files('shipaw'))
+    res = res / 'ui'
+    if not res.exists():
+        raise FileNotFoundError(f'UI directory {res} does not exist')
+    return res
+
+
+def path_from_env_key(env_key: str) -> Path:
+    env = os.getenv(env_key)
+    if not env:
+        raise ValueError(f'{env_key} not set')
+    env_path = Path(env)
+    if not env_path.exists():
+        raise FileNotFoundError(f'{env_key} file {env_path} does not exist')
+    return env_path
+
+
+@dataclass
+class ProviderEnv:
+    name: str
+    env_path: Path
+
+
+ProviderEnvs = list[ProviderEnv]
+
+
+@functools.cache
+def get_templates_cached(template_dir: Path):
+    temps = Jinja2Templates(directory=str(template_dir))
+    temps.env.filters['jsonable'] = jsonable_encoder
+    temps.env.filters['urlencode'] = lambda value: quote(str(value))
+    temps.env.filters['sanitise_id'] = sanitise_id
+    temps.env.filters['ordinal_dt'] = ordinal_dt
+    return temps
+
+
+class ShipawSettings(BaseSettings):
+    # toggles
+    shipper_live: bool = True
+    log_level: str = 'DEBUG'
+
+    # dirs
+    data_dir: Path = Path.home() / 'shipaw'
+    label_dir: Path = Path.home() / 'shipaw' / 'labels'
+    log_db_path: str | None = None
+    ui_dir: Path = get_ui()
+    static_dir: Path = ui_dir / 'static'
+    template_dir: Path = ui_dir / 'templates'
+
+    # @property
+    # def template_dir(self):
+    #     return self.ui_dir / 'templates'
+    #
+    # @property
+    # def static_dir(self):
+    #     return self.ui_dir / 'static'
+
+    @property
+    def templates(self):
+        return get_templates_cached(self.template_dir)
+
+    # Provider env file dict (json string in .env)
+    provider_env_dict: dict[str, Path]
+    default_provider_name: str | None = None
+
+    # auto dirs
+    # templates: Jinja2Templates | None = None
+
+    # sender details
+    address_line1: str
+    address_line2: str = ''
+    address_line3: str = ''
+    town: str
+    postcode: str
+    country: str = 'GB'
+    business_name: str
+    contact_name: str
+    email: str
+    phone: str | None = None
+    mobile_phone: str
+
+    model_config = SettingsConfigDict(frozen=True)
+
+    @classmethod
+    @functools.cache
+    def from_env(cls) -> ShipawSettings:
+        env_path = path_from_env_key(SHIPAW_ENV_KEY)
+        logger.info(f'Loading ShipawSettings from env file {env_path}')
+        return cls(_env_file=env_path)  # pycharm_pydantic false positive
+
+    @property
+    def log_dir(self):
+        return self.data_dir / 'logs'
+
+    ## SET LOGGING & LABELS ##
+    @computed_field
+    @property
+    def log_file(self) -> Path:
+        return self.log_dir / 'shipaw.log'
+
+    @computed_field
+    @property
+    def ndjson_log_file(self) -> Path:
+        return self.log_dir / 'shipaw.ndjson'
+
+    @_p.model_validator(mode='after')
+    def create_log_files(self):
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        for v in (self.log_file, self.ndjson_log_file):
+            v.touch()
+        return self
+
+    @_p.field_validator('label_dir', mode='after')
+    def create_label_dirs(cls, v, values):
+        directions = [_ for _ in ShipDirection]
+        try:
+            make_label_dirs(directions, v)
+        except FileNotFoundError:
+            v = Path.home() / 'Shipping Labels'
+            make_label_dirs(directions, v)
+        return v
+
+    # SET ADDRESS/CONTACT OBJECTS #
+    @property
+    def contact(self):
+        return Contact(
+            name=self.contact_name,
+            email=self.email,
+            mobile_phone=self.mobile_phone,
+        )
+
+    @property
+    def address(self):
+        return Address(
+            # address_lines=[_ for _ in [self.address_line1, self.address_line2, self.address_line3] if _],
+            address_line1=self.address_line1,
+            address_line2=self.address_line2,
+            address_line3=self.address_line3,
+            town=self.town,
+            postcode=self.postcode,
+            country=self.country,
+            business_name=self.business_name,
+        )
+
+    @property
+    def full_contact(self) -> FullContact:
+        return FullContact(
+            address=self.address,
+            contact=self.contact,
+        )
+
+
+def make_label_dirs(directions, parent):
+    for direction in directions:
+        apath = parent / direction
+        if not apath.exists():
+            apath.mkdir(parents=True, exist_ok=True)
+
+
+_SHIPAW_SETTINGS: ShipawSettings | None = None
+
+
+@functools.cache
+def get_shipaw_settings() -> ShipawSettings:
+    global _SHIPAW_SETTINGS
+    if _SHIPAW_SETTINGS is None:
+        _shipaw_settings = ShipawSettings.from_env()
+        _SHIPAW_SETTINGS = _shipaw_settings
+        return _shipaw_settings
+    return _SHIPAW_SETTINGS
+
+
+def populate_providers(settings: ShipawSettings | None = None):
+    settings: ShipawSettings = settings or get_shipaw_settings()
+    for name, env_path in settings.provider_env_dict.items():
+        if provider_type := PROVIDER_TYPE_REGISTER.get(name):
+            provider_settings = provider_type.settings_type(_env_file=env_path)
+            register_provider_instance(provider_type(settings=provider_settings))
+
+
+class FapiConfig(BaseModel):
+    port: int = 8000
+    post_body: dict = {}
+    url_for_: str = ''
+    context: dict = Field(default_factory=dict)

@@ -1,0 +1,57 @@
+import io
+from pathlib import Path
+from typing import TYPE_CHECKING
+import re
+
+from loguru import logger
+from pypdf import PdfReader, PdfWriter
+
+from shipaw.utils.consts_enums import ShipDirection
+
+if TYPE_CHECKING:
+    from shipaw.models.shipment import Shipment
+
+
+def make_filename_safe(name: str) -> str:
+    return re.sub(r'[ <>:"/\\|?*\x00-\x1F]', '_', name)
+
+
+def get_label_stem(shipment: 'Shipment'):
+    label_name = (
+        f'{"Dropoff" if shipment.direction == ShipDirection.DROPOFF else "Shipping"} Label '
+        f'{f"FROM {shipment.sender.address.business_name} " if shipment.sender else ""}'
+        f'TO {shipment.recipient.address.business_name} '
+        f'ON {shipment.shipping_date}'
+    )
+    return make_filename_safe(label_name)
+
+
+def unused_path(filepath: Path):
+    def numbered_filepath(number: int):
+        return filepath if not number else filepath.with_stem(f'{filepath.stem}_{number}')
+
+    incremented = 0
+    lpath = numbered_filepath(incremented)
+    while lpath.exists():
+        incremented += 1
+        logger.warning(f'FilePath {lpath} already exists')
+        lpath = numbered_filepath(incremented)
+    logger.debug(f'Using FilePath={lpath}')
+    return lpath
+
+
+# def get_shipment_label_path(shipment: 'Shipment') -> Path:
+#     folder = get_label_folder(shipment.direction)
+#     label_stem = get_label_stem(shipment)
+#     label_filepath = (folder / label_stem).with_suffix('.pdf')
+#     label_filepath = unused_path(label_filepath)
+#     return label_filepath
+def merge_pdf_bytes(pdf_bytes_list: list[bytes]) -> bytes:
+    writer = PdfWriter()
+    for pdf_bytes in pdf_bytes_list:
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        for page in reader.pages:
+            writer.add_page(page)
+    output = io.BytesIO()
+    writer.write(output)
+    return output.getvalue()
