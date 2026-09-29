@@ -2,15 +2,11 @@ import json
 import pprint
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from loguru import logger
 from pydantic import BaseModel
 
 from shipaw.config import get_shipaw_settings
-
-if TYPE_CHECKING:
-    pass
 
 
 def ndlog_dict(data: dict, ndjson_file: Path | None = None):

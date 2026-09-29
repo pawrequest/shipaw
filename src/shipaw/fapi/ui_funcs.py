@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, date
+from datetime import date, datetime
 from importlib.resources import files
 from pathlib import Path
 

@@ -1,8 +1,11 @@
 from apc_hypaship.models.request.address import Address, Contact
-from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, Shipment as ShipmentAPC, ShipmentDetails
 from apc_hypaship.models.request.services import APCServiceCode
+from apc_hypaship.models.request.shipment import GoodsInfo, Order, Orders, ShipmentDetails
+from apc_hypaship.models.request.shipment import Shipment as ShipmentAPC
+from shipaw.models.address_contact import Address as AddressAgnost
+from shipaw.models.address_contact import Contact as ContactAgnost
+from shipaw.models.address_contact import FullContact
 
-from shipaw.models.address_contact import Address as AddressAgnost, Contact as ContactAgnost, FullContact
 from shipaw.models.shipment import Shipment as ShipmentAgnost
 from shipaw.utils.consts_enums import ShipDirection
 

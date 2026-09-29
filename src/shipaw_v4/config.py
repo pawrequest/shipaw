@@ -12,12 +12,12 @@ from fastapi.encoders import jsonable_encoder
 from loguru import logger
 from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from shipaw.models.address_contact import Address, Contact, FullContact
+from shipaw.utils.ui_funcs import ordinal_dt, sanitise_id
 from starlette.templating import Jinja2Templates
 
-from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.providers.registry import PROVIDER_TYPE_REGISTER, register_provider_instance
 from shipaw.utils.consts_enums import ShipDirection
-from shipaw.utils.ui_funcs import ordinal_dt, sanitise_id
 
 SHIPAW_ENV_KEY = 'SHIPAW_ENV'
 

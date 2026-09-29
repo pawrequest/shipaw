@@ -1,6 +1,7 @@
-import requests
-import webbrowser
 import tempfile
+import webbrowser
+
+import requests
 
 
 def do_track(consignment_number: int, postcode: str):

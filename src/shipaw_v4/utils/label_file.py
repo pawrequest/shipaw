@@ -1,7 +1,7 @@
 import io
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING
-import re
 
 from loguru import logger
 from pypdf import PdfReader, PdfWriter

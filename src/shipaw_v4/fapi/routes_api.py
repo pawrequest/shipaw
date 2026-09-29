@@ -8,18 +8,11 @@ from royal_mail_combined.parcels_apis.address.models import (
     AddressRecordDefPermissive,
     AddressSummaryDef,
 )
-from starlette.requests import Request
-from starlette.responses import JSONResponse, StreamingResponse
-
-from shipaw.config import get_shipaw_settings
-from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
 from shipaw.logging import log_obj, log_obj_text
 from shipaw.models.address_contact import Address
 from shipaw.models.alerts import Alerts
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse
-from shipaw.models.shipment import Shipment
-from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.backend import (
     errored_shipment,
     maybe_alert_apc,
@@ -27,9 +20,16 @@ from shipaw.utils.backend import (
     resize_and_write_labels,
     try_book_shipment,
 )
+from shipaw.utils.ui_funcs import make_nice_str
+from starlette.requests import Request
+from starlette.responses import JSONResponse, StreamingResponse
+
+from shipaw.config import get_shipaw_settings
+from shipaw.fapi.form_data import provider_from_form, shipment_request_form, shipment_request_form_json
+from shipaw.models.shipment import Shipment
+from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import RM_UNAVAIL
 from shipaw.utils.funcs import compare_texts
-from shipaw.utils.ui_funcs import make_nice_str
 
 router = APIRouter()
 NoAddressFound = AddressRecordDefPermissive(label='No matching results', address_id='')

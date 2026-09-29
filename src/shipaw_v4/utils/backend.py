@@ -6,11 +6,11 @@ from apc_hypaship.error import apc_http_status_alerts
 from httpx import HTTPStatusError
 from loguru import logger
 from pawdf.array_pdf.array_p import on_a4
-
 from shipaw.logging import log_obj
 from shipaw.models.alerts import Alert, Alerts, AlertType
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import CompletedShipmentResponse, ShipawTemplate, ShipawTemplateResponse, ShipmentResponse
+
 from shipaw.providers.provider_abc import ProviderName
 from shipaw.utils.consts_enums import ShipDirection
 

@@ -1,8 +1,8 @@
 import datetime as dt
 
 from pydantic import Field, model_validator
-
 from shipaw.models.address_contact import Address, Contact, FullContact
+
 from shipaw.models.base import ShipawBaseModel
 from shipaw.utils.consts_enums import PackageFormat, ShipDirection
 

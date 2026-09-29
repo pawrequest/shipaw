@@ -7,16 +7,16 @@ Calls *goto_results* on success or *goto_form* on back/error.
 
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 from loguru import logger
 from nicegui import ui
-
 from shipaw.models.address_contact import FullContact
 from shipaw.models.requests import ShipmentRequest
-from shipaw.nicegui_ui import theme
 from shipaw.utils.backend import resize_and_write_labels, try_book_shipment
 from shipaw.utils.callbacks import ShipmentCallbackFn
+
+from shipaw.nicegui_ui import theme
 
 
 def _fc_card(title: str, fc: FullContact) -> None:

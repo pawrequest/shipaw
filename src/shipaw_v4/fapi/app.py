@@ -5,7 +5,7 @@ from fastapi import FastAPI, Query, responses
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
-from pawlogger import configure_loguru
+from shipaw.models.alerts import Alert, Alerts, AlertType
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
@@ -13,7 +13,6 @@ from starlette.staticfiles import StaticFiles
 from shipaw.config import get_shipaw_settings, populate_providers
 from shipaw.fapi.routes_api import router as json_router
 from shipaw.fapi.routes_html import router as html_router
-from shipaw.models.alerts import Alert, Alerts, AlertType
 
 
 @contextlib.asynccontextmanager

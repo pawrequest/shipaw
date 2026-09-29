@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import re
 import datetime as dt
+import re
 from enum import StrEnum
 from typing import Annotated
 
 import phonenumbers
 from loguru import logger
 from pydantic import AfterValidator, BeforeValidator, Field, ValidationError
-
 
 #
 # class ShipDirection(StrEnum):

@@ -4,9 +4,9 @@ from base64 import b64encode
 from pathlib import Path
 
 from pydantic import ConfigDict, Field, computed_field
+from shipaw.models.alerts import Alerts
 
 from shipaw.config import get_shipaw_settings
-from shipaw.models.alerts import Alerts
 from shipaw.models.base import ShipawBaseModel
 from shipaw.models.shipment import Shipment
 from shipaw.utils.label_file import get_label_stem, unused_path

@@ -12,8 +12,7 @@ from dataclasses import dataclass
 
 from nicegui import app as _ng_app
 from nicegui import ui
-
-from shipaw.models.alerts import AlertType, Alerts
+from shipaw.models.alerts import Alerts, AlertType
 
 # ── Theme registry ────────────────────────────────────────────────────────────
 

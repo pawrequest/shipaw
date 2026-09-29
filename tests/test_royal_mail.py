@@ -1,5 +1,6 @@
-from shipaw.providers.registry import PROVIDER_REGISTER
 from test_providers import provider_context
+
+from shipaw.providers.registry import PROVIDER_REGISTER
 
 
 def test_rm_converts_shipment(all_sample_shipment_requests):

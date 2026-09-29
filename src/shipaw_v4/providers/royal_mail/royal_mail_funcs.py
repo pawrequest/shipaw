@@ -28,9 +28,9 @@ from royal_mail_combined.core.consts_types import PackageFormat, RoyalMailServic
 from royal_mail_combined.core.endpoints import build_tracking_link
 from royal_mail_combined.core.helpers import should_split_rm_tracked_24
 from royal_mail_combined.parcels_apis.collection_order.models import SenderDetailsPostDef
-
 from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.models.responses import CompletedShipmentResponse
+
 from shipaw.models.shipment import Shipment, build_reference
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import ShipDirection

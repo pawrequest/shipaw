@@ -4,8 +4,8 @@ import pytest
 
 from shipaw.fapi.requests import ShipmentRequest
 from shipaw.fapi.responses import ShipmentResponse
-from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
+from shipaw.utils.consts_enums import ShipDirection
 
 
 def test_sample_fixtures(sample_remote_contact, sample_remote_address, sample_shipment):

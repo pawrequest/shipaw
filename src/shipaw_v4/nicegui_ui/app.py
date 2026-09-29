@@ -1,14 +1,14 @@
 from loguru import logger
 from nicegui.ui_run import run as ui_run  # just importing the function to run the server
-
 from shipaw.models.requests import ShipmentRequest
-from shipaw.models.shipment import Shipment
-from shipaw.nicegui_ui import theme
 from shipaw.nicegui_ui.pages.form import FormPage
 from shipaw.nicegui_ui.pages.results import ResultsPage
 from shipaw.nicegui_ui.pages.summary import SummaryPage
 from shipaw.utils.backend import notify_dev
 from shipaw.utils.callbacks import ShipmentCallbackFn
+
+from shipaw.models.shipment import Shipment
+from shipaw.nicegui_ui import theme
 
 INIT = False
 

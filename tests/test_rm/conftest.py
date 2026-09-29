@@ -1,5 +1,5 @@
+from collections.abc import Generator
 from pprint import pprint
-from typing import Generator
 
 import pytest
 from royal_mail_combined import RoyalMailClient

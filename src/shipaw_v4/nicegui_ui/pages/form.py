@@ -14,19 +14,19 @@ from nicegui import ui
 from nicegui.elements.select import Select
 from nicegui.observables import ObservableDict
 
-from shipaw.config import get_shipaw_settings
-
 # from shipaw.config import get_shipaw_settings
 # from shipaw.models.address_contact import FullContact
 from shipaw.models.alerts import Alerts
 from shipaw.models.requests import ShipmentRequest
+from shipaw.nicegui_ui.pages.address import AddressPanel
+from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
+
+from shipaw.config import get_shipaw_settings
 from shipaw.models.shipment import Shipment, sample_shipment
 from shipaw.nicegui_ui import theme
-from shipaw.nicegui_ui.pages.address import AddressPanel
 from shipaw.providers.provider_abc import ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER
 from shipaw.utils.consts_enums import ShipDirection
-from shipaw.utils.ui_funcs import make_nice_str, str_to_nice_str_dict
 
 
 def provider_names_sorted() -> list[str]:

@@ -3,6 +3,9 @@ from functools import wraps
 
 from fastapi import APIRouter, Body
 from fastapi.params import Depends
+from shipaw.models.alerts import Alerts
+from shipaw.models.requests import ShipmentRequest
+from shipaw.models.responses import ShipawTemplateResponse
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 
@@ -16,9 +19,6 @@ from shipaw.fapi.routes_api import (
 from shipaw.fapi.routes_api import (
     shipping_form_api as ship_form_json,
 )
-from shipaw.models.alerts import Alerts
-from shipaw.models.requests import ShipmentRequest
-from shipaw.models.responses import ShipawTemplateResponse
 from shipaw.models.shipment import Shipment, sample_shipment
 
 router = APIRouter()

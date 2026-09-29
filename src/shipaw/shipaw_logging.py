@@ -5,7 +5,7 @@ import sys
 from copy import copy
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from loguru import logger
 from pydantic import BaseModel
@@ -14,8 +14,6 @@ from shipaw.config import SHIPAW_SETTINGS
 
 LOGGING_EXCLUDES = {'label_data': ..., 'response': {'label_data'}, 'label': ...}
 DUMP_EXLUDES = {'label_data', 'label', 'qr_code'}
-if TYPE_CHECKING:
-    pass
 
 
 def set_deps_log_level():

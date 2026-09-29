@@ -5,8 +5,8 @@ from enum import StrEnum
 from pydantic import Field
 
 from shipaw.models.base import ShipawBaseModel
-from shipaw.utils.consts_enums import ShipDirection
 from shipaw.providers.provider_abc import ProviderName
+from shipaw.utils.consts_enums import ShipDirection
 
 
 class AlertType(StrEnum):

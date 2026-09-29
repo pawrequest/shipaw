@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import ShipmentResponse

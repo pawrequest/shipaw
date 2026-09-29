@@ -8,10 +8,10 @@ from loguru import logger
 
 # from pawdantic.paw_types import VALID_POSTCODE
 from pydantic import EmailStr
-
-from shipaw.config import get_shipaw_settings
 from shipaw.models.address_contact import Address, Contact, FullContact
 from shipaw.models.requests import ShipmentRequest
+
+from shipaw.config import get_shipaw_settings
 from shipaw.models.shipment import Shipment
 from shipaw.providers.provider_abc import ProviderName, ShippingProvider
 from shipaw.providers.registry import PROVIDER_REGISTER

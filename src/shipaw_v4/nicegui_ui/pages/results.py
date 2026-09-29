@@ -8,12 +8,12 @@ card listing the errors.  The only navigation is back to the form.
 from __future__ import annotations
 
 import os
-from typing import Callable
+from collections.abc import Callable
 
 from nicegui import ui
-
 from shipaw.models.requests import ShipmentRequest
 from shipaw.models.responses import ShipmentResponse
+
 from shipaw.nicegui_ui import theme
 
 
